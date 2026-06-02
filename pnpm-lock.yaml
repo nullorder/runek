@@ -67,6 +67,9 @@ importers:
         specifier: workspace:*
         version: link:../core
     devDependencies:
+      '@react-three/drei':
+        specifier: ^10.7.7
+        version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@types/react@19.2.16)(@types/three@0.184.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
       '@react-three/fiber':
         specifier: ^9.6.1
         version: 9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)

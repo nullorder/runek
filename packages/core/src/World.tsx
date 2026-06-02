@@ -10,6 +10,8 @@ export interface WorldProps {
   unit?: number
   gravity?: Vec3
   keyboardMap?: KeyboardControlsEntry[]
+  /** Render the default light rig. Set false to supply your own (e.g. <LightRig>). */
+  lights?: boolean
   debug?: boolean
   children?: ReactNode
 }
@@ -18,6 +20,7 @@ export function World({
   unit = 1,
   gravity = [0, -9.81, 0],
   keyboardMap = defaultKeyboardMap,
+  lights = true,
   debug = false,
   children,
 }: WorldProps) {
@@ -25,19 +28,23 @@ export function World({
     <KeyboardControls map={keyboardMap}>
       <Canvas shadows camera={{ position: [6, 4, 6], fov: 60 }}>
         <WorldContext.Provider value={{ unit, gravity }}>
-          <ambientLight intensity={0.6} />
-          <directionalLight
-            position={[12, 18, 8]}
-            intensity={1.6}
-            castShadow
-            shadow-mapSize={[2048, 2048]}
-            shadow-camera-near={1}
-            shadow-camera-far={60}
-            shadow-camera-left={-25}
-            shadow-camera-right={25}
-            shadow-camera-top={25}
-            shadow-camera-bottom={-25}
-          />
+          {lights && (
+            <>
+              <ambientLight intensity={0.6} />
+              <directionalLight
+                position={[12, 18, 8]}
+                intensity={1.6}
+                castShadow
+                shadow-mapSize={[2048, 2048]}
+                shadow-camera-near={1}
+                shadow-camera-far={60}
+                shadow-camera-left={-25}
+                shadow-camera-right={25}
+                shadow-camera-top={25}
+                shadow-camera-bottom={-25}
+              />
+            </>
+          )}
           <Physics gravity={gravity} debug={debug}>
             {children}
           </Physics>

@@ -6,18 +6,21 @@ export type PlayerView = 'first' | 'third'
 export interface PlayerProps {
   position?: Vec3
   view?: PlayerView
+  /** Initial camera yaw in radians (0 faces +z). */
+  yaw?: number
 }
 
 const CAPSULE_RADIUS = 0.3
 const CAPSULE_HALF_HEIGHT = 0.35
 
-export function Player({ position = [0, 3, 0], view = 'first' }: PlayerProps) {
+export function Player({ position = [0, 3, 0], view = 'first', yaw = 0 }: PlayerProps) {
   const firstPerson = view === 'first'
 
   return (
     <Ecctrl
       position={position}
       mode="CameraBasedMovement"
+      camInitDir={{ x: 0, y: yaw }}
       capsuleRadius={CAPSULE_RADIUS}
       capsuleHalfHeight={CAPSULE_HALF_HEIGHT}
       camInitDis={firstPerson ? -0.01 : -5}
