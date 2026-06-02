@@ -1,0 +1,26 @@
+{
+  "name": "@runek/core",
+  "version": "0.0.0",
+  "description": "Core runtime for Runek — <World>, useWorld, seeded rng, and the component contract.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@react-three/fiber": "^9.6.1",
+    "@react-three/rapier": "^2.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.184.0"
+  }
+}

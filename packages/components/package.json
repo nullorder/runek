@@ -1,0 +1,30 @@
+{
+  "name": "@runek/components",
+  "version": "0.0.0",
+  "description": "Procedural 3D components for Runek (React Three Fiber).",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@runek/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "@react-three/rapier": "^2.2.0",
+    "ecctrl": "^1.0.97",
+    "react": "^19.2.0",
+    "three": "^0.184.0"
+  }
+}

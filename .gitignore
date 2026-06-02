@@ -1,0 +1,27 @@
+node_modules/
+dist/
+dist-ssr/
+build/
+coverage/
+
+# Vite
+.vite/
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+plan
+.claude
+.pi

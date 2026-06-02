@@ -1,0 +1,23 @@
+{
+  "name": "runek",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Procedural 3D components for the web. Compose walkable worlds from code.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter helicon dev",
+    "build": "pnpm --filter helicon build",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "pnpm -r --if-present typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.16",
+    "typescript": "^6.0.3"
+  }
+}
