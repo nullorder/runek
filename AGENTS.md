@@ -4,7 +4,7 @@ Guidelines for AI agents (Claude Code and others) working in this repository.
 
 ## What this is
 
-**Runek** — a copy-paste registry of procedural 3D components for React Three Fiber ("shadcn for 3D worlds"). Every component generates its geometry from props + a `seed`; a whole world is serializable `{ component, props, seed }[]` data. No binary assets, no server, static deploy.
+**Runek** — a source registry of procedural 3D components for React Three Fiber ("shadcn for 3D worlds"): you pull a component's source into your project and own it. Every component generates its geometry from props + a `seed`; a whole world is serializable `{ component, props, seed }[]` data. No binary assets, no server, static deploy.
 
 ## Repository layout
 
@@ -20,16 +20,30 @@ Dependency direction is strictly one-way: `helicon → components → core`. Not
 
 ## Commands
 
+This repo uses [`just`](https://just.systems) as the task runner. Run `just` to list every recipe; prefer these over raw `pnpm`/`biome` calls.
+
 ```sh
-pnpm install      # install workspace deps
-pnpm dev          # run the Helicon showcase app (Vite)
-pnpm build        # typecheck + production build of the app
-pnpm lint         # Biome lint + format check
-pnpm format       # Biome auto-format
-pnpm typecheck    # tsc --noEmit across all packages
+just            # list all recipes
+just install    # install workspace dependencies
+just dev        # run the Helicon showcase app (Vite)
+just check      # full gate: lint + typecheck + build
+just lint       # Biome lint + format check (no writes)
+just fmt        # Biome auto-format + safe fixes
+just typecheck  # tsc --noEmit across all packages
+just build      # production build of the app
+just test       # type gate for now (unit suite lands in v0.3.0)
+just clean      # remove build output + node_modules
 ```
 
-Node ≥ 20, pnpm. Before handing off a change, make sure `pnpm typecheck` and `pnpm lint` pass.
+Node ≥ 20, pnpm. **Before handing off a change, run `just check`** — lint, typecheck, and build must all pass.
+
+## Versions & dependencies
+
+Both are centralized — do not hand-edit them in individual `package.json` files:
+
+- **Dependency versions** live in one place: the `catalog:` block in `pnpm-workspace.yaml`. Every `package.json` references `"catalog:"` instead of a literal version. To bump a dependency (e.g. three.js), edit its catalog entry **once**, then `just install`.
+- **Package versions** are kept in lockstep across all workspace packages. Change them with **`just version X.Y.Z`** (writes every `package.json` via `scripts/set-version.mjs`) — never edit a `version` field by hand.
+- Publishing is gated on the still-open distribution decision; `just publish` is a stub until then.
 
 ## Core principles (the moat — never compromise these)
 

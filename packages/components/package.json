@@ -20,21 +20,21 @@
     "@runek/core": "workspace:*"
   },
   "peerDependencies": {
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.1",
-    "@react-three/rapier": "^2.2.0",
-    "ecctrl": "^1.0.97",
-    "react": "^19.2.0",
-    "three": "^0.184.0"
+    "@react-three/drei": "catalog:",
+    "@react-three/fiber": "catalog:",
+    "@react-three/rapier": "catalog:",
+    "ecctrl": "catalog:",
+    "react": "catalog:",
+    "three": "catalog:"
   },
   "devDependencies": {
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.1",
-    "@react-three/rapier": "^2.2.0",
-    "@types/react": "^19.2.16",
-    "@types/three": "^0.184.1",
-    "ecctrl": "^1.0.97",
-    "react": "^19.2.0",
-    "three": "^0.184.0"
+    "@react-three/drei": "catalog:",
+    "@react-three/fiber": "catalog:",
+    "@react-three/rapier": "catalog:",
+    "@types/react": "catalog:",
+    "@types/three": "catalog:",
+    "ecctrl": "catalog:",
+    "react": "catalog:",
+    "three": "catalog:"
   }
 }

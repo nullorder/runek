@@ -13,11 +13,11 @@
     "dev": "pnpm --filter helicon dev",
     "build": "pnpm --filter helicon build",
     "lint": "biome check .",
-    "format": "biome format --write .",
+    "format": "biome check --write .",
     "typecheck": "pnpm -r --if-present typecheck"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.16",
-    "typescript": "^6.0.3"
+    "@biomejs/biome": "catalog:",
+    "typescript": "catalog:"
   }
 }

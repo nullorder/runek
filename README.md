@@ -4,7 +4,7 @@
 
 > *Worlds, one rune at a time.*
 
-Runek is a copy-paste registry of procedural 3D components for [React Three Fiber](https://r3f.docs.pmnd.rs/). Every component — a bookshelf, a lake, a whole house — generates its own geometry from props and a `seed`. No binary assets, no model files, no CDN. A whole world is just data: diffable, forkable, version-controlled like any repo.
+Runek is a source registry of procedural 3D components for [React Three Fiber](https://r3f.docs.pmnd.rs/) — pull a component's source into your project and own it (shadcn-style). Every component — a bookshelf, a lake, a whole house — generates its own geometry from props and a `seed`. No binary assets, no model files, no CDN. A whole world is just data: diffable, forkable, version-controlled like any repo.
 
 Think **"shadcn for 3D worlds."**
 

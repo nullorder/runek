@@ -4,27 +4,72 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@biomejs/biome':
+      specifier: ^2.4.16
+      version: 2.4.16
+    '@react-three/drei':
+      specifier: ^10.7.7
+      version: 10.7.7
+    '@react-three/fiber':
+      specifier: ^9.6.1
+      version: 9.6.1
+    '@react-three/rapier':
+      specifier: ^2.2.0
+      version: 2.2.0
+    '@types/react':
+      specifier: ^19.2.16
+      version: 19.2.16
+    '@types/react-dom':
+      specifier: ^19.2.3
+      version: 19.2.3
+    '@types/three':
+      specifier: ^0.184.1
+      version: 0.184.1
+    '@vitejs/plugin-react':
+      specifier: ^6.0.2
+      version: 6.0.2
+    ecctrl:
+      specifier: ^1.0.97
+      version: 1.0.97
+    react:
+      specifier: ^19.2.0
+      version: 19.2.7
+    react-dom:
+      specifier: ^19.2.0
+      version: 19.2.7
+    three:
+      specifier: ^0.184.0
+      version: 0.184.0
+    typescript:
+      specifier: ^6.0.3
+      version: 6.0.3
+    vite:
+      specifier: ^8.0.16
+      version: 8.0.16
+
 importers:
 
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^2.4.16
+        specifier: 'catalog:'
         version: 2.4.16
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   apps/helicon:
     dependencies:
       '@react-three/drei':
-        specifier: ^10.7.7
+        specifier: 'catalog:'
         version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@types/react@19.2.16)(@types/three@0.184.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
       '@react-three/fiber':
-        specifier: ^9.6.1
+        specifier: 'catalog:'
         version: 9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
       '@react-three/rapier':
-        specifier: ^2.2.0
+        specifier: 'catalog:'
         version: 2.2.0(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(react@19.2.7)(three@0.184.0)
       '@runek/components':
         specifier: workspace:*
@@ -33,32 +78,32 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       ecctrl:
-        specifier: ^1.0.97
+        specifier: 'catalog:'
         version: 1.0.97(@react-three/drei@10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@types/react@19.2.16)(@types/three@0.184.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@react-three/rapier@2.2.0(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(react@19.2.7)(three@0.184.0))(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)(use-sync-external-store@1.6.0(react@19.2.7))
       react:
-        specifier: ~19.2.0
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: ~19.2.0
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
       three:
-        specifier: ^0.184.0
+        specifier: 'catalog:'
         version: 0.184.0
     devDependencies:
       '@types/react':
-        specifier: ^19.2.16
+        specifier: 'catalog:'
         version: 19.2.16
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.16)
       '@types/three':
-        specifier: ^0.184.1
+        specifier: 'catalog:'
         version: 0.184.1
       '@vitejs/plugin-react':
-        specifier: ^6.0.2
+        specifier: 'catalog:'
         version: 6.0.2(vite@8.0.16)
       vite:
-        specifier: ^8.0.16
+        specifier: 'catalog:'
         version: 8.0.16
 
   packages/components:
@@ -68,52 +113,52 @@ importers:
         version: link:../core
     devDependencies:
       '@react-three/drei':
-        specifier: ^10.7.7
+        specifier: 'catalog:'
         version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@types/react@19.2.16)(@types/three@0.184.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
       '@react-three/fiber':
-        specifier: ^9.6.1
+        specifier: 'catalog:'
         version: 9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
       '@react-three/rapier':
-        specifier: ^2.2.0
+        specifier: 'catalog:'
         version: 2.2.0(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(react@19.2.7)(three@0.184.0)
       '@types/react':
-        specifier: ^19.2.16
+        specifier: 'catalog:'
         version: 19.2.16
       '@types/three':
-        specifier: ^0.184.1
+        specifier: 'catalog:'
         version: 0.184.1
       ecctrl:
-        specifier: ^1.0.97
+        specifier: 'catalog:'
         version: 1.0.97(@react-three/drei@10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@types/react@19.2.16)(@types/three@0.184.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@react-three/rapier@2.2.0(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(react@19.2.7)(three@0.184.0))(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)(use-sync-external-store@1.6.0(react@19.2.7))
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.7
       three:
-        specifier: ^0.184.0
+        specifier: 'catalog:'
         version: 0.184.0
 
   packages/core:
     devDependencies:
       '@react-three/drei':
-        specifier: ^10.7.7
+        specifier: 'catalog:'
         version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@types/react@19.2.16)(@types/three@0.184.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
       '@react-three/fiber':
-        specifier: ^9.6.1
+        specifier: 'catalog:'
         version: 9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
       '@react-three/rapier':
-        specifier: ^2.2.0
+        specifier: 'catalog:'
         version: 2.2.0(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(react@19.2.7)(three@0.184.0)
       '@types/react':
-        specifier: ^19.2.16
+        specifier: 'catalog:'
         version: 19.2.16
       '@types/three':
-        specifier: ^0.184.1
+        specifier: 'catalog:'
         version: 0.184.1
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.7
       three:
-        specifier: ^0.184.0
+        specifier: 'catalog:'
         version: 0.184.0
 
 packages:
