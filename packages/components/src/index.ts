@@ -1,2 +1,8 @@
-// @runek/components — Player, Terrain, Bookshelf, Room land in v0.1.0.
-export {}
+export type { BookshelfProps } from './Bookshelf'
+export { Bookshelf } from './Bookshelf'
+export type { PlayerProps, PlayerView } from './Player'
+export { Player } from './Player'
+export type { RoomProps } from './Room'
+export { Room } from './Room'
+export type { TerrainProps } from './Terrain'
+export { Terrain } from './Terrain'

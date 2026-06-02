@@ -1,0 +1,48 @@
+{
+  "$schema": "https://runek.dev/registry/schema.json",
+  "name": "runek",
+  "homepage": "https://runek.dev",
+  "items": [
+    {
+      "name": "core",
+      "type": "registry:lib",
+      "description": "World provider, useWorld, seeded rng, and contract types.",
+      "dependencies": ["@react-three/drei", "@react-three/fiber", "@react-three/rapier"],
+      "files": [{ "path": "packages/core/src", "target": "runek/core" }]
+    },
+    {
+      "name": "player",
+      "type": "registry:component",
+      "description": "First/third-person character controller (ecctrl wrapper).",
+      "registryDependencies": ["core"],
+      "dependencies": ["ecctrl"],
+      "files": [{ "path": "packages/components/src/Player.tsx", "target": "runek/player.tsx" }]
+    },
+    {
+      "name": "terrain",
+      "type": "registry:component",
+      "description": "Procedural ground plane with a fixed collider.",
+      "registryDependencies": ["core"],
+      "dependencies": ["@react-three/rapier"],
+      "files": [{ "path": "packages/components/src/Terrain.tsx", "target": "runek/terrain.tsx" }]
+    },
+    {
+      "name": "bookshelf",
+      "type": "registry:component",
+      "description": "Procedurally generated bookshelf with seeded books.",
+      "registryDependencies": ["core"],
+      "dependencies": ["@react-three/rapier"],
+      "files": [
+        { "path": "packages/components/src/Bookshelf.tsx", "target": "runek/bookshelf.tsx" }
+      ]
+    },
+    {
+      "name": "room",
+      "type": "registry:component",
+      "description": "Four walls + floor with a doorway and fixed colliders.",
+      "registryDependencies": ["core"],
+      "dependencies": ["@react-three/rapier"],
+      "files": [{ "path": "packages/components/src/Room.tsx", "target": "runek/room.tsx" }]
+    }
+  ]
+}
