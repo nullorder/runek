@@ -36,3 +36,19 @@ body,
   pointer-events: none;
   user-select: none;
 }
+
+.mode-toggle {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 11;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background: #4a90d9;
+  color: #fff;
+  font:
+    600 0.85rem system-ui,
+    sans-serif;
+  cursor: pointer;
+}

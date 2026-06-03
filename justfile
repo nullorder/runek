@@ -32,12 +32,12 @@ fmt:
 typecheck:
     pnpm -r --if-present typecheck
 
-# Full verification gate: lint, typecheck, build
-check: lint typecheck build
+# Full verification gate: lint, typecheck, test, build
+check: lint typecheck test build
 
-# Run the test suite (unit tests arrive with v0.3.0; for now this is the type gate)
-test: typecheck
-    @echo "No unit tests yet — typecheck passed. (vitest suite lands in v0.3.0)"
+# Run the test suite (vitest, across packages)
+test:
+    pnpm -r --if-present test
 
 # Set the version across all workspace packages, e.g. `just version 0.3.0`
 version VERSION:

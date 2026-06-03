@@ -12,6 +12,8 @@ export interface WorldProps {
   keyboardMap?: KeyboardControlsEntry[]
   /** Render the default light rig. Set false to supply your own (e.g. <LightRig>). */
   lights?: boolean
+  /** Fired when a pointer click misses every object (used to deselect in the editor). */
+  onPointerMissed?: () => void
   debug?: boolean
   children?: ReactNode
 }
@@ -21,12 +23,13 @@ export function World({
   gravity = [0, -9.81, 0],
   keyboardMap = defaultKeyboardMap,
   lights = true,
+  onPointerMissed,
   debug = false,
   children,
 }: WorldProps) {
   return (
     <KeyboardControls map={keyboardMap}>
-      <Canvas shadows camera={{ position: [6, 4, 6], fov: 60 }}>
+      <Canvas shadows camera={{ position: [6, 4, 6], fov: 60 }} onPointerMissed={onPointerMissed}>
         <WorldContext.Provider value={{ unit, gravity }}>
           {lights && (
             <>

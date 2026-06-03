@@ -6,3 +6,14 @@ export type { Vec3, WorldComponentProps, WorldContextValue } from './types'
 export { useWorld } from './useWorld'
 export type { WorldProps } from './World'
 export { World } from './World'
+export type { WorldEditorProps } from './WorldEditor'
+export { WorldEditor } from './WorldEditor'
+export type { WorldNodesProps } from './WorldNodes'
+export { WorldNodes } from './WorldNodes'
+export type { WorldRendererProps } from './WorldRenderer'
+export { WorldRenderer } from './WorldRenderer'
+export type { ComponentRegistry, JsonValue, WorldData, WorldNode } from './world-data'
+export {
+  parseWorld,
+  serializeWorld,
+} from './world-data'

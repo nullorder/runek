@@ -14,12 +14,14 @@
     }
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "peerDependencies": {
     "@react-three/drei": "catalog:",
     "@react-three/fiber": "catalog:",
     "@react-three/rapier": "catalog:",
+    "leva": "catalog:",
     "react": "catalog:",
     "three": "catalog:"
   },
@@ -29,7 +31,9 @@
     "@react-three/rapier": "catalog:",
     "@types/react": "catalog:",
     "@types/three": "catalog:",
+    "leva": "catalog:",
     "react": "catalog:",
-    "three": "catalog:"
+    "three": "catalog:",
+    "vitest": "catalog:"
   }
 }
