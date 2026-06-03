@@ -1,0 +1,19 @@
+{
+  "name": "floor",
+  "title": "Floor",
+  "type": "registry:component",
+  "description": "Flat floor slab with a fixed collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Floor.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface FloorProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** `[width, depth]` in units. The top surface sits at the component origin. */\n  size?: [number, number]\n  thickness?: number\n  color?: string\n}\n\nexport function Floor({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  size = [8, 8],\n  thickness = 0.2,\n  color = '#b8a98f',\n}: FloorProps) {\n  const { unit } = useWorld()\n  const w = size[0] * unit\n  const d = size[1] * unit\n  const t = thickness * unit\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"cuboid\" position={position} rotation={rotation}>\n      <mesh receiveShadow position={[0, -t / 2, 0]}>\n        <boxGeometry args={[w, t, d]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

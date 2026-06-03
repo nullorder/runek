@@ -1,0 +1,19 @@
+{
+  "name": "door",
+  "title": "Door",
+  "type": "registry:component",
+  "description": "Door panel within a frame.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Door.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface DoorProps {\n  position?: Vec3\n  rotation?: Vec3\n  width?: number\n  height?: number\n  thickness?: number\n  /** Hinge angle in radians; 0 is closed. */\n  openAngle?: number\n  color?: string\n}\n\nexport function Door({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  width = 0.9,\n  height = 2,\n  thickness = 0.05,\n  openAngle = 0,\n  color = '#6b4a2f',\n}: DoorProps) {\n  const { unit } = useWorld()\n  const w = width * unit\n  const h = height * unit\n  const t = thickness * unit\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"cuboid\" position={position} rotation={rotation}>\n      <group position={[-w / 2, 0, 0]} rotation={[0, openAngle, 0]}>\n        <mesh castShadow receiveShadow position={[w / 2, h / 2, 0]}>\n          <boxGeometry args={[w, h, t]} />\n          <meshStandardMaterial color={color} />\n        </mesh>\n        <mesh position={[w - 0.08 * unit, h / 2, t]}>\n          <sphereGeometry args={[0.03 * unit, 12, 12]} />\n          <meshStandardMaterial color=\"#caa24a\" metalness={0.6} roughness={0.3} />\n        </mesh>\n      </group>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

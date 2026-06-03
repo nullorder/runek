@@ -1,0 +1,22 @@
+{
+  "name": "house",
+  "title": "House",
+  "type": "registry:component",
+  "description": "Composed dwelling: walls with openings, floor, roof, door, and windows.",
+  "dependencies": [],
+  "registryDependencies": [
+    "core",
+    "door",
+    "floor",
+    "roof",
+    "wall",
+    "window"
+  ],
+  "files": [
+    {
+      "path": "House.tsx",
+      "content": "import { useWorld, type Vec3 } from '@runek/core'\nimport { Door } from './Door'\nimport { Floor } from './Floor'\nimport { Roof, type RoofStyle } from './Roof'\nimport { Wall } from './Wall'\nimport { Window } from './Window'\n\nexport interface HouseProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Interior footprint `[width, depth]`, in units. */\n  size?: [number, number]\n  height?: number\n  thickness?: number\n  roofStyle?: RoofStyle\n  wallColor?: string\n  roofColor?: string\n  /** Reserved for procedural variation. */\n  seed?: number\n}\n\nconst DOOR_WIDTH = 1\nconst DOOR_HEIGHT = 2.1\nconst WINDOW_WIDTH = 1.3\nconst WINDOW_HEIGHT = 1.2\nconst WINDOW_SILL = 1\n\nexport function House({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  size = [9, 9],\n  height = 3,\n  thickness = 0.2,\n  roofStyle = 'gable',\n  wallColor = '#d8cfc0',\n  roofColor = '#8a5a44',\n}: HouseProps) {\n  const { unit } = useWorld()\n  const [w, d] = size\n  const halfW = (w / 2) * unit\n  const halfD = (d / 2) * unit\n  const sideTurn: Vec3 = [0, Math.PI / 2, 0]\n  const windowOpening = {\n    width: WINDOW_WIDTH,\n    height: WINDOW_HEIGHT,\n    sill: WINDOW_SILL,\n  }\n\n  return (\n    <group position={position} rotation={rotation}>\n      <Floor size={size} thickness={thickness} color={wallColor} />\n\n      <Wall\n        position={[0, 0, -halfD]}\n        width={w}\n        height={height}\n        thickness={thickness}\n        color={wallColor}\n      />\n      <Wall\n        position={[0, 0, halfD]}\n        width={w}\n        height={height}\n        thickness={thickness}\n        color={wallColor}\n        opening={{ width: DOOR_WIDTH, height: DOOR_HEIGHT }}\n      />\n      <Wall\n        position={[-halfW, 0, 0]}\n        rotation={sideTurn}\n        width={d}\n        height={height}\n        thickness={thickness}\n        color={wallColor}\n        opening={windowOpening}\n      />\n      <Wall\n        position={[halfW, 0, 0]}\n        rotation={sideTurn}\n        width={d}\n        height={height}\n        thickness={thickness}\n        color={wallColor}\n        opening={windowOpening}\n      />\n\n      <Door position={[0, 0, halfD]} width={DOOR_WIDTH} height={DOOR_HEIGHT} openAngle={-1.1} />\n      <Window\n        position={[-halfW, WINDOW_SILL * unit, 0]}\n        rotation={sideTurn}\n        width={WINDOW_WIDTH}\n        height={WINDOW_HEIGHT}\n      />\n      <Window\n        position={[halfW, WINDOW_SILL * unit, 0]}\n        rotation={sideTurn}\n        width={WINDOW_WIDTH}\n        height={WINDOW_HEIGHT}\n      />\n\n      <Roof position={[0, height * unit, 0]} size={size} style={roofStyle} color={roofColor} />\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

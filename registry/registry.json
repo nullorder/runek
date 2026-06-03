@@ -5,44 +5,195 @@
   "items": [
     {
       "name": "core",
+      "title": "Core",
       "type": "registry:lib",
-      "description": "World provider, useWorld, seeded rng, and contract types.",
-      "dependencies": ["@react-three/drei", "@react-three/fiber", "@react-three/rapier"],
-      "files": [{ "path": "packages/core/src", "target": "runek/core" }]
+      "category": "lib",
+      "description": "World provider, useWorld, seeded rng, worlds-as-data, the runtime editor, and the component contract types.",
+      "files": [{ "path": "packages/core/src", "target": "core" }]
     },
     {
       "name": "player",
+      "title": "Player",
       "type": "registry:component",
+      "category": "character",
       "description": "First/third-person character controller (ecctrl wrapper).",
-      "registryDependencies": ["core"],
-      "dependencies": ["ecctrl"],
-      "files": [{ "path": "packages/components/src/Player.tsx", "target": "runek/player.tsx" }]
+      "files": [{ "path": "packages/components/src/Player.tsx", "target": "Player.tsx" }]
     },
     {
       "name": "terrain",
+      "title": "Terrain",
       "type": "registry:component",
-      "description": "Procedural ground plane with a fixed collider.",
-      "registryDependencies": ["core"],
-      "dependencies": ["@react-three/rapier"],
-      "files": [{ "path": "packages/components/src/Terrain.tsx", "target": "runek/terrain.tsx" }]
-    },
-    {
-      "name": "bookshelf",
-      "type": "registry:component",
-      "description": "Procedurally generated bookshelf with seeded books.",
-      "registryDependencies": ["core"],
-      "dependencies": ["@react-three/rapier"],
-      "files": [
-        { "path": "packages/components/src/Bookshelf.tsx", "target": "runek/bookshelf.tsx" }
-      ]
+      "category": "terrain",
+      "description": "Procedural fbm-displaced ground with a matching trimesh collider and a flat build-pad option.",
+      "files": [{ "path": "packages/components/src/Terrain.tsx", "target": "Terrain.tsx" }]
     },
     {
       "name": "room",
+      "title": "Room",
       "type": "registry:component",
-      "description": "Four walls + floor with a doorway and fixed colliders.",
-      "registryDependencies": ["core"],
-      "dependencies": ["@react-three/rapier"],
-      "files": [{ "path": "packages/components/src/Room.tsx", "target": "runek/room.tsx" }]
+      "category": "structures",
+      "description": "Four walls + floor with a doorway and fixed colliders; optional roof.",
+      "files": [{ "path": "packages/components/src/Room.tsx", "target": "Room.tsx" }]
+    },
+    {
+      "name": "house",
+      "title": "House",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Composed dwelling: walls with openings, floor, roof, door, and windows.",
+      "files": [{ "path": "packages/components/src/House.tsx", "target": "House.tsx" }]
+    },
+    {
+      "name": "wall",
+      "title": "Wall",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Wall segment with door/window openings and a fixed collider.",
+      "files": [{ "path": "packages/components/src/Wall.tsx", "target": "Wall.tsx" }]
+    },
+    {
+      "name": "floor",
+      "title": "Floor",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Flat floor slab with a fixed collider.",
+      "files": [{ "path": "packages/components/src/Floor.tsx", "target": "Floor.tsx" }]
+    },
+    {
+      "name": "roof",
+      "title": "Roof",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Flat or gable roof.",
+      "files": [{ "path": "packages/components/src/Roof.tsx", "target": "Roof.tsx" }]
+    },
+    {
+      "name": "door",
+      "title": "Door",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Door panel within a frame.",
+      "files": [{ "path": "packages/components/src/Door.tsx", "target": "Door.tsx" }]
+    },
+    {
+      "name": "window",
+      "title": "Window",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Window with frame and translucent pane.",
+      "files": [{ "path": "packages/components/src/Window.tsx", "target": "Window.tsx" }]
+    },
+    {
+      "name": "staircase",
+      "title": "Staircase",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Stepped staircase with per-step colliders.",
+      "files": [{ "path": "packages/components/src/Staircase.tsx", "target": "Staircase.tsx" }]
+    },
+    {
+      "name": "table",
+      "title": "Table",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Table with a top and four legs.",
+      "files": [{ "path": "packages/components/src/Table.tsx", "target": "Table.tsx" }]
+    },
+    {
+      "name": "chair",
+      "title": "Chair",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Chair with seat, back, and legs.",
+      "files": [{ "path": "packages/components/src/Chair.tsx", "target": "Chair.tsx" }]
+    },
+    {
+      "name": "lamp",
+      "title": "Lamp",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Lamp that emits a point light.",
+      "files": [{ "path": "packages/components/src/Lamp.tsx", "target": "Lamp.tsx" }]
+    },
+    {
+      "name": "rug",
+      "title": "Rug",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Procedural striped rug (seeded stripes, no textures).",
+      "files": [{ "path": "packages/components/src/Rug.tsx", "target": "Rug.tsx" }]
+    },
+    {
+      "name": "shelf",
+      "title": "Shelf",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Wall shelf with planks.",
+      "files": [{ "path": "packages/components/src/Shelf.tsx", "target": "Shelf.tsx" }]
+    },
+    {
+      "name": "bookshelf",
+      "title": "Bookshelf",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Procedurally generated bookshelf with seeded books and one cuboid collider.",
+      "files": [{ "path": "packages/components/src/Bookshelf.tsx", "target": "Bookshelf.tsx" }]
+    },
+    {
+      "name": "lake",
+      "title": "Lake",
+      "type": "registry:component",
+      "category": "water",
+      "description": "Procedural animated-shader water surface (no textures).",
+      "files": [{ "path": "packages/components/src/Lake.tsx", "target": "Lake.tsx" }]
+    },
+    {
+      "name": "shore",
+      "title": "Shore",
+      "type": "registry:component",
+      "category": "water",
+      "description": "Sloped beach/shore strip to meet a Lake.",
+      "files": [{ "path": "packages/components/src/Shore.tsx", "target": "Shore.tsx" }]
+    },
+    {
+      "name": "rocks",
+      "title": "Rocks",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Faceted rocks with convex-hull colliders (seeded scatter).",
+      "files": [{ "path": "packages/components/src/Rocks.tsx", "target": "Rocks.tsx" }]
+    },
+    {
+      "name": "sky",
+      "title": "Sky",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Procedural atmosphere (drei Sky).",
+      "files": [{ "path": "packages/components/src/Sky.tsx", "target": "Sky.tsx" }]
+    },
+    {
+      "name": "grass",
+      "title": "Grass",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Instanced grass blades (seeded scatter).",
+      "files": [{ "path": "packages/components/src/Grass.tsx", "target": "Grass.tsx" }]
+    },
+    {
+      "name": "trees",
+      "title": "Trees",
+      "type": "registry:component",
+      "category": "vegetation",
+      "description": "L-system trees grown by a 3D turtle, deterministic from seed.",
+      "files": [{ "path": "packages/components/src/Trees.tsx", "target": "Trees.tsx" }]
+    },
+    {
+      "name": "lightrig",
+      "title": "LightRig",
+      "type": "registry:component",
+      "category": "systems",
+      "description": "Sun + hemisphere/ground fill with shadow configuration.",
+      "files": [{ "path": "packages/components/src/LightRig.tsx", "target": "LightRig.tsx" }]
     }
   ]
 }

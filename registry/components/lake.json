@@ -1,0 +1,20 @@
+{
+  "name": "lake",
+  "title": "Lake",
+  "type": "registry:component",
+  "description": "Procedural animated-shader water surface (no textures).",
+  "dependencies": [
+    "@react-three/fiber@^9.6.1",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Lake.tsx",
+      "content": "import { useFrame } from '@react-three/fiber'\nimport { useWorld, type Vec3 } from '@runek/core'\nimport { useMemo, useRef } from 'react'\nimport * as THREE from 'three'\n\nexport interface LakeProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Water surface `[width, depth]`, in units. */\n  size?: [number, number]\n  colorDeep?: string\n  colorShallow?: string\n  waveHeight?: number\n  waveSpeed?: number\n  segments?: number\n}\n\nconst VERTEX = /* glsl */ `\n  uniform float uTime;\n  uniform float uWaveHeight;\n  uniform float uWaveSpeed;\n  varying float vWave;\n  void main() {\n    vec3 p = position;\n    float t = uTime * uWaveSpeed;\n    float w1 = sin(p.x * 0.6 + t) * cos(p.y * 0.4 + t * 0.8);\n    float w2 = sin(p.x * 0.2 - t * 0.7) * sin(p.y * 0.8 + t);\n    vWave = (w1 + w2) * 0.5;\n    p.z += vWave * uWaveHeight;\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);\n  }\n`\n\nconst FRAGMENT = /* glsl */ `\n  uniform vec3 uColorDeep;\n  uniform vec3 uColorShallow;\n  varying float vWave;\n  void main() {\n    float m = smoothstep(-1.0, 1.0, vWave);\n    vec3 col = mix(uColorDeep, uColorShallow, m);\n    col += pow(max(m - 0.6, 0.0), 2.0) * 0.6;\n    gl_FragColor = vec4(col, 0.85);\n  }\n`\n\n/** Procedural animated water — no textures, decorative (no collider). */\nexport function Lake({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  size = [20, 20],\n  colorDeep = '#13415c',\n  colorShallow = '#3f86a8',\n  waveHeight = 0.12,\n  waveSpeed = 1,\n  segments = 64,\n}: LakeProps) {\n  const { unit } = useWorld()\n  const w = size[0] * unit\n  const d = size[1] * unit\n  const matRef = useRef<THREE.ShaderMaterial>(null)\n\n  const uniforms = useMemo(\n    () => ({\n      uTime: { value: 0 },\n      uWaveHeight: { value: waveHeight * unit },\n      uWaveSpeed: { value: waveSpeed },\n      uColorDeep: { value: new THREE.Color(colorDeep) },\n      uColorShallow: { value: new THREE.Color(colorShallow) },\n    }),\n    [waveHeight, waveSpeed, colorDeep, colorShallow, unit],\n  )\n\n  useFrame((_, delta) => {\n    if (matRef.current) matRef.current.uniforms.uTime.value += delta\n  })\n\n  return (\n    <mesh position={position} rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}>\n      <planeGeometry args={[w, d, segments, segments]} />\n      <shaderMaterial\n        ref={matRef}\n        uniforms={uniforms}\n        vertexShader={VERTEX}\n        fragmentShader={FRAGMENT}\n        transparent\n      />\n    </mesh>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

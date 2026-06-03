@@ -1,0 +1,17 @@
+{
+  "name": "lightrig",
+  "title": "LightRig",
+  "type": "registry:component",
+  "description": "Sun + hemisphere/ground fill with shadow configuration.",
+  "dependencies": [],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "LightRig.tsx",
+      "content": "import type { Vec3 } from '@runek/core'\n\nexport interface LightRigProps {\n  sunPosition?: Vec3\n  sunColor?: string\n  sunIntensity?: number\n  ambient?: number\n  skyColor?: string\n  groundColor?: string\n  shadows?: boolean\n  /** Half-extent of the shadow camera frustum, in units. */\n  shadowRange?: number\n}\n\n/** A drop-in sun + sky/ground fill rig. Pair with `<World lights={false}>`. */\nexport function LightRig({\n  sunPosition = [12, 18, 8],\n  sunColor = '#fff4e0',\n  sunIntensity = 1.7,\n  ambient = 0.35,\n  skyColor = '#bcd4ff',\n  groundColor = '#4a4030',\n  shadows = true,\n  shadowRange = 30,\n}: LightRigProps) {\n  return (\n    <>\n      <hemisphereLight color={skyColor} groundColor={groundColor} intensity={0.7} />\n      <ambientLight intensity={ambient} />\n      <directionalLight\n        position={sunPosition}\n        color={sunColor}\n        intensity={sunIntensity}\n        castShadow={shadows}\n        shadow-mapSize={[2048, 2048]}\n        shadow-camera-near={1}\n        shadow-camera-far={120}\n        shadow-camera-left={-shadowRange}\n        shadow-camera-right={shadowRange}\n        shadow-camera-top={shadowRange}\n        shadow-camera-bottom={-shadowRange}\n      />\n    </>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "sky",
+  "title": "Sky",
+  "type": "registry:component",
+  "description": "Procedural atmosphere (drei Sky).",
+  "dependencies": [
+    "@react-three/drei@^10.7.7"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Sky.tsx",
+      "content": "import { Sky as DreiSky } from '@react-three/drei'\nimport type { Vec3 } from '@runek/core'\n\nexport interface SkyProps {\n  /** Direction of the sun; also where the bright spot appears. */\n  sunPosition?: Vec3\n  turbidity?: number\n  rayleigh?: number\n}\n\n/** Procedural atmospheric sky (no textures). */\nexport function Sky({ sunPosition = [80, 30, 40], turbidity = 8, rayleigh = 1.4 }: SkyProps) {\n  return <DreiSky sunPosition={sunPosition} turbidity={turbidity} rayleigh={rayleigh} />\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

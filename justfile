@@ -20,6 +20,14 @@ build:
 preview:
     pnpm --filter helicon preview
 
+# Rebuild the served registry (registry/components/*.json) from the index + source
+registry:
+    @node scripts/build-registry.mjs
+
+# Run the Runek CLI from source, e.g. `just cli add bookshelf --registry ./registry`
+cli *ARGS:
+    @node packages/cli/src/index.ts {{ARGS}}
+
 # Lint + format check (no writes)
 lint:
     pnpm exec biome check .
@@ -43,10 +51,13 @@ test:
 version VERSION:
     @node scripts/set-version.mjs {{VERSION}}
 
-# Publish — gated on the distribution decision (see plan/open-questions.md)
+# Publish — distribution model is the source registry (Path A); GA hosting is still pending
 publish:
-    @echo "Publishing isn't wired yet: the distribution model is still open."
-    @echo "Once decided — scoped npm: 'pnpm -r publish --access public'; source registry: build & deploy registry.json."
+    @echo "Distribution model: source registry (Path A — npx runek add)."
+    @echo "GA steps (not yet automated — needs npm auth + runek.dev hosting):"
+    @echo "  1. just registry                                    # regenerate registry/components/*.json"
+    @echo "  2. deploy registry/ to https://runek.dev/r          # static host"
+    @echo "  3. pnpm --filter @runek/cli build && pnpm --filter @runek/cli publish --access public"
     @exit 1
 
 # Remove build output and installed dependencies

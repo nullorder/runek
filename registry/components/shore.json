@@ -1,0 +1,19 @@
+{
+  "name": "shore",
+  "title": "Shore",
+  "type": "registry:component",
+  "description": "Sloped beach/shore strip to meet a Lake.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Shore.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface ShoreProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** `[width, depth]` in units. The sandy top sits at the component origin. */\n  size?: [number, number]\n  thickness?: number\n  color?: string\n}\n\nexport function Shore({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  size = [24, 24],\n  thickness = 0.3,\n  color = '#d8c79a',\n}: ShoreProps) {\n  const { unit } = useWorld()\n  const w = size[0] * unit\n  const d = size[1] * unit\n  const t = thickness * unit\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"cuboid\" position={position} rotation={rotation}>\n      <mesh receiveShadow position={[0, -t / 2, 0]}>\n        <boxGeometry args={[w, t, d]} />\n        <meshStandardMaterial color={color} roughness={1} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

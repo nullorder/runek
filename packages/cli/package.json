@@ -1,0 +1,26 @@
+{
+  "name": "@runek/cli",
+  "version": "0.0.0",
+  "description": "Runek CLI — pull procedural 3D component source into your project (source registry).",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "runek": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

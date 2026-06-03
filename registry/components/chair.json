@@ -1,0 +1,19 @@
+{
+  "name": "chair",
+  "title": "Chair",
+  "type": "registry:component",
+  "description": "Chair with seat, back, and legs.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Chair.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface ChairProps {\n  position?: Vec3\n  rotation?: Vec3\n  width?: number\n  depth?: number\n  seatHeight?: number\n  backHeight?: number\n  color?: string\n}\n\nexport function Chair({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  width = 0.45,\n  depth = 0.45,\n  seatHeight = 0.45,\n  backHeight = 0.5,\n  color = '#6b4a2f',\n}: ChairProps) {\n  const { unit } = useWorld()\n  const w = width * unit\n  const d = depth * unit\n  const seatY = seatHeight * unit\n  const backH = backHeight * unit\n  const t = 0.04 * unit\n  const leg = 0.04 * unit\n  const lx = w / 2 - leg\n  const lz = d / 2 - leg\n  const legs: Vec3[] = [\n    [-lx, seatY / 2, -lz],\n    [lx, seatY / 2, -lz],\n    [-lx, seatY / 2, lz],\n    [lx, seatY / 2, lz],\n  ]\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[w / 2, t, d / 2]} position={[0, seatY, 0]} />\n      <mesh castShadow receiveShadow position={[0, seatY, 0]}>\n        <boxGeometry args={[w, t, d]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n      <mesh castShadow receiveShadow position={[0, seatY + backH / 2, -d / 2 + t / 2]}>\n        <boxGeometry args={[w, backH, t]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n      {legs.map((p) => (\n        <mesh key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`} castShadow position={p}>\n          <boxGeometry args={[leg, seatY, leg]} />\n          <meshStandardMaterial color={color} />\n        </mesh>\n      ))}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

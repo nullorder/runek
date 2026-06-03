@@ -12,11 +12,17 @@ Guidelines for AI agents (Claude Code and others) working in this repository.
 packages/
   core/         @runek/core        — <World>, useWorld, seeded rng, contract types
   components/   @runek/components   — the procedural components (depends on core)
+  cli/          @runek/cli         — the `runek` CLI: init / add / list (source registry)
 apps/
   helicon/      the showcase world (Vite app; extracts to its own repo at distribution GA)
+registry/       the served source registry: registry.json (index) + generated components/*.json
 ```
 
-Dependency direction is strictly one-way: `helicon → components → core`. Nothing in the library imports from an app. Standalone worlds live in their own repos; the monorepo holds the library plus a dev/docs harness.
+Dependency direction is strictly one-way: `helicon → components → core`. Nothing in the library imports from an app. The CLI is standalone (Node built-ins only) and reads the registry. Standalone worlds live in their own repos; the monorepo holds the library plus a dev/docs harness.
+
+## Distribution: source registry (Path A)
+
+Decided model (see `plan/open-questions.md` §1): users pull editable component **source** into their project via `npx runek add <name>` — no black box. `registry/registry.json` is the hand-maintained index; `registry/components/*.json` are **generated** (`just registry`) self-contained manifests with inlined source + auto-derived deps. The CLI repoints the `@runek/core` import at the user's copy on `add`. After editing any component or the index, run `just registry` to refresh the manifests.
 
 ## Commands
 
@@ -31,11 +37,13 @@ just lint       # Biome lint + format check (no writes)
 just fmt        # Biome auto-format + safe fixes
 just typecheck  # tsc --noEmit across all packages
 just build      # production build of the app
-just test       # type gate for now (unit suite lands in v0.3.0)
+just test       # run the vitest suites across packages
+just registry   # regenerate the served registry (registry/components/*.json)
+just cli ...    # run the runek CLI from source, e.g. `just cli add bookshelf --registry ./registry`
 just clean      # remove build output + node_modules
 ```
 
-Node ≥ 20, pnpm. **Before handing off a change, run `just check`** — lint, typecheck, and build must all pass.
+Node ≥ 20, pnpm. The repo pins **Node 24** via `.nvmrc` (`nvm use` / `fnm use`; CI reads it through `node-version-file`). **Before handing off a change, run `just check`** — lint, typecheck, and build must all pass.
 
 ## Versions & dependencies
 

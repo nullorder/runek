@@ -1,0 +1,19 @@
+{
+  "name": "bookshelf",
+  "title": "Bookshelf",
+  "type": "registry:component",
+  "description": "Procedurally generated bookshelf with seeded books and one cuboid collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Bookshelf.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useMemo } from 'react'\n\nexport interface BookshelfProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Outer dimensions in units. */\n  width?: number\n  height?: number\n  depth?: number\n  shelves?: number\n  /** Fraction of shelf space filled with books, 0–1. */\n  fill?: number\n  seed?: number\n}\n\ninterface Book {\n  x: number\n  y: number\n  width: number\n  height: number\n  hue: number\n}\n\nconst FRAME_COLOR = '#6b4f3a'\nconst BACK_COLOR = '#5c4330'\n\nexport function Bookshelf({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  width = 1.2,\n  height = 2,\n  depth = 0.3,\n  shelves = 4,\n  fill = 0.7,\n  seed = 1,\n}: BookshelfProps) {\n  const { unit } = useWorld()\n  const w = width * unit\n  const h = height * unit\n  const d = depth * unit\n  const plank = 0.03 * unit\n  const inner = w - plank * 2\n  const gap = (h - plank) / shelves\n\n  const books = useMemo<Book[]>(() => {\n    const next = rng(seed)\n    const out: Book[] = []\n    for (let shelf = 0; shelf < shelves; shelf++) {\n      let x = -inner / 2\n      while (x < inner / 2) {\n        const bw = (0.025 + next() * 0.03) * unit\n        if (x + bw > inner / 2) break\n        const bh = gap * (0.55 + next() * 0.35)\n        if (next() < fill) {\n          out.push({\n            x: x + bw / 2,\n            y: -h / 2 + plank + gap * shelf + bh / 2,\n            width: bw,\n            height: bh,\n            hue: next() * 360,\n          })\n        }\n        x += bw + 0.004 * unit\n      }\n    }\n    return out\n  }, [h, inner, gap, plank, shelves, fill, seed, unit])\n\n  const plankYs = Array.from({ length: shelves + 1 }, (_, i) => -h / 2 + plank / 2 + gap * i)\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      {/* one collider for the whole footprint — books stay visual-only */}\n      <CuboidCollider args={[w / 2, h / 2, d / 2]} />\n\n      <mesh castShadow receiveShadow position={[-w / 2 + plank / 2, 0, 0]}>\n        <boxGeometry args={[plank, h, d]} />\n        <meshStandardMaterial color={FRAME_COLOR} />\n      </mesh>\n      <mesh castShadow receiveShadow position={[w / 2 - plank / 2, 0, 0]}>\n        <boxGeometry args={[plank, h, d]} />\n        <meshStandardMaterial color={FRAME_COLOR} />\n      </mesh>\n      <mesh castShadow receiveShadow position={[0, 0, -d / 2 + plank / 2]}>\n        <boxGeometry args={[w, h, plank]} />\n        <meshStandardMaterial color={BACK_COLOR} />\n      </mesh>\n\n      {plankYs.map((y) => (\n        <mesh key={`plank-${y.toFixed(4)}`} castShadow receiveShadow position={[0, y, 0]}>\n          <boxGeometry args={[inner, plank, d]} />\n          <meshStandardMaterial color={FRAME_COLOR} />\n        </mesh>\n      ))}\n\n      {books.map((book) => (\n        <mesh\n          key={`book-${book.x.toFixed(4)}-${book.y.toFixed(4)}`}\n          castShadow\n          position={[book.x, book.y, 0]}\n        >\n          <boxGeometry args={[book.width, book.height, d * 0.6]} />\n          <meshStandardMaterial color={`hsl(${book.hue}, 45%, 55%)`} />\n        </mesh>\n      ))}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

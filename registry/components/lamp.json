@@ -1,0 +1,19 @@
+{
+  "name": "lamp",
+  "title": "Lamp",
+  "type": "registry:component",
+  "description": "Lamp that emits a point light.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Lamp.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface LampProps {\n  position?: Vec3\n  rotation?: Vec3\n  height?: number\n  color?: string\n  shadeColor?: string\n  lightColor?: string\n  intensity?: number\n}\n\nexport function Lamp({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  height = 1.6,\n  color = '#39383a',\n  shadeColor = '#e9d8a6',\n  lightColor = '#ffe8c2',\n  intensity = 18,\n}: LampProps) {\n  const { unit } = useWorld()\n  const h = height * unit\n  const baseR = 0.16 * unit\n  const poleR = 0.02 * unit\n  const shadeR = 0.19 * unit\n  const shadeH = 0.26 * unit\n  const poleH = h - shadeH\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[baseR, h / 2, baseR]} position={[0, h / 2, 0]} />\n\n      <mesh castShadow position={[0, 0.025 * unit, 0]}>\n        <cylinderGeometry args={[baseR, baseR, 0.05 * unit, 24]} />\n        <meshStandardMaterial color={color} metalness={0.4} roughness={0.5} />\n      </mesh>\n      <mesh castShadow position={[0, poleH / 2, 0]}>\n        <cylinderGeometry args={[poleR, poleR, poleH, 12]} />\n        <meshStandardMaterial color={color} metalness={0.4} roughness={0.5} />\n      </mesh>\n      <mesh castShadow position={[0, h - shadeH / 2, 0]}>\n        <coneGeometry args={[shadeR, shadeH, 24, 1, true]} />\n        <meshStandardMaterial\n          color={shadeColor}\n          emissive={shadeColor}\n          emissiveIntensity={0.4}\n          side={2}\n        />\n      </mesh>\n\n      <pointLight\n        position={[0, h - shadeH, 0]}\n        color={lightColor}\n        intensity={intensity}\n        distance={12 * unit}\n        decay={2}\n      />\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

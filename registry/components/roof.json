@@ -1,0 +1,19 @@
+{
+  "name": "roof",
+  "title": "Roof",
+  "type": "registry:component",
+  "description": "Flat or gable roof.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Roof.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport type RoofStyle = 'flat' | 'gable'\n\nexport interface RoofProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** `[width, depth]` in units. The roof rests with its base at the component origin. */\n  size?: [number, number]\n  style?: RoofStyle\n  /** Ridge height for a gable roof, in units. */\n  peak?: number\n  thickness?: number\n  overhang?: number\n  color?: string\n}\n\nexport function Roof({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  size = [8, 8],\n  style = 'gable',\n  peak = 1.6,\n  thickness = 0.18,\n  overhang = 0.3,\n  color = '#8a5a44',\n}: RoofProps) {\n  const { unit } = useWorld()\n  const w = size[0] * unit + overhang * 2 * unit\n  const d = size[1] * unit + overhang * 2 * unit\n  const t = thickness * unit\n\n  if (style === 'flat') {\n    return (\n      <RigidBody type=\"fixed\" colliders=\"cuboid\" position={position} rotation={rotation}>\n        <mesh castShadow receiveShadow position={[0, t / 2, 0]}>\n          <boxGeometry args={[w, t, d]} />\n          <meshStandardMaterial color={color} />\n        </mesh>\n      </RigidBody>\n    )\n  }\n\n  const ridge = peak * unit\n  const slope = Math.hypot(d / 2, ridge)\n  const angle = Math.atan2(ridge, d / 2)\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"cuboid\" position={position} rotation={rotation}>\n      <mesh castShadow receiveShadow position={[0, ridge / 2, d / 4]} rotation={[angle, 0, 0]}>\n        <boxGeometry args={[w, t, slope]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n      <mesh castShadow receiveShadow position={[0, ridge / 2, -d / 4]} rotation={[-angle, 0, 0]}>\n        <boxGeometry args={[w, t, slope]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

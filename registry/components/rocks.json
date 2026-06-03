@@ -1,0 +1,19 @@
+{
+  "name": "rocks",
+  "title": "Rocks",
+  "type": "registry:component",
+  "description": "Faceted rocks with convex-hull colliders (seeded scatter).",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Rocks.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useMemo } from 'react'\n\nexport interface RocksProps {\n  position?: Vec3\n  rotation?: Vec3\n  count?: number\n  /** Cluster radius, in units. */\n  spread?: number\n  /** Mean rock radius, in units. */\n  size?: number\n  hue?: number\n  seed?: number\n}\n\ninterface Rock {\n  pos: Vec3\n  scale: Vec3\n  rot: Vec3\n  radius: number\n  lightness: number\n}\n\nexport function Rocks({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  count = 6,\n  spread = 3,\n  size = 0.6,\n  hue = 30,\n  seed = 1,\n}: RocksProps) {\n  const { unit } = useWorld()\n\n  const rocks = useMemo<Rock[]>(() => {\n    const next = rng(seed)\n    return Array.from({ length: count }, () => {\n      const radius = size * unit * (0.6 + next() * 0.8)\n      return {\n        radius,\n        pos: [(next() - 0.5) * spread * unit, radius * 0.3, (next() - 0.5) * spread * unit],\n        scale: [0.8 + next() * 0.5, 0.6 + next() * 0.5, 0.8 + next() * 0.5],\n        rot: [next() * Math.PI, next() * Math.PI, next() * Math.PI],\n        lightness: 30 + next() * 18,\n      }\n    })\n  }, [count, spread, size, seed, unit])\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"hull\" position={position} rotation={rotation}>\n      {rocks.map((r) => (\n        <mesh\n          key={`rock-${r.pos[0].toFixed(3)}:${r.pos[2].toFixed(3)}`}\n          castShadow\n          receiveShadow\n          position={r.pos}\n          rotation={r.rot}\n          scale={r.scale}\n        >\n          <icosahedronGeometry args={[r.radius, 0]} />\n          <meshStandardMaterial\n            color={`hsl(${hue}, 8%, ${r.lightness}%)`}\n            flatShading\n            roughness={1}\n          />\n        </mesh>\n      ))}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

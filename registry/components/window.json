@@ -1,0 +1,17 @@
+{
+  "name": "window",
+  "title": "Window",
+  "type": "registry:component",
+  "description": "Window with frame and translucent pane.",
+  "dependencies": [],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Window.tsx",
+      "content": "import { useWorld, type Vec3 } from '@runek/core'\n\nexport interface WindowProps {\n  position?: Vec3\n  rotation?: Vec3\n  width?: number\n  height?: number\n  /** Frame bar thickness, in units. */\n  frame?: number\n  depth?: number\n  color?: string\n  glassColor?: string\n}\n\n/** Decorative — the surrounding wall opening owns the collision. */\nexport function Window({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  width = 1.2,\n  height = 1.2,\n  frame = 0.08,\n  depth = 0.1,\n  color = '#e8e2d6',\n  glassColor = '#acd4e6',\n}: WindowProps) {\n  const { unit } = useWorld()\n  const w = width * unit\n  const h = height * unit\n  const f = frame * unit\n  const d = depth * unit\n\n  return (\n    <group position={position} rotation={rotation}>\n      <mesh position={[0, h - f / 2, 0]}>\n        <boxGeometry args={[w, f, d]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n      <mesh position={[0, f / 2, 0]}>\n        <boxGeometry args={[w, f, d]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n      <mesh position={[-w / 2 + f / 2, h / 2, 0]}>\n        <boxGeometry args={[f, h, d]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n      <mesh position={[w / 2 - f / 2, h / 2, 0]}>\n        <boxGeometry args={[f, h, d]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n      <mesh position={[0, h / 2, 0]}>\n        <boxGeometry args={[w - f, h - f, d * 0.3]} />\n        <meshStandardMaterial color={glassColor} transparent opacity={0.35} roughness={0.1} />\n      </mesh>\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

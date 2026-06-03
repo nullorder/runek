@@ -1,0 +1,19 @@
+{
+  "name": "grass",
+  "title": "Grass",
+  "type": "registry:component",
+  "description": "Instanced grass blades (seeded scatter).",
+  "dependencies": [
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Grass.tsx",
+      "content": "import { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useLayoutEffect, useMemo, useRef } from 'react'\nimport * as THREE from 'three'\n\nexport interface GrassProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Patch extent `[width, depth]`, in units. */\n  area?: [number, number]\n  count?: number\n  height?: number\n  color?: string\n  seed?: number\n}\n\ninterface Blade {\n  x: number\n  z: number\n  rot: number\n  scale: number\n  shade: number\n}\n\n/** Decorative instanced blades — no collider. */\nexport function Grass({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  area = [10, 10],\n  count = 600,\n  height = 0.35,\n  color = '#5f8a3a',\n  seed = 1,\n}: GrassProps) {\n  const { unit } = useWorld()\n  const w = area[0] * unit\n  const d = area[1] * unit\n  const h = height * unit\n  const ref = useRef<THREE.InstancedMesh>(null)\n\n  const blades = useMemo<Blade[]>(() => {\n    const next = rng(seed)\n    return Array.from({ length: count }, () => ({\n      x: (next() - 0.5) * w,\n      z: (next() - 0.5) * d,\n      rot: next() * Math.PI,\n      scale: 0.6 + next() * 0.8,\n      shade: 0.8 + next() * 0.4,\n    }))\n  }, [w, d, count, seed])\n\n  useLayoutEffect(() => {\n    const mesh = ref.current\n    if (!mesh) return\n    const dummy = new THREE.Object3D()\n    const base = new THREE.Color(color)\n    const tint = new THREE.Color()\n    blades.forEach((b, i) => {\n      dummy.position.set(b.x, (h * b.scale) / 2, b.z)\n      dummy.rotation.set(0, b.rot, 0)\n      dummy.scale.set(1, b.scale, 1)\n      dummy.updateMatrix()\n      mesh.setMatrixAt(i, dummy.matrix)\n      mesh.setColorAt(i, tint.copy(base).multiplyScalar(b.shade))\n    })\n    mesh.instanceMatrix.needsUpdate = true\n    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true\n  }, [blades, h, color])\n\n  return (\n    <group position={position} rotation={rotation}>\n      <instancedMesh ref={ref} args={[undefined, undefined, count]} castShadow receiveShadow>\n        <coneGeometry args={[0.015 * unit, h, 4]} />\n        <meshStandardMaterial />\n      </instancedMesh>\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "terrain",
+  "title": "Terrain",
+  "type": "registry:component",
+  "description": "Procedural fbm-displaced ground with a matching trimesh collider and a flat build-pad option.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [
+    "core"
+  ],
+  "files": [
+    {
+      "path": "Terrain.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\nimport { useMemo } from 'react'\nimport * as THREE from 'three'\n\nexport interface TerrainProps {\n  position?: Vec3\n  /** Ground extent `[width, depth]`, in units. */\n  size?: [number, number]\n  thickness?: number\n  color?: string\n  /** Vertical relief amplitude, in units. 0 keeps the ground flat. */\n  relief?: number\n  /** Grid subdivisions for displaced ground. */\n  resolution?: number\n  /** Noise frequency. */\n  frequency?: number\n  /** Radius from center kept flat (for a build pad), in units. */\n  flatRadius?: number\n  seed?: number\n}\n\nfunction valueNoise(seed: number) {\n  const hash = (x: number, y: number) => {\n    let h = (seed ^ Math.imul(x, 374761393) ^ Math.imul(y, 668265263)) >>> 0\n    h = Math.imul(h ^ (h >>> 13), 1274126177)\n    return ((h ^ (h >>> 16)) >>> 0) / 4294967296\n  }\n  return (x: number, y: number) => {\n    const x0 = Math.floor(x)\n    const y0 = Math.floor(y)\n    const fx = x - x0\n    const fy = y - y0\n    const sx = fx * fx * (3 - 2 * fx)\n    const sy = fy * fy * (3 - 2 * fy)\n    const top = hash(x0, y0) + (hash(x0 + 1, y0) - hash(x0, y0)) * sx\n    const bot = hash(x0, y0 + 1) + (hash(x0 + 1, y0 + 1) - hash(x0, y0 + 1)) * sx\n    return top + (bot - top) * sy\n  }\n}\n\nfunction fbm(noise: (x: number, y: number) => number, x: number, y: number) {\n  let value = 0\n  let amp = 0.5\n  let freq = 1\n  for (let octave = 0; octave < 4; octave++) {\n    value += amp * noise(x * freq, y * freq)\n    amp *= 0.5\n    freq *= 2\n  }\n  return value\n}\n\nexport function Terrain({\n  position = [0, 0, 0],\n  size = [40, 40],\n  thickness = 0.4,\n  color = '#3a4a3f',\n  relief = 0,\n  resolution = 64,\n  frequency = 0.04,\n  flatRadius = 0,\n  seed = 1,\n}: TerrainProps) {\n  const { unit } = useWorld()\n  const width = size[0] * unit\n  const depth = size[1] * unit\n  const t = thickness * unit\n\n  const displaced = useMemo(() => {\n    if (relief <= 0) return null\n    const geo = new THREE.PlaneGeometry(width, depth, resolution, resolution)\n    geo.rotateX(-Math.PI / 2)\n    const noise = valueNoise(seed)\n    const fr = flatRadius * unit\n    const pos = geo.attributes.position\n    for (let i = 0; i < pos.count; i++) {\n      const x = pos.getX(i)\n      const z = pos.getZ(i)\n      let h = (fbm(noise, x * frequency, z * frequency) - 0.5) * 2 * relief * unit\n      if (fr > 0) h *= THREE.MathUtils.smoothstep(Math.hypot(x, z), fr, fr + 8 * unit)\n      pos.setY(i, h)\n    }\n    pos.needsUpdate = true\n    geo.computeVertexNormals()\n    return geo\n  }, [width, depth, resolution, relief, frequency, flatRadius, seed, unit])\n\n  if (displaced) {\n    return (\n      <RigidBody type=\"fixed\" colliders=\"trimesh\" position={position}>\n        <mesh geometry={displaced} receiveShadow castShadow>\n          <meshStandardMaterial color={color} flatShading />\n        </mesh>\n      </RigidBody>\n    )\n  }\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"cuboid\" position={position}>\n      <mesh receiveShadow position={[0, -t / 2, 0]}>\n        <boxGeometry args={[width, t, depth]} />\n        <meshStandardMaterial color={color} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}
