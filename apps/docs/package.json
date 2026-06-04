@@ -20,6 +20,7 @@
     "@runek/core": "workspace:*",
     "ecctrl": "catalog:",
     "leva": "catalog:",
+    "marked": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "three": "catalog:"

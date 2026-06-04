@@ -51,6 +51,9 @@ catalogs:
     leva:
       specifier: ^0.10.1
       version: 0.10.1
+    marked:
+      specifier: ^15.0.0
+      version: 15.0.12
     react:
       specifier: ^19.2.0
       version: 19.2.7
@@ -104,6 +107,9 @@ importers:
       leva:
         specifier: 'catalog:'
         version: 0.10.1(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      marked:
+        specifier: 'catalog:'
+        version: 15.0.12
       react:
         specifier: 'catalog:'
         version: 19.2.7
@@ -2495,6 +2501,11 @@ packages:
 
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
+
+  marked@15.0.12:
+    resolution: {integrity: sha512-8dD6FusOQSrpv9Z1rdNMdlSgQOIP880DHqnohobOmYLElGEqAL/JvxvuxZO16r4HtjTlfPRDC1hbvxC9dPN2nA==}
+    engines: {node: '>= 18'}
+    hasBin: true
 
   mdast-util-definitions@6.0.0:
     resolution: {integrity: sha512-scTllyX6pnYNZH/AIp/0ePz6s4cZtARxImwoPJ7kS42n+MnVsI4XbnG6d4ibehRIldYMWM2LD7ImQblVhUejVQ==}
@@ -5903,6 +5914,8 @@ snapshots:
   markdown-extensions@2.0.0: {}
 
   markdown-table@3.0.4: {}
+
+  marked@15.0.12: {}
 
   mdast-util-definitions@6.0.0:
     dependencies:

@@ -53,7 +53,7 @@ Both are centralized — do not hand-edit them in individual `package.json` file
 
 - **Dependency versions** live in one place: the `catalog:` block in `pnpm-workspace.yaml`. Every `package.json` references `"catalog:"` instead of a literal version. To bump a dependency (e.g. three.js), edit its catalog entry **once**, then `just install`.
 - **Package versions** are kept in lockstep across all workspace packages. Change them with **`just version X.Y.Z`** (writes every `package.json` via `scripts/set-version.mjs`) — never edit a `version` field by hand.
-- Publishing is gated on the still-open distribution decision; `just publish` is a stub until then.
+- Releases: **`just publish`** runs the gate, npm-publishes `@runek/cli`, tags `vX.Y.Z`, and creates a GitHub release (`just publish-help` shows the steps). The component library ships as source via the registry, which goes live by deploying `apps/docs` (serves `/r`).
 
 ## Core principles (the moat — never compromise these)
 
@@ -68,6 +68,8 @@ Any feature that requires a binary asset or a server must be questioned against 
 ## The component contract
 
 Every component: accepts `position`, `rotation`, `seed`; generates geometry inside `useMemo` keyed on all geometry-affecting props (including `seed`); registers its own colliders (a Rapier `RigidBody`); respects the `unit` scale from `useWorld()`. Keep collider count proportional to gameplay surface, not visual detail (e.g. one cuboid for a bookshelf, not one per book).
+
+The **normative spec** (MUST/SHOULD + conformance checklist) is [CONTRACT.md](CONTRACT.md); the contributor workflow for adding a component is [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Code conventions
 

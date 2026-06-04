@@ -9,6 +9,8 @@ export type DocMeta = {
   title: string
   summary: string
   category: string
+  /** Pre-rendered HTML of the doc body (built with `marked` in library.astro). */
+  body?: string
 }
 
 const CATEGORY_COLOR: Record<string, string> = {
@@ -82,7 +84,24 @@ function DocReader({ doc, onClose }: { doc: DocMeta; onClose: () => void }) {
 
   return (
     <div className="doc-overlay" role="dialog" aria-modal="true" aria-label={doc.title}>
-      <DocCard doc={doc} onClose={onClose} />
+      <div className="doc-reader">
+        <div className="row">
+          <span className="eyebrow">{doc.category}</span>
+          <button type="button" className="close" onClick={onClose} aria-label="Close">
+            ✕
+          </button>
+        </div>
+        <h2>{doc.title}</h2>
+        {doc.body ? (
+          // Trusted, build-rendered doc HTML (from our own Markdown).
+          <div className="doc-reader-body" dangerouslySetInnerHTML={{ __html: doc.body }} />
+        ) : (
+          <p className="doc-reader-body">{doc.summary}</p>
+        )}
+        <a className="btn primary" href={`/docs/${doc.slug}`}>
+          Open full page →
+        </a>
+      </div>
     </div>
   )
 }
@@ -127,23 +146,5 @@ function DocBook({
         </Html>
       )}
     </group>
-  )
-}
-
-function DocCard({ doc, onClose }: { doc: DocMeta; onClose: () => void }) {
-  return (
-    <div className="doc-card">
-      <div className="row">
-        <span className="eyebrow">{doc.category}</span>
-        <button type="button" className="close" onClick={onClose} aria-label="Close">
-          ✕
-        </button>
-      </div>
-      <h3>{doc.title}</h3>
-      <p>{doc.summary}</p>
-      <a className="btn primary" href={`/docs/${doc.slug}`}>
-        Open full page →
-      </a>
-    </div>
   )
 }

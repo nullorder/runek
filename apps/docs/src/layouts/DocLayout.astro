@@ -15,6 +15,7 @@ const { title, summary, eyebrow } = Astro.props
     {eyebrow && <p class="eyebrow">{eyebrow}</p>}
     <h1>{title}</h1>
     {summary && <p class="summary">{summary}</p>}
+    <p class="explore-3d"><a href="/library">⌖ Explore the library in 3D →</a></p>
     <slot />
   </article>
 </BaseLayout>

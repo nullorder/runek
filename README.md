@@ -8,15 +8,39 @@ Runek is a source registry of procedural 3D components for [React Three Fiber](h
 
 Think **"shadcn for 3D worlds."**
 
-> **Status:** `v0.0.x` — scaffolding. The API below is the target shape; components land in `v0.1.0`.
+**[Docs](https://runek.nullorder.org/docs) · [Gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library)**
+
+> **Status:** `v0.4.0` — 23 components, a runtime editor, worlds-as-data, the `runek` CLI + source registry, and a docs site (flat docs + a walkable 3D library) all live in the monorepo. `v0.5.0` (distribution GA + deploy) in progress.
+
+## Why Runek
+
+- **Procedural-first** — geometry from props + `seed`; no `.glb`, no textures, no CDN.
+- **A world is data** — every component is a pure, deterministic function of its props.
+- **Seeded determinism** — same seed → same result, on every machine and every render.
+- **Parametric LOD** — detail scales with props and distance.
+- **Local-first** — no backend; a world deploys as a static site.
+- **You own the source** — components are copied into your project, not locked behind an import.
+
+## Install
+
+```sh
+npx runek init                          # writes runek.config.json + the install dir
+npx runek add player terrain bookshelf  # pulls source + deps into your project
+npx runek list                          # browse the catalog
+```
+
+`add` copies editable component source into your project (default `src/runek/`),
+resolves dependencies, and installs the npm packages it needs.
 
 ## Compose your first world
 
 ```tsx
-import { World } from '@runek/core'
-import { Bookshelf, Player, Terrain } from '@runek/components'
+import { World } from './runek/core'
+import { Bookshelf } from './runek/Bookshelf'
+import { Player } from './runek/Player'
+import { Terrain } from './runek/Terrain'
 
-export function Helicon() {
+export function FirstWorld() {
   return (
     <World>
       <Terrain size={[40, 40]} />
@@ -35,21 +59,30 @@ Same `seed` → same world, every time.
 packages/
   core/         @runek/core        — <World>, useWorld, seeded rng, contract types
   components/   @runek/components   — the procedural components
+  cli/          @runek/cli         — the `runek` CLI (init / add / list)
 apps/
-  helicon/      the showcase world (Vite app; extracts to its own repo at GA)
+  helicon/      the showcase world (extracts to its own repo at distribution GA)
+  docs/         the docs site (flat docs + a walkable 3D library); serves the registry at /r
+registry/       registry.json (index) + generated components/*.json
 ```
 
 ## Development
 
 ```sh
-pnpm install
-pnpm dev          # run the Helicon showcase app
-pnpm build        # typecheck + build the app
-pnpm lint         # Biome lint + format check
-pnpm typecheck    # tsc across the workspace
+just install      # install workspace deps (pnpm)
+just dev          # run the Helicon showcase app
+just docs         # run the docs site
+just check        # full gate: lint + typecheck + test + build
 ```
 
-Requires Node ≥ 20 and pnpm. Built on React 19, React Three Fiber 9, Rapier, ecctrl, and drei.
+Run `just` to list every recipe. Requires Node 24 (pinned in `.nvmrc`) and pnpm.
+Built on React 19, React Three Fiber 9, Rapier, ecctrl, and drei.
+
+## Contributing
+
+Component contributions are welcome. Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+for the dev setup and the step-by-step "add a component" flow, and check your work
+against the [component contract](./CONTRACT.md).
 
 [![made with Pixelspace](https://pixelspace.anirudha.dev/badge.svg)](https://pixelspace.anirudha.dev)
 
