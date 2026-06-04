@@ -1,0 +1,40 @@
+---
+import '../styles/global.css'
+
+const title = 'Runek — procedural 3D worlds for React Three Fiber'
+const description =
+  'Runek is a source registry of procedural, seeded React Three Fiber components. shadcn for 3D worlds.'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <nav class="site-nav">
+      <a class="brand" href="/">runek</a>
+      <span class="spacer"></span>
+      <a href="/docs">Docs</a>
+      <a href="/library">Library</a>
+      <a href="https://github.com/nullorder/runek">GitHub</a>
+    </nav>
+
+    <main class="hero">
+      <p class="rune">worlds, one rune at a time</p>
+      <h1>Runek</h1>
+      <p class="tagline">
+        Procedural 3D components for React Three Fiber. Compose walkable worlds from code —
+        seeded, asset-free, and yours to own.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="/library">Enter the library →</a>
+        <a class="btn ghost" href="/docs">Read the docs</a>
+      </div>
+      <code class="install">npx runek add bookshelf</code>
+    </main>
+  </body>
+</html>

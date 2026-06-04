@@ -12,9 +12,17 @@ install:
 dev:
     pnpm --filter helicon dev
 
+# Run the docs site (Astro dev server)
+docs:
+    pnpm --filter @runek/docs dev
+
 # Production build of the showcase app
 build:
     pnpm --filter helicon build
+
+# Production build of the docs site (Astro static)
+build-docs:
+    pnpm --filter @runek/docs build
 
 # Preview the production build
 preview:
@@ -40,8 +48,8 @@ fmt:
 typecheck:
     pnpm -r --if-present typecheck
 
-# Full verification gate: lint, typecheck, test, build
-check: lint typecheck test build
+# Full verification gate: lint, typecheck, test, build (apps)
+check: lint typecheck test build build-docs
 
 # Run the test suite (vitest, across packages)
 test:
@@ -64,3 +72,4 @@ publish:
 clean:
     rm -rf node_modules packages/*/node_modules apps/*/node_modules
     rm -rf apps/helicon/dist apps/helicon/.vite
+    rm -rf apps/docs/dist apps/docs/.astro apps/docs/public/r

@@ -1,0 +1,6 @@
+# Astro build output + generated types
+dist/
+.astro/
+
+# Registry copied in from /registry at build (served at /r)
+public/r/

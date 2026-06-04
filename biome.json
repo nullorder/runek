@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!registry/components"]
+    "includes": ["**", "!registry/components", "!**/*.astro"]
   },
   "formatter": {
     "enabled": true,
@@ -21,6 +21,19 @@
       "recommended": true
     }
   },
+  "overrides": [
+    {
+      "includes": ["**/components/world/**"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noStaticElementInteractions": "off",
+            "useKeyWithClickEvents": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "single",

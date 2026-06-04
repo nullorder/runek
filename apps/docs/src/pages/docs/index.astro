@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content'
+import DocLayout from '../../layouts/DocLayout.astro'
+
+const order = ['intro', 'guide', 'component', 'reference']
+const docs = (await getCollection('docs')).sort(
+  (a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
+)
+const groups = order
+  .map((category) => ({ category, items: docs.filter((d) => d.data.category === category) }))
+  .filter((g) => g.items.length > 0)
+---
+
+<DocLayout title="Documentation" summary="Compose, walk, and edit procedural 3D worlds in React Three Fiber.">
+  {
+    groups.map((group) => (
+      <section>
+        <h2 style="text-transform:capitalize">{group.category}</h2>
+        <ul>
+          {group.items.map((doc) => (
+            <li>
+              <a href={`/docs/${doc.id}`}>{doc.data.title}</a>
+              {doc.data.summary && <span style="color:var(--muted)"> — {doc.data.summary}</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</DocLayout>

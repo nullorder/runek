@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content'
+import LibraryWorld from '../components/world/LibraryWorld.tsx'
+import '../styles/global.css'
+
+const docs = (await getCollection('docs'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((d) => ({ slug: d.id, title: d.data.title, summary: d.data.summary ?? '', category: d.data.category }))
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Walk the Runek library — a docs world built from the components it documents." />
+    <title>Runek — the library</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0d12; }
+    </style>
+  </head>
+  <body>
+    <a class="world-back" href="/">← home</a>
+    <LibraryWorld client:only="react" docs={docs} />
+  </body>
+</html>

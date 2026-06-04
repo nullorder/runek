@@ -1,0 +1,37 @@
+{
+  "name": "@runek/docs",
+  "version": "0.0.0",
+  "description": "Runek documentation site — flat docs + a walkable 3D library world (Astro + R3F).",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/sync-registry.mjs && astro dev",
+    "build": "node scripts/sync-registry.mjs && astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "sync-registry": "node scripts/sync-registry.mjs"
+  },
+  "dependencies": {
+    "@react-three/drei": "catalog:",
+    "@react-three/fiber": "catalog:",
+    "@react-three/rapier": "catalog:",
+    "@runek/components": "workspace:*",
+    "@runek/core": "workspace:*",
+    "ecctrl": "catalog:",
+    "leva": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "three": "catalog:"
+  },
+  "devDependencies": {
+    "@astrojs/check": "catalog:",
+    "@astrojs/mdx": "catalog:",
+    "@astrojs/react": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/three": "catalog:",
+    "astro": "catalog:",
+    "typescript": "catalog:"
+  }
+}
