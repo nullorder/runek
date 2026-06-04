@@ -1,5 +1,5 @@
 ---
-import '../styles/global.css'
+import BaseLayout from './BaseLayout.astro'
 
 interface Props {
   title: string
@@ -10,27 +10,11 @@ interface Props {
 const { title, summary, eyebrow } = Astro.props
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {summary && <meta name="description" content={summary} />}
-    <title>{title} — Runek</title>
-  </head>
-  <body>
-    <nav class="site-nav">
-      <a class="brand" href="/">runek</a>
-      <span class="spacer"></span>
-      <a href="/docs">Docs</a>
-      <a href="/library">Library</a>
-      <a href="https://github.com/nullorder/runek">GitHub</a>
-    </nav>
-    <article class="doc">
-      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-      <h1>{title}</h1>
-      {summary && <p class="summary">{summary}</p>}
-      <slot />
-    </article>
-  </body>
-</html>
+<BaseLayout title={`${title} — Runek`} description={summary}>
+  <article class="doc">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {summary && <p class="summary">{summary}</p>}
+    <slot />
+  </article>
+</BaseLayout>

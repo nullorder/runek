@@ -1,0 +1,57 @@
+---
+import ComponentPreview from '../../components/gallery/ComponentPreview.tsx'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { getComponents } from '../../lib/registry'
+
+const order = [
+  'structures',
+  'interiors',
+  'water',
+  'environment',
+  'vegetation',
+  'terrain',
+  'character',
+  'systems',
+]
+const components = getComponents()
+const groups = order
+  .map((category) => ({ category, items: components.filter((i) => i.category === category) }))
+  .filter((g) => g.items.length > 0)
+---
+
+<BaseLayout
+  title="Component gallery — Runek"
+  description="Browse every Runek component as a live, seeded 3D preview."
+>
+  <main class="gallery">
+    <header class="gallery-head">
+      <p class="eyebrow">Gallery</p>
+      <h1>Every component, live</h1>
+      <p class="summary">
+        Each preview is the real component, generated from a seed — drag to orbit. Open one for
+        its props, dependencies, and source.
+      </p>
+    </header>
+
+    {
+      groups.map((group) => (
+        <section class="gallery-section">
+          <h2>{group.category}</h2>
+          <div class="grid">
+            {group.items.map((item) => (
+              <div class="card">
+                <ComponentPreview client:visible title={item.title} />
+                <div class="card-meta">
+                  <a class="card-title" href={`/gallery/${item.name}`}>
+                    {item.title}
+                  </a>
+                  <p>{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </main>
+</BaseLayout>

@@ -36,7 +36,7 @@ export type Config = {
 export const CONFIG_FILE = 'runek.config.json'
 
 export const DEFAULT_CONFIG: Config = {
-  registry: 'https://runek.dev/r',
+  registry: 'https://runek.nullorder.org/r',
   dir: 'src/runek',
   coreImport: './core',
 }
@@ -54,7 +54,7 @@ export function readConfig(cwd: string): Config {
 }
 
 export function writeConfig(cwd: string, config: Config): void {
-  const body = { $schema: 'https://runek.dev/registry/config-schema.json', ...config }
+  const body = { $schema: 'https://runek.nullorder.org/registry/config-schema.json', ...config }
   writeFileSync(join(cwd, CONFIG_FILE), `${JSON.stringify(body, null, 2)}\n`)
 }
 

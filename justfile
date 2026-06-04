@@ -32,6 +32,10 @@ preview:
 registry:
     @node scripts/build-registry.mjs
 
+# Regenerate per-component docs (apps/docs) from the registry
+gen-docs:
+    @node apps/docs/scripts/gen-component-docs.mjs
+
 # Run the Runek CLI from source, e.g. `just cli add bookshelf --registry ./registry`
 cli *ARGS:
     @node packages/cli/src/index.ts {{ARGS}}
@@ -62,9 +66,9 @@ version VERSION:
 # Publish — distribution model is the source registry (Path A); GA hosting is still pending
 publish:
     @echo "Distribution model: source registry (Path A — npx runek add)."
-    @echo "GA steps (not yet automated — needs npm auth + runek.dev hosting):"
+    @echo "GA steps (not yet automated — needs npm auth + runek.nullorder.org hosting):"
     @echo "  1. just registry                                    # regenerate registry/components/*.json"
-    @echo "  2. deploy registry/ to https://runek.dev/r          # static host"
+    @echo "  2. deploy registry/ to https://runek.nullorder.org/r          # static host"
     @echo "  3. pnpm --filter @runek/cli build && pnpm --filter @runek/cli publish --access public"
     @exit 1
 

@@ -1,6 +1,6 @@
 {
   "name": "@runek/cli",
-  "version": "0.0.0",
+  "version": "0.4.0",
   "description": "Runek CLI — pull procedural 3D component source into your project (source registry).",
   "license": "MIT",
   "type": "module",

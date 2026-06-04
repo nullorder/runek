@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Copy the served registry into public/r so the docs deploy also hosts
-// https://runek.dev/r — the CLI's default registry. Runs before dev and build.
+// https://runek.nullorder.org/r — the CLI's default registry. Runs before dev and build.
 import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'

@@ -1,0 +1,77 @@
+---
+import '../styles/global.css'
+
+interface Props {
+  title: string
+  description?: string
+}
+
+const { title, description } = Astro.props
+const nav = [
+  { href: '/docs', label: 'Docs' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/library', label: 'Library' },
+  { href: 'https://github.com/nullorder/runek', label: 'GitHub' },
+]
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {description && <meta name="description" content={description} />}
+    <link rel="preload" href="/fonts/Pixelspace-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <title>{title}</title>
+  </head>
+  <body>
+    <nav class="site-nav">
+      <a class="brand" href="/">runek</a>
+      <span class="spacer"></span>
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+
+    <slot />
+
+    <footer class="site-footer">
+      <div class="foot-inner">
+        <span class="foot-brand">runek</span>
+        <span class="foot-tag">
+          Procedural 3D worlds for React Three Fiber — composable, seeded, asset-free.
+        </span>
+        <nav>
+          {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+        </nav>
+        <p class="foot-fine">MIT © nullorder · worlds, one rune at a time</p>
+      </div>
+    </footer>
+
+    <script>
+      function enhanceCodeBlocks() {
+        const blocks = document.querySelectorAll('pre.astro-code')
+        for (const pre of blocks) {
+          if (pre.parentElement?.classList.contains('code-block')) continue
+          const wrap = document.createElement('div')
+          wrap.className = 'code-block'
+          pre.replaceWith(wrap)
+          wrap.appendChild(pre)
+          const btn = document.createElement('button')
+          btn.type = 'button'
+          btn.className = 'copy-btn'
+          btn.textContent = 'copy'
+          btn.addEventListener('click', async () => {
+            await navigator.clipboard.writeText(pre.textContent ?? '')
+            btn.textContent = 'copied'
+            btn.dataset.copied = 'true'
+            window.setTimeout(() => {
+              btn.textContent = 'copy'
+              btn.dataset.copied = 'false'
+            }, 1400)
+          })
+          wrap.appendChild(btn)
+        }
+      }
+      enhanceCodeBlocks()
+    </script>
+  </body>
+</html>

@@ -51,6 +51,8 @@ pnpm typecheck    # tsc across the workspace
 
 Requires Node ≥ 20 and pnpm. Built on React 19, React Three Fiber 9, Rapier, ecctrl, and drei.
 
+[![made with Pixelspace](https://pixelspace.anirudha.dev/badge.svg)](https://pixelspace.anirudha.dev)
+
 ## License
 
 [MIT](LICENSE) © nullorder

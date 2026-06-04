@@ -31,5 +31,5 @@ npx runek list                         # browse the catalog
 A custom or local registry works via `--registry <url|path>` (e.g. point it at this
 folder during development: `just cli add bookshelf --registry ./registry`).
 
-The published default registry is `https://runek.dev/r`, which serves `registry.json`
+The published default registry is `https://runek.nullorder.org/r`, which serves `registry.json`
 and `components/<name>.json` from this directory.

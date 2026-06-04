@@ -3,7 +3,9 @@ import { getCollection } from 'astro:content'
 import LibraryWorld from '../components/world/LibraryWorld.tsx'
 import '../styles/global.css'
 
+// The library is the guides reading room; the full component catalog is the gallery.
 const docs = (await getCollection('docs'))
+  .filter((d) => d.data.category === 'intro' || d.data.category === 'guide')
   .sort((a, b) => a.data.order - b.data.order)
   .map((d) => ({ slug: d.id, title: d.data.title, summary: d.data.summary ?? '', category: d.data.category }))
 ---

@@ -1,7 +1,7 @@
 {
-  "$schema": "https://runek.dev/registry/schema.json",
+  "$schema": "https://runek.nullorder.org/registry/schema.json",
   "name": "runek",
-  "homepage": "https://runek.dev",
+  "homepage": "https://runek.nullorder.org",
   "items": [
     {
       "name": "core",
