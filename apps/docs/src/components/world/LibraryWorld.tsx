@@ -1,7 +1,7 @@
 import { Html } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
-import { Bookshelf, LightRig, Player, Room, Sky } from '@runek/components'
-import { World } from '@runek/core'
+import { Bookshelf, Lamp, LightRig, Player, Room, Rug, Sky } from '@runek/components'
+import { World, type WorldPalette } from '@runek/core'
 import { useEffect, useState } from 'react'
 
 export type DocMeta = {
@@ -22,21 +22,35 @@ const CATEGORY_COLOR: Record<string, string> = {
 
 const SPREAD = 0.9
 
+/** Warm reading-room theme — one palette re-colors every component in the world. */
+const LIBRARY_PALETTE: Partial<WorldPalette> = {
+  wood: '#7a5a40',
+  woodDark: '#64482f',
+  wall: '#b9b2a4',
+  fabric: '#6e3d44',
+  accent: '#c2a05a',
+}
+
 export default function LibraryWorld({ docs }: { docs: DocMeta[] }) {
   const [selected, setSelected] = useState<DocMeta | null>(null)
 
   return (
     <div style={{ position: 'fixed', inset: 0 }}>
-      <World lights={false} onPointerMissed={() => setSelected(null)}>
+      <World lights={false} palette={LIBRARY_PALETTE} onPointerMissed={() => setSelected(null)}>
         <Sky />
         <LightRig sunPosition={[4, 16, -8]} ambient={0.6} />
-        <Room size={[14, 14]} height={4.5} doorWidth={0} color="#b9b2a4" />
+        <Room size={[14, 14]} height={4.5} doorWidth={0} />
 
         {/* Atmosphere: decorative shelves lining the far wall, facing the visitor. */}
         <Bookshelf position={[-5, 1, 6.5]} rotation={[0, Math.PI, 0]} seed={3} />
         <Bookshelf position={[-3.4, 1, 6.5]} rotation={[0, Math.PI, 0]} seed={7} />
         <Bookshelf position={[3.4, 1, 6.5]} rotation={[0, Math.PI, 0]} seed={11} />
         <Bookshelf position={[5, 1, 6.5]} rotation={[0, Math.PI, 0]} seed={17} />
+
+        {/* Reading-room warmth: flickering lamps flanking the shelves, a rug at the cabinet. */}
+        <Lamp position={[-6.2, 0, 6.2]} />
+        <Lamp position={[6.2, 0, 6.2]} />
+        <Rug position={[0, 0.01, 0.4]} size={[7, 3.4]} seed={5} />
 
         {/* The doc cabinet + interactive books, one per Markdown doc. */}
         <mesh position={[0, 0.5, 2.2]} castShadow receiveShadow>

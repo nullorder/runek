@@ -32,6 +32,7 @@ export interface WallProps {
   width?: number
   height?: number
   thickness?: number
+  /** Defaults to the world palette's `wall` slot. */
   color?: string
   opening?: WallOpening
 }

@@ -67,7 +67,17 @@ used as in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 - A component **MUST** read `unit` from `useWorld()` and scale its dimensions by
   it. **1 unit = 1 meter**, **Y is up**, rotations are in **radians**.
 
-## 7. Dependencies & boundaries
+## 7. Palette & performance
+
+- Color props **SHOULD** default to a slot of the world palette
+  (`useWorld().palette`) so one palette swap re-themes a whole world. An explicit
+  color prop **MUST** still override the palette. Fixed colors are acceptable
+  only where no slot fits (e.g. seeded book spines).
+- Repeated geometry (books, branches, blades, …) **SHOULD** render as an
+  `InstancedMesh` — draw calls scale with *kinds* of geometry, not instance
+  counts. See `Bookshelf`, `Trees`, and `Grass` for the pattern.
+
+## 8. Dependencies & boundaries
 
 - Shared utilities **MUST** be imported from `@runek/core` only.
 - A component **MAY** compose sibling components; each such sibling **MUST** be
@@ -88,5 +98,7 @@ used as in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 - [ ] No binary assets, no runtime fetch / CDN
 - [ ] Registers colliders proportional to gameplay surface (or none, if decorative)
 - [ ] Respects `unit` from `useWorld()` (meters, Y-up, radians)
+- [ ] Color props default to world-palette slots; explicit colors still win
+- [ ] Repeated geometry is instanced, not one mesh per piece
 - [ ] Imports shared code from `@runek/core`; sibling deps declared; no app imports
 - [ ] `just check` passes (lint, typecheck, test, build)

@@ -1,6 +1,6 @@
 import { CylinderCollider, RigidBody } from '@react-three/rapier'
 import { rng, useWorld, type Vec3 } from '@runek/core'
-import { useMemo } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
 export interface TreesProps {
@@ -12,22 +12,24 @@ export interface TreesProps {
   segmentLength?: number
   /** Branching angle, in radians. */
   angle?: number
+  /** Defaults to the world palette's `bark` slot. */
   trunkColor?: string
+  /** Defaults to the world palette's `foliage` slot. */
   leafColor?: string
 }
 
 interface Branch {
-  id: string
-  position: Vec3
-  quaternion: [number, number, number, number]
+  position: THREE.Vector3
+  quaternion: THREE.Quaternion
   length: number
   radius: number
 }
 
 interface Leaf {
-  id: string
-  position: Vec3
+  position: THREE.Vector3
   size: number
+  /** Per-leaf brightness multiplier for color variation. */
+  shade: number
 }
 
 const AXIOM = 'F'
@@ -53,7 +55,10 @@ function buildTree(seed: number, iterations: number, segLen: number, angle: numb
   let pos = new THREE.Vector3()
   let quat = new THREE.Quaternion()
   let depth = 0
-  let count = 0
+
+  const addLeaf = (at: THREE.Vector3) => {
+    leaves.push({ position: at.clone(), size: segLen * 0.45, shade: 0.8 + next() * 0.4 })
+  }
 
   for (const ch of symbols) {
     switch (ch) {
@@ -63,11 +68,9 @@ function buildTree(seed: number, iterations: number, segLen: number, angle: numb
         const start = pos.clone()
         pos = start.clone().addScaledVector(dir, len)
         const mid = start.clone().add(pos).multiplyScalar(0.5)
-        const q = new THREE.Quaternion().setFromUnitVectors(UP, dir)
         branches.push({
-          id: `b${count++}`,
-          position: [mid.x, mid.y, mid.z],
-          quaternion: [q.x, q.y, q.z, q.w],
+          position: mid,
+          quaternion: new THREE.Quaternion().setFromUnitVectors(UP, dir),
           length: len,
           radius: segLen * 0.12 * 0.7 ** depth,
         })
@@ -90,7 +93,7 @@ function buildTree(seed: number, iterations: number, segLen: number, angle: numb
         depth++
         break
       case ']': {
-        leaves.push({ id: `l${count++}`, position: [pos.x, pos.y, pos.z], size: segLen * 0.45 })
+        addLeaf(pos)
         const saved = stack.pop()
         if (saved) {
           pos = saved.pos
@@ -101,11 +104,14 @@ function buildTree(seed: number, iterations: number, segLen: number, angle: numb
       }
     }
   }
-  leaves.push({ id: `l${count++}`, position: [pos.x, pos.y, pos.z], size: segLen * 0.45 })
+  addLeaf(pos)
   return { branches, leaves }
 }
 
-/** A single procedural tree grown from a bracketed L-system. */
+/**
+ * A single procedural tree grown from a bracketed L-system.
+ * Branches and leaves render as one instanced mesh each, so a forest stays cheap.
+ */
 export function Trees({
   position = [0, 0, 0],
   rotation = [0, 0, 0],
@@ -113,31 +119,77 @@ export function Trees({
   iterations = 2,
   segmentLength = 0.7,
   angle = 0.5,
-  trunkColor = '#5b4636',
-  leafColor = '#4f7a3a',
+  trunkColor,
+  leafColor,
 }: TreesProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const bark = trunkColor ?? palette.bark
+  const foliage = leafColor ?? palette.foliage
   const segLen = segmentLength * unit
+  const branchesRef = useRef<THREE.InstancedMesh>(null)
+  const leavesRef = useRef<THREE.InstancedMesh>(null)
+
   const { branches, leaves } = useMemo(
     () => buildTree(seed, iterations, segLen, angle),
     [seed, iterations, segLen, angle],
   )
 
+  useLayoutEffect(() => {
+    const mesh = branchesRef.current
+    if (!mesh) return
+    const dummy = new THREE.Object3D()
+    branches.forEach((b, i) => {
+      dummy.position.copy(b.position)
+      dummy.quaternion.copy(b.quaternion)
+      dummy.scale.set(b.radius, b.length, b.radius)
+      dummy.updateMatrix()
+      mesh.setMatrixAt(i, dummy.matrix)
+    })
+    mesh.count = branches.length
+    mesh.instanceMatrix.needsUpdate = true
+  }, [branches])
+
+  useLayoutEffect(() => {
+    const mesh = leavesRef.current
+    if (!mesh) return
+    const dummy = new THREE.Object3D()
+    const base = new THREE.Color(foliage)
+    const tint = new THREE.Color()
+    leaves.forEach((leaf, i) => {
+      dummy.position.copy(leaf.position)
+      dummy.rotation.set(0, 0, 0)
+      dummy.scale.setScalar(leaf.size)
+      dummy.updateMatrix()
+      mesh.setMatrixAt(i, dummy.matrix)
+      mesh.setColorAt(i, tint.copy(base).multiplyScalar(leaf.shade))
+    })
+    mesh.count = leaves.length
+    mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+  }, [leaves, foliage])
+
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CylinderCollider args={[segLen, segLen * 0.2]} position={[0, segLen, 0]} />
-      {branches.map((b) => (
-        <mesh key={b.id} position={b.position} quaternion={b.quaternion} castShadow>
-          <cylinderGeometry args={[b.radius * 0.7, b.radius, b.length, 5]} />
-          <meshStandardMaterial color={trunkColor} />
-        </mesh>
-      ))}
-      {leaves.map((l) => (
-        <mesh key={l.id} position={l.position} castShadow>
-          <icosahedronGeometry args={[l.size, 0]} />
-          <meshStandardMaterial color={leafColor} flatShading />
-        </mesh>
-      ))}
+      <instancedMesh
+        key={`b${branches.length}`}
+        ref={branchesRef}
+        args={[undefined, undefined, branches.length]}
+        castShadow
+      >
+        {/* unit cylinder, tapered; instances scale x/z by radius and y by length */}
+        <cylinderGeometry args={[0.7, 1, 1, 5]} />
+        <meshStandardMaterial color={bark} roughness={0.95} />
+      </instancedMesh>
+      <instancedMesh
+        key={`l${leaves.length}`}
+        ref={leavesRef}
+        args={[undefined, undefined, leaves.length]}
+        castShadow
+      >
+        <icosahedronGeometry args={[1, 0]} />
+        <meshStandardMaterial flatShading />
+      </instancedMesh>
     </RigidBody>
   )
 }

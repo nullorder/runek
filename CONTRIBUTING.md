@@ -48,7 +48,9 @@ Dependency direction is one-way: `app → components → core`.
 1. **Write it.** Create `packages/components/src/<Name>.tsx` following the
    [component contract](./CONTRACT.md) — typed `<Name>Props`, deterministic from
    `seed`, geometry in `useMemo`, colliders proportional to gameplay surface, no
-   assets, respects `unit` from `useWorld()`.
+   assets, respects `unit` from `useWorld()`. Default colors to world-palette
+   slots (`useWorld().palette`) and render repeated geometry as an
+   `InstancedMesh` (see `Bookshelf`, `Trees`, `Grass`).
 
 2. **Export it.** Add to `packages/components/src/index.ts` (the type and the
    component, kept alphabetical):

@@ -13,7 +13,9 @@ export interface HouseProps {
   height?: number
   thickness?: number
   roofStyle?: RoofStyle
+  /** Defaults to the world palette's `wall` slot. */
   wallColor?: string
+  /** Defaults to the world palette's `roof` slot. */
   roofColor?: string
   /** Reserved for procedural variation. */
   seed?: number
@@ -32,8 +34,8 @@ export function House({
   height = 3,
   thickness = 0.2,
   roofStyle = 'gable',
-  wallColor = '#d8cfc0',
-  roofColor = '#8a5a44',
+  wallColor,
+  roofColor,
 }: HouseProps) {
   const { unit } = useWorld()
   const [w, d] = size
@@ -48,7 +50,7 @@ export function House({
 
   return (
     <group position={position} rotation={rotation}>
-      <Floor size={size} thickness={thickness} color={wallColor} />
+      <Floor size={size} thickness={thickness} />
 
       <Wall
         position={[0, 0, -halfD]}

@@ -8,6 +8,7 @@ export interface TerrainProps {
   /** Ground extent `[width, depth]`, in units. */
   size?: [number, number]
   thickness?: number
+  /** Defaults to the world palette's `ground` slot. */
   color?: string
   /** Vertical relief amplitude, in units. 0 keeps the ground flat. */
   relief?: number
@@ -55,14 +56,15 @@ export function Terrain({
   position = [0, 0, 0],
   size = [40, 40],
   thickness = 0.4,
-  color = '#3a4a3f',
+  color,
   relief = 0,
   resolution = 64,
   frequency = 0.04,
   flatRadius = 0,
   seed = 1,
 }: TerrainProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const groundColor = color ?? palette.ground
   const width = size[0] * unit
   const depth = size[1] * unit
   const t = thickness * unit
@@ -90,7 +92,7 @@ export function Terrain({
     return (
       <RigidBody type="fixed" colliders="trimesh" position={position}>
         <mesh geometry={displaced} receiveShadow castShadow>
-          <meshStandardMaterial color={color} flatShading />
+          <meshStandardMaterial color={groundColor} flatShading />
         </mesh>
       </RigidBody>
     )
@@ -100,7 +102,7 @@ export function Terrain({
     <RigidBody type="fixed" colliders="cuboid" position={position}>
       <mesh receiveShadow position={[0, -t / 2, 0]}>
         <boxGeometry args={[width, t, depth]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={groundColor} />
       </mesh>
     </RigidBody>
   )

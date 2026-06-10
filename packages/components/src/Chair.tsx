@@ -8,6 +8,7 @@ export interface ChairProps {
   depth?: number
   seatHeight?: number
   backHeight?: number
+  /** Defaults to the world palette's `wood` slot. */
   color?: string
 }
 
@@ -18,9 +19,10 @@ export function Chair({
   depth = 0.45,
   seatHeight = 0.45,
   backHeight = 0.5,
-  color = '#6b4a2f',
+  color,
 }: ChairProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const woodColor = color ?? palette.wood
   const w = width * unit
   const d = depth * unit
   const seatY = seatHeight * unit
@@ -41,16 +43,16 @@ export function Chair({
       <CuboidCollider args={[w / 2, t, d / 2]} position={[0, seatY, 0]} />
       <mesh castShadow receiveShadow position={[0, seatY, 0]}>
         <boxGeometry args={[w, t, d]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={woodColor} />
       </mesh>
       <mesh castShadow receiveShadow position={[0, seatY + backH / 2, -d / 2 + t / 2]}>
         <boxGeometry args={[w, backH, t]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={woodColor} />
       </mesh>
       {legs.map((p) => (
         <mesh key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`} castShadow position={p}>
           <boxGeometry args={[leg, seatY, leg]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color={woodColor} />
         </mesh>
       ))}
     </RigidBody>

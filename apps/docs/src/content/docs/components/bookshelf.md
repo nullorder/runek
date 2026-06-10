@@ -12,7 +12,7 @@ order: 100
 npx runek add bookshelf
 ```
 
-Pulls `core`, `@react-three/rapier@^2.2.0`.
+Pulls `core`, `@react-three/rapier@^2.2.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -35,6 +35,10 @@ export interface BookshelfProps {
   shelves?: number
   /** Fraction of shelf space filled with books, 0–1. */
   fill?: number
+  /** Frame color. Defaults to the world palette's `wood` slot. */
+  color?: string
+  /** Back-panel color. Defaults to the world palette's `woodDark` slot. */
+  backColor?: string
   seed?: number
 }
 ```

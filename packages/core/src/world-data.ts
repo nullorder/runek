@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
-import type { Vec3 } from './types'
+import type { WorldPalette } from './palette'
+import type { Vec3, WorldFog } from './types'
 
 export type JsonValue =
   | string
@@ -22,6 +23,9 @@ export interface WorldData {
   version: 1
   unit?: number
   gravity?: Vec3
+  /** Color-slot overrides applied to every component in the world. */
+  palette?: Partial<WorldPalette>
+  fog?: WorldFog
   nodes: WorldNode[]
 }
 

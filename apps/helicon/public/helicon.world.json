@@ -2,6 +2,13 @@
   "version": 1,
   "unit": 1,
   "gravity": [0, -9.81, 0],
+  "palette": {
+    "wood": "#75563c",
+    "wall": "#d8cfc0",
+    "roof": "#7d4f3a",
+    "foliage": "#557d3c"
+  },
+  "fog": { "color": "#dfe9f5", "near": 35, "far": 110 },
   "nodes": [
     { "type": "Sky", "props": { "sunPosition": [60, 25, 30] } },
     { "type": "LightRig", "props": { "sunPosition": [60, 25, 30], "shadowRange": 34 } },
@@ -41,7 +48,10 @@
       "props": { "position": [0, 0.02, 11], "area": [30, 12], "count": 900, "seed": 3 }
     },
     { "type": "Shore", "props": { "position": [18, 0.03, 0], "size": [24, 26] } },
-    { "type": "Lake", "props": { "position": [18, 0.12, 0], "size": [15, 17] } },
+    {
+      "type": "Lake",
+      "props": { "position": [18, 0.12, 0], "size": [15, 17], "sunPosition": [60, 25, 30] }
+    },
     {
       "type": "Rocks",
       "props": { "position": [9, 0.02, -8], "count": 7, "spread": 3.5, "seed": 11 }

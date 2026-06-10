@@ -1,6 +1,6 @@
 import { OrbitControls, TransformControls } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
-import { type CSSProperties, useEffect, useState } from 'react'
+import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import type { Object3D } from 'three'
 import type { Vec3 } from './types'
 import { World, type WorldProps } from './World'
@@ -15,7 +15,8 @@ import {
 type TransformMode = 'translate' | 'rotate'
 type Selection = { index: number; object: Object3D } | null
 
-export interface WorldEditorProps extends Omit<WorldProps, 'children' | 'unit' | 'gravity'> {
+export interface WorldEditorProps
+  extends Omit<WorldProps, 'children' | 'unit' | 'gravity' | 'palette' | 'fog'> {
   data: WorldData
   registry: ComponentRegistry
   onChange: (next: WorldData) => void
@@ -26,29 +27,65 @@ const NON_SELECTABLE = new Set(['Sky', 'LightRig'])
 /** Nodes skipped in the editor (no FPS controller while orbiting). */
 const SKIPPED = new Set(['Player'])
 
+const HISTORY_LIMIT = 100
+
 const asVec3 = (value: JsonValue | undefined): Vec3 | undefined =>
   Array.isArray(value) && value.length === 3 ? (value as unknown as Vec3) : undefined
 
-/** Edit a world data-first: orbit camera, click-select, gizmo move/rotate, leva props — all writing back to `WorldData`. */
+const isTyping = (target: EventTarget | null) => {
+  const el = target as HTMLElement | null
+  return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
+}
+
+/**
+ * Edit a world data-first: orbit camera, click-select, gizmo move/rotate, leva props,
+ * add/duplicate/delete nodes, undo — all writing back to `WorldData`.
+ */
 export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEditorProps) {
   const [selected, setSelected] = useState<Selection>(null)
   const [mode, setMode] = useState<TransformMode>('translate')
+  const history = useRef<WorldData[]>([])
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setSelected(null)
-      else if (event.key === 'g') setMode('translate')
-      else if (event.key === 'r') setMode('rotate')
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  /** Commit a change, recording the previous state for undo. */
+  const apply = (next: WorldData) => {
+    history.current.push(data)
+    if (history.current.length > HISTORY_LIMIT) history.current.shift()
+    onChange(next)
+  }
+
+  const undo = () => {
+    const prev = history.current.pop()
+    if (!prev) return
+    setSelected(null)
+    onChange(prev)
+  }
 
   const patchNode = (index: number, patch: Record<string, JsonValue>) => {
     const nodes = data.nodes.map((node, i) =>
       i === index ? { ...node, props: { ...node.props, ...patch } } : node,
     )
-    onChange({ ...data, nodes })
+    apply({ ...data, nodes })
+  }
+
+  const addNode = (type: string) => {
+    apply({ ...data, nodes: [...data.nodes, { type, props: { position: [0, 0, 0] } }] })
+    setSelected(null)
+  }
+
+  const duplicateSelected = () => {
+    if (!selected) return
+    const source = data.nodes[selected.index]
+    const copy: WorldNode = JSON.parse(JSON.stringify(source))
+    const at = asVec3(copy.props?.position) ?? [0, 0, 0]
+    copy.props = { ...copy.props, position: [at[0] + 0.5, at[1], at[2] + 0.5] }
+    apply({ ...data, nodes: [...data.nodes, copy] })
+    setSelected(null)
+  }
+
+  const deleteSelected = () => {
+    if (!selected) return
+    apply({ ...data, nodes: data.nodes.filter((_, i) => i !== selected.index) })
+    setSelected(null)
   }
 
   const commitTransform = () => {
@@ -61,12 +98,32 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
     })
   }
 
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (isTyping(event.target)) return
+      if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
+        event.preventDefault()
+        undo()
+        return
+      }
+      if (event.key === 'Escape') setSelected(null)
+      else if (event.key === 'g') setMode('translate')
+      else if (event.key === 'r') setMode('rotate')
+      else if (event.key === 'd') duplicateSelected()
+      else if (event.key === 'Delete' || event.key === 'Backspace') deleteSelected()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [data, selected, onChange])
+
   return (
     <>
       <World
         {...worldProps}
         unit={data.unit}
         gravity={data.gravity}
+        palette={data.palette}
+        fog={data.fog}
         onPointerMissed={() => setSelected(null)}
       >
         <OrbitControls makeDefault />
@@ -81,7 +138,18 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
       </World>
 
       <Leva hidden={selected === null} />
-      <EditorToolbar mode={mode} onMode={setMode} data={data} selected={selected?.index ?? null} />
+      <EditorToolbar
+        mode={mode}
+        onMode={setMode}
+        data={data}
+        registry={registry}
+        selected={selected?.index ?? null}
+        canUndo={history.current.length > 0}
+        onAdd={addNode}
+        onDuplicate={duplicateSelected}
+        onDelete={deleteSelected}
+        onUndo={undo}
+      />
       {selected !== null && (
         <NodeControls
           index={selected.index}
@@ -191,30 +259,74 @@ const TOOLBAR: CSSProperties = {
   top: '1rem',
   left: '1rem',
   display: 'flex',
-  gap: '0.5rem',
+  gap: '0.45rem',
   alignItems: 'center',
   zIndex: 10,
-  fontFamily: 'system-ui, sans-serif',
+  padding: '0.45rem 0.6rem',
+  borderRadius: 10,
+  background: 'rgba(7, 11, 17, 0.82)',
+  border: '1px solid #15202a',
+  backdropFilter: 'blur(8px)',
+  fontFamily: 'ui-monospace, SF Mono, Menlo, monospace',
 }
 
-const button = (active: boolean): CSSProperties => ({
-  padding: '0.4rem 0.7rem',
+const button = (active: boolean, disabled = false): CSSProperties => ({
+  padding: '0.35rem 0.65rem',
   borderRadius: 6,
-  border: 'none',
-  cursor: 'pointer',
-  background: active ? '#4a90d9' : 'rgba(0, 0, 0, 0.6)',
-  color: '#fff',
-  fontSize: '0.8rem',
+  border: `1px solid ${active ? 'rgba(61, 245, 138, 0.5)' : '#15202a'}`,
+  cursor: disabled ? 'default' : 'pointer',
+  background: active ? 'rgba(61, 245, 138, 0.14)' : 'rgba(255, 255, 255, 0.04)',
+  color: disabled ? '#5f7d75' : active ? '#3df58a' : '#cfe6db',
+  opacity: disabled ? 0.5 : 1,
+  fontSize: '0.78rem',
+  fontFamily: 'inherit',
 })
+
+const SELECT: CSSProperties = {
+  ...button(false),
+  appearance: 'none',
+  paddingRight: '0.9rem',
+}
+
+const DIVIDER: CSSProperties = {
+  width: 1,
+  alignSelf: 'stretch',
+  background: '#15202a',
+}
+
+const HINT: CSSProperties = {
+  color: '#5f7d75',
+  fontSize: '0.72rem',
+  paddingLeft: '0.2rem',
+}
 
 interface EditorToolbarProps {
   mode: TransformMode
   onMode: (mode: TransformMode) => void
   data: WorldData
+  registry: ComponentRegistry
   selected: number | null
+  canUndo: boolean
+  onAdd: (type: string) => void
+  onDuplicate: () => void
+  onDelete: () => void
+  onUndo: () => void
 }
 
-function EditorToolbar({ mode, onMode, data, selected }: EditorToolbarProps) {
+function EditorToolbar({
+  mode,
+  onMode,
+  data,
+  registry,
+  selected,
+  canUndo,
+  onAdd,
+  onDuplicate,
+  onDelete,
+  onUndo,
+}: EditorToolbarProps) {
+  const hasSelection = selected !== null
+
   const exportWorld = async () => {
     const text = serializeWorld(data)
     try {
@@ -231,17 +343,74 @@ function EditorToolbar({ mode, onMode, data, selected }: EditorToolbarProps) {
         type="button"
         style={button(mode === 'translate')}
         onClick={() => onMode('translate')}
+        title="Move (g)"
       >
         Move
       </button>
-      <button type="button" style={button(mode === 'rotate')} onClick={() => onMode('rotate')}>
+      <button
+        type="button"
+        style={button(mode === 'rotate')}
+        onClick={() => onMode('rotate')}
+        title="Rotate (r)"
+      >
         Rotate
       </button>
+
+      <span style={DIVIDER} />
+
+      <select
+        style={SELECT}
+        value=""
+        onChange={(event) => {
+          if (event.target.value) onAdd(event.target.value)
+          event.target.value = ''
+        }}
+        title="Insert a component at the origin"
+      >
+        <option value="">+ Add…</option>
+        {Object.keys(registry)
+          .sort()
+          .map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+      </select>
+      <button
+        type="button"
+        style={button(false, !hasSelection)}
+        disabled={!hasSelection}
+        onClick={onDuplicate}
+        title="Duplicate selection (d)"
+      >
+        Duplicate
+      </button>
+      <button
+        type="button"
+        style={button(false, !hasSelection)}
+        disabled={!hasSelection}
+        onClick={onDelete}
+        title="Delete selection (⌫)"
+      >
+        Delete
+      </button>
+      <button
+        type="button"
+        style={button(false, !canUndo)}
+        disabled={!canUndo}
+        onClick={onUndo}
+        title="Undo (⌘Z)"
+      >
+        Undo
+      </button>
+
+      <span style={DIVIDER} />
+
       <button type="button" style={button(false)} onClick={exportWorld}>
         Export JSON
       </button>
-      <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.8rem' }}>
-        {selected === null ? 'click a component · Esc to deselect' : `selected #${selected}`}
+      <span style={HINT}>
+        {selected === null ? 'click a component · Esc deselects' : `selected #${selected}`}
       </span>
     </div>
   )

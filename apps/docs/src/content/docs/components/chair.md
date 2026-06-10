@@ -32,6 +32,7 @@ export interface ChairProps {
   depth?: number
   seatHeight?: number
   backHeight?: number
+  /** Defaults to the world palette's `wood` slot. */
   color?: string
 }
 ```

@@ -31,6 +31,7 @@ export interface ShoreProps {
   /** `[width, depth]` in units. The sandy top sits at the component origin. */
   size?: [number, number]
   thickness?: number
+  /** Defaults to the world palette's `sand` slot. */
   color?: string
 }
 ```

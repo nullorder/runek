@@ -12,7 +12,7 @@ order: 100
 npx runek add lamp
 ```
 
-Pulls `core`, `@react-three/rapier@^2.2.0`.
+Pulls `core`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -29,10 +29,13 @@ export interface LampProps {
   position?: Vec3
   rotation?: Vec3
   height?: number
+  /** Base + pole color. Defaults to the world palette's `metal` slot. */
   color?: string
   shadeColor?: string
   lightColor?: string
   intensity?: number
+  /** Candle-like intensity flicker, 0–1; 0 holds the light steady. */
+  flicker?: number
 }
 ```
 

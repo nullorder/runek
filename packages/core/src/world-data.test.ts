@@ -5,6 +5,8 @@ const sample: WorldData = {
   version: 1,
   unit: 1,
   gravity: [0, -9.81, 0],
+  palette: { wood: '#7a5638', foliage: '#557d3c' },
+  fog: { color: '#cfe3f5', near: 30, far: 90 },
   nodes: [
     { type: 'Terrain', props: { size: [60, 60], seed: 9 } },
     {

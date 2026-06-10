@@ -31,6 +31,7 @@ export interface FloorProps {
   /** `[width, depth]` in units. The top surface sits at the component origin. */
   size?: [number, number]
   thickness?: number
+  /** Defaults to the world palette's `floor` slot. */
   color?: string
 }
 ```

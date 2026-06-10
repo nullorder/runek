@@ -30,7 +30,9 @@ export interface RugProps {
   rotation?: Vec3
   /** `[width, depth]` in units. */
   size?: [number, number]
+  /** Defaults to the world palette's `fabric` slot. */
   baseColor?: string
+  /** Defaults to the world palette's `accent` slot. */
   borderColor?: string
   accentColor?: string
   seed?: number

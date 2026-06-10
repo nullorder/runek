@@ -2,10 +2,10 @@ import { OrbitControls } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { registry } from '@runek/components'
-import { WorldContext } from '@runek/core'
+import { DEFAULT_PALETTE, WorldContext } from '@runek/core'
 import { type ComponentType, type ReactNode, useEffect, useRef, useState } from 'react'
 import type { Group } from 'three'
-import { DEFAULT_CAMERA, DEFAULT_TARGET, PREVIEW } from '../../lib/preview'
+import { DEFAULT_CAMERA, DEFAULT_TARGET, PREVIEW, SEEDED } from '../../lib/preview'
 
 type Props = { title: string; detail?: boolean }
 
@@ -22,6 +22,7 @@ function Spin({ children, enabled }: { children: ReactNode; enabled: boolean }) 
 export default function ComponentPreview({ title, detail = false }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const [inView, setInView] = useState(false)
+  const [seed, setSeed] = useState(3)
   const cfg = PREVIEW[title] ?? {}
   const Component = components[title]
 
@@ -50,12 +51,14 @@ export default function ComponentPreview({ title, detail = false }: Props) {
       {inView && (
         <Canvas shadows dpr={[1, 1.5]} camera={{ position: cfg.camera ?? DEFAULT_CAMERA, fov: 50 }}>
           <color attach="background" args={['#0e1117']} />
-          <WorldContext.Provider value={{ unit: 1, gravity: [0, -9.81, 0] }}>
+          <WorldContext.Provider
+            value={{ unit: 1, gravity: [0, -9.81, 0], palette: DEFAULT_PALETTE }}
+          >
             <ambientLight intensity={0.7} />
             <directionalLight position={[6, 10, 6]} intensity={1.5} castShadow />
             <Physics paused>
               <Spin enabled={!detail}>
-                <Component seed={3} {...cfg.props} />
+                <Component seed={seed} {...cfg.props} />
               </Spin>
             </Physics>
             <OrbitControls
@@ -67,6 +70,16 @@ export default function ComponentPreview({ title, detail = false }: Props) {
             />
           </WorldContext.Provider>
         </Canvas>
+      )}
+      {detail && SEEDED.has(title) && (
+        <button
+          type="button"
+          className="reroll"
+          onClick={() => setSeed(1 + Math.floor(Math.random() * 9999))}
+          title="Re-roll the seed — same seed always rebuilds the same geometry"
+        >
+          seed {seed} <span aria-hidden="true">↻</span>
+        </button>
       )}
     </div>
   )

@@ -19,6 +19,11 @@ composable, serializable, and swappable with any other.
    bookshelf, not one per book).
 4. **Respect `unit`** from `useWorld()` so the component scales with the world.
 5. **No assets.** Geometry and color come from code; no `.glb`, no textures.
+6. **Default colors from the palette.** Read `palette` from `useWorld()` and use
+   its slots (`wood`, `wall`, `foliage`, …) as your color defaults; an explicit
+   color prop always wins. One palette swap then re-themes the whole world.
+7. **Instance repeated geometry.** Books, branches, blades — render them as one
+   `InstancedMesh`, not one mesh per piece, so worlds stay cheap at scale.
 
 ## A minimal compliant component
 

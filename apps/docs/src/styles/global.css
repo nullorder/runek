@@ -199,6 +199,72 @@ h1,
   font-size: 1.1rem;
 }
 
+/* Doc shell: sidebar + article */
+.doc-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 1.5rem;
+}
+.doc-sidebar {
+  position: sticky;
+  top: 56px;
+  align-self: start;
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+  padding: 2.6rem 1.2rem 2rem 1.5rem;
+  border-right: 1px solid var(--border);
+}
+.doc-sidebar h4 {
+  margin: 0 0 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--blue);
+}
+.doc-sidebar ul {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+.doc-sidebar a {
+  display: block;
+  padding: 0.16rem 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+.doc-sidebar a:hover {
+  color: var(--green);
+  text-decoration: none;
+}
+.doc-sidebar a[aria-current="page"] {
+  color: var(--green);
+}
+@media (max-width: 900px) {
+  .doc-shell {
+    display: block;
+  }
+  .doc-sidebar {
+    display: none;
+  }
+}
+
+/* Prev/next pager at the foot of a doc */
+.doc-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
 /* Doc article */
 .doc {
   max-width: 760px;
@@ -353,9 +419,32 @@ pre.astro-code code {
   box-shadow: 0 0 28px var(--green-soft);
 }
 .preview {
+  position: relative;
   height: 200px;
   background: #05080d;
   border-bottom: 1px solid var(--border);
+}
+.preview .reroll {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--green);
+  background: color-mix(in oklab, var(--bg) 78%, transparent);
+  border: 1px solid var(--green-line);
+  border-radius: 8px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.preview .reroll:hover {
+  background: var(--green-soft);
+  box-shadow: 0 0 18px var(--green-soft);
 }
 .preview canvas {
   display: block;

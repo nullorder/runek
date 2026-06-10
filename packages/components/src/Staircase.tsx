@@ -10,6 +10,7 @@ export interface StaircaseProps {
   width?: number
   /** Total run (depth), in units. */
   depth?: number
+  /** Defaults to the world palette's `stone` slot. */
   color?: string
 }
 
@@ -20,9 +21,10 @@ export function Staircase({
   totalHeight = 1.5,
   width = 1.2,
   depth = 2.4,
-  color = '#9a8c78',
+  color,
 }: StaircaseProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const stoneColor = color ?? palette.stone
   const w = width * unit
   const rise = (totalHeight * unit) / steps
   const run = (depth * unit) / steps
@@ -39,7 +41,7 @@ export function Staircase({
             position={[0, h / 2, run * (i + 0.5)]}
           >
             <boxGeometry args={[w, h, run]} />
-            <meshStandardMaterial color={color} />
+            <meshStandardMaterial color={stoneColor} />
           </mesh>
         )
       })}

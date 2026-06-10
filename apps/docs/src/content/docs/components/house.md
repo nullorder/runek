@@ -33,7 +33,9 @@ export interface HouseProps {
   height?: number
   thickness?: number
   roofStyle?: RoofStyle
+  /** Defaults to the world palette's `wall` slot. */
   wallColor?: string
+  /** Defaults to the world palette's `roof` slot. */
   roofColor?: string
   /** Reserved for procedural variation. */
   seed?: number

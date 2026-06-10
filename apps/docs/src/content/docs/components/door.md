@@ -33,6 +33,7 @@ export interface DoorProps {
   thickness?: number
   /** Hinge angle in radians; 0 is closed. */
   openAngle?: number
+  /** Defaults to the world palette's `wood` slot. */
   color?: string
 }
 ```

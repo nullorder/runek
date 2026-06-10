@@ -12,7 +12,7 @@ order: 100
 npx runek add grass
 ```
 
-Pulls `core`, `three@^0.184.0`.
+Pulls `core`, `@react-three/fiber@^9.6.1`, `three@^0.184.0`.
 
 ## Use it
 
@@ -32,7 +32,10 @@ export interface GrassProps {
   area?: [number, number]
   count?: number
   height?: number
+  /** Defaults to the world palette's `foliage` slot. */
   color?: string
+  /** Wind sway strength; 0 disables the animation. */
+  sway?: number
   seed?: number
 }
 ```

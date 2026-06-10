@@ -35,6 +35,7 @@ export interface RoofProps {
   peak?: number
   thickness?: number
   overhang?: number
+  /** Defaults to the world palette's `roof` slot. */
   color?: string
 }
 ```

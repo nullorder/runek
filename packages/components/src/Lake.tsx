@@ -8,8 +8,12 @@ export interface LakeProps {
   rotation?: Vec3
   /** Water surface `[width, depth]`, in units. */
   size?: [number, number]
+  /** Defaults to the world palette's `waterDeep` slot. */
   colorDeep?: string
+  /** Defaults to the world palette's `waterShallow` slot. */
   colorShallow?: string
+  /** Direction the sun glint comes from; pair with your Sky's `sunPosition`. */
+  sunPosition?: Vec3
   waveHeight?: number
   waveSpeed?: number
   segments?: number
@@ -19,27 +23,64 @@ const VERTEX = /* glsl */ `
   uniform float uTime;
   uniform float uWaveHeight;
   uniform float uWaveSpeed;
+  varying vec3 vWorldPos;
+  varying vec3 vNormal;
   varying float vWave;
+
+  float waveH(vec2 q, float t) {
+    float w1 = sin(q.x * 0.6 + t) * cos(q.y * 0.4 + t * 0.8);
+    float w2 = sin(q.x * 0.2 - t * 0.7) * sin(q.y * 0.8 + t);
+    float w3 = sin((q.x + q.y) * 1.5 + t * 1.6) * 0.25;
+    return (w1 + w2 + w3) * 0.5;
+  }
+
   void main() {
-    vec3 p = position;
     float t = uTime * uWaveSpeed;
-    float w1 = sin(p.x * 0.6 + t) * cos(p.y * 0.4 + t * 0.8);
-    float w2 = sin(p.x * 0.2 - t * 0.7) * sin(p.y * 0.8 + t);
-    vWave = (w1 + w2) * 0.5;
-    p.z += vWave * uWaveHeight;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+    vec3 p = position;
+    float h = waveH(p.xy, t);
+    vWave = h;
+    p.z += h * uWaveHeight;
+
+    // finite-difference normal so the light reacts to the waves
+    float eps = 0.35;
+    float hx = waveH(position.xy + vec2(eps, 0.0), t);
+    float hy = waveH(position.xy + vec2(0.0, eps), t);
+    vec3 n = normalize(vec3(-(hx - h) * uWaveHeight / eps, -(hy - h) * uWaveHeight / eps, 1.0));
+    vNormal = normalize(mat3(modelMatrix) * n);
+
+    vWorldPos = (modelMatrix * vec4(p, 1.0)).xyz;
+    gl_Position = projectionMatrix * viewMatrix * vec4(vWorldPos, 1.0);
   }
 `
 
 const FRAGMENT = /* glsl */ `
   uniform vec3 uColorDeep;
   uniform vec3 uColorShallow;
+  uniform vec3 uSunDir;
+  varying vec3 vWorldPos;
+  varying vec3 vNormal;
   varying float vWave;
+
   void main() {
+    vec3 n = normalize(vNormal);
+    vec3 viewDir = normalize(cameraPosition - vWorldPos);
+
     float m = smoothstep(-1.0, 1.0, vWave);
     vec3 col = mix(uColorDeep, uColorShallow, m);
-    col += pow(max(m - 0.6, 0.0), 2.0) * 0.6;
-    gl_FragColor = vec4(col, 0.85);
+
+    // sky tint at grazing angles
+    float fresnel = pow(1.0 - max(dot(n, viewDir), 0.0), 3.0);
+    col = mix(col, vec3(0.62, 0.78, 0.9), fresnel * 0.55);
+
+    // sun glint
+    vec3 r = reflect(-uSunDir, n);
+    float glint = pow(max(dot(r, viewDir), 0.0), 70.0);
+    col += vec3(1.0, 0.95, 0.85) * glint * 0.7;
+
+    // crest brighten, as before
+    col += pow(max(m - 0.6, 0.0), 2.0) * 0.4;
+
+    gl_FragColor = vec4(col, 0.78 + fresnel * 0.18);
   }
 `
 
@@ -48,13 +89,16 @@ export function Lake({
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   size = [20, 20],
-  colorDeep = '#13415c',
-  colorShallow = '#3f86a8',
+  colorDeep,
+  colorShallow,
+  sunPosition = [80, 30, 40],
   waveHeight = 0.12,
   waveSpeed = 1,
   segments = 64,
 }: LakeProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const deep = colorDeep ?? palette.waterDeep
+  const shallow = colorShallow ?? palette.waterShallow
   const w = size[0] * unit
   const d = size[1] * unit
   const matRef = useRef<THREE.ShaderMaterial>(null)
@@ -64,10 +108,11 @@ export function Lake({
       uTime: { value: 0 },
       uWaveHeight: { value: waveHeight * unit },
       uWaveSpeed: { value: waveSpeed },
-      uColorDeep: { value: new THREE.Color(colorDeep) },
-      uColorShallow: { value: new THREE.Color(colorShallow) },
+      uColorDeep: { value: new THREE.Color(deep) },
+      uColorShallow: { value: new THREE.Color(shallow) },
+      uSunDir: { value: new THREE.Vector3(...sunPosition).normalize() },
     }),
-    [waveHeight, waveSpeed, colorDeep, colorShallow, unit],
+    [waveHeight, waveSpeed, deep, shallow, sunPosition, unit],
   )
 
   useFrame((_, delta) => {

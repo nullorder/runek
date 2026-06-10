@@ -13,6 +13,7 @@ export interface RoofProps {
   peak?: number
   thickness?: number
   overhang?: number
+  /** Defaults to the world palette's `roof` slot. */
   color?: string
 }
 
@@ -24,9 +25,10 @@ export function Roof({
   peak = 1.6,
   thickness = 0.18,
   overhang = 0.3,
-  color = '#8a5a44',
+  color,
 }: RoofProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const roofColor = color ?? palette.roof
   const w = size[0] * unit + overhang * 2 * unit
   const d = size[1] * unit + overhang * 2 * unit
   const t = thickness * unit
@@ -36,7 +38,7 @@ export function Roof({
       <RigidBody type="fixed" colliders="cuboid" position={position} rotation={rotation}>
         <mesh castShadow receiveShadow position={[0, t / 2, 0]}>
           <boxGeometry args={[w, t, d]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color={roofColor} />
         </mesh>
       </RigidBody>
     )
@@ -50,11 +52,11 @@ export function Roof({
     <RigidBody type="fixed" colliders="cuboid" position={position} rotation={rotation}>
       <mesh castShadow receiveShadow position={[0, ridge / 2, d / 4]} rotation={[angle, 0, 0]}>
         <boxGeometry args={[w, t, slope]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={roofColor} />
       </mesh>
       <mesh castShadow receiveShadow position={[0, ridge / 2, -d / 4]} rotation={[-angle, 0, 0]}>
         <boxGeometry args={[w, t, slope]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={roofColor} />
       </mesh>
     </RigidBody>
   )

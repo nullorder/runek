@@ -30,6 +30,7 @@ export interface TerrainProps {
   /** Ground extent `[width, depth]`, in units. */
   size?: [number, number]
   thickness?: number
+  /** Defaults to the world palette's `ground` slot. */
   color?: string
   /** Vertical relief amplitude, in units. 0 keeps the ground flat. */
   relief?: number

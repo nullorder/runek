@@ -35,7 +35,25 @@ import { Player } from './runek/Player'
 | `unit` | `number` | `1` | World scale: `1` unit = 1 meter. Read it via `useWorld()`. |
 | `gravity` | `[x, y, z]` | `[0, -9.81, 0]` | Physics gravity. |
 | `lights` | `boolean` | `true` | Render the default lights. Set `false` to use your own. |
+| `palette` | `Partial<WorldPalette>` | built-in | Override color slots; every component re-themes at once. |
+| `fog` | `{ color, near, far }` | off | Linear distance fog; pair the color with the sky's horizon. |
 | `debug` | `boolean` | `false` | Draw Rapier collider wireframes. |
+
+## The palette
+
+Components default their colors to named slots — `wood`, `wall`, `foliage`,
+`waterDeep`, and friends — read from context. Override any subset on `<World>`
+and the whole scene re-themes; explicit color props on a component still win:
+
+```tsx
+<World palette={{ wood: '#7a5a40', foliage: '#557d3c' }}>
+  <Bookshelf seed={7} />          {/* frame picks up the new wood */}
+  <Trees seed={4} />              {/* leaves pick up the new foliage */}
+  <Chair color="#222" />          {/* explicit prop beats the palette */}
+</World>
+```
+
+The full slot list is the `WorldPalette` interface in `@runek/core`.
 
 ## useWorld()
 
@@ -45,8 +63,9 @@ Components read the shared scale from the provider so they size consistently:
 import { useWorld } from './runek/core'
 
 function MyThing() {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
   const width = 2 * unit // 2 meters, whatever the world's scale
+  const color = palette.wood // themed with the rest of the world
   // …
 }
 ```

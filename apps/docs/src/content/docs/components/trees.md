@@ -34,7 +34,9 @@ export interface TreesProps {
   segmentLength?: number
   /** Branching angle, in radians. */
   angle?: number
+  /** Defaults to the world palette's `bark` slot. */
   trunkColor?: string
+  /** Defaults to the world palette's `foliage` slot. */
   leafColor?: string
 }
 ```

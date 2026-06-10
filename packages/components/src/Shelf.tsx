@@ -8,6 +8,7 @@ export interface ShelfProps {
   height?: number
   depth?: number
   shelves?: number
+  /** Defaults to the world palette's `wood` slot. */
   color?: string
 }
 
@@ -19,9 +20,10 @@ export function Shelf({
   height = 1.8,
   depth = 0.3,
   shelves = 4,
-  color = '#6b4f3a',
+  color,
 }: ShelfProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const frameColor = color ?? palette.wood
   const w = width * unit
   const h = height * unit
   const d = depth * unit
@@ -36,17 +38,17 @@ export function Shelf({
 
       <mesh castShadow receiveShadow position={[-w / 2 + plank / 2, h / 2, 0]}>
         <boxGeometry args={[plank, h, d]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={frameColor} />
       </mesh>
       <mesh castShadow receiveShadow position={[w / 2 - plank / 2, h / 2, 0]}>
         <boxGeometry args={[plank, h, d]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={frameColor} />
       </mesh>
 
       {plankYs.map((y) => (
         <mesh key={`plank-${y.toFixed(4)}`} castShadow receiveShadow position={[0, y, 0]}>
           <boxGeometry args={[inner, plank, d]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color={frameColor} />
         </mesh>
       ))}
     </RigidBody>

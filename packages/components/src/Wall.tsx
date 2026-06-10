@@ -18,6 +18,7 @@ export interface WallProps {
   width?: number
   height?: number
   thickness?: number
+  /** Defaults to the world palette's `wall` slot. */
   color?: string
   opening?: WallOpening
 }
@@ -60,10 +61,11 @@ export function Wall({
   width = 4,
   height = 3,
   thickness = 0.2,
-  color = '#cfc7ba',
+  color,
   opening,
 }: WallProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const wallColor = color ?? palette.wall
   const w = width * unit
   const h = height * unit
   const t = thickness * unit
@@ -84,7 +86,7 @@ export function Wall({
           position={[s.x, s.y, 0]}
         >
           <boxGeometry args={[s.w, s.h, t]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color={wallColor} />
         </mesh>
       ))}
     </RigidBody>

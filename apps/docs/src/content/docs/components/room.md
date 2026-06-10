@@ -34,6 +34,7 @@ export interface RoomProps {
   /** Opening width in the front (+z) wall; set to 0 for a sealed room. */
   doorWidth?: number
   roof?: boolean
+  /** Defaults to the world palette's `wall` slot. */
   color?: string
 }
 ```

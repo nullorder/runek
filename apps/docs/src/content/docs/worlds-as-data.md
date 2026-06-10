@@ -16,6 +16,8 @@ interface WorldData {
   version: 1
   unit?: number
   gravity?: [number, number, number]
+  palette?: Partial<WorldPalette> // color-slot overrides for the whole world
+  fog?: { color: string; near: number; far: number }
   nodes: WorldNode[]
 }
 
@@ -31,6 +33,7 @@ A small world:
 ```json
 {
   "version": 1,
+  "palette": { "wood": "#7a5a40" },
   "nodes": [
     { "type": "Terrain", "props": { "size": [40, 40] } },
     { "type": "Bookshelf", "props": { "position": [0, 1, 0], "seed": 42 } },
@@ -38,6 +41,9 @@ A small world:
   ]
 }
 ```
+
+The look of a world is data too: `palette` re-themes every component at once and
+`fog` sets the atmosphere — both diff as cleanly as any node.
 
 ## Render it
 

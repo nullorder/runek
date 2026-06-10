@@ -32,6 +32,7 @@ export interface TableProps {
   depth?: number
   height?: number
   thickness?: number
+  /** Defaults to the world palette's `wood` slot. */
   color?: string
 }
 ```

@@ -10,13 +10,14 @@ Think **"shadcn for 3D worlds."**
 
 **[Docs](https://runek.nullorder.org/docs) · [Gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library)**
 
-> **Status:** `v0.4.0` — 23 components, a runtime editor, worlds-as-data, the `runek` CLI + source registry, and a docs site (flat docs + a walkable 3D library) all live in the monorepo. `v0.5.0` (distribution GA + deploy) in progress.
+> **Status:** `v0.4.0` — 23 components (palette-aware, instanced), a runtime editor (move/rotate, add/duplicate/delete, undo), worlds-as-data with world-level palette + fog, the `runek` CLI + source registry, and a docs site (flat docs + a walkable 3D library) all live in the monorepo. `v0.5.0` (distribution GA + deploy) in progress.
 
 ## Why Runek
 
 - **Procedural-first** — geometry from props + `seed`; no `.glb`, no textures, no CDN.
 - **A world is data** — every component is a pure, deterministic function of its props.
 - **Seeded determinism** — same seed → same result, on every machine and every render.
+- **Re-themeable** — components default their colors to a world palette; swap the palette, re-skin the world.
 - **Parametric LOD** — detail scales with props and distance.
 - **Local-first** — no backend; a world deploys as a static site.
 - **You own the source** — components are copied into your project, not locked behind an import.

@@ -32,6 +32,7 @@ export interface ShelfProps {
   height?: number
   depth?: number
   shelves?: number
+  /** Defaults to the world palette's `wood` slot. */
   color?: string
 }
 ```

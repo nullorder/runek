@@ -15,11 +15,14 @@ export type PreviewConfig = {
 export const DEFAULT_CAMERA: [number, number, number] = [3.4, 2.6, 4.4]
 export const DEFAULT_TARGET: [number, number, number] = [0, 0.9, 0]
 
+/** Components whose geometry visibly changes with `seed` — these get the re-roll control. */
+export const SEEDED = new Set(['Bookshelf', 'Grass', 'Rocks', 'Rug', 'Terrain', 'Trees'])
+
 export const PREVIEW: Record<string, PreviewConfig> = {
   Player: { skip: true, note: 'First-person controller — drop it into a world to walk.' },
   LightRig: { skip: true, note: 'Lighting system — lights a whole scene rather than an object.' },
   Sky: { camera: [0, 1.5, 7], target: [0, 3, 0] },
-  Terrain: { camera: [11, 8, 13], target: [0, 0, 0] },
+  Terrain: { camera: [11, 8, 13], target: [0, 0, 0], props: { size: [30, 30], relief: 1.5 } },
   Lake: { camera: [9, 6, 10], target: [0, 0, 0] },
   Shore: { camera: [8, 5, 9], target: [0, 0, 0] },
   Grass: { camera: [4, 3, 5], target: [0, 0.3, 0] },

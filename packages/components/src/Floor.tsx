@@ -7,6 +7,7 @@ export interface FloorProps {
   /** `[width, depth]` in units. The top surface sits at the component origin. */
   size?: [number, number]
   thickness?: number
+  /** Defaults to the world palette's `floor` slot. */
   color?: string
 }
 
@@ -15,9 +16,10 @@ export function Floor({
   rotation = [0, 0, 0],
   size = [8, 8],
   thickness = 0.2,
-  color = '#b8a98f',
+  color,
 }: FloorProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const floorColor = color ?? palette.floor
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit
@@ -26,7 +28,7 @@ export function Floor({
     <RigidBody type="fixed" colliders="cuboid" position={position} rotation={rotation}>
       <mesh receiveShadow position={[0, -t / 2, 0]}>
         <boxGeometry args={[w, t, d]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={floorColor} />
       </mesh>
     </RigidBody>
   )

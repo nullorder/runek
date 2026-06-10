@@ -11,7 +11,11 @@ const { entry } = Astro.props
 const { Content } = await render(entry)
 ---
 
-<DocLayout title={entry.data.title} summary={entry.data.summary} eyebrow={entry.data.category}>
+<DocLayout
+  title={entry.data.title}
+  summary={entry.data.summary}
+  eyebrow={entry.data.category}
+  slug={entry.id}
+>
   <Content />
-  <p class="back" style="margin-top:3rem"><a href="/docs">← all docs</a></p>
 </DocLayout>

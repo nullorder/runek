@@ -6,7 +6,9 @@ export interface RugProps {
   rotation?: Vec3
   /** `[width, depth]` in units. */
   size?: [number, number]
+  /** Defaults to the world palette's `fabric` slot. */
   baseColor?: string
+  /** Defaults to the world palette's `accent` slot. */
   borderColor?: string
   accentColor?: string
   seed?: number
@@ -22,12 +24,14 @@ export function Rug({
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   size = [3, 2],
-  baseColor = '#7a3b3b',
-  borderColor = '#caa24a',
+  baseColor,
+  borderColor,
   accentColor = '#9c5252',
   seed = 1,
 }: RugProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const baseCol = baseColor ?? palette.fabric
+  const borderCol = borderColor ?? palette.accent
   const w = size[0] * unit
   const d = size[1] * unit
   const t = 0.02 * unit
@@ -47,11 +51,11 @@ export function Rug({
     <group position={position} rotation={rotation}>
       <mesh receiveShadow position={[0, t / 2, 0]}>
         <boxGeometry args={[w, t, d]} />
-        <meshStandardMaterial color={borderColor} />
+        <meshStandardMaterial color={borderCol} />
       </mesh>
       <mesh position={[0, t + 0.001 * unit, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[w - border * 2, d - border * 2]} />
-        <meshStandardMaterial color={baseColor} />
+        <meshStandardMaterial color={baseCol} />
       </mesh>
       {stripes.map((s) => (
         <mesh

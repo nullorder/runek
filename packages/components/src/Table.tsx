@@ -8,6 +8,7 @@ export interface TableProps {
   depth?: number
   height?: number
   thickness?: number
+  /** Defaults to the world palette's `wood` slot. */
   color?: string
 }
 
@@ -18,9 +19,10 @@ export function Table({
   depth = 0.8,
   height = 0.75,
   thickness = 0.05,
-  color = '#7a5638',
+  color,
 }: TableProps) {
-  const { unit } = useWorld()
+  const { unit, palette } = useWorld()
+  const woodColor = color ?? palette.wood
   const w = width * unit
   const d = depth * unit
   const h = height * unit
@@ -41,12 +43,12 @@ export function Table({
       <CuboidCollider args={[w / 2, t / 2, d / 2]} position={[0, h - t / 2, 0]} />
       <mesh castShadow receiveShadow position={[0, h - t / 2, 0]}>
         <boxGeometry args={[w, t, d]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={woodColor} />
       </mesh>
       {legs.map((p) => (
         <mesh key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`} castShadow position={p}>
           <boxGeometry args={[leg, legH, leg]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color={woodColor} />
         </mesh>
       ))}
     </RigidBody>

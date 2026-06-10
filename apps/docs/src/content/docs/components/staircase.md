@@ -34,6 +34,7 @@ export interface StaircaseProps {
   width?: number
   /** Total run (depth), in units. */
   depth?: number
+  /** Defaults to the world palette's `stone` slot. */
   color?: string
 }
 ```
