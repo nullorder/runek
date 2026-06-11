@@ -1,0 +1,61 @@
+# Build apps/docs (Astro) and deploy it to GitHub Pages at runek.nullorder.org.
+# The same artifact serves the registry at /r — `runek add` resolves against it —
+# so deploying the docs *is* publishing the component library.
+name: Deploy docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; let an in-flight production deploy finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the pnpm version from the root package.json "packageManager" field.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Regenerate the served manifests from component source so /r can never
+      # ship stale relative to the deployed commit (same as `just registry`).
+      - name: Rebuild the registry
+        run: node scripts/build-registry.mjs
+
+      # `build` runs sync-registry.mjs first, copying registry/ -> public/r.
+      - name: Build the docs site
+        run: pnpm --filter @runek/docs build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/docs/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
