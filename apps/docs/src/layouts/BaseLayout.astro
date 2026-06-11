@@ -21,27 +21,57 @@ const nav = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {description && <meta name="description" content={description} />}
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
     <link rel="preload" href="/fonts/Pixelspace-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
   </head>
   <body>
     <nav class="site-nav">
-      <a class="brand" href="/">runek</a>
+      <a class="brand" href="/">
+        <img src="/logo.svg" alt="" width="22" height="22" />
+        runek
+      </a>
       <span class="spacer"></span>
-      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      <button
+        type="button"
+        class="nav-toggle"
+        aria-expanded="false"
+        aria-controls="site-menu"
+        aria-label="Menu"
+      >≡</button>
+      <div class="nav-links" id="site-menu">
+        {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      </div>
     </nav>
 
     <slot />
 
     <footer class="site-footer">
       <div class="foot-inner">
-        <span class="foot-brand">runek</span>
+        <span class="foot-brand">
+          <img src="/logo.svg" alt="" width="20" height="20" />
+          runek
+        </span>
         <span class="foot-tag">
           Procedural 3D worlds for React Three Fiber — composable, seeded, asset-free.
         </span>
-        <nav>
-          {nav.map((item) => <a href={item.href}>{item.label}</a>)}
-        </nav>
+        <div class="foot-social">
+          <a href="https://github.com/nullorder/runek" aria-label="GitHub" title="GitHub">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.17c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.66.41.35.77 1.05.77 2.12v3.14c0 .31.21.68.8.56A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+            </svg>
+          </a>
+          <a href="https://x.com/nullorder" aria-label="X (Twitter)" title="X">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644Z" />
+            </svg>
+          </a>
+          <a href="https://discord.gg/runek" aria-label="Discord" title="Discord">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z" />
+            </svg>
+          </a>
+        </div>
         <p class="foot-fine">MIT © nullorder · worlds, one rune at a time</p>
       </div>
     </footer>
@@ -72,6 +102,25 @@ const nav = [
         }
       }
       enhanceCodeBlocks()
+
+      const nav = document.querySelector('.site-nav')
+      const toggle = document.querySelector('.nav-toggle')
+      toggle?.addEventListener('click', () => {
+        const open = nav?.classList.toggle('open') ?? false
+        toggle.setAttribute('aria-expanded', String(open))
+        toggle.textContent = open ? '✕' : '≡'
+      })
+
+      // Click-to-copy for inline CLI commands (e.g. the hero install snippet).
+      for (const el of document.querySelectorAll<HTMLElement>('[data-copy]')) {
+        el.addEventListener('click', async () => {
+          await navigator.clipboard.writeText(el.dataset.copy || el.textContent?.trim() || '')
+          el.dataset.copied = 'true'
+          window.setTimeout(() => {
+            el.dataset.copied = 'false'
+          }, 1400)
+        })
+      }
     </script>
   </body>
 </html>

@@ -74,7 +74,8 @@ h1,
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.25rem;
   padding: 0.9rem 1.5rem;
   border-bottom: 1px solid var(--border);
   background: color-mix(in oklab, var(--bg) 82%, transparent);
@@ -83,11 +84,66 @@ h1,
   backdrop-filter: blur(10px);
   z-index: 10;
 }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+.nav-toggle {
+  display: none;
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--green);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+.nav-toggle:hover {
+  border-color: var(--green-line);
+}
+@media (max-width: 640px) {
+  .site-nav {
+    padding: 0.75rem 1rem;
+  }
+  .nav-toggle {
+    display: inline-flex;
+  }
+  .nav-links {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    margin-top: 0.4rem;
+    padding-top: 0.3rem;
+  }
+  .site-nav.open .nav-links {
+    display: flex;
+  }
+  .site-nav .nav-links a {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.2rem;
+  }
+}
 .site-nav .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 1.05rem;
   letter-spacing: 0.06em;
   color: var(--green);
   text-shadow: 0 0 16px var(--green-soft);
+}
+.site-nav .brand img {
+  display: block;
+  transition: transform 0.25s ease;
+}
+.site-nav .brand:hover img {
+  transform: rotate(-8deg) scale(1.08);
 }
 .site-nav .spacer {
   flex: 1;
@@ -101,44 +157,6 @@ h1,
 .site-nav a:not(.brand):hover {
   color: var(--green);
   text-decoration: none;
-}
-
-/* Hero */
-.hero {
-  min-height: calc(100vh - 56px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 1.2rem;
-  padding: 2rem 1.5rem;
-}
-.hero .rune {
-  color: var(--blue);
-  letter-spacing: 0.3em;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-}
-.hero h1 {
-  font-size: clamp(3rem, 9vw, 6rem);
-  line-height: 0.95;
-  margin: 0;
-  color: var(--green);
-  text-shadow: 0 0 40px var(--green-soft);
-}
-.hero .tagline {
-  color: var(--muted);
-  font-size: 1.15rem;
-  max-width: 48ch;
-  margin: 0;
-}
-.hero .cta {
-  display: flex;
-  gap: 0.8rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 0.6rem;
 }
 
 /* Buttons */
@@ -172,21 +190,6 @@ h1,
   border-color: var(--green-line);
   color: var(--green);
 }
-.hero .install {
-  font-family: var(--mono);
-  font-size: 0.85rem;
-  color: var(--muted);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.5rem 0.9rem;
-  margin-top: 0.4rem;
-}
-.hero .install::before {
-  content: "$ ";
-  color: var(--green);
-}
-
 /* General eyebrow / summary */
 .eyebrow {
   font-size: 0.8rem;
@@ -272,7 +275,7 @@ h1,
   padding: 3rem 1.5rem 5rem;
 }
 .doc h1 {
-  font-size: 2.4rem;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
   margin: 0.5rem 0 0.6rem;
   line-height: 1.1;
   color: var(--green);
@@ -337,6 +340,14 @@ pre.astro-code code {
   border: none;
   padding: 0;
 }
+/* On small screens, wrap code instead of forcing horizontal scroll. */
+@media (max-width: 640px) {
+  pre.astro-code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.74rem;
+  }
+}
 .copy-btn {
   position: absolute;
   top: 8px;
@@ -379,7 +390,7 @@ pre.astro-code code {
   margin-bottom: 2.5rem;
 }
 .gallery-head h1 {
-  font-size: 2.6rem;
+  font-size: clamp(1.8rem, 5.5vw, 2.6rem);
   margin: 0.4rem 0 0.5rem;
   color: var(--green);
 }
@@ -486,7 +497,7 @@ pre.astro-code code {
   padding: 2.5rem 1.5rem 5rem;
 }
 .detail h1 {
-  font-size: 2.4rem;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
   margin: 0.4rem 0 0.5rem;
   color: var(--green);
 }
@@ -511,7 +522,7 @@ pre.astro-code code {
   font-size: 0.85rem;
 }
 .detail-preview {
-  height: 440px;
+  height: clamp(300px, 55vw, 440px);
   margin-top: 1.5rem;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -554,13 +565,19 @@ pre.astro-code code {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem 2rem;
-  align-items: baseline;
+  align-items: center;
 }
 .site-footer .foot-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--display);
   font-size: 1.1rem;
   color: var(--green);
   letter-spacing: 0.06em;
+}
+.site-footer .foot-brand img {
+  display: block;
 }
 .site-footer .foot-tag {
   color: var(--muted);
@@ -568,18 +585,21 @@ pre.astro-code code {
   flex: 1;
   min-width: 200px;
 }
-.site-footer nav {
+.foot-social {
   display: flex;
-  gap: 1.1rem;
-  font-family: var(--mono);
-  font-size: 0.82rem;
+  align-items: center;
+  gap: 1rem;
 }
-.site-footer nav a {
+.foot-social a {
+  display: inline-flex;
   color: var(--muted);
+  transition:
+    color 0.12s ease,
+    transform 0.12s ease;
 }
-.site-footer nav a:hover {
+.foot-social a:hover {
   color: var(--green);
-  text-decoration: none;
+  transform: translateY(-2px);
 }
 .site-footer .foot-fine {
   width: 100%;

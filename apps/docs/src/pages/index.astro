@@ -1,22 +1,879 @@
 ---
+import { Code } from 'astro:components'
 import BaseLayout from '../layouts/BaseLayout.astro'
+import { getComponents } from '../lib/registry'
 
 const description =
   'Runek is a source registry of procedural, seeded React Three Fiber components. shadcn for 3D worlds.'
+
+const components = getComponents()
+const categories = [...new Set(components.map((c) => c.category))]
+const tickerNames = components.map((c) => c.name)
+const bootText = `runek registry :: ${components.length} artifacts :: 0 assets`
+
+// The hero artifact is generated, not drawn — same seeded RNG as @runek/core,
+// run at build time for the no-JS initial state. The client script re-rolls it.
+const INITIAL_SEED = 42
+function rng(seed: number) {
+  let s = seed >>> 0
+  return () => {
+    s = Math.imul(s ^ (s >>> 15), 1 | s)
+    s ^= s + Math.imul(s ^ (s >>> 7), 61 | s)
+    return ((s ^ (s >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+type Spine = { x: number; y: number; w: number; h: number; fill: string }
+function generateSpines(seed: number): Spine[] {
+  const next = rng(seed)
+  const spines: Spine[] = []
+  const left = 22
+  const right = 198
+  const planks = [76, 138, 200, 262]
+  for (const plankY of planks) {
+    let x = left
+    while (x < right) {
+      const w = 7 + next() * 9
+      if (x + w > right) break
+      const h = 30 + next() * 24
+      const blue = next() < 0.18
+      const hue = blue ? 207 : 140 + next() * 40
+      const lit = 38 + next() * 22
+      if (next() < 0.82) {
+        spines.push({
+          x: Math.round(x * 10) / 10,
+          y: Math.round((plankY - h) * 10) / 10,
+          w: Math.round(w * 10) / 10,
+          h: Math.round(h * 10) / 10,
+          fill: `hsl(${Math.round(hue)}, 65%, ${Math.round(lit)}%)`,
+        })
+      }
+      x += w + 2.5
+    }
+  }
+  return spines
+}
+const spines = generateSpines(INITIAL_SEED)
+const seedHex = `0x${INITIAL_SEED.toString(16).toUpperCase().padStart(2, '0')}`
+
+const manifest = `{
+  "version": 1,
+  "palette": { "wood": "#7a5a40", "foliage": "#557d3c" },
+  "nodes": [
+    { "type": "Terrain",   "props": { "size": [40, 40], "relief": 2, "seed": 9 } },
+    { "type": "House",     "props": { "position": [0, 0, 0] } },
+    { "type": "Bookshelf", "props": { "position": [2, 1, -3], "seed": 42 } },
+    { "type": "Trees",     "props": { "position": [-9, 0, 6], "seed": 4 } },
+    { "type": "Player" }
+  ]
+}`
 ---
 
 <BaseLayout title="Runek — procedural 3D worlds for React Three Fiber" description={description}>
-  <main class="hero">
-    <p class="rune">worlds, one rune at a time</p>
-    <h1>Runek</h1>
-    <p class="tagline">
-      Procedural 3D components for React Three Fiber. Compose walkable worlds from code —
-      seeded, asset-free, and yours to own.
-    </p>
-    <div class="cta">
-      <a class="btn primary" href="/library">Enter the library →</a>
-      <a class="btn ghost" href="/gallery">Browse components</a>
+  <main class="land">
+    <!-- ::: hero ::: -->
+    <section class="hero">
+      <div class="hero-copy">
+        <!-- Raidho (ᚱ), the journey rune — extruded into real 3D from stacked layers. -->
+        <div class="rune3d" aria-hidden="true">
+          <div class="rune3d-spin">
+            {Array.from({ length: 9 }, (_, i) => (
+              <svg class="rune-layer" style={`--z:${i}`} viewBox="0 0 24 24">
+                <path d="M8 3 V21 M8 3 L16 7.5 L8 12 L16 21" fill="none" stroke-width="2.4" stroke-linecap="square" />
+              </svg>
+            ))}
+          </div>
+        </div>
+        <p class="boot">
+          <span class="boot-text" style={`--chars: ${bootText.length}`}>{bootText}</span>
+        </p>
+        <h1 aria-label="Runek">
+          {'runek'.split('').map((ch, i) => <span class="g" style={`--i:${i}`}>{ch}</span>)}
+        </h1>
+        <p class="rune">worlds, one rune at a time</p>
+        <p class="tagline">
+          A source registry of <b>procedural 3D components</b> for React Three Fiber.
+          Every artifact generates its own geometry from props and a seed — no models,
+          no textures, no CDN. Pull the source. Own the world.
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="/library">Enter the library →</a>
+          <a class="btn ghost" href="/gallery">Browse artifacts</a>
+        </div>
+        <button type="button" class="install" data-copy="npx runek add bookshelf" title="Copy command">
+          npx runek add bookshelf
+        </button>
+      </div>
+
+      <!-- The artifact: a bookshelf generated from a seed, right here in SVG. -->
+      <figure class="artifact">
+        <div class="plate">
+          <svg
+            id="artifact-svg"
+            viewBox="0 0 220 290"
+            role="img"
+            aria-label={`Procedurally generated bookshelf, seed ${INITIAL_SEED}`}
+          >
+            <!-- blue anaglyph ghost -->
+            <g class="ghost" stroke="var(--blue)" stroke-width="2" fill="none" opacity="0.3" transform="translate(4,-4)">
+              <rect x="14" y="10" width="192" height="256" />
+              <line x1="14" y1="76" x2="206" y2="76" />
+              <line x1="14" y1="138" x2="206" y2="138" />
+              <line x1="14" y1="200" x2="206" y2="200" />
+            </g>
+            <!-- frame -->
+            <g class="frame" stroke="var(--green)" stroke-width="2" fill="none">
+              <rect x="14" y="10" width="192" height="256" />
+              <line x1="14" y1="76" x2="206" y2="76" />
+              <line x1="14" y1="138" x2="206" y2="138" />
+              <line x1="14" y1="200" x2="206" y2="200" />
+            </g>
+            <!-- seeded spines -->
+            <g id="spines">
+              {spines.map((s) => <rect x={s.x} y={s.y} width={s.w} height={s.h} fill={s.fill} />)}
+            </g>
+            <!-- corner registration marks -->
+            <g stroke="var(--blue)" stroke-width="1.5" opacity="0.8">
+              <path d="M4 14 V4 H14" fill="none" />
+              <path d="M206 4 H216 V14" fill="none" />
+              <path d="M216 276 V286 H206" fill="none" />
+              <path d="M14 286 H4 V276" fill="none" />
+            </g>
+            <line class="scan" x1="6" y1="0" x2="214" y2="0" stroke="var(--green)" stroke-width="1" opacity="0.5" />
+          </svg>
+        </div>
+        <figcaption class="readout">
+          <span>seed <b id="seed-label">{seedHex}</b></span>
+          <span><b id="spine-count">{spines.length}</b> spines</span>
+          <span>1 draw call</span>
+          <button type="button" id="reseed" title="Same seed, same shelf — new seed, new shelf">
+            reseed <span aria-hidden="true">↻</span>
+          </button>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ::: catalog ticker ::: -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        {[0, 1].map(() => (
+          <span class="ticker-run">
+            {tickerNames.map((n) => (
+              <span class="tick">{n}<i>◆</i></span>
+            ))}
+          </span>
+        ))}
+      </div>
     </div>
-    <code class="install">npx runek add bookshelf</code>
+
+    <!-- ::: doctrine plates ::: -->
+    <section class="plates">
+      <article class="spec">
+        <p class="num">01 / determinism</p>
+        <h2>Same seed, same world</h2>
+        <p>
+          Every artifact is a pure function of its props. <code>seed: 42</code> builds the
+          identical bookshelf on every machine, every render, forever. Worlds are reproducible
+          by construction.
+        </p>
+      </article>
+      <article class="spec">
+        <p class="num">02 / the moat</p>
+        <h2>No assets, anywhere</h2>
+        <p>
+          No <code>.glb</code>, no textures, no HDRIs, no CDN. Geometry, materials, and palette
+          come from code — an entire world fits in version control and deploys as a static site.
+        </p>
+      </article>
+      <article class="spec">
+        <p class="num">03 / ownership</p>
+        <h2>Pull the source</h2>
+        <p>
+          <code>runek add</code> copies editable component source into your project,
+          shadcn-style. No black-box imports — fork the artifact, bend it, ship it.
+        </p>
+      </article>
+    </section>
+
+    <!-- ::: worlds-as-data ::: -->
+    <section class="manifest">
+      <div class="manifest-copy">
+        <p class="eyebrow">worlds as data</p>
+        <h2>A world is a file</h2>
+        <p>
+          Because every component is deterministic, a whole walkable world serializes to plain
+          JSON — palette, fog, and all. Diff it, fork it, review it in a pull request, hand it
+          to an agent.
+        </p>
+        <p class="manifest-links">
+          <a href="/docs/worlds-as-data">Read the spec →</a>
+        </p>
+      </div>
+      <div class="manifest-code">
+        <Code code={manifest} lang="json" theme="night-owl" />
+      </div>
+    </section>
+
+    <!-- ::: registry index ::: -->
+    <section class="index">
+      <p class="eyebrow">registry index</p>
+      <h2>{components.length} artifacts · {categories.length} wings</h2>
+      <div class="index-grid">
+        {categories.map((category) => (
+          <div class="wing">
+            <h3>{category}</h3>
+            <ul>
+              {components
+                .filter((c) => c.category === category)
+                .map((c) => (
+                  <li><a href={`/gallery/${c.name}`}>{c.title}</a></li>
+                ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ::: closing band ::: -->
+    <section class="band">
+      <h2>walk the library</h2>
+      <p>The docs are themselves a Runek world — built from the artifacts they document.</p>
+      <a class="btn primary" href="/library">Enter →</a>
+    </section>
   </main>
 </BaseLayout>
+
+<script>
+  // Re-roll the hero artifact. Identical RNG to @runek/core — the point being made
+  // is the product: same seed, same shelf.
+  function rng(seed: number) {
+    let s = seed >>> 0
+    return () => {
+      s = Math.imul(s ^ (s >>> 15), 1 | s)
+      s ^= s + Math.imul(s ^ (s >>> 7), 61 | s)
+      return ((s ^ (s >>> 14)) >>> 0) / 4294967296
+    }
+  }
+
+  function generate(seed: number) {
+    const next = rng(seed)
+    const spines: { x: number; y: number; w: number; h: number; fill: string }[] = []
+    const left = 22
+    const right = 198
+    const planks = [76, 138, 200, 262]
+    for (const plankY of planks) {
+      let x = left
+      while (x < right) {
+        const w = 7 + next() * 9
+        if (x + w > right) break
+        const h = 30 + next() * 24
+        const blue = next() < 0.18
+        const hue = blue ? 207 : 140 + next() * 40
+        const lit = 38 + next() * 22
+        if (next() < 0.82) {
+          spines.push({
+            x,
+            y: plankY - h,
+            w,
+            h,
+            fill: `hsl(${Math.round(hue)}, 65%, ${Math.round(lit)}%)`,
+          })
+        }
+        x += w + 2.5
+      }
+    }
+    return spines
+  }
+
+  const SVG_NS = 'http://www.w3.org/2000/svg'
+  const group = document.getElementById('spines')
+  const seedLabel = document.getElementById('seed-label')
+  const countLabel = document.getElementById('spine-count')
+  const button = document.getElementById('reseed')
+
+  button?.addEventListener('click', () => {
+    if (!group || !seedLabel || !countLabel) return
+    const seed = 1 + Math.floor(Math.random() * 0xffff)
+    const spines = generate(seed)
+    group.replaceChildren(
+      ...spines.map((s) => {
+        const rect = document.createElementNS(SVG_NS, 'rect')
+        rect.setAttribute('x', s.x.toFixed(1))
+        rect.setAttribute('y', s.y.toFixed(1))
+        rect.setAttribute('width', s.w.toFixed(1))
+        rect.setAttribute('height', s.h.toFixed(1))
+        rect.setAttribute('fill', s.fill)
+        return rect
+      }),
+    )
+    seedLabel.textContent = `0x${seed.toString(16).toUpperCase().padStart(2, '0')}`
+    countLabel.textContent = String(spines.length)
+    group.classList.remove('respawn')
+    void (group as unknown as SVGGElement).getBBox() // restart the CSS animation
+    group.classList.add('respawn')
+  })
+</script>
+
+<style>
+  .land {
+    overflow-x: clip;
+  }
+
+  /* ── hero ───────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(3rem, 9vh, 6.5rem) 1.5rem 4rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: 3rem;
+    align-items: center;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: -20% -30% auto;
+    height: 130%;
+    background: radial-gradient(
+      ellipse 55% 45% at 30% 35%,
+      rgba(61, 245, 138, 0.08),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  /* the 3D rune: stacked layers rotating in a real perspective space */
+  .rune3d {
+    width: 72px;
+    height: 72px;
+    perspective: 560px;
+    margin: 0 0 1.4rem;
+    animation: fadeup 0.6s ease 0.05s both;
+  }
+  .rune3d-spin {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    animation: runespin 11s linear infinite;
+  }
+  .rune-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateZ(calc((var(--z) - 4) * 2.4px));
+    stroke: #11522f;
+  }
+  .rune-layer:first-child {
+    stroke: rgba(42, 167, 255, 0.85);
+  }
+  .rune-layer:last-child {
+    stroke: var(--green);
+    filter: drop-shadow(0 0 12px rgba(61, 245, 138, 0.45));
+  }
+  @keyframes runespin {
+    from { transform: rotateX(14deg) rotateY(0turn); }
+    to   { transform: rotateX(14deg) rotateY(1turn); }
+  }
+
+  .boot {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--blue);
+    letter-spacing: 0.06em;
+    margin: 0 0 1rem;
+    min-height: 1.2em;
+  }
+  .boot-text {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100%;
+    vertical-align: bottom;
+    border-right: 0.55em solid var(--green);
+    animation:
+      type 1.6s steps(43, end) 0.2s both,
+      caret 1s step-end 2s 3;
+  }
+  @keyframes type {
+    from { width: 0; }
+    /* 1ch per character + the letter-spacing each one adds */
+    to { width: calc(var(--chars) * (1ch + 0.06em)); }
+  }
+  @keyframes caret {
+    50% { border-color: transparent; }
+  }
+
+  .hero h1 {
+    margin: 0;
+    font-size: clamp(3.4rem, 10vw, 7rem);
+    line-height: 0.9;
+    color: var(--green);
+    text-shadow: 0 0 48px var(--green-soft);
+    letter-spacing: 0.02em;
+  }
+  .hero h1 .g {
+    display: inline-block;
+    animation: rise 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+    animation-delay: calc(0.25s + var(--i) * 0.07s);
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.35em);
+      filter: blur(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  .rune {
+    font-family: var(--display);
+    color: var(--blue);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    margin: 2.1rem 0 0;
+    animation: fadeup 0.6s ease 0.8s both;
+  }
+  .tagline {
+    color: var(--muted);
+    font-size: 1.08rem;
+    max-width: 46ch;
+    margin: 1rem 0 0;
+    animation: fadeup 0.6s ease 0.95s both;
+  }
+  .tagline b {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .cta {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-top: 1.6rem;
+    animation: fadeup 0.6s ease 1.1s both;
+  }
+  .install {
+    display: inline-block;
+    appearance: none;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    text-align: left;
+    color: var(--muted);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    margin-top: 1.1rem;
+    cursor: pointer;
+    transition: border-color 0.12s ease, color 0.12s ease;
+    animation: fadeup 0.6s ease 1.2s both;
+  }
+  .install:hover {
+    border-color: var(--green-line);
+    color: var(--text);
+  }
+  .install::before {
+    content: "$ ";
+    color: var(--green);
+  }
+  .install::after {
+    content: " ⧉";
+    color: var(--muted);
+    opacity: 0.7;
+  }
+  .install:hover::after {
+    color: var(--green);
+    opacity: 1;
+  }
+  .install[data-copied="true"]::after {
+    content: " ✓ copied";
+    color: var(--green);
+    opacity: 1;
+  }
+  @keyframes fadeup {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ── the artifact ───────────────────────────────────── */
+  .artifact {
+    margin: 0;
+    animation: fadeup 0.7s ease 0.6s both;
+  }
+  .plate {
+    position: relative;
+    background:
+      linear-gradient(var(--green-soft) 1px, transparent 1px) 0 0 / 100% 22px,
+      var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.2rem;
+    box-shadow:
+      0 24px 70px rgba(0, 0, 0, 0.55),
+      0 0 50px rgba(61, 245, 138, 0.06);
+  }
+  .plate svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .frame rect,
+  .frame line {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 1.6s ease-out 0.5s forwards;
+  }
+  @keyframes draw {
+    to { stroke-dashoffset: 0; }
+  }
+  #spines rect {
+    transform-origin: bottom;
+    transform-box: fill-box;
+    animation: spawn 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+  }
+  #spines rect:nth-child(3n)  { animation-delay: 1.15s; }
+  #spines rect:nth-child(3n+1) { animation-delay: 1.3s; }
+  #spines rect:nth-child(3n+2) { animation-delay: 1.45s; }
+  #spines.respawn rect { animation-delay: 0.05s; }
+  @keyframes spawn {
+    from {
+      opacity: 0;
+      transform: scaleY(0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .scan {
+    animation: sweep 5s linear 2s infinite;
+  }
+  @keyframes sweep {
+    from { transform: translateY(8px); opacity: 0.5; }
+    60%  { opacity: 0.5; }
+    to   { transform: translateY(284px); opacity: 0; }
+  }
+
+  .readout {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    flex-wrap: wrap;
+    margin-top: 0.8rem;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .readout b {
+    color: var(--green);
+    font-weight: 600;
+  }
+  .readout button {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--green);
+    background: none;
+    border: 1px solid var(--green-line);
+    border-radius: 7px;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    transition: background 0.12s ease, box-shadow 0.12s ease;
+  }
+  .readout button:hover {
+    background: var(--green-soft);
+    box-shadow: 0 0 16px var(--green-soft);
+  }
+
+  /* ── ticker ─────────────────────────────────────────── */
+  .ticker {
+    border-block: 1px solid var(--border);
+    background: var(--bg-soft);
+    overflow: hidden;
+    padding: 0.55rem 0;
+  }
+  .ticker-track {
+    display: flex;
+    width: max-content;
+    animation: ticker 36s linear infinite;
+  }
+  .ticker:hover .ticker-track {
+    animation-play-state: paused;
+  }
+  .ticker-run {
+    display: flex;
+  }
+  .tick {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .tick i {
+    font-style: normal;
+    color: var(--green);
+    opacity: 0.55;
+    margin: 0 1.1rem;
+    font-size: 0.6rem;
+    vertical-align: 1px;
+  }
+  @keyframes ticker {
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── doctrine plates ────────────────────────────────── */
+  .plates {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 4.5rem) 1.5rem 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  .spec {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.4rem 1.4rem 1.5rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .spec:hover {
+    border-color: var(--green-line);
+    box-shadow: 0 0 32px var(--green-soft);
+    transform: translateY(-3px);
+  }
+  .spec .num {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--blue);
+    margin: 0 0 0.8rem;
+  }
+  .spec h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.15rem;
+    color: var(--green);
+    margin: 0 0 0.6rem;
+  }
+  .spec p:last-child {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+
+  /* ── manifest ───────────────────────────────────────── */
+  .manifest {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 4.5rem) 1.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+    align-items: center;
+  }
+  .manifest h2,
+  .index h2,
+  .band h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    color: var(--green);
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+    margin: 0.4rem 0 0.8rem;
+  }
+  .manifest-copy p {
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .manifest-links {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+  }
+  .manifest-code :global(pre.astro-code) {
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  }
+
+  /* ── registry index ─────────────────────────────────── */
+  .index {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 4rem;
+  }
+  .index-grid {
+    margin-top: 1.6rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 1rem;
+  }
+  .wing {
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--green-line);
+    border-radius: 0 10px 10px 0;
+    background: var(--bg-soft);
+    padding: 0.9rem 1rem 1rem;
+  }
+  .wing h3 {
+    margin: 0 0 0.5rem;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--blue);
+  }
+  .wing ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .wing a {
+    display: block;
+    padding: 0.13rem 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .wing a:hover {
+    color: var(--green);
+    text-decoration: none;
+  }
+  .wing a::before {
+    content: "▸ ";
+    color: var(--green);
+    opacity: 0;
+    transition: opacity 0.1s ease;
+  }
+  .wing a:hover::before {
+    opacity: 1;
+  }
+
+  /* ── closing band ───────────────────────────────────── */
+  .band {
+    border-top: 1px solid var(--border);
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 110%, rgba(42, 167, 255, 0.1), transparent 70%),
+      var(--bg-soft);
+    text-align: center;
+    padding: 4.5rem 1.5rem 5rem;
+  }
+  .band h2 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    letter-spacing: 0.04em;
+  }
+  .band p {
+    color: var(--muted);
+    margin: 0 0 1.6rem;
+  }
+
+  /* ── responsive + motion ────────────────────────────── */
+  @media (max-width: 880px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 2.2rem;
+      padding-top: clamp(2rem, 6vh, 3.5rem);
+    }
+    .artifact {
+      width: 100%;
+      max-width: 360px;
+      margin-inline: auto;
+    }
+    .manifest {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 520px) {
+    .hero {
+      padding-inline: 1.1rem;
+    }
+    .rune3d {
+      width: 58px;
+      height: 58px;
+      margin-bottom: 1.1rem;
+    }
+    .boot {
+      font-size: 0.62rem;
+    }
+    .rune {
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      margin-top: 1.6rem;
+    }
+    .tagline {
+      font-size: 1rem;
+    }
+    .cta {
+      width: 100%;
+    }
+    .cta :global(.btn) {
+      flex: 1 1 auto;
+      text-align: center;
+    }
+    .install {
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    .plate {
+      padding: 0.9rem;
+    }
+    .readout {
+      gap: 0.8rem;
+      font-size: 0.7rem;
+    }
+    .plates,
+    .manifest,
+    .index {
+      padding-inline: 1.1rem;
+    }
+    .spec {
+      padding: 1.2rem 1.1rem 1.3rem;
+    }
+    .index-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .band {
+      padding: 3.2rem 1.1rem 3.6rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rune3d-spin {
+      animation: none;
+      transform: rotateX(14deg) rotateY(-32deg);
+    }
+    .boot-text,
+    .hero h1 .g,
+    .rune,
+    .tagline,
+    .cta,
+    .install,
+    .artifact,
+    .frame rect,
+    .frame line,
+    #spines rect {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .scan {
+      display: none;
+    }
+    .ticker-track {
+      animation-duration: 120s;
+    }
+  }
+</style>
