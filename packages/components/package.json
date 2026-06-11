@@ -1,8 +1,9 @@
 {
   "name": "@runek/components",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Procedural 3D components for Runek (React Three Fiber).",
   "license": "MIT",
+  "private": true,
   "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",

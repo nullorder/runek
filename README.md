@@ -60,7 +60,7 @@ Same `seed` → same world, every time.
 packages/
   core/         @runek/core        — <World>, useWorld, seeded rng, contract types
   components/   @runek/components   — the procedural components
-  cli/          @runek/cli         — the `runek` CLI (init / add / list)
+  cli/          runek              — the `runek` CLI (init / add / list)
 apps/
   docs/         the docs site (flat docs + a walkable 3D library); serves the registry at /r
 registry/       registry.json (index) + generated components/*.json

@@ -14,7 +14,6 @@ const files = [
   'packages/core/package.json',
   'packages/components/package.json',
   'packages/cli/package.json',
-  'apps/helicon/package.json',
   'apps/docs/package.json',
 ]
 

@@ -1,9 +1,25 @@
 {
-  "name": "@runek/cli",
-  "version": "0.4.0",
+  "name": "runek",
+  "version": "0.5.0",
   "description": "Runek CLI — pull procedural 3D component source into your project (source registry).",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nullorder/runek.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://runek.nullorder.org",
+  "bugs": "https://github.com/nullorder/runek/issues",
+  "keywords": [
+    "react-three-fiber",
+    "threejs",
+    "3d",
+    "procedural-generation",
+    "components",
+    "registry",
+    "cli"
+  ],
   "bin": {
     "runek": "./dist/index.js"
   },

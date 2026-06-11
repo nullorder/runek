@@ -12,7 +12,7 @@ Guidelines for AI agents (Claude Code and others) working in this repository.
 packages/
   core/         @runek/core        — <World>, useWorld, seeded rng, contract types
   components/   @runek/components   — the procedural components (depends on core)
-  cli/          @runek/cli         — the `runek` CLI: init / add / list (source registry)
+  cli/          runek              — the `runek` CLI: init / add / list (source registry)
 apps/
   docs/         the docs site (Astro + R3F): pre-rendered flat Markdown pages + a walkable 3D library world; also serves the registry at /r
 registry/       the served source registry: registry.json (index) + generated components/*.json
@@ -51,7 +51,7 @@ Both are centralized — do not hand-edit them in individual `package.json` file
 
 - **Dependency versions** live in one place: the `catalog:` block in `pnpm-workspace.yaml`. Every `package.json` references `"catalog:"` instead of a literal version. To bump a dependency (e.g. three.js), edit its catalog entry **once**, then `just install`.
 - **Package versions** are kept in lockstep across all workspace packages. Change them with **`just version X.Y.Z`** (writes every `package.json` via `scripts/set-version.mjs`) — never edit a `version` field by hand.
-- Releases: **`just publish`** runs the gate, npm-publishes `@runek/cli`, tags `vX.Y.Z`, and creates a GitHub release (`just publish-help` shows the steps). The component library ships as source via the registry, which goes live by deploying `apps/docs` (serves `/r`).
+- Releases: **`just publish`** runs the gate, npm-publishes the `runek` CLI, tags `vX.Y.Z`, and creates a GitHub release (`just publish-help` shows the steps). The component library ships as source via the registry, which goes live by deploying `apps/docs` (serves `/r`).
 
 ## Core principles (the moat — never compromise these)
 

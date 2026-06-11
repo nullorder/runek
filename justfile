@@ -71,11 +71,12 @@ check-npm-login:
 check-gh-login:
     @gh auth status >/dev/null 2>&1 && echo "✓ gh authenticated" || { echo "✗ not logged in to GitHub — run 'gh auth login'"; exit 1; }
 
-# Publish @runek/cli to npm (the component library ships as source via the registry deploy)
+# Publish the `runek` CLI to npm (the component library ships as source via the registry deploy)
 publish-cli:
-    @echo "Publishing @runek/cli v{{version}} to npm..."
-    pnpm --filter @runek/cli build
-    pnpm --filter @runek/cli publish --access public --no-git-checks
+    @echo "Publishing runek v{{version}} to npm..."
+    pnpm --filter runek build
+    node packages/cli/dist/index.js --help > /dev/null
+    pnpm --filter runek publish --access public --no-git-checks
 
 # Tag the release and create a GitHub release with auto-generated notes
 gh-release:
@@ -94,7 +95,7 @@ gh-release:
 # Full release: gate → npm (CLI) → git tag + GitHub release.
 # The component library + registry go live by deploying the docs site (serves /r).
 publish: prepare-publish check-npm-login check-gh-login registry publish-cli gh-release
-    @echo "✓ Released v{{version}}: @runek/cli on npm, tagged, GitHub release created."
+    @echo "✓ Released v{{version}}: runek on npm, tagged, GitHub release created."
     @echo "  Next: deploy apps/docs to publish the registry at https://runek.nullorder.org/r"
 
 # What `just publish` does, and the version it would cut
@@ -103,7 +104,7 @@ publish-help:
     @echo "  1. prepare-publish   full gate (lint, typecheck, test, build)"
     @echo "  2. check-*-login     verify npm + GitHub credentials"
     @echo "  3. registry          regenerate served manifests"
-    @echo "  4. publish-cli       build + npm publish @runek/cli (public)"
+    @echo "  4. publish-cli       build + npm publish runek (public)"
     @echo "  5. gh-release        git tag v{{version}} + GitHub release (auto notes)"
     @echo "  Set the version first with: just version X.Y.Z"
 

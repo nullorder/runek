@@ -34,7 +34,7 @@ list every recipe. Node ≥ 20 and pnpm are required.
 ```
 packages/core/         @runek/core       — <World>, useWorld, seeded rng, contract types
 packages/components/   @runek/components — the procedural components
-packages/cli/          @runek/cli        — the `runek` CLI
+packages/cli/          runek             — the `runek` CLI
 apps/docs/             the docs site (also serves the registry at /r)
 registry/              registry.json (index) + generated components/*.json
 ```
