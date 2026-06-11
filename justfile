@@ -12,25 +12,17 @@ default:
 install:
     pnpm install
 
-# Run the Helicon showcase app (dev server)
-dev:
-    pnpm --filter helicon dev
-
-# Run the docs site (Astro dev server)
+# Run the docs site (Astro dev server) — the in-repo dev harness
 docs:
     pnpm --filter @runek/docs dev
-
-# Production build of the showcase app
-build:
-    pnpm --filter helicon build
 
 # Production build of the docs site (Astro static)
 build-docs:
     pnpm --filter @runek/docs build
 
-# Preview the production build
+# Preview the docs production build
 preview:
-    pnpm --filter helicon preview
+    pnpm --filter @runek/docs preview
 
 # Rebuild the served registry (registry/components/*.json) from the index + source
 registry:
@@ -56,8 +48,8 @@ fmt:
 typecheck:
     pnpm -r --if-present typecheck
 
-# Full verification gate: lint, typecheck, test, build (apps)
-check: lint typecheck test build build-docs
+# Full verification gate: lint, typecheck, test, build
+check: lint typecheck test build-docs
 
 # Run the test suite (vitest, across packages)
 test:
@@ -118,5 +110,4 @@ publish-help:
 # Remove build output and installed dependencies
 clean:
     rm -rf node_modules packages/*/node_modules apps/*/node_modules
-    rm -rf apps/helicon/dist apps/helicon/.vite
     rm -rf apps/docs/dist apps/docs/.astro apps/docs/public/r

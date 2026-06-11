@@ -23,8 +23,7 @@ a server gets questioned.
 ```sh
 nvm use            # or fnm use — Node 24, pinned in .nvmrc
 just install       # install workspace deps (pnpm)
-just dev           # run the Helicon showcase app
-just docs          # run the docs site
+just docs          # run the docs site (gallery + 3D library — the dev harness)
 ```
 
 This repo uses [`just`](https://just.systems) as the task runner — run `just` to
@@ -36,7 +35,6 @@ list every recipe. Node ≥ 20 and pnpm are required.
 packages/core/         @runek/core       — <World>, useWorld, seeded rng, contract types
 packages/components/   @runek/components — the procedural components
 packages/cli/          @runek/cli        — the `runek` CLI
-apps/helicon/          showcase world
 apps/docs/             the docs site (also serves the registry at /r)
 registry/              registry.json (index) + generated components/*.json
 ```

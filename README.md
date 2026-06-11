@@ -62,7 +62,6 @@ packages/
   components/   @runek/components   — the procedural components
   cli/          @runek/cli         — the `runek` CLI (init / add / list)
 apps/
-  helicon/      the showcase world (extracts to its own repo at distribution GA)
   docs/         the docs site (flat docs + a walkable 3D library); serves the registry at /r
 registry/       registry.json (index) + generated components/*.json
 ```
@@ -71,8 +70,7 @@ registry/       registry.json (index) + generated components/*.json
 
 ```sh
 just install      # install workspace deps (pnpm)
-just dev          # run the Helicon showcase app
-just docs         # run the docs site
+just docs         # run the docs site (the in-repo dev harness)
 just check        # full gate: lint + typecheck + test + build
 ```
 

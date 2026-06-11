@@ -14,12 +14,11 @@ packages/
   components/   @runek/components   — the procedural components (depends on core)
   cli/          @runek/cli         — the `runek` CLI: init / add / list (source registry)
 apps/
-  helicon/      the showcase world (Vite app; extracts to its own repo at distribution GA)
   docs/         the docs site (Astro + R3F): pre-rendered flat Markdown pages + a walkable 3D library world; also serves the registry at /r
 registry/       the served source registry: registry.json (index) + generated components/*.json
 ```
 
-Dependency direction is strictly one-way: `helicon`/`docs → components → core`. Nothing in the library imports from an app. The CLI is standalone (Node built-ins only) and reads the registry. Standalone worlds live in their own repos; the monorepo holds the library plus a dev/docs harness.
+Dependency direction is strictly one-way: `docs → components → core`. Nothing in the library imports from an app. The CLI is standalone (Node built-ins only) and reads the registry. Standalone worlds live in their own repos — **Helicon**, the showcase world, lives at `nullorder/helicon` and consumes Runek via the CLI-vendored source registry; the monorepo holds the library plus the docs harness.
 
 ## Distribution: source registry (Path A)
 
@@ -32,13 +31,12 @@ This repo uses [`just`](https://just.systems) as the task runner. Run `just` to 
 ```sh
 just            # list all recipes
 just install    # install workspace dependencies
-just dev        # run the Helicon showcase app (Vite)
-just docs       # run the docs site (Astro dev server)
-just check      # full gate: lint + typecheck + build
+just docs       # run the docs site (Astro dev server) — the in-repo dev harness
+just check      # full gate: lint + typecheck + test + build
 just lint       # Biome lint + format check (no writes)
 just fmt        # Biome auto-format + safe fixes
 just typecheck  # tsc --noEmit across all packages
-just build      # production build of the app
+just build-docs # production build of the docs site
 just test       # run the vitest suites across packages
 just registry   # regenerate the served registry (registry/components/*.json)
 just cli ...    # run the runek CLI from source, e.g. `just cli add bookshelf --registry ./registry`

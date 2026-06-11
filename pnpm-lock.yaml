@@ -39,9 +39,6 @@ catalogs:
     '@types/three':
       specifier: ^0.184.1
       version: 0.184.1
-    '@vitejs/plugin-react':
-      specifier: ^6.0.2
-      version: 6.0.2
     astro:
       specifier: ^5.0.0
       version: 5.18.2
@@ -66,9 +63,6 @@ catalogs:
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
-    vite:
-      specifier: ^8.0.16
-      version: 8.0.16
     vitest:
       specifier: ^4.1.8
       version: 4.1.8
@@ -144,52 +138,6 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
-
-  apps/helicon:
-    dependencies:
-      '@react-three/drei':
-        specifier: 'catalog:'
-        version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@types/react@19.2.16)(@types/three@0.184.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
-      '@react-three/fiber':
-        specifier: 'catalog:'
-        version: 9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)
-      '@react-three/rapier':
-        specifier: 'catalog:'
-        version: 2.2.0(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(react@19.2.7)(three@0.184.0)
-      '@runek/components':
-        specifier: workspace:*
-        version: link:../../packages/components
-      '@runek/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      ecctrl:
-        specifier: 'catalog:'
-        version: 1.0.97(@react-three/drei@10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@types/react@19.2.16)(@types/three@0.184.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(@react-three/rapier@2.2.0(@react-three/fiber@9.6.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0))(react@19.2.7)(three@0.184.0))(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.184.0)(use-sync-external-store@1.6.0(react@19.2.7))
-      react:
-        specifier: 'catalog:'
-        version: 19.2.7
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.7(react@19.2.7)
-      three:
-        specifier: 'catalog:'
-        version: 0.184.0
-    devDependencies:
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.16
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.2.3(@types/react@19.2.16)
-      '@types/three':
-        specifier: 'catalog:'
-        version: 0.184.1
-      '@vitejs/plugin-react':
-        specifier: 'catalog:'
-        version: 6.0.2(vite@8.0.16(@types/node@24.12.4)(esbuild@0.27.7)(yaml@2.9.0))
-      vite:
-        specifier: 'catalog:'
-        version: 8.0.16(@types/node@24.12.4)(esbuild@0.27.7)(yaml@2.9.0)
 
   packages/cli:
     devDependencies:
@@ -1679,19 +1627,6 @@ packages:
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
-
-  '@vitejs/plugin-react@6.0.2':
-    resolution: {integrity: sha512-DlSMqo4WhThw4vB8Mpn0Woe9J+Jfq1geJ61AKW0QEgLzGMNwtIMdxbDUzLxcun8W7NbJO0e2Jg/Nxm3cCSVzzg==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    peerDependencies:
-      '@rolldown/plugin-babel': ^0.1.7 || ^0.2.0
-      babel-plugin-react-compiler: ^1.0.0
-      vite: ^8.0.0
-    peerDependenciesMeta:
-      '@rolldown/plugin-babel':
-        optional: true
-      babel-plugin-react-compiler:
-        optional: true
 
   '@vitest/expect@4.1.8':
     resolution: {integrity: sha512-h3nDO677RDLEGlBxyQ5CW8RlMThSKSRLUePLOx09gNIWRL40edgA1GCZSZgf1W55MFAG6/Sw14KeaAnqv0NKdQ==}
@@ -4927,11 +4862,6 @@ snapshots:
       vite: 6.4.3(@types/node@24.12.4)(lightningcss@1.32.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
-
-  '@vitejs/plugin-react@6.0.2(vite@8.0.16(@types/node@24.12.4)(esbuild@0.27.7)(yaml@2.9.0))':
-    dependencies:
-      '@rolldown/pluginutils': 1.0.1
-      vite: 8.0.16(@types/node@24.12.4)(esbuild@0.27.7)(yaml@2.9.0)
 
   '@vitest/expect@4.1.8':
     dependencies:
