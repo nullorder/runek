@@ -327,14 +327,14 @@ function EditorToolbar({
 }: EditorToolbarProps) {
   const hasSelection = selected !== null
 
-  const exportWorld = async () => {
+  const exportWorld = () => {
     const text = serializeWorld(data)
-    try {
-      await navigator.clipboard.writeText(text)
-    } catch {
-      // clipboard may be unavailable; the log below is the fallback
-    }
-    console.log(text)
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'world.json'
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -407,7 +407,7 @@ function EditorToolbar({
       <span style={DIVIDER} />
 
       <button type="button" style={button(false)} onClick={exportWorld}>
-        Export JSON
+        Download JSON
       </button>
       <span style={HINT}>
         {selected === null ? 'click a component · Esc deselects' : `selected #${selected}`}
