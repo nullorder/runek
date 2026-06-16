@@ -30,7 +30,6 @@ export type RegistryIndex = { name: string; homepage?: string; items: IndexItem[
 export type Config = {
   registry: string
   dir: string
-  coreImport: string
 }
 
 export const CONFIG_FILE = 'runek.config.json'
@@ -38,7 +37,6 @@ export const CONFIG_FILE = 'runek.config.json'
 export const DEFAULT_CONFIG: Config = {
   registry: 'https://runek.nullorder.org/r',
   dir: 'src/runek',
-  coreImport: './core',
 }
 
 // --- config ----------------------------------------------------------------
@@ -106,18 +104,16 @@ export async function resolveItems(base: string, names: string[]): Promise<Manif
 
 // --- writing files ---------------------------------------------------------
 
-/** Repoint the `@runek/core` import at the user's installed copy of core. */
-export function rewriteCoreImport(content: string, coreImport: string): string {
-  return content.replace(/(['"])@runek\/core(['"])/g, `$1${coreImport}$2`)
-}
-
 export type WriteResult = { written: string[]; skipped: string[] }
 
+/**
+ * Write component source verbatim. Components import `@runek/core` from npm
+ * (installed as a dependency), so there's no import to rewrite.
+ */
 export function writeFiles(
   cwd: string,
   dir: string,
   files: RegistryFile[],
-  coreImport: string,
   overwrite: boolean,
 ): WriteResult {
   const result: WriteResult = { written: [], skipped: [] }
@@ -128,7 +124,7 @@ export function writeFiles(
       continue
     }
     mkdirSync(dirname(dest), { recursive: true })
-    writeFileSync(dest, rewriteCoreImport(file.content, coreImport))
+    writeFileSync(dest, file.content)
     result.written.push(file.path)
   }
   return result

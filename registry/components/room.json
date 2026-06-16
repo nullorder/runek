@@ -4,11 +4,10 @@
   "type": "registry:component",
   "description": "Four walls + floor with a doorway and fixed colliders; optional roof.",
   "dependencies": [
-    "@react-three/rapier@^2.2.0"
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.5.0"
   ],
-  "registryDependencies": [
-    "core"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Room.tsx",

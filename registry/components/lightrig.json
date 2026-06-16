@@ -3,10 +3,10 @@
   "title": "LightRig",
   "type": "registry:component",
   "description": "Sun + hemisphere/ground fill with shadow configuration.",
-  "dependencies": [],
-  "registryDependencies": [
-    "core"
+  "dependencies": [
+    "@runek/core@^0.5.0"
   ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "LightRig.tsx",

@@ -4,11 +4,10 @@
   "type": "registry:component",
   "description": "Flat or gable roof.",
   "dependencies": [
-    "@react-three/rapier@^2.2.0"
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.5.0"
   ],
-  "registryDependencies": [
-    "core"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Roof.tsx",

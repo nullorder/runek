@@ -3,10 +3,10 @@
   "title": "Window",
   "type": "registry:component",
   "description": "Window with frame and translucent pane.",
-  "dependencies": [],
-  "registryDependencies": [
-    "core"
+  "dependencies": [
+    "@runek/core@^0.5.0"
   ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Window.tsx",

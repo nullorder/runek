@@ -1,25 +1,8 @@
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { collectDependencies, installCommand, resolveItems, rewriteCoreImport } from './lib.ts'
+import { collectDependencies, installCommand, resolveItems } from './lib.ts'
 
 const localRegistry = fileURLToPath(new URL('../../../registry', import.meta.url))
-
-describe('rewriteCoreImport', () => {
-  it('repoints the core import, leaving others untouched', () => {
-    const src = [
-      "import { CuboidCollider } from '@react-three/rapier'",
-      "import { rng, useWorld, type Vec3 } from '@runek/core'",
-    ].join('\n')
-    const out = rewriteCoreImport(src, './core')
-    expect(out).toContain("from './core'")
-    expect(out).not.toContain('@runek/core')
-    expect(out).toContain("from '@react-three/rapier'")
-  })
-
-  it('honors a custom core import and double quotes', () => {
-    expect(rewriteCoreImport('from "@runek/core"', '@/runek/core')).toBe('from "@/runek/core"')
-  })
-})
 
 describe('collectDependencies', () => {
   it('unions, dedupes, and sorts across manifests', () => {
@@ -51,18 +34,23 @@ describe('installCommand', () => {
 })
 
 describe('resolveItems', () => {
-  it('resolves registry dependencies with deps ordered before dependents', async () => {
+  it('resolves sibling component dependencies, deps before dependents', async () => {
     const manifests = await resolveItems(localRegistry, ['house'])
     const names = manifests.map((m) => m.name)
-    expect(names).toContain('core')
     expect(names).toContain('wall')
+    expect(names).not.toContain('core') // core is an npm dep now, not a copied item
     expect(names.at(-1)).toBe('house')
-    expect(names.indexOf('core')).toBeLessThan(names.indexOf('house'))
+    expect(names.indexOf('wall')).toBeLessThan(names.indexOf('house'))
   })
 
   it('does not duplicate a shared dependency', async () => {
-    const manifests = await resolveItems(localRegistry, ['door', 'window'])
-    const cores = manifests.filter((m) => m.name === 'core')
-    expect(cores).toHaveLength(1)
+    const manifests = await resolveItems(localRegistry, ['house', 'wall'])
+    const walls = manifests.filter((m) => m.name === 'wall')
+    expect(walls).toHaveLength(1)
+  })
+
+  it('declares @runek/core as an npm dependency on each component', async () => {
+    const [bookshelf] = await resolveItems(localRegistry, ['bookshelf'])
+    expect(bookshelf.dependencies.some((d) => d.startsWith('@runek/core@'))).toBe(true)
   })
 })

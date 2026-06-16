@@ -12,21 +12,21 @@ into your project and installs what it needs.
 
 ```bash
 npx runek init                          # writes runek.config.json + the install dir
-npx runek add player terrain bookshelf  # pulls source + core + installs peer deps
+npx runek add player terrain bookshelf  # pulls source + installs deps
 npx runek list                          # browse the catalog
 ```
 
-`add` resolves dependencies for you: every component pulls in `core` (the `<World>`
-provider, seeded `rng`, and contract types), and `house` pulls the walls, floor,
-roof, door, and window it composes from.
+`add` resolves dependencies for you: it installs `@runek/core` (the `<World>`
+provider, seeded `rng`, and contract types) from npm, and `house` pulls the walls,
+floor, roof, door, and window it composes from as source.
 
 ## Compose a world
 
-The CLI installs into `src/runek/` by default and repoints the core import, so the
-files resolve out of the box:
+The CLI copies components into `src/runek/` by default; they import the runtime
+from `@runek/core`, which it installs for you:
 
 ```tsx
-import { World } from './runek/core'
+import { World } from '@runek/core'
 import { Bookshelf } from './runek/Bookshelf'
 import { Player } from './runek/Player'
 import { Terrain } from './runek/Terrain'

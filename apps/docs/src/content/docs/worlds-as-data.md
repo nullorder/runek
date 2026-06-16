@@ -50,7 +50,7 @@ The look of a world is data too: `palette` re-themes every component at once and
 `<WorldRenderer>` maps each node's `type` through a registry of components:
 
 ```tsx
-import { WorldRenderer, parseWorld } from './runek/core'
+import { WorldRenderer, parseWorld } from '@runek/core'
 import { registry } from './runek/registry'
 
 const world = parseWorld(await (await fetch('/my.world.json')).text())

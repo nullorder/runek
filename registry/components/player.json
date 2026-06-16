@@ -4,11 +4,10 @@
   "type": "registry:component",
   "description": "First/third-person character controller (ecctrl wrapper).",
   "dependencies": [
+    "@runek/core@^0.5.0",
     "ecctrl@^1.0.97"
   ],
-  "registryDependencies": [
-    "core"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Player.tsx",

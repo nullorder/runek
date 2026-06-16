@@ -14,7 +14,7 @@ number and the world is locked forever; change it to roll a new variation.
 `rng(seed)` returns a stream — call it for the next value in `[0, 1)`:
 
 ```tsx
-import { rng } from './runek/core'
+import { rng } from '@runek/core'
 
 const next = rng(42)
 next() // 0.37… — and always the same first value for seed 42
@@ -24,7 +24,7 @@ next() // 0.81…
 ## Helpers
 
 ```tsx
-import { rng, range, int, pick, sub } from './runek/core'
+import { rng, range, int, pick, sub } from '@runek/core'
 
 const next = rng(42)
 range(next, 0, 10)            // a float in [0, 10)
@@ -39,7 +39,7 @@ with `sub(seed, n)` so each child is deterministic *and* distinct — without
 threading the same stream through everything:
 
 ```tsx
-import { sub } from './runek/core'
+import { sub } from '@runek/core'
 
 <Window seed={sub(seed, 0)} />
 <Window seed={sub(seed, 1)} />

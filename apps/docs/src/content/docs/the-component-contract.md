@@ -29,7 +29,7 @@ composable, serializable, and swappable with any other.
 
 ```tsx
 import { RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from './runek/core'
+import { rng, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 
 export interface CrateProps {

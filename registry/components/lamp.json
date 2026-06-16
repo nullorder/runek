@@ -6,11 +6,10 @@
   "dependencies": [
     "@react-three/fiber@^9.6.1",
     "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.5.0",
     "three@^0.184.0"
   ],
-  "registryDependencies": [
-    "core"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Lamp.tsx",

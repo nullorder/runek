@@ -6,8 +6,9 @@
 // `registryDependencies` (other items) from the imports, and writes a
 // self-contained manifest to registry/components/<name>.json.
 //
-// Source content is stored verbatim — the CLI rewrites the `@runek/core`
-// import to the user's layout at `add` time, so manifests stay layout-agnostic.
+// Source content is stored verbatim. Components import `@runek/core` from npm
+// (declared as a dependency, pinned to core's current version), so manifests
+// stay layout-agnostic and need no import rewriting.
 //
 // Usage: node scripts/build-registry.mjs
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
@@ -23,6 +24,12 @@ const BASELINE_DEPS = new Set(['react', 'react-dom'])
 
 const catalog = readCatalog(join(root, 'pnpm-workspace.yaml'))
 const index = JSON.parse(readFileSync(join(registryDir, 'registry.json'), 'utf8'))
+
+// Components depend on the published @runek/core, pinned to its current version.
+const coreVersion = JSON.parse(
+  readFileSync(join(root, 'packages/core/package.json'), 'utf8'),
+).version
+const CORE_DEP = `@runek/core@^${coreVersion}`
 
 // Map a source file's basename (no extension) → item name, so a sibling import
 // like `./Door` resolves to the `door` registry item.
@@ -105,7 +112,7 @@ function imports(content) {
 
 function classify(spec, selfName, deps, registryDeps) {
   if (spec === '@runek/core' || spec.startsWith('@runek/core/')) {
-    registryDeps.add('core')
+    deps.add(CORE_DEP)
     return
   }
   if (spec.startsWith('.')) {

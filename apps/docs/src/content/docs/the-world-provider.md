@@ -10,7 +10,7 @@ canvas, a default light rig, the Rapier physics world, and keyboard controls, th
 exposes scene-wide settings to its children through context.
 
 ```tsx
-import { World } from './runek/core'
+import { World } from '@runek/core'
 import { Bookshelf } from './runek/Bookshelf'
 import { Player } from './runek/Player'
 
@@ -60,7 +60,7 @@ The full slot list is the `WorldPalette` interface in `@runek/core`.
 Components read the shared scale from the provider so they size consistently:
 
 ```tsx
-import { useWorld } from './runek/core'
+import { useWorld } from '@runek/core'
 
 function MyThing() {
   const { unit, palette } = useWorld()
