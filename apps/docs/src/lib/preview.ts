@@ -19,6 +19,9 @@ export const DEFAULT_TARGET: [number, number, number] = [0, 0.9, 0]
 export const SEEDED = new Set(['Bookshelf', 'Grass', 'Rocks', 'Rug', 'Terrain', 'Trees'])
 
 export const PREVIEW: Record<string, PreviewConfig> = {
+  // Empty by default now; show the decorative fill variant in the gallery.
+  Bookshelf: { props: { fill: 0.7 } },
+  Clock: { camera: [0, 0, 2.4], target: [0, 0, 0] },
   Player: { skip: true, note: 'First-person controller — drop it into a world to walk.' },
   LightRig: { skip: true, note: 'Lighting system — lights a whole scene rather than an object.' },
   Sky: { camera: [0, 1.5, 7], target: [0, 3, 0] },
