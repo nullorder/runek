@@ -4,11 +4,10 @@
   "type": "registry:component",
   "description": "Procedural atmosphere (drei Sky).",
   "dependencies": [
-    "@react-three/drei@^10.7.7"
+    "@react-three/drei@^10.7.7",
+    "@runek/core@^0.5.0"
   ],
-  "registryDependencies": [
-    "core"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Sky.tsx",

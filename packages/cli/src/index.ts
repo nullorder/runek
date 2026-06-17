@@ -124,13 +124,7 @@ async function add(names: string[], opts: Options): Promise<void> {
   }
 
   const files = manifests.flatMap((m) => m.files)
-  const { written, skipped } = writeFiles(
-    cwd,
-    config.dir,
-    files,
-    config.coreImport,
-    !!opts.overwrite,
-  )
+  const { written, skipped } = writeFiles(cwd, config.dir, files, !!opts.overwrite)
   for (const path of written) console.log(`  ${green('+')} ${config.dir}/${path}`)
   for (const path of skipped)
     console.log(`  ${yellow('•')} ${config.dir}/${path} ${dim('(exists, skipped)')}`)

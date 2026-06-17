@@ -20,7 +20,7 @@ Think **"shadcn for 3D worlds."**
 - **Re-themeable** — components default their colors to a world palette; swap the palette, re-skin the world.
 - **Parametric LOD** — detail scales with props and distance.
 - **Local-first** — no backend; a world deploys as a static site.
-- **You own the source** — components are copied into your project, not locked behind an import.
+- **You own the components** — component source is copied into your project to edit and fork; the small `@runek/core` runtime comes from npm (shadcn-style: own the components, depend on the primitives).
 
 ## Install
 
@@ -31,12 +31,13 @@ npx runek list                          # browse the catalog
 ```
 
 `add` copies editable component source into your project (default `src/runek/`),
-resolves dependencies, and installs the npm packages it needs.
+resolves dependencies, and installs the npm packages it needs, including
+`@runek/core`.
 
 ## Compose your first world
 
 ```tsx
-import { World } from './runek/core'
+import { World } from '@runek/core'
 import { Bookshelf } from './runek/Bookshelf'
 import { Player } from './runek/Player'
 import { Terrain } from './runek/Terrain'

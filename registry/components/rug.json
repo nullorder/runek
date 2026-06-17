@@ -3,10 +3,10 @@
   "title": "Rug",
   "type": "registry:component",
   "description": "Procedural striped rug (seeded stripes, no textures).",
-  "dependencies": [],
-  "registryDependencies": [
-    "core"
+  "dependencies": [
+    "@runek/core@^0.5.0"
   ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Rug.tsx",

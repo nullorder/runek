@@ -4,14 +4,6 @@
   "homepage": "https://runek.nullorder.org",
   "items": [
     {
-      "name": "core",
-      "title": "Core",
-      "type": "registry:lib",
-      "category": "lib",
-      "description": "World provider, useWorld, seeded rng, worlds-as-data, the runtime editor, and the component contract types.",
-      "files": [{ "path": "packages/core/src", "target": "core" }]
-    },
-    {
       "name": "player",
       "title": "Player",
       "type": "registry:component",

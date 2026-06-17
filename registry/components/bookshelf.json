@@ -5,11 +5,10 @@
   "description": "Procedurally generated bookshelf with seeded books and one cuboid collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.5.0",
     "three@^0.184.0"
   ],
-  "registryDependencies": [
-    "core"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Bookshelf.tsx",

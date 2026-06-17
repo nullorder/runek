@@ -3,9 +3,10 @@
   "title": "House",
   "type": "registry:component",
   "description": "Composed dwelling: walls with openings, floor, roof, door, and windows.",
-  "dependencies": [],
+  "dependencies": [
+    "@runek/core@^0.5.0"
+  ],
   "registryDependencies": [
-    "core",
     "door",
     "floor",
     "roof",

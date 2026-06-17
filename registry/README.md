@@ -16,9 +16,10 @@ project, then own and edit it). The distribution model is decided — **Path A**
 they never drift from the source. After changing a component (or `registry.json`),
 run **`just registry`** to regenerate `components/`.
 
-Source `content` is stored verbatim; the CLI repoints the `@runek/core` import at
-the user's installed copy (default `./core`) at `add` time, so manifests stay
-layout-agnostic.
+Source `content` is stored verbatim. Components import `@runek/core` from npm
+(each manifest declares it as a `dependency`, pinned to core's version), so there
+is no import to rewrite and manifests stay layout-agnostic. `core` is not a
+registry item; only components are copied.
 
 ## Using it
 

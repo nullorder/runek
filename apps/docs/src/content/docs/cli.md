@@ -25,12 +25,12 @@ npx runek add <name...> [options]
 
 Pulls one or more components. For each, it:
 
-1. resolves **registry dependencies** recursively (every component pulls `core`;
-   `house` also pulls its walls, floor, roof, door, and window),
-2. writes the source into your install directory, repointing the `@runek/core`
-   import at your copy,
-3. installs the npm **dependencies** with your package manager (auto-detected from
-   the lockfile).
+1. resolves **registry dependencies** recursively (e.g. `house` also pulls its
+   walls, floor, roof, door, and window as source),
+2. writes the source into your install directory verbatim (components import
+   `@runek/core` from npm, so there's no import to rewrite),
+3. installs the npm **dependencies**, including `@runek/core`, with your package
+   manager (auto-detected from the lockfile).
 
 ```bash
 npx runek add player terrain bookshelf
@@ -61,12 +61,10 @@ Prints the catalog, grouped by category.
 {
   "$schema": "https://runek.nullorder.org/registry/config-schema.json",
   "registry": "https://runek.nullorder.org/r",
-  "dir": "src/runek",
-  "coreImport": "./core"
+  "dir": "src/runek"
 }
 ```
 
 - **registry** — where components are fetched from.
-- **dir** — where source is written (components flat, `core` in a subfolder).
-- **coreImport** — what `@runek/core` is rewritten to (default `./core`, since
-  components and `core/` land side by side).
+- **dir** — where component source is written. The runtime comes from the
+  `@runek/core` npm package, not copied here.
