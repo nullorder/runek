@@ -23,6 +23,11 @@ used as in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 - Every prop **SHOULD** be **JSON-serializable** (numbers, strings, booleans,
   arrays, plain objects). Function/ref props break [worlds-as-data](https://runek.nullorder.org/docs/worlds-as-data) and **SHOULD NOT** be required.
 - Each prop **MUST** have a sensible default, so `<Name />` renders something.
+- A component **MAY** be interactive. If so, the *data* of the interaction (what is
+  clickable, where a click leads) **MUST** stay JSON-serializable — e.g. a `books`
+  array, a per-item `href` — and any event callback (e.g. `onBookSelect`) **MUST**
+  be **optional**, so the component still renders and round-trips from data without
+  it. See `Bookshelf`.
 
 ## 2. Determinism
 
