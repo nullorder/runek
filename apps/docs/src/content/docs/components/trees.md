@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add trees
+npx @runek/cli add trees
 ```
 
 Pulls `core`, `@react-three/rapier@^2.2.0`, `three@^0.184.0`.

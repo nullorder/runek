@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add lightrig
+npx @runek/cli add lightrig
 ```
 
 Pulls `core`.

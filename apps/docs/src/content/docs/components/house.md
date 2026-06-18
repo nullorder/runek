@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add house
+npx @runek/cli add house
 ```
 
 Pulls `core`, `door`, `floor`, `roof`, `wall`, `window`.

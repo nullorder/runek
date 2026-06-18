@@ -25,9 +25,9 @@ Think **"shadcn for 3D worlds."**
 ## Install
 
 ```sh
-npx runek init                          # writes runek.config.json + the install dir
-npx runek add player terrain bookshelf  # pulls source + deps into your project
-npx runek list                          # browse the catalog
+npx @runek/cli init                          # writes runek.config.json + the install dir
+npx @runek/cli add player terrain bookshelf  # pulls source + deps into your project
+npx @runek/cli list                          # browse the catalog
 ```
 
 `add` copies editable component source into your project (default `src/runek/`),

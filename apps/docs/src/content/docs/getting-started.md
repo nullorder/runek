@@ -11,9 +11,9 @@ into your project and installs what it needs.
 ## Install components
 
 ```bash
-npx runek init                          # writes runek.config.json + the install dir
-npx runek add player terrain bookshelf  # pulls source + installs deps
-npx runek list                          # browse the catalog
+npx @runek/cli init                          # writes runek.config.json + the install dir
+npx @runek/cli add player terrain bookshelf  # pulls source + installs deps
+npx @runek/cli list                          # browse the catalog
 ```
 
 `add` resolves dependencies for you: it installs `@runek/core` (the `<World>`

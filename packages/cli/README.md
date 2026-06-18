@@ -11,9 +11,9 @@ bookshelf, a lake, a whole house — generates its geometry from props and a
 ## Usage
 
 ```sh
-npx runek init                          # write runek.config.json + the install dir
-npx runek add player terrain bookshelf  # pull source + deps into your project
-npx runek list                          # browse the catalog
+npx @runek/cli init                          # write runek.config.json + the install dir
+npx @runek/cli add player terrain bookshelf  # pull source + deps into your project
+npx @runek/cli list                          # browse the catalog
 ```
 
 `add` resolves registry dependencies recursively (every component pulls

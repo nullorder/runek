@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add bookshelf
+npx @runek/cli add bookshelf
 ```
 
 Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.5.0`, `three@^0.184.0`.
