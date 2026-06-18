@@ -4,13 +4,28 @@
 
 > *Worlds, one rune at a time.*
 
+[![@runek/core on npm](https://img.shields.io/npm/v/%40runek%2Fcore?logo=npm&label=%40runek%2Fcore&color=cb3837)](https://www.npmjs.com/package/@runek/core)
+[![@runek/cli on npm](https://img.shields.io/npm/v/%40runek%2Fcli?logo=npm&label=%40runek%2Fcli&color=cb3837)](https://www.npmjs.com/package/@runek/cli)
+[![node](https://img.shields.io/node/v/%40runek%2Fcli?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![license: MIT](https://img.shields.io/npm/l/%40runek%2Fcore?color=blue)](./LICENSE)
+
 Runek is a source registry of procedural 3D components for [React Three Fiber](https://r3f.docs.pmnd.rs/) — pull a component's source into your project and own it (shadcn-style). Every component — a bookshelf, a lake, a whole house — generates its own geometry from props and a `seed`. No binary assets, no model files, no CDN. A whole world is just data: diffable, forkable, version-controlled like any repo.
 
 Think **"shadcn for 3D worlds."**
 
 **[Docs](https://runek.nullorder.org/docs) · [Gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library)**
 
-> **Status:** `v0.4.0` — 23 components (palette-aware, instanced), a runtime editor (move/rotate, add/duplicate/delete, undo), worlds-as-data with world-level palette + fog, the `runek` CLI + source registry, and a docs site (flat docs + a walkable 3D library) all live in the monorepo. `v0.5.0` (distribution GA + deploy) in progress.
+> **Status:** `v0.6.0` — distribution GA shipped. `@runek/core` + `@runek/cli` are published to npm, and the docs site + component registry are live at [runek.nullorder.org](https://runek.nullorder.org). The 23-component catalog (palette-aware, instanced), a runtime editor (move/rotate, add/duplicate/delete, undo), and worlds-as-data with world-level palette + fog all ship today.
+
+## Demo: Helicon
+
+[**Helicon**](https://helicon.nullorder.org) is the showcase world — a walkable,
+editable procedural island built **entirely from Runek components**, with its
+whole scene defined as a single JSON file. It consumes Runek exactly the way your
+project would: `@runek/core` from npm plus component source copied via
+`@runek/cli`, so it doubles as a worked end-to-end example of the workflow below.
+
+**[Walk Helicon →](https://helicon.nullorder.org)** · [Source on GitHub](https://github.com/nullorder/helicon)
 
 ## Why Runek
 
@@ -61,7 +76,7 @@ Same `seed` → same world, every time.
 packages/
   core/         @runek/core        — <World>, useWorld, seeded rng, contract types
   components/   @runek/components   — the procedural components
-  cli/          runek              — the `runek` CLI (init / add / list)
+  cli/          @runek/cli          — the CLI (init / add / list); bin: runek
 apps/
   docs/         the docs site (flat docs + a walkable 3D library); serves the registry at /r
 registry/       registry.json (index) + generated components/*.json
