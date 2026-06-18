@@ -16,13 +16,22 @@ install:
 docs:
     pnpm --filter @runek/docs dev
 
-# Build the publishable @runek/core (tsup → dist)
+# Build the publishable @runek/core (tsup → dist, production)
 build-core:
-    pnpm --filter @runek/core build
+    NODE_ENV=production pnpm --filter @runek/core build
+
+# Build the publishable @runek/cli (tsc → dist, production)
+build-cli:
+    NODE_ENV=production pnpm --filter @runek/cli build
 
 # Production build of the docs site (Astro static)
 build-docs:
-    pnpm --filter @runek/docs build
+    NODE_ENV=production pnpm --filter @runek/docs build
+
+# Build every package for release, one by one: core lib → CLI → docs site.
+# @runek/components ships as source (copy-first), so there is nothing to compile.
+build: build-core build-cli build-docs
+    @echo "✓ release build complete: @runek/core + @runek/cli + @runek/docs"
 
 # Preview the docs production build
 preview:
