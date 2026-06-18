@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add grass
+npx @runek/cli add grass
 ```
 
 Pulls `core`, `@react-three/fiber@^9.6.1`, `three@^0.184.0`.

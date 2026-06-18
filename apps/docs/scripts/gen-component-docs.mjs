@@ -38,7 +38,7 @@ order: 100
 ## Add it
 
 \`\`\`bash
-npx runek add ${item.name}
+npx @runek/cli add ${item.name}
 \`\`\`
 ${deps.length ? `\nPulls ${deps.map((d) => `\`${d}\``).join(', ')}.\n` : ''}
 ## Use it

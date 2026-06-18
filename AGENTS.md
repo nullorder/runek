@@ -22,7 +22,7 @@ Dependency direction is strictly one-way: `docs → components → core`. Nothin
 
 ## Distribution: source registry (Path A)
 
-Decided model (see `plan/open-questions.md` §1) — **the shadcn split**: users pull editable component **source** into their project via `npx runek add <name>` (no black box), while the small runtime is the published **`@runek/core`** npm package the components import. `registry/registry.json` is the hand-maintained index; `registry/components/*.json` are **generated** (`just registry`) self-contained manifests with inlined source + auto-derived deps (each component declares `@runek/core` as an npm dependency, pinned to core's version). Component source is written verbatim — there's no import to rewrite. After editing any component or the index, run `just registry` to refresh the manifests.
+Decided model (see `plan/open-questions.md` §1) — **the shadcn split**: users pull editable component **source** into their project via `npx @runek/cli add <name>` (no black box), while the small runtime is the published **`@runek/core`** npm package the components import. `registry/registry.json` is the hand-maintained index; `registry/components/*.json` are **generated** (`just registry`) self-contained manifests with inlined source + auto-derived deps (each component declares `@runek/core` as an npm dependency, pinned to core's version). Component source is written verbatim — there's no import to rewrite. After editing any component or the index, run `just registry` to refresh the manifests.
 
 ## Commands
 

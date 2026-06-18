@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add lamp
+npx @runek/cli add lamp
 ```
 
 Pulls `core`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `three@^0.184.0`.

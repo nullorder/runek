@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add sky
+npx @runek/cli add sky
 ```
 
 Pulls `core`, `@react-three/drei@^10.7.7`.

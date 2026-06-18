@@ -16,13 +16,22 @@ install:
 docs:
     pnpm --filter @runek/docs dev
 
-# Build the publishable @runek/core (tsup → dist)
+# Build the publishable @runek/core (tsup → dist, production)
 build-core:
-    pnpm --filter @runek/core build
+    NODE_ENV=production pnpm --filter @runek/core build
+
+# Build the publishable @runek/cli (tsc → dist, production)
+build-cli:
+    NODE_ENV=production pnpm --filter @runek/cli build
 
 # Production build of the docs site (Astro static)
 build-docs:
-    pnpm --filter @runek/docs build
+    NODE_ENV=production pnpm --filter @runek/docs build
+
+# Build every package for release, one by one: core lib → CLI → docs site.
+# @runek/components ships as source (copy-first), so there is nothing to compile.
+build: build-core build-cli build-docs
+    @echo "✓ release build complete: @runek/core + @runek/cli + @runek/docs"
 
 # Preview the docs production build
 preview:
@@ -82,12 +91,12 @@ publish-core:
     pnpm --filter @runek/core build
     pnpm --filter @runek/core publish --access public --no-git-checks
 
-# Publish the `runek` CLI to npm
+# Publish the @runek/cli CLI to npm (the `runek` bin lives here)
 publish-cli:
-    @echo "Publishing runek v{{version}} to npm..."
-    pnpm --filter runek build
+    @echo "Publishing @runek/cli v{{version}} to npm..."
+    pnpm --filter @runek/cli build
     node packages/cli/dist/index.js --help > /dev/null
-    pnpm --filter runek publish --access public --no-git-checks
+    pnpm --filter @runek/cli publish --access public --no-git-checks
 
 # Tag the release and create a GitHub release with auto-generated notes
 gh-release:
@@ -106,7 +115,7 @@ gh-release:
 # Full release: gate → npm (@runek/core + CLI) → git tag + GitHub release.
 # Component source goes live by deploying the docs site (serves /r).
 publish: prepare-publish check-npm-login check-gh-login registry publish-core publish-cli gh-release
-    @echo "✓ Released v{{version}}: @runek/core + runek on npm, tagged, GitHub release created."
+    @echo "✓ Released v{{version}}: @runek/core + @runek/cli on npm, tagged, GitHub release created."
     @echo "  Next: deploy apps/docs to publish the registry at https://runek.nullorder.org/r"
 
 # What `just publish` does, and the version it would cut
@@ -116,7 +125,7 @@ publish-help:
     @echo "  2. check-*-login     verify npm + GitHub credentials"
     @echo "  3. registry          regenerate served manifests"
     @echo "  4. publish-core      build + npm publish @runek/core (public)"
-    @echo "  5. publish-cli       build + npm publish runek (public)"
+    @echo "  5. publish-cli       build + npm publish @runek/cli (public)"
     @echo "  6. gh-release        git tag v{{version}} + GitHub release (auto notes)"
     @echo "  Set the version first with: just version X.Y.Z"
 

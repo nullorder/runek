@@ -30,7 +30,7 @@ const deps = [...manifest.registryDependencies, ...manifest.dependencies]
     </div>
 
     <h2>Install</h2>
-    <Code code={`npx runek add ${item.name}`} lang="bash" theme="night-owl" />
+    <Code code={`npx @runek/cli add ${item.name}`} lang="bash" theme="night-owl" />
     <p class="deps">
       Pulls: {deps.map((d) => <code>{d}</code>)}
     </p>

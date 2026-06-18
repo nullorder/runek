@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add window
+npx @runek/cli add window
 ```
 
 Pulls `core`.

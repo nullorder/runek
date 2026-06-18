@@ -6,12 +6,12 @@ order: 30
 ---
 
 The `runek` CLI copies component **source** from the registry into your project —
-you own and edit the files. Run it with `npx runek <command>`.
+you own and edit the files. Run it with `npx @runek/cli <command>`.
 
 ## init
 
 ```bash
-npx runek init [options]
+npx @runek/cli init [options]
 ```
 
 Writes `runek.config.json` and creates the install directory. Run it once per
@@ -20,7 +20,7 @@ project.
 ## add
 
 ```bash
-npx runek add <name...> [options]
+npx @runek/cli add <name...> [options]
 ```
 
 Pulls one or more components. For each, it:
@@ -33,13 +33,13 @@ Pulls one or more components. For each, it:
    manager (auto-detected from the lockfile).
 
 ```bash
-npx runek add player terrain bookshelf
+npx @runek/cli add player terrain bookshelf
 ```
 
 ## list
 
 ```bash
-npx runek list [options]
+npx @runek/cli list [options]
 ```
 
 Prints the catalog, grouped by category.

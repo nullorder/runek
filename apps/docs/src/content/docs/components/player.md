@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add player
+npx @runek/cli add player
 ```
 
 Pulls `core`, `ecctrl@^1.0.97`.

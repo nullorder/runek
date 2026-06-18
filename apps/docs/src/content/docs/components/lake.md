@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add lake
+npx @runek/cli add lake
 ```
 
 Pulls `core`, `@react-three/fiber@^9.6.1`, `three@^0.184.0`.

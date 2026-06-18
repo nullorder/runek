@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add shelf
+npx @runek/cli add shelf
 ```
 
 Pulls `core`, `@react-three/rapier@^2.2.0`.

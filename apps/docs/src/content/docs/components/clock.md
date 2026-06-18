@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add clock
+npx @runek/cli add clock
 ```
 
 Pulls `@react-three/fiber@^9.6.1`, `@runek/core@^0.5.0`, `three@^0.184.0`.

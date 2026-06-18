@@ -1,6 +1,6 @@
 {
   "name": "@runek/core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Core runtime for Runek: the World provider, useWorld, seeded rng, and the component contract.",
   "license": "MIT",
   "type": "module",

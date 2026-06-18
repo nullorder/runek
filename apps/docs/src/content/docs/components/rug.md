@@ -9,7 +9,7 @@ order: 100
 ## Add it
 
 ```bash
-npx runek add rug
+npx @runek/cli add rug
 ```
 
 Pulls `core`.

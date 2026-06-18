@@ -24,9 +24,9 @@ registry item; only components are copied.
 ## Using it
 
 ```bash
-npx runek init                         # writes runek.config.json + the install dir
-npx runek add player terrain bookshelf # pulls source + registry deps + installs npm deps
-npx runek list                         # browse the catalog
+npx @runek/cli init                         # writes runek.config.json + the install dir
+npx @runek/cli add player terrain bookshelf # pulls source + registry deps + installs npm deps
+npx @runek/cli list                         # browse the catalog
 ```
 
 A custom or local registry works via `--registry <url|path>` (e.g. point it at this
