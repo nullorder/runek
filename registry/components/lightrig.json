@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "Sun + hemisphere/ground fill with shadow configuration.",
   "dependencies": [
-    "@runek/core@^0.5.0"
+    "@runek/core@^0.6.0"
   ],
   "registryDependencies": [],
   "files": [
