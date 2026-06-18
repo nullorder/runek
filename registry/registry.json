@@ -100,6 +100,14 @@
       "files": [{ "path": "packages/components/src/Chair.tsx", "target": "Chair.tsx" }]
     },
     {
+      "name": "clock",
+      "title": "Clock",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Procedural analog wall clock; hands track the system clock or a given IANA timezone.",
+      "files": [{ "path": "packages/components/src/Clock.tsx", "target": "Clock.tsx" }]
+    },
+    {
       "name": "lamp",
       "title": "Lamp",
       "type": "registry:component",

@@ -1,8 +1,16 @@
-import { Html } from '@react-three/drei'
-import type { ThreeEvent } from '@react-three/fiber'
-import { Bookshelf, Lamp, LightRig, Player, Room, Rug, Sky } from '@runek/components'
+import { Stars, Text } from '@react-three/drei'
+import {
+  type BookSpec,
+  Bookshelf,
+  Clock,
+  Lamp,
+  LightRig,
+  Player,
+  Room,
+  Rug,
+} from '@runek/components'
 import { World, type WorldPalette } from '@runek/core'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export type DocMeta = {
   slug: string
@@ -20,8 +28,6 @@ const CATEGORY_COLOR: Record<string, string> = {
   reference: '#c08cf0',
 }
 
-const SPREAD = 0.9
-
 /** Warm reading-room theme — one palette re-colors every component in the world. */
 const LIBRARY_PALETTE: Partial<WorldPalette> = {
   wood: '#7a5a40',
@@ -30,6 +36,18 @@ const LIBRARY_PALETTE: Partial<WorldPalette> = {
   fabric: '#6e3d44',
   accent: '#c2a05a',
 }
+
+/** The four doc shelves on the far wall; the docs are dealt across them in order. */
+const WALL_SHELVES = [
+  { x: -5, seed: 3 },
+  { x: -3.4, seed: 7 },
+  { x: 3.4, seed: 11 },
+  { x: 5, seed: 17 },
+]
+
+/** Runek's display face, served from the docs public dir. troika needs ttf/otf
+ * (not the woff2 the CSS @font-face uses), so we ship the ttf alongside. */
+const PIXEL_FONT = '/fonts/Pixelspace-Regular.ttf'
 
 // Runek's mark: Raidho (ᚱ), built as 3D geometry so it stays crisp and asset-free.
 // Stroke endpoints in a centered, y-up space; x is mirrored from logo.svg so the
@@ -98,43 +116,145 @@ function RunekEmblem({ position }: { position: [number, number, number] }) {
   )
 }
 
+/** "RUNEK" painted on a wall, in the brand's Pixelspace face. */
+function WallWord({
+  position,
+  rotation,
+}: {
+  position: [number, number, number]
+  rotation: [number, number, number]
+}) {
+  return (
+    <Text
+      font={PIXEL_FONT}
+      position={position}
+      rotation={rotation}
+      fontSize={1.2}
+      letterSpacing={0.08}
+      color={RUNE_GREEN}
+      anchorX="center"
+      anchorY="middle"
+      // A blurred green halo around the letters reads as a subtle glow without bloom.
+      outlineWidth={0.02}
+      outlineColor={RUNE_GREEN}
+      outlineBlur="45%"
+      outlineOpacity={0.5}
+    >
+      RUNEK
+    </Text>
+  )
+}
+
+/** The zone the clock is showing, as `UTC±HH:MM`. Local offset when available,
+ * otherwise the IST fallback the time uses. */
+function clockZoneLabel(): string {
+  try {
+    const off = -new Date().getTimezoneOffset() // minutes east of UTC
+    if (!Number.isFinite(off)) throw new Error('no local zone')
+    const a = Math.abs(off)
+    const hh = String(Math.floor(a / 60)).padStart(2, '0')
+    const mm = String(a % 60).padStart(2, '0')
+    return `UTC${off >= 0 ? '+' : '-'}${hh}:${mm}`
+  } catch {
+    return 'UTC+05:30'
+  }
+}
+
 export default function LibraryWorld({ docs }: { docs: DocMeta[] }) {
   const [selected, setSelected] = useState<DocMeta | null>(null)
+
+  // One clickable spine per doc; ids are slugs so a select maps back to its doc.
+  const books = useMemo<BookSpec[]>(
+    () =>
+      docs.map((doc) => ({ id: doc.slug, title: doc.title, color: CATEGORY_COLOR[doc.category] })),
+    [docs],
+  )
+  const perShelf = Math.ceil(books.length / WALL_SHELVES.length)
+  const zone = useMemo(clockZoneLabel, [])
+  const openDoc = (book: BookSpec) => {
+    const doc = docs.find((d) => d.slug === book.id)
+    if (doc) setSelected(doc)
+  }
 
   return (
     <div style={{ position: 'fixed', inset: 0 }}>
       <World lights={false} palette={LIBRARY_PALETTE} onPointerMissed={() => setSelected(null)}>
-        <Sky />
+        {/* Night sky: a deep background and a procedural starfield over the open-topped room. */}
+        <color attach="background" args={['#04060e']} />
+        <Stars radius={80} depth={50} count={2500} factor={4} saturation={0} fade speed={0.4} />
         <LightRig sunPosition={[4, 16, -8]} ambient={0.6} />
         <Room size={[14, 14]} height={4.5} doorWidth={0} />
+
+        {/* "RUNEK" painted on each side wall, facing the room. */}
+        <WallWord position={[-6.78, 2.7, 0]} rotation={[0, Math.PI / 2, 0]} />
+        <WallWord position={[6.78, 2.7, 0]} rotation={[0, -Math.PI / 2, 0]} />
 
         {/* The Runek mark on the far wall, above the shelves — the room's focal point. */}
         <RunekEmblem position={[0, 3.2, 6.78]} />
 
-        {/* Atmosphere: decorative shelves lining the far wall, facing the visitor. */}
-        <Bookshelf position={[-5, 1, 6.5]} rotation={[0, Math.PI, 0]} seed={3} />
-        <Bookshelf position={[-3.4, 1, 6.5]} rotation={[0, Math.PI, 0]} seed={7} />
-        <Bookshelf position={[3.4, 1, 6.5]} rotation={[0, Math.PI, 0]} seed={11} />
-        <Bookshelf position={[5, 1, 6.5]} rotation={[0, Math.PI, 0]} seed={17} />
+        {/* Nameplate beneath the mark, facing the room (−z, toward the player). */}
+        <group position={[0, 1.7, 6.72]}>
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[3.7, 0.46, 0.07]} />
+            <meshStandardMaterial color="#3a2c1d" roughness={0.6} metalness={0.2} />
+          </mesh>
+          <Text
+            font={PIXEL_FONT}
+            position={[0, 0, -0.05]}
+            rotation={[0, Math.PI, 0]}
+            fontSize={0.14}
+            letterSpacing={0.015}
+            color="#e3cd96"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Welcome to Runek Library
+          </Text>
+        </group>
 
-        {/* Reading-room warmth: flickering lamps flanking the shelves, a rug at the cabinet. */}
+        {/* Analog clock on the back wall (−z), behind the visitor's spawn. The
+            timezone label rides on the dial as app-side text (fonts can't ship
+            in registry components). */}
+        <Clock position={[0, 2.7, -6.78]} frameColor="#2c2118" accentColor={RUNE_GREEN} />
+        <Text
+          font={PIXEL_FONT}
+          position={[0, 2.447, -6.73]}
+          fontSize={0.07}
+          letterSpacing={0.01}
+          color="#9fb4c8"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {zone}
+        </Text>
+        <pointLight
+          position={[0, 2.7, -5.9]}
+          intensity={4}
+          distance={4.5}
+          decay={2}
+          color="#cfe0ff"
+        />
+
+        {/* The doc shelves lining the far wall: every book is a clickable doc,
+            dealt across the four shelves in reading order. */}
+        {WALL_SHELVES.map(({ x, seed }, i) => (
+          <Bookshelf
+            key={x}
+            position={[x, 0.8, 6.5]}
+            rotation={[0, Math.PI, 0]}
+            width={1.1}
+            height={1.6}
+            shelves={2}
+            seed={seed}
+            books={books.slice(i * perShelf, (i + 1) * perShelf)}
+            onBookSelect={openDoc}
+          />
+        ))}
+
+        {/* Reading-room warmth: flickering lamps flanking the shelves, a central rug. */}
         <Lamp position={[-6.2, 0, 6.2]} />
         <Lamp position={[6.2, 0, 6.2]} />
         <Rug position={[0, 0.01, 0.4]} size={[7, 3.4]} seed={5} />
-
-        {/* The doc cabinet + interactive books, one per Markdown doc. */}
-        <mesh position={[0, 0.5, 2.2]} castShadow receiveShadow>
-          <boxGeometry args={[docs.length * SPREAD + 0.9, 1, 0.7]} />
-          <meshStandardMaterial color="#4a3726" />
-        </mesh>
-        {docs.map((doc, i) => (
-          <DocBook
-            key={doc.slug}
-            doc={doc}
-            position={[(i - (docs.length - 1) / 2) * SPREAD, 1.25, 2.0]}
-            onOpen={setSelected}
-          />
-        ))}
 
         <Player position={[0, 2, -3.5]} yaw={0} />
       </World>
@@ -167,7 +287,16 @@ function DocReader({ doc, onClose }: { doc: DocMeta; onClose: () => void }) {
   }, [onClose])
 
   return (
-    <div className="doc-overlay" role="dialog" aria-modal="true" aria-label={doc.title}>
+    <div
+      className="doc-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label={doc.title}
+      // Click the backdrop (but not the reader itself) to close.
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
       <div className="doc-reader">
         <div className="row">
           <span className="eyebrow">{doc.category}</span>
@@ -187,48 +316,5 @@ function DocReader({ doc, onClose }: { doc: DocMeta; onClose: () => void }) {
         </a>
       </div>
     </div>
-  )
-}
-
-function DocBook({
-  doc,
-  position,
-  onOpen,
-}: {
-  doc: DocMeta
-  position: [number, number, number]
-  onOpen: (doc: DocMeta) => void
-}) {
-  const [hover, setHover] = useState(false)
-  const color = CATEGORY_COLOR[doc.category] ?? '#e0a96d'
-
-  return (
-    <group position={position}>
-      <mesh
-        castShadow
-        scale={hover ? [1.1, 1.08, 1.4] : [1, 1, 1]}
-        onClick={(e: ThreeEvent<MouseEvent>) => {
-          e.stopPropagation()
-          onOpen(doc)
-        }}
-        onPointerOver={(e: ThreeEvent<PointerEvent>) => {
-          e.stopPropagation()
-          setHover(true)
-          document.body.style.cursor = 'pointer'
-        }}
-        onPointerOut={() => {
-          setHover(false)
-          document.body.style.cursor = 'auto'
-        }}
-      >
-        <boxGeometry args={[0.6, 0.46, 0.14]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hover ? 0.45 : 0} />
-      </mesh>
-      {hover && (
-        <Html position={[0, 0.42, 0]} center distanceFactor={6} zIndexRange={[30, 0]}>
-          <div className="book-label">{doc.title}</div>
-        </Html>
-      )}
-    </group>
   )
 }

@@ -1,6 +1,7 @@
 import type { ComponentRegistry } from '@runek/core'
 import { Bookshelf } from './Bookshelf'
 import { Chair } from './Chair'
+import { Clock } from './Clock'
 import { Door } from './Door'
 import { Floor } from './Floor'
 import { Grass } from './Grass'
@@ -27,6 +28,7 @@ import { Window } from './Window'
 export const registry: ComponentRegistry = {
   Bookshelf,
   Chair,
+  Clock,
   Door,
   Floor,
   Grass,
