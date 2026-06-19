@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add window
 ```
 
-Pulls `core`.
+Pulls `@runek/core@^0.6.0`.
 
 ## Use it
 
@@ -37,5 +37,13 @@ export interface WindowProps {
   glassColor?: string
 }
 ```
+
+## Registry manifest
+
+<a class="manifest-card" href="https://runek.nullorder.org/r/components/window.json">
+<span class="manifest-card__label">registry manifest</span>
+<span class="manifest-card__path">/r/components/window.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add window</code> fetches.</span>
+</a>
 
 See it live with editable props in the **[gallery →](/gallery/window)**.

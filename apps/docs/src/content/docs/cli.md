@@ -68,3 +68,13 @@ Prints the catalog, grouped by category.
 - **registry** — where components are fetched from.
 - **dir** — where component source is written. The runtime comes from the
   `@runek/core` npm package, not copied here.
+
+## Registry index
+
+The default registry is served at [`https://runek.nullorder.org/r`](https://runek.nullorder.org/r). Its index lists every component (name, type, description); each entry resolves to a self-contained manifest under `components/<name>.json`. Point `--registry` at it (the default) or at a local copy for development.
+
+<a class="manifest-card" href="https://runek.nullorder.org/r/registry.json">
+<span class="manifest-card__label">registry index</span>
+<span class="manifest-card__path">/r/registry.json</span>
+<span class="manifest-card__hint">The catalog the CLI reads first: every component name, type, and description.</span>
+</a>

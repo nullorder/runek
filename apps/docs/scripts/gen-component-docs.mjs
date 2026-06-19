@@ -12,6 +12,9 @@ const outDir = join(root, 'apps/docs/src/content/docs/components')
 const index = JSON.parse(readFileSync(join(registryDir, 'registry.json'), 'utf8'))
 const components = index.items.filter((i) => i.type === 'registry:component')
 
+// Where the registry is served (the CLI's default base).
+const REGISTRY = 'https://runek.nullorder.org/r'
+
 mkdirSync(outDir, { recursive: true })
 
 for (const item of components) {
@@ -49,6 +52,14 @@ import { ${item.title} } from './runek/${item.title}'
 ${usage}
 \`\`\`
 ${propsMatch ? `\n## Props\n\n\`\`\`ts\n${propsMatch[0]}\n\`\`\`\n` : ''}
+## Registry manifest
+
+<a class="manifest-card" href="${REGISTRY}/components/${item.name}.json">
+<span class="manifest-card__label">registry manifest</span>
+<span class="manifest-card__path">/r/components/${item.name}.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add ${item.name}</code> fetches.</span>
+</a>
+
 See it live with editable props in the **[gallery →](/gallery/${item.name})**.
 `
 

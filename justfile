@@ -61,8 +61,20 @@ fmt:
 typecheck:
     pnpm -r --if-present typecheck
 
-# Full verification gate: lint, typecheck, test, build (core lib + docs)
-check: lint typecheck test build-core build-docs
+# Full verification gate: lint, typecheck, test, build (core lib + docs), clean tree
+check: lint typecheck test build-core build-docs verify-clean
+
+# Fail if the working tree has uncommitted changes (e.g. regenerated registry
+# manifests left over after a version bump). Respects .gitignore.
+verify-clean:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "✗ uncommitted changes — commit them before releasing:"
+        git status --short
+        exit 1
+    fi
+    echo "✓ working tree clean"
 
 # Run the test suite (vitest, across packages)
 test:
@@ -72,8 +84,10 @@ test:
 version VERSION:
     @node scripts/set-version.mjs {{VERSION}}
 
-# Pre-flight: full gate must be green before any release
-prepare-publish: check
+# Pre-flight: regenerate the served registry, then run the full gate. The gate's
+# verify-clean step fails if the rebuild left uncommitted manifest changes (the
+# usual case right after `just version`) — commit them, then re-run.
+prepare-publish: registry check
     @echo "✓ gate green — ready to release v{{version}}"
 
 # Verify npm credentials
@@ -109,24 +123,25 @@ gh-release:
         echo "✓ tag v{{version}} already exists"
     fi
     git push origin "v{{version}}"
-    gh release create "v{{version}}" --title "v{{version}}" --generate-notes
+    read -r -p "Release title [v{{version}}]: " title </dev/tty || true
+    title="${title:-v{{version}}}"
+    gh release create "v{{version}}" --title "$title" --generate-notes
     echo "✓ https://github.com/{{repo}}/releases/tag/v{{version}}"
 
 # Full release: gate → npm (@runek/core + CLI) → git tag + GitHub release.
 # Component source goes live by deploying the docs site (serves /r).
-publish: prepare-publish check-npm-login check-gh-login registry publish-core publish-cli gh-release
+publish: prepare-publish check-npm-login check-gh-login publish-core publish-cli gh-release
     @echo "✓ Released v{{version}}: @runek/core + @runek/cli on npm, tagged, GitHub release created."
     @echo "  Next: deploy apps/docs to publish the registry at https://runek.nullorder.org/r"
 
 # What `just publish` does, and the version it would cut
 publish-help:
     @echo "just publish — cut release v{{version}}:"
-    @echo "  1. prepare-publish   full gate (lint, typecheck, test, build)"
+    @echo "  1. prepare-publish   regenerate registry + full gate (fails on uncommitted changes)"
     @echo "  2. check-*-login     verify npm + GitHub credentials"
-    @echo "  3. registry          regenerate served manifests"
-    @echo "  4. publish-core      build + npm publish @runek/core (public)"
-    @echo "  5. publish-cli       build + npm publish @runek/cli (public)"
-    @echo "  6. gh-release        git tag v{{version}} + GitHub release (auto notes)"
+    @echo "  3. publish-core      build + npm publish @runek/core (public)"
+    @echo "  4. publish-cli       build + npm publish @runek/cli (public)"
+    @echo "  5. gh-release        git tag v{{version}} + GitHub release (auto notes)"
     @echo "  Set the version first with: just version X.Y.Z"
 
 # Remove build output and installed dependencies

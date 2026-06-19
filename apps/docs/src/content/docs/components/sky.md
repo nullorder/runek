@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sky
 ```
 
-Pulls `core`, `@react-three/drei@^10.7.7`.
+Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.6.0`.
 
 ## Use it
 
@@ -32,5 +32,13 @@ export interface SkyProps {
   rayleigh?: number
 }
 ```
+
+## Registry manifest
+
+<a class="manifest-card" href="https://runek.nullorder.org/r/components/sky.json">
+<span class="manifest-card__label">registry manifest</span>
+<span class="manifest-card__path">/r/components/sky.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add sky</code> fetches.</span>
+</a>
 
 See it live with editable props in the **[gallery →](/gallery/sky)**.

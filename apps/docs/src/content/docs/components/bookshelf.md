@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add bookshelf
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.5.0`, `three@^0.184.0`.
+Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.6.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -55,5 +55,13 @@ export interface BookshelfProps {
   onBookSelect?: (book: BookSpec) => void
 }
 ```
+
+## Registry manifest
+
+<a class="manifest-card" href="https://runek.nullorder.org/r/components/bookshelf.json">
+<span class="manifest-card__label">registry manifest</span>
+<span class="manifest-card__path">/r/components/bookshelf.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add bookshelf</code> fetches.</span>
+</a>
 
 See it live with editable props in the **[gallery →](/gallery/bookshelf)**.

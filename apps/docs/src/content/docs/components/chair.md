@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add chair
 ```
 
-Pulls `core`, `@react-three/rapier@^2.2.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.6.0`.
 
 ## Use it
 
@@ -36,5 +36,13 @@ export interface ChairProps {
   color?: string
 }
 ```
+
+## Registry manifest
+
+<a class="manifest-card" href="https://runek.nullorder.org/r/components/chair.json">
+<span class="manifest-card__label">registry manifest</span>
+<span class="manifest-card__path">/r/components/chair.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add chair</code> fetches.</span>
+</a>
 
 See it live with editable props in the **[gallery →](/gallery/chair)**.

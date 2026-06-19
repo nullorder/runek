@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add wall
 ```
 
-Pulls `core`, `@react-three/rapier@^2.2.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.6.0`.
 
 ## Use it
 
@@ -37,5 +37,13 @@ export interface WallProps {
   opening?: WallOpening
 }
 ```
+
+## Registry manifest
+
+<a class="manifest-card" href="https://runek.nullorder.org/r/components/wall.json">
+<span class="manifest-card__label">registry manifest</span>
+<span class="manifest-card__path">/r/components/wall.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add wall</code> fetches.</span>
+</a>
 
 See it live with editable props in the **[gallery →](/gallery/wall)**.
