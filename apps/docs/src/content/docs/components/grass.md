@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add grass
 ```
 
-Pulls `core`, `@react-three/fiber@^9.6.1`, `three@^0.184.0`.
+Pulls `@react-three/fiber@^9.6.1`, `@runek/core@^0.6.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -39,5 +39,13 @@ export interface GrassProps {
   seed?: number
 }
 ```
+
+## Registry manifest
+
+<a class="manifest-card" href="https://runek.nullorder.org/r/components/grass.json">
+<span class="manifest-card__label">registry manifest</span>
+<span class="manifest-card__path">/r/components/grass.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add grass</code> fetches.</span>
+</a>
 
 See it live with editable props in the **[gallery →](/gallery/grass)**.

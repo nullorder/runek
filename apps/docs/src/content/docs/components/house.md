@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add house
 ```
 
-Pulls `core`, `door`, `floor`, `roof`, `wall`, `window`.
+Pulls `door`, `floor`, `roof`, `wall`, `window`, `@runek/core@^0.6.0`.
 
 ## Use it
 
@@ -41,5 +41,13 @@ export interface HouseProps {
   seed?: number
 }
 ```
+
+## Registry manifest
+
+<a class="manifest-card" href="https://runek.nullorder.org/r/components/house.json">
+<span class="manifest-card__label">registry manifest</span>
+<span class="manifest-card__path">/r/components/house.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add house</code> fetches.</span>
+</a>
 
 See it live with editable props in the **[gallery →](/gallery/house)**.

@@ -13,7 +13,7 @@ Runek is a source registry of procedural 3D components for [React Three Fiber](h
 
 Think **"shadcn for 3D worlds."**
 
-**[Docs](https://runek.nullorder.org/docs) · [Gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library)**
+**[Docs](https://runek.nullorder.org/docs) · [Gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library) · [Registry index](https://runek.nullorder.org/r/registry.json)**
 
 > **Status:** `v0.6.0` — distribution GA shipped. `@runek/core` + `@runek/cli` are published to npm, and the docs site + component registry are live at [runek.nullorder.org](https://runek.nullorder.org). The 23-component catalog (palette-aware, instanced), a runtime editor (move/rotate, add/duplicate/delete, undo), and worlds-as-data with world-level palette + fog all ship today.
 

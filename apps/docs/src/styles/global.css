@@ -34,6 +34,9 @@
 }
 html {
   color-scheme: dark;
+  /* Base type scale. Everything below is sized in rem/em, so this nudges the
+     whole site up proportionally (16px → 18px). */
+  font-size: 112.5%;
 }
 
 body {
@@ -205,10 +208,8 @@ h1,
   font-size: 1.1rem;
 }
 
-/* Doc shell: sidebar + article */
+/* Doc shell: sidebar + article. Full-bleed — fills the viewport at any width. */
 .doc-shell {
-  max-width: 1100px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: 230px minmax(0, 1fr);
   gap: 1.5rem;
@@ -271,10 +272,8 @@ h1,
   font-size: 0.85rem;
 }
 
-/* Doc article */
+/* Doc article — fills the content column (no reading-width cap). */
 .doc {
-  max-width: 760px;
-  margin: 0 auto;
   padding: 3rem 1.5rem 5rem;
 }
 .doc h1 {
@@ -310,6 +309,47 @@ h1,
 }
 .explore-3d a {
   color: var(--blue);
+}
+
+/* Registry link card — the served index (CLI ref) and per-component manifests */
+.manifest-card {
+  display: block;
+  margin: 1.3rem 0;
+  padding: 0.95rem 1.1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.manifest-card:hover {
+  border-color: var(--green-line);
+  box-shadow: 0 0 24px var(--green-soft);
+  text-decoration: none;
+}
+.manifest-card__label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.manifest-card__path {
+  display: block;
+  margin: 0.3rem 0 0.45rem;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--text);
+  word-break: break-all;
+}
+.manifest-card__hint {
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 /* Inline + block code */
