@@ -1,9 +1,8 @@
 # registry/
 
 The **source registry** (shadcn-style: pull editable component source into your
-project, then own and edit it). The distribution model is decided — **Path A** in
-[`plan/open-questions.md`](../plan/open-questions.md) — and implemented by
-[`runek` CLI](../packages/cli).
+project, then own and edit it). The distribution model is decided — **the shadcn
+split** — and implemented by [`runek` CLI](../packages/cli).
 
 ## Layout
 

@@ -20,9 +20,9 @@ registry/       the served source registry: registry.json (index) + generated co
 
 Dependency direction is strictly one-way: `docs → components → core`. Nothing in the library imports from an app. The CLI is standalone (Node built-ins only) and reads the registry. Standalone worlds live in their own repos — **Helicon**, the showcase world, lives at `nullorder/helicon` and consumes Runek via the CLI-vendored source registry; the monorepo holds the library plus the docs harness.
 
-## Distribution: source registry (Path A)
+## Distribution: source registry (the shadcn split)
 
-Decided model (see `plan/open-questions.md` §1) — **the shadcn split**: users pull editable component **source** into their project via `npx @runek/cli add <name>` (no black box), while the small runtime is the published **`@runek/core`** npm package the components import. `registry/registry.json` is the hand-maintained index; `registry/components/*.json` are **generated** (`just registry`) self-contained manifests with inlined source + auto-derived deps (each component declares `@runek/core` as an npm dependency, pinned to core's version). Component source is written verbatim — there's no import to rewrite. After editing any component or the index, run `just registry` to refresh the manifests.
+Decided model — **the shadcn split**: users pull editable component **source** into their project via `npx @runek/cli add <name>` (no black box), while the small runtime is the published **`@runek/core`** npm package the components import. `registry/registry.json` is the hand-maintained index; `registry/components/*.json` are **generated** (`just registry`) self-contained manifests with inlined source + auto-derived deps (each component declares `@runek/core` as an npm dependency, pinned to core's version). Component source is written verbatim — there's no import to rewrite. After editing any component or the index, run `just registry` to refresh the manifests.
 
 ## Commands
 
@@ -81,6 +81,6 @@ The **normative spec** (MUST/SHOULD + conformance checklist) is [CONTRACT.md](CO
 ## Working agreements
 
 - **Never run `git add` or `git commit` unless explicitly asked.** Leave staging and commits to the user.
-- **Planning docs:** if a `plan/` directory is present, it holds the maintainer's internal planning notes (roadmap, architecture, open decisions). It is git-ignored and may differ per contributor — when present, read it and follow it on priority.
+- **Planning docs:** if a `plan/` directory is present, it holds the maintainer's internal planning notes. It is git-ignored and may differ per contributor — when present, read it and follow it on priority.
 - Plan substantial work before writing it.
 - Distribution model (registry vs npm) is still open — keep package boundaries clean so either path stays viable.
