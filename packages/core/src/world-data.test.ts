@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseWorld, serializeWorld, type WorldData } from './world-data'
+import { assignNodeIds, parseWorld, serializeWorld, type WorldData } from './world-data'
 
 const sample: WorldData = {
   version: 1,
@@ -23,11 +23,76 @@ describe('world-data', () => {
     expect(parseWorld(serializeWorld(sample))).toEqual(sample)
   })
 
+  it('round-trips meta and node ids with no loss', () => {
+    const withMeta: WorldData = {
+      version: 1,
+      meta: {
+        title: 'Helicon',
+        description: 'A walkable procedural island.',
+        authors: [{ name: 'Kumar Anirudha', url: 'https://anirudha.dev' }],
+        license: 'CC-BY-4.0',
+        source: {
+          url: 'https://github.com/nullorder/helicon',
+          path: 'public/helicon.world.json',
+          branch: 'main',
+        },
+      },
+      nodes: [{ type: 'Terrain', id: 'n1', props: { seed: 9 } }],
+    }
+    expect(parseWorld(serializeWorld(withMeta))).toEqual(withMeta)
+  })
+
+  it('serializes keys in a canonical order regardless of input order', () => {
+    const scrambled = {
+      nodes: [{ props: { seed: 1 }, type: 'Terrain' }],
+      unit: 2,
+      version: 1,
+    } as WorldData
+    const text = serializeWorld(scrambled)
+    expect(text.indexOf('"version"')).toBeLessThan(text.indexOf('"unit"'))
+    expect(text.indexOf('"unit"')).toBeLessThan(text.indexOf('"nodes"'))
+    expect(text.indexOf('"type"')).toBeLessThan(text.indexOf('"props"'))
+  })
+
   it('rejects an unsupported version', () => {
     expect(() => parseWorld('{"version":2,"nodes":[]}')).toThrow()
   })
 
   it('rejects data without a nodes array', () => {
     expect(() => parseWorld('{"version":1}')).toThrow()
+  })
+
+  it('rejects a non-object meta', () => {
+    expect(() => parseWorld('{"version":1,"meta":"nope","nodes":[]}')).toThrow()
+  })
+
+  it('rejects meta.authors that is not an array', () => {
+    expect(() => parseWorld('{"version":1,"meta":{"authors":"me"},"nodes":[]}')).toThrow()
+  })
+})
+
+describe('assignNodeIds', () => {
+  it('gives every node a stable id, preserving existing ones', () => {
+    const input: WorldData = {
+      version: 1,
+      nodes: [
+        { type: 'Terrain', id: 'keep-me' },
+        { type: 'House', children: [{ type: 'Bookshelf' }] },
+      ],
+    }
+    const out = assignNodeIds(input)
+
+    expect(out.nodes[0].id).toBe('keep-me')
+    expect(out.nodes[1].id).toBeTypeOf('string')
+    expect(out.nodes[1].children?.[0].id).toBeTypeOf('string')
+
+    const ids = [out.nodes[0].id, out.nodes[1].id, out.nodes[1].children?.[0].id]
+    expect(new Set(ids).size).toBe(3)
+  })
+
+  it('does not mutate the input world', () => {
+    const input: WorldData = { version: 1, nodes: [{ type: 'Terrain' }] }
+    assignNodeIds(input)
+    expect(input.nodes[0].id).toBeUndefined()
   })
 })

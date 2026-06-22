@@ -19,7 +19,7 @@ export function WorldNodes({ nodes, registry }: WorldNodesProps) {
           <WorldNodes nodes={node.children} registry={registry} />
         ) : null
         return (
-          <Component key={index} {...node.props}>
+          <Component key={node.id ?? index} {...node.props}>
             {children}
           </Component>
         )

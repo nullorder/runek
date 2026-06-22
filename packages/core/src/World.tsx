@@ -19,6 +19,10 @@ export interface WorldProps {
   fog?: WorldFog
   /** Fired when a pointer click misses every object (used to deselect in the editor). */
   onPointerMissed?: () => void
+  /** Keep the WebGL backbuffer so the canvas can be snapshotted via `toDataURL`
+   *  (the editor enables this for the "suggest changes" PNG). Off by default — it can
+   *  cost a little performance. */
+  preserveDrawingBuffer?: boolean
   debug?: boolean
   children?: ReactNode
 }
@@ -31,6 +35,7 @@ export function World({
   palette,
   fog,
   onPointerMissed,
+  preserveDrawingBuffer = false,
   debug = false,
   children,
 }: WorldProps) {
@@ -41,7 +46,12 @@ export function World({
 
   return (
     <KeyboardControls map={keyboardMap}>
-      <Canvas shadows camera={{ position: [6, 4, 6], fov: 60 }} onPointerMissed={onPointerMissed}>
+      <Canvas
+        shadows
+        camera={{ position: [6, 4, 6], fov: 60 }}
+        gl={{ preserveDrawingBuffer }}
+        onPointerMissed={onPointerMissed}
+      >
         <WorldContext.Provider value={context}>
           {fog && <fog attach="fog" args={[fog.color, fog.near * unit, fog.far * unit]} />}
           {lights && (

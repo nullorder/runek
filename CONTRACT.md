@@ -92,6 +92,23 @@ used as in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 - Third-party npm dependencies are derived automatically from imports — keep them
   minimal and justified.
 
+## 9. World data (the envelope)
+
+These govern the `WorldData` a component is placed into, not individual components.
+`@runek/core` handles them, but an author should know the shape round-trips losslessly.
+
+- `WorldData` **MAY** carry optional top-level fields the renderer reads (`unit`,
+  `gravity`, `palette`, `fog`) plus **`meta`**, the world's identity (`title`,
+  `description`, `authors[]`, `license`, `source`). Every one is optional and additive.
+- `parseWorld` **MUST** accept a world without `meta`, **MUST** pass `meta` and unknown
+  fields through unchanged (light shape validation only), and a new optional field
+  **MUST NOT** require a `version` bump.
+- A `WorldNode` **MAY** carry an optional stable **`id`**. The editor assigns ids to
+  nodes that lack them and preserves existing ones; ids key React reconciliation and
+  selection, with an array-index fallback. Hand-authored worlds need not write ids.
+- `serializeWorld` **MUST** emit a canonical key order, so an unchanged node never
+  churns the diff.
+
 ---
 
 ## Conformance checklist

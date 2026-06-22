@@ -4,7 +4,10 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import type { Object3D } from 'three'
 import type { Vec3 } from './types'
 import { World, type WorldProps } from './World'
+import { WorldAbout } from './WorldAbout'
+import { WorldContribute } from './WorldContribute'
 import {
+  assignNodeIds,
   type ComponentRegistry,
   type JsonValue,
   serializeWorld,
@@ -32,6 +35,17 @@ const HISTORY_LIMIT = 100
 const asVec3 = (value: JsonValue | undefined): Vec3 | undefined =>
   Array.isArray(value) && value.length === 3 ? (value as unknown as Vec3) : undefined
 
+/** True if any node in the tree still lacks a stable id. */
+const needsIds = (nodes: WorldNode[]): boolean =>
+  nodes.some((node) => !node.id || (node.children ? needsIds(node.children) : false))
+
+/** Clear ids on a node subtree so a duplicate gets fresh ones instead of colliding. */
+const stripIds = (node: WorldNode): WorldNode => ({
+  ...node,
+  id: undefined,
+  ...(node.children ? { children: node.children.map(stripIds) } : {}),
+})
+
 const isTyping = (target: EventTarget | null) => {
   const el = target as HTMLElement | null
   return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
@@ -44,7 +58,11 @@ const isTyping = (target: EventTarget | null) => {
 export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEditorProps) {
   const [selected, setSelected] = useState<Selection>(null)
   const [mode, setMode] = useState<TransformMode>('translate')
+  const [contributeOpen, setContributeOpen] = useState(false)
   const history = useRef<WorldData[]>([])
+
+  /** Contribution is offered only when the world declares where it lives. */
+  const canContribute = !!data.meta?.source?.url
 
   /** Commit a change, recording the previous state for undo. */
   const apply = (next: WorldData) => {
@@ -68,17 +86,19 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
   }
 
   const addNode = (type: string) => {
-    apply({ ...data, nodes: [...data.nodes, { type, props: { position: [0, 0, 0] } }] })
+    apply(
+      assignNodeIds({ ...data, nodes: [...data.nodes, { type, props: { position: [0, 0, 0] } }] }),
+    )
     setSelected(null)
   }
 
   const duplicateSelected = () => {
     if (!selected) return
     const source = data.nodes[selected.index]
-    const copy: WorldNode = JSON.parse(JSON.stringify(source))
+    const copy = stripIds(JSON.parse(JSON.stringify(source)) as WorldNode)
     const at = asVec3(copy.props?.position) ?? [0, 0, 0]
     copy.props = { ...copy.props, position: [at[0] + 0.5, at[1], at[2] + 0.5] }
-    apply({ ...data, nodes: [...data.nodes, copy] })
+    apply(assignNodeIds({ ...data, nodes: [...data.nodes, copy] }))
     setSelected(null)
   }
 
@@ -97,6 +117,13 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
       rotation: [r(rotation.x), r(rotation.y), r(rotation.z)],
     })
   }
+
+  // On load, give every node a stable id so edits and exported JSON carry durable
+  // identity (and minimal diffs). Create-time assignment keeps this true afterward,
+  // so it settles after one pass. onChange (not apply): id assignment is not undoable.
+  useEffect(() => {
+    if (needsIds(data.nodes)) onChange(assignNodeIds(data))
+  }, [data, onChange])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -124,6 +151,7 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         gravity={data.gravity}
         palette={data.palette}
         fog={data.fog}
+        preserveDrawingBuffer={canContribute}
         onPointerMissed={() => setSelected(null)}
       >
         <OrbitControls makeDefault />
@@ -138,6 +166,8 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
       </World>
 
       <Leva hidden={selected === null} />
+      <WorldAbout meta={data.meta} />
+      {contributeOpen && <WorldContribute data={data} onClose={() => setContributeOpen(false)} />}
       <EditorToolbar
         mode={mode}
         onMode={setMode}
@@ -145,10 +175,12 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         registry={registry}
         selected={selected?.index ?? null}
         canUndo={history.current.length > 0}
+        canContribute={canContribute}
         onAdd={addNode}
         onDuplicate={duplicateSelected}
         onDelete={deleteSelected}
         onUndo={undo}
+        onContribute={() => setContributeOpen(true)}
       />
       {selected !== null && (
         <NodeControls
@@ -176,14 +208,14 @@ function EditableNodes({ nodes, registry, onSelect }: EditableNodesProps) {
         if (!Component) return null
 
         if (NON_SELECTABLE.has(node.type)) {
-          return <Component key={index} {...node.props} />
+          return <Component key={node.id ?? index} {...node.props} />
         }
 
         const { position, rotation, ...rest } = node.props ?? {}
         return (
           // biome-ignore lint/a11y/noStaticElementInteractions: <group> is a three.js object, not a DOM element
           <group
-            key={index}
+            key={node.id ?? index}
             position={asVec3(position) ?? [0, 0, 0]}
             rotation={asVec3(rotation) ?? [0, 0, 0]}
             onClick={(event) => {
@@ -307,10 +339,12 @@ interface EditorToolbarProps {
   registry: ComponentRegistry
   selected: number | null
   canUndo: boolean
+  canContribute: boolean
   onAdd: (type: string) => void
   onDuplicate: () => void
   onDelete: () => void
   onUndo: () => void
+  onContribute: () => void
 }
 
 function EditorToolbar({
@@ -320,10 +354,12 @@ function EditorToolbar({
   registry,
   selected,
   canUndo,
+  canContribute,
   onAdd,
   onDuplicate,
   onDelete,
   onUndo,
+  onContribute,
 }: EditorToolbarProps) {
   const hasSelection = selected !== null
 
@@ -409,6 +445,16 @@ function EditorToolbar({
       <button type="button" style={button(false)} onClick={exportWorld}>
         Download JSON
       </button>
+      {canContribute && (
+        <button
+          type="button"
+          style={button(false)}
+          onClick={onContribute}
+          title="Fork or suggest changes upstream"
+        >
+          Contribute ↗
+        </button>
+      )}
       <span style={HINT}>
         {selected === null ? 'click a component · Esc deselects' : `selected #${selected}`}
       </span>
