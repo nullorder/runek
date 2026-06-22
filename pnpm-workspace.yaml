@@ -22,6 +22,7 @@ catalog:
   ecctrl: ^1.0.97
   leva: ^0.10.1
   marked: ^15.0.0
+  pagefind: ^1.3.0
   react: ^19.2.0
   react-dom: ^19.2.0
   three: ^0.184.0

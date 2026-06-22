@@ -31,6 +31,7 @@ const next = current >= 0 && current < docs.length - 1 ? docs[current + 1] : nul
 <BaseLayout title={`${title} — Runek`} description={summary}>
   <div class="doc-shell">
     <aside class="doc-sidebar">
+      <div class="doc-search" id="docsearch"></div>
       <nav aria-label="Documentation">
         {
           groups.map((group) => (
@@ -51,15 +52,15 @@ const next = current >= 0 && current < docs.length - 1 ? docs[current + 1] : nul
       </nav>
     </aside>
 
-    <article class="doc">
+    <article class="doc" data-pagefind-body>
       {eyebrow && <p class="eyebrow">{eyebrow}</p>}
       <h1>{title}</h1>
       {summary && <p class="summary">{summary}</p>}
-      <p class="explore-3d"><a href="/library">⌖ Explore the library in 3D →</a></p>
+      <p class="explore-3d" data-pagefind-ignore><a href="/library">⌖ Explore the library in 3D →</a></p>
       <slot />
       {
         (prev || next) && (
-          <nav class="doc-pager" aria-label="Adjacent docs">
+          <nav class="doc-pager" aria-label="Adjacent docs" data-pagefind-ignore>
             {prev ? <a href={`/docs/${prev.id}`}>← {prev.data.title}</a> : <span />}
             {next ? <a href={`/docs/${next.id}`}>{next.data.title} →</a> : <span />}
           </nav>
@@ -67,4 +68,26 @@ const next = current >= 0 && current < docs.length - 1 ? docs[current + 1] : nul
       }
     </article>
   </div>
+
+  {/* Pagefind search: assets are emitted into dist/pagefind by `pagefind --site dist`
+      (production build only), so this is gated on PROD to avoid dev 404s. */}
+  {
+    import.meta.env.PROD && (
+      <Fragment>
+        <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+        <script is:inline src="/pagefind/pagefind-ui.js" />
+        <script is:inline>
+          window.addEventListener('DOMContentLoaded', () => {
+            if (window.PagefindUI) {
+              new window.PagefindUI({
+                element: '#docsearch',
+                showSubResults: true,
+                showImages: false,
+              })
+            }
+          })
+        </script>
+      </Fragment>
+    )
+  }
 </BaseLayout>

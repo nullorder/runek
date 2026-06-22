@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/sync-registry.mjs && astro dev",
-    "build": "node scripts/sync-registry.mjs && astro build",
+    "build": "node scripts/sync-registry.mjs && astro build && pagefind --site dist",
     "preview": "astro preview",
     "typecheck": "astro check",
     "sync-registry": "node scripts/sync-registry.mjs"
@@ -33,6 +33,7 @@
     "@types/react-dom": "catalog:",
     "@types/three": "catalog:",
     "astro": "catalog:",
+    "pagefind": "catalog:",
     "typescript": "catalog:"
   }
 }
