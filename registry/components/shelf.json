@@ -5,7 +5,7 @@
   "description": "Wall shelf with planks.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.6.0"
+    "@runek/core@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [

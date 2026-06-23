@@ -19,7 +19,10 @@ type TransformMode = 'translate' | 'rotate'
 type Selection = { index: number; object: Object3D } | null
 
 export interface WorldEditorProps
-  extends Omit<WorldProps, 'children' | 'unit' | 'gravity' | 'palette' | 'fog'> {
+  extends Omit<
+    WorldProps,
+    'children' | 'unit' | 'gravity' | 'palette' | 'fog' | 'time' | 'timezone' | 'avatar'
+  > {
   data: WorldData
   registry: ComponentRegistry
   onChange: (next: WorldData) => void
@@ -151,6 +154,9 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         gravity={data.gravity}
         palette={data.palette}
         fog={data.fog}
+        time={data.time}
+        timezone={data.timezone}
+        avatar={data.avatar}
         preserveDrawingBuffer={canContribute}
         onPointerMissed={() => setSelected(null)}
       >

@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add player
 ```
 
-Pulls `@runek/core@^0.6.0`, `ecctrl@^1.0.97`.
+Pulls `@runek/core@^0.8.0`, `ecctrl@^1.0.97`.
 
 ## Use it
 
@@ -27,6 +27,8 @@ import { Player } from './runek/Player'
 ```ts
 export interface PlayerProps {
   position?: Vec3
+  /** Camera view. Unset defers to the world default (`<World avatar>`); falls back
+   *  to first-person. An explicit value here always wins. */
   view?: PlayerView
   /** Initial camera yaw in radians (0 faces +z). */
   yaw?: number

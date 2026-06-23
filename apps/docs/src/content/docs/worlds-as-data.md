@@ -17,6 +17,9 @@ interface WorldData {
   meta?: WorldMeta // the world's identity (title, authors, license, source)
   unit?: number
   gravity?: [number, number, number]
+  time?: string // pinned time-of-day "HH:MM" (reproducible day/night)
+  timezone?: string // OR an IANA zone for a live, clock-driven day/night
+  avatar?: 'first' | 'third' // default player camera view
   palette?: Partial<WorldPalette> // color-slot overrides for the whole world
   fog?: { color: string; near: number; far: number }
   nodes: WorldNode[]
@@ -46,6 +49,35 @@ A small world:
 
 The look of a world is data too: `palette` re-themes every component at once and
 `fog` sets the atmosphere — both diff as cleanly as any node.
+
+## World settings (the rules)
+
+A handful of top-level fields are the world's **rules**: values components read
+through `useWorld()` to decide how the world looks and plays, not geometry. They
+resolve onto the world context the same way `unit`, `gravity`, and `palette` do —
+set once on the world, read everywhere.
+
+```json
+{
+  "version": 1,
+  "time": "21:30",
+  "avatar": "third",
+  "nodes": [{ "type": "Sky" }, { "type": "LightRig" }, { "type": "Player" }]
+}
+```
+
+- **`time`** pins a fixed time-of-day (`"HH:MM"`, 24-hour), so the world is fully
+  reproducible: the same file lights the same way every time. **`timezone`** (an IANA
+  zone like `"Asia/Kolkata"`) makes the world *live* instead — the day/night state
+  tracks the real clock, an explicit exception to determinism. A pin wins if both are
+  set. Day/night-aware components read the resolved value as `useWorld().time`: `Sky`
+  arcs the sun overhead by day and swaps to a dark, starlit dome at night, and
+  `LightRig` follows it with golden-hour tints and dim moonlight.
+- **`avatar`** (`"first"` or `"third"`) is the default camera view. `Player` uses it
+  unless its own `view` prop is set — an explicit prop always wins.
+
+Every setting is optional with a sensible default (a bright midday, first-person), so
+a world that declares none renders exactly as before.
 
 ## Render it
 

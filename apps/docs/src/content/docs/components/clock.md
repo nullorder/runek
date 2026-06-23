@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add clock
 ```
 
-Pulls `@react-three/fiber@^9.6.1`, `@runek/core@^0.6.0`, `three@^0.184.0`.
+Pulls `@react-three/fiber@^9.6.1`, `@runek/core@^0.8.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -31,8 +31,9 @@ export interface ClockProps {
   /** Face radius in units. */
   radius?: number
   /**
-   * IANA timezone, e.g. "Asia/Kolkata". Omit to track the local system time;
-   * if neither resolves, the clock falls back to UTC.
+   * IANA timezone, e.g. "Asia/Kolkata". Omit to inherit the world's `timezone`
+   * (`<World timezone>`), then the local system time; if neither resolves, the
+   * clock falls back to UTC.
    */
   timezone?: string
   /** Rim/frame color. Defaults to the world palette's `metal` slot. */

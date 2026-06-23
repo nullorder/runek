@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sky
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.6.0`.
+Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@runek/core@^0.8.0`.
 
 ## Use it
 
@@ -26,10 +26,13 @@ import { Sky } from './runek/Sky'
 
 ```ts
 export interface SkyProps {
-  /** Direction of the sun; also where the bright spot appears. */
+  /** Direction of the sun; also where the bright spot appears. Set this to pin the
+   *  sky to a fixed sun and bypass the world's day/night cycle. */
   sunPosition?: Vec3
   turbidity?: number
   rayleigh?: number
+  /** Background when the sun is below the horizon. */
+  nightColor?: string
 }
 ```
 

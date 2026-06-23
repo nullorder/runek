@@ -2,7 +2,7 @@ import { OrbitControls } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { registry } from '@runek/components'
-import { DEFAULT_PALETTE, WorldContext } from '@runek/core'
+import { DEFAULT_PALETTE, DEFAULT_WORLD_TIME, WorldContext } from '@runek/core'
 import { type ComponentType, type ReactNode, useEffect, useRef, useState } from 'react'
 import type { Group } from 'three'
 import { DEFAULT_CAMERA, DEFAULT_TARGET, PREVIEW, SEEDED } from '../../lib/preview'
@@ -52,7 +52,12 @@ export default function ComponentPreview({ title, detail = false }: Props) {
         <Canvas shadows dpr={[1, 1.5]} camera={{ position: cfg.camera ?? DEFAULT_CAMERA, fov: 50 }}>
           <color attach="background" args={['#0e1117']} />
           <WorldContext.Provider
-            value={{ unit: 1, gravity: [0, -9.81, 0], palette: DEFAULT_PALETTE }}
+            value={{
+              unit: 1,
+              gravity: [0, -9.81, 0],
+              palette: DEFAULT_PALETTE,
+              time: DEFAULT_WORLD_TIME,
+            }}
           >
             <ambientLight intensity={0.7} />
             <directionalLight position={[6, 10, 6]} intensity={1.5} castShadow />

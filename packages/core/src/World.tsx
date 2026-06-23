@@ -5,7 +5,8 @@ import { type ReactNode, useMemo } from 'react'
 import { WorldContext } from './context'
 import { keyboardMap as defaultKeyboardMap } from './keyboard'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
-import type { Vec3, WorldFog } from './types'
+import { resolveWorldTime } from './time'
+import type { AvatarView, Vec3, WorldFog } from './types'
 
 export interface WorldProps {
   unit?: number
@@ -17,6 +18,14 @@ export interface WorldProps {
   palette?: Partial<WorldPalette>
   /** Linear distance fog. Pair the color with your sky's horizon. */
   fog?: WorldFog
+  /** Pin a fixed time-of-day ("HH:MM", 24h) so the world is reproducible. Drives
+   *  day/night-aware components. A `timezone` instead makes it track a live clock. */
+  time?: string
+  /** IANA timezone (e.g. "Asia/Kolkata") for a live, clock-driven day/night. Ignored
+   *  when `time` is set (a pin wins); used as the live source otherwise. */
+  timezone?: string
+  /** World default camera view. `Player` reads it when its own `view` is unset. */
+  avatar?: AvatarView
   /** Fired when a pointer click misses every object (used to deselect in the editor). */
   onPointerMissed?: () => void
   /** Keep the WebGL backbuffer so the canvas can be snapshotted via `toDataURL`
@@ -34,14 +43,23 @@ export function World({
   lights = true,
   palette,
   fog,
+  time,
+  timezone,
+  avatar,
   onPointerMissed,
   preserveDrawingBuffer = false,
   debug = false,
   children,
 }: WorldProps) {
   const context = useMemo(
-    () => ({ unit, gravity, palette: { ...DEFAULT_PALETTE, ...palette } }),
-    [unit, gravity, palette],
+    () => ({
+      unit,
+      gravity,
+      palette: { ...DEFAULT_PALETTE, ...palette },
+      time: resolveWorldTime({ time, timezone }),
+      avatar,
+    }),
+    [unit, gravity, palette, time, timezone, avatar],
   )
 
   return (

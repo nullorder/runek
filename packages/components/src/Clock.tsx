@@ -9,8 +9,9 @@ export interface ClockProps {
   /** Face radius in units. */
   radius?: number
   /**
-   * IANA timezone, e.g. "Asia/Kolkata". Omit to track the local system time;
-   * if neither resolves, the clock falls back to UTC.
+   * IANA timezone, e.g. "Asia/Kolkata". Omit to inherit the world's `timezone`
+   * (`<World timezone>`), then the local system time; if neither resolves, the
+   * clock falls back to UTC.
    */
   timezone?: string
   /** Rim/frame color. Defaults to the world palette's `metal` slot. */
@@ -64,23 +65,24 @@ export function Clock({
   handColor = '#e8eef5',
   accentColor,
 }: ClockProps) {
-  const { unit, palette } = useWorld()
+  const { unit, palette, time } = useWorld()
   const rim = frameColor ?? palette.metal
   const accent = accentColor ?? palette.accent
   const R = radius * unit
+  const zone = timezone ?? time.timezone
 
   const fmt = useMemo(
     () =>
-      timezone
+      zone
         ? new Intl.DateTimeFormat('en-GB', {
-            timeZone: timezone,
+            timeZone: zone,
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
             hour12: false,
           })
         : null,
-    [timezone],
+    [zone],
   )
 
   const ticks = useMemo(() => {

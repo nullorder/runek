@@ -15,7 +15,7 @@ Think **"shadcn for 3D worlds."**
 
 **[Docs](https://runek.nullorder.org/docs) · [Gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library) · [Registry index](https://runek.nullorder.org/r/registry.json)**
 
-> **Status:** `v0.6.0` — distribution GA shipped. `@runek/core` + `@runek/cli` are published to npm, and the docs site + component registry are live at [runek.nullorder.org](https://runek.nullorder.org). The 23-component catalog (palette-aware, instanced), a runtime editor (move/rotate, add/duplicate/delete, undo), and worlds-as-data with world-level palette + fog all ship today.
+> **Status:** `v0.8.0` (in repo; npm publish of `@runek/core` + `@runek/cli` at 0.8.0 pending) — adds **world settings & rules** on top of distribution GA: a world picks a reproducible time-of-day or a live timezone (driving day/night in `Sky` and `LightRig`) and a default avatar view. The 23-component catalog (palette-aware, instanced, day/night-aware), a runtime editor (move/rotate, add/duplicate/delete, undo), and worlds-as-data with world-level palette, fog, time, and avatar. The docs site + component registry are live at [runek.nullorder.org](https://runek.nullorder.org); the prior GA (`@runek/core` + `@runek/cli` 0.6.0) is on npm.
 
 ## Demo: Helicon
 

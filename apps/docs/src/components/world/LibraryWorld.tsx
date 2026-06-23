@@ -1,4 +1,4 @@
-import { Stars, Text } from '@react-three/drei'
+import { Text } from '@react-three/drei'
 import {
   type BookSpec,
   Bookshelf,
@@ -8,6 +8,7 @@ import {
   Player,
   Room,
   Rug,
+  Sky,
 } from '@runek/components'
 import { World, type WorldPalette } from '@runek/core'
 import { useEffect, useMemo, useState } from 'react'
@@ -178,11 +179,16 @@ export default function LibraryWorld({ docs }: { docs: DocMeta[] }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0 }}>
-      <World lights={false} palette={LIBRARY_PALETTE} onPointerMissed={() => setSelected(null)}>
-        {/* Night sky: a deep background and a procedural starfield over the open-topped room. */}
-        <color attach="background" args={['#04060e']} />
-        <Stars radius={80} depth={50} count={2500} factor={4} saturation={0} fade speed={0.4} />
-        <LightRig sunPosition={[4, 16, -8]} ambient={0.6} />
+      <World
+        lights={false}
+        palette={LIBRARY_PALETTE}
+        time="21:30"
+        onPointerMissed={() => setSelected(null)}
+      >
+        {/* Night over the open-topped room: Sky reads the world's late hour and
+            renders the dark dome + starfield itself. */}
+        <Sky />
+        <LightRig sunPosition={[4, 16, -8]} sunColor="#fff4e0" sunIntensity={1.7} ambient={0.6} />
         <Room size={[14, 14]} height={4.5} doorWidth={0} />
 
         {/* "RUNEK" painted on each side wall, facing the room. */}
