@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sky
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@runek/core@^0.8.0`.
+Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@runek/core@^0.9.0`.
 
 ## Use it
 

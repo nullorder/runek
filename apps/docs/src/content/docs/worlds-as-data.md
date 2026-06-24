@@ -21,6 +21,7 @@ interface WorldData {
   timezone?: string // OR an IANA zone for a live, clock-driven day/night
   avatar?: 'first' | 'third' // default player camera view
   palette?: Partial<WorldPalette> // color-slot overrides for the whole world
+  fonts?: Partial<WorldFonts> // fonts the world ships, by role (display, body)
   fog?: { color: string; near: number; far: number }
   nodes: WorldNode[]
 }
@@ -75,6 +76,11 @@ set once on the world, read everywhere.
   `LightRig` follows it with golden-hour tints and dim moonlight.
 - **`avatar`** (`"first"` or `"third"`) is the default camera view. `Player` uses it
   unless its own `view` prop is set — an explicit prop always wins.
+- **`fonts`** are the typefaces the world ships, keyed by role (`display` for
+  titles and signage, `body` for labels). They are the one exception to the
+  no-assets moat: components hold no fonts, so the world declares them and `Sign`
+  draws from them. An undeclared role falls back to the pixel font bundled in
+  `@runek/core`, so `Sign` always renders even with no `fonts` set.
 
 Every setting is optional with a sensible default (a bright midday, first-person), so
 a world that declares none renders exactly as before.

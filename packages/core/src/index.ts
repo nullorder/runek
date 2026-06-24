@@ -1,6 +1,8 @@
 export { WorldContext } from './context'
 export type { GitHubSource } from './contribute'
 export { editFileUrl, forkUrl, parseGitHubSource } from './contribute'
+export type { WorldFonts } from './font'
+export { DEFAULT_FONT, DEFAULT_FONTS } from './font'
 export { keyboardMap } from './keyboard'
 export type { WorldPalette } from './palette'
 export { DEFAULT_PALETTE } from './palette'

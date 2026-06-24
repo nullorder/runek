@@ -1,0 +1,18 @@
+{
+  "name": "sign",
+  "title": "Sign",
+  "type": "registry:component",
+  "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core.",
+  "dependencies": [
+    "@react-three/drei@^10.7.7",
+    "@runek/core@^0.9.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Sign.tsx",
+      "content": "import { Text } from '@react-three/drei'\nimport { useWorld, type Vec3, type WorldFonts } from '@runek/core'\nimport type { ReactNode } from 'react'\n\nexport interface SignProps {\n  /** The text to render. */\n  children: ReactNode\n  position?: Vec3\n  rotation?: Vec3\n  /**\n   * Which world font role to render in (`display` for titles/signage, `body`\n   * for labels). The world declares the actual face via `<World fonts>`; an\n   * undeclared role falls back to the font bundled in `@runek/core`. (Named\n   * `variant`, not `role`, so it doesn't trip JSX a11y linters.)\n   */\n  variant?: keyof WorldFonts\n  /** Explicit font URL, overriding the world role. */\n  font?: string\n  /** Cap height in units. */\n  size?: number\n  /** Text color. Defaults to the world palette's `accent` slot. */\n  color?: string\n  /** Wrap width in units; omit to keep the text on one line. */\n  maxWidth?: number\n  letterSpacing?: number\n  anchorX?: 'left' | 'center' | 'right'\n  anchorY?: 'top' | 'middle' | 'bottom'\n  /** Soft colored halo around the glyphs, for a glow without bloom. */\n  glow?: boolean\n}\n\n/**\n * In-world text. The one component that renders glyphs, and so the single\n * carve-out to the no-assets rule (CONTRACT §4): it ships no font of its own,\n * drawing only from the world's declared `fonts` or the default bundled in\n * `@runek/core`. Decorative: it registers no colliders (mount it on a surface\n * that has one, e.g. a Wall).\n */\nexport function Sign({\n  children,\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  variant = 'display',\n  font,\n  size = 0.3,\n  color,\n  maxWidth,\n  letterSpacing = 0,\n  anchorX = 'center',\n  anchorY = 'middle',\n  glow = false,\n}: SignProps) {\n  const { unit, fonts, palette } = useWorld()\n  const face = font ?? fonts[variant]\n  const ink = color ?? palette.accent\n\n  return (\n    <Text\n      font={face}\n      position={position}\n      rotation={rotation}\n      fontSize={size * unit}\n      color={ink}\n      maxWidth={maxWidth !== undefined ? maxWidth * unit : undefined}\n      letterSpacing={letterSpacing}\n      anchorX={anchorX}\n      anchorY={anchorY}\n      outlineWidth={glow ? 0.02 * unit : 0}\n      outlineColor={ink}\n      outlineBlur={glow ? '45%' : 0}\n      outlineOpacity={glow ? 0.5 : 1}\n    >\n      {children}\n    </Text>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

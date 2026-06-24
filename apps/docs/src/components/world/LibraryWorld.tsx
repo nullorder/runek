@@ -1,4 +1,3 @@
-import { Text } from '@react-three/drei'
 import {
   type BookSpec,
   Bookshelf,
@@ -8,6 +7,7 @@ import {
   Player,
   Room,
   Rug,
+  Sign,
   Sky,
 } from '@runek/components'
 import { World, type WorldPalette } from '@runek/core'
@@ -46,7 +46,8 @@ const WALL_SHELVES = [
   { x: 5, seed: 17 },
 ]
 
-/** Runek's display face, served from the docs public dir. troika needs ttf/otf
+/** Runek's display face, served from the docs public dir. The world declares it
+ * as its `display` font, and every `Sign` draws from there. troika needs ttf/otf
  * (not the woff2 the CSS @font-face uses), so we ship the ttf alongside. */
 const PIXEL_FONT = '/fonts/Pixelspace-Regular.ttf'
 
@@ -125,24 +126,18 @@ function WallWord({
   position: [number, number, number]
   rotation: [number, number, number]
 }) {
+  // `glow` gives the letters a blurred green halo, a subtle glow without bloom.
   return (
-    <Text
-      font={PIXEL_FONT}
+    <Sign
       position={position}
       rotation={rotation}
-      fontSize={1.2}
+      size={1.2}
       letterSpacing={0.08}
       color={RUNE_GREEN}
-      anchorX="center"
-      anchorY="middle"
-      // A blurred green halo around the letters reads as a subtle glow without bloom.
-      outlineWidth={0.02}
-      outlineColor={RUNE_GREEN}
-      outlineBlur="45%"
-      outlineOpacity={0.5}
+      glow
     >
       RUNEK
-    </Text>
+    </Sign>
   )
 }
 
@@ -182,6 +177,7 @@ export default function LibraryWorld({ docs }: { docs: DocMeta[] }) {
       <World
         lights={false}
         palette={LIBRARY_PALETTE}
+        fonts={{ display: PIXEL_FONT }}
         time="21:30"
         onPointerMissed={() => setSelected(null)}
       >
@@ -204,35 +200,30 @@ export default function LibraryWorld({ docs }: { docs: DocMeta[] }) {
             <boxGeometry args={[3.7, 0.46, 0.07]} />
             <meshStandardMaterial color="#3a2c1d" roughness={0.6} metalness={0.2} />
           </mesh>
-          <Text
-            font={PIXEL_FONT}
+          <Sign
             position={[0, 0, -0.05]}
             rotation={[0, Math.PI, 0]}
-            fontSize={0.14}
+            size={0.14}
             letterSpacing={0.015}
             color="#e3cd96"
-            anchorX="center"
-            anchorY="middle"
           >
             Welcome to Runek Library
-          </Text>
+          </Sign>
         </group>
 
         {/* Analog clock on the back wall (−z), behind the visitor's spawn. The
-            timezone label rides on the dial as app-side text (fonts can't ship
-            in registry components). */}
+            timezone label rides on the dial as a Sign; the world declares no
+            `body` font, so it falls back to the default bundled in core. */}
         <Clock position={[0, 2.7, -6.78]} frameColor="#2c2118" accentColor={RUNE_GREEN} />
-        <Text
-          font={PIXEL_FONT}
+        <Sign
+          variant="body"
           position={[0, 2.447, -6.73]}
-          fontSize={0.07}
+          size={0.07}
           letterSpacing={0.01}
           color="#9fb4c8"
-          anchorX="center"
-          anchorY="middle"
         >
           {zone}
-        </Text>
+        </Sign>
         <pointLight
           position={[0, 2.7, -5.9]}
           intensity={4}

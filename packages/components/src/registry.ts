@@ -16,6 +16,7 @@ import { Room } from './Room'
 import { Rug } from './Rug'
 import { Shelf } from './Shelf'
 import { Shore } from './Shore'
+import { Sign } from './Sign'
 import { Sky } from './Sky'
 import { Staircase } from './Staircase'
 import { Table } from './Table'
@@ -43,6 +44,7 @@ export const registry: ComponentRegistry = {
   Rug,
   Shelf,
   Shore,
+  Sign,
   Sky,
   Staircase,
   Table,

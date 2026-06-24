@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { type ReactNode, useMemo } from 'react'
 import { WorldContext } from './context'
+import { DEFAULT_FONTS, type WorldFonts } from './font'
 import { keyboardMap as defaultKeyboardMap } from './keyboard'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { resolveWorldTime } from './time'
@@ -16,6 +17,9 @@ export interface WorldProps {
   lights?: boolean
   /** Override color slots; unset slots keep their defaults. Components read these via `useWorld()`. */
   palette?: Partial<WorldPalette>
+  /** Fonts the world ships, by role (`display`, `body`). Text components draw from
+   *  these; unset roles fall back to the bundled default. Values are font URLs. */
+  fonts?: Partial<WorldFonts>
   /** Linear distance fog. Pair the color with your sky's horizon. */
   fog?: WorldFog
   /** Pin a fixed time-of-day ("HH:MM", 24h) so the world is reproducible. Drives
@@ -42,6 +46,7 @@ export function World({
   keyboardMap = defaultKeyboardMap,
   lights = true,
   palette,
+  fonts,
   fog,
   time,
   timezone,
@@ -56,10 +61,11 @@ export function World({
       unit,
       gravity,
       palette: { ...DEFAULT_PALETTE, ...palette },
+      fonts: { ...DEFAULT_FONTS, ...fonts },
       time: resolveWorldTime({ time, timezone }),
       avatar,
     }),
-    [unit, gravity, palette, time, timezone, avatar],
+    [unit, gravity, palette, fonts, time, timezone, avatar],
   )
 
   return (

@@ -108,6 +108,14 @@
       "files": [{ "path": "packages/components/src/Clock.tsx", "target": "Clock.tsx" }]
     },
     {
+      "name": "sign",
+      "title": "Sign",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core.",
+      "files": [{ "path": "packages/components/src/Sign.tsx", "target": "Sign.tsx" }]
+    },
+    {
       "name": "lamp",
       "title": "Lamp",
       "type": "registry:component",

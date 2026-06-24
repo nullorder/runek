@@ -5,7 +5,7 @@
   "description": "Procedural animated-shader water surface (no textures).",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.8.0",
+    "@runek/core@^0.9.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

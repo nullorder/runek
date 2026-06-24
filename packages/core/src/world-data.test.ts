@@ -53,6 +53,15 @@ describe('world-data', () => {
     expect(parseWorld(serializeWorld(settings))).toEqual(settings)
   })
 
+  it('round-trips world fonts with no loss', () => {
+    const withFonts: WorldData = {
+      version: 1,
+      fonts: { display: '/fonts/Pixelspace-Regular.woff2', body: 'system-ui.woff2' },
+      nodes: [{ type: 'Sign', props: { children: 'Hello' } }],
+    }
+    expect(parseWorld(serializeWorld(withFonts))).toEqual(withFonts)
+  })
+
   it('serializes keys in a canonical order regardless of input order', () => {
     const scrambled = {
       nodes: [{ props: { seed: 1 }, type: 'Terrain' }],
@@ -71,6 +80,14 @@ describe('world-data', () => {
 
   it('rejects an unknown avatar value', () => {
     expect(() => parseWorld('{"version":1,"avatar":"bird","nodes":[]}')).toThrow()
+  })
+
+  it('rejects a non-object fonts', () => {
+    expect(() => parseWorld('{"version":1,"fonts":["a.woff2"],"nodes":[]}')).toThrow()
+  })
+
+  it('rejects a non-string font value', () => {
+    expect(() => parseWorld('{"version":1,"fonts":{"display":42},"nodes":[]}')).toThrow()
   })
 
   it('rejects an unsupported version', () => {

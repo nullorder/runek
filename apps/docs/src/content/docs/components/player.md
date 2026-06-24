@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add player
 ```
 
-Pulls `@runek/core@^0.8.0`, `ecctrl@^1.0.97`.
+Pulls `@runek/core@^0.9.0`, `ecctrl@^1.0.97`.
 
 ## Use it
 

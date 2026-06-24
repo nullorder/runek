@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add table
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.8.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.9.0`.
 
 ## Use it
 

@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import type { WorldFonts } from './font'
 import type { WorldPalette } from './palette'
 import type { AvatarView, Vec3, WorldFog } from './types'
 
@@ -67,6 +68,9 @@ export interface WorldData {
   avatar?: AvatarView
   /** Color-slot overrides applied to every component in the world. */
   palette?: Partial<WorldPalette>
+  /** Fonts the world ships, by role (`display`, `body`). Text components draw from
+   *  these; unset roles fall back to the bundled default. Values are font URLs. */
+  fonts?: Partial<WorldFonts>
   fog?: WorldFog
   nodes: WorldNode[]
 }
@@ -85,9 +89,9 @@ function normalizeNode(node: WorldNode): WorldNode {
 
 /**
  * Serialize a world to pretty JSON text with a canonical, stable key order
- * (`version, meta, unit, gravity, time, timezone, avatar, palette, fog, nodes`;
- * each node `type, id, props, children`). Stable output means an unchanged node
- * never churns the diff, so PR reviews show only the real change.
+ * (`version, meta, unit, gravity, time, timezone, avatar, palette, fonts, fog,
+ * nodes`; each node `type, id, props, children`). Stable output means an
+ * unchanged node never churns the diff, so PR reviews show only the real change.
  */
 export function serializeWorld(data: WorldData): string {
   // Build with a fixed key insertion order (nodes last); a plain record lets us add
@@ -100,6 +104,7 @@ export function serializeWorld(data: WorldData): string {
   if (data.timezone !== undefined) out.timezone = data.timezone
   if (data.avatar !== undefined) out.avatar = data.avatar
   if (data.palette !== undefined) out.palette = data.palette
+  if (data.fonts !== undefined) out.fonts = data.fonts
   if (data.fog !== undefined) out.fog = data.fog
   out.nodes = data.nodes.map(normalizeNode)
   return `${JSON.stringify(out, null, 2)}\n`
@@ -133,6 +138,17 @@ export function parseWorld(json: string): WorldData {
   }
   if (data.avatar !== undefined && data.avatar !== 'first' && data.avatar !== 'third') {
     throw new Error('World "avatar" must be "first" or "third"')
+  }
+  if (data.fonts !== undefined) {
+    const fonts = data.fonts as unknown
+    if (typeof fonts !== 'object' || fonts === null || Array.isArray(fonts)) {
+      throw new Error('World "fonts" must be an object of role to font URL')
+    }
+    for (const value of Object.values(fonts as Record<string, unknown>)) {
+      if (typeof value !== 'string') {
+        throw new Error('World "fonts" values must be font URL strings')
+      }
+    }
   }
   return data
 }

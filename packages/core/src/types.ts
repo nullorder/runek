@@ -1,3 +1,4 @@
+import type { WorldFonts } from './font'
 import type { WorldPalette } from './palette'
 import type { WorldTime } from './time'
 
@@ -29,6 +30,10 @@ export interface WorldContextValue {
   gravity: Vec3
   /** Resolved color slots components default their materials to. */
   palette: WorldPalette
+  /** Resolved font roles (display, body) text components draw from. Every role
+   *  is filled (the world's overrides over the bundled default), so a text
+   *  component can read `fonts[role]` unconditionally. */
+  fonts: WorldFonts
   /** Resolved time-of-day. Day/night-aware components (`Sky`, `LightRig`,
    *  `Clock`) read this; defaults to a pinned midday. */
   time: WorldTime

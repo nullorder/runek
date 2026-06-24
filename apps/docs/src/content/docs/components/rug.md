@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add rug
 ```
 
-Pulls `@runek/core@^0.8.0`.
+Pulls `@runek/core@^0.9.0`.
 
 ## Use it
 

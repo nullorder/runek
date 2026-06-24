@@ -22,6 +22,11 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   // Empty by default now; show the decorative fill variant in the gallery.
   Bookshelf: { props: { fill: 0.7 } },
   Clock: { camera: [0, 0, 2.4], target: [0, 0, 0] },
+  Sign: {
+    camera: [0, 0, 3],
+    target: [0, 0, 0],
+    props: { children: 'Runek', size: 0.8, color: '#3df58a', glow: true },
+  },
   Player: { skip: true, note: 'First-person controller — drop it into a world to walk.' },
   LightRig: { skip: true, note: 'Lighting system — lights a whole scene rather than an object.' },
   Sky: { camera: [0, 1.5, 7], target: [0, 3, 0] },
