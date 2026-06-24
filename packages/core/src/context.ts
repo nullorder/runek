@@ -7,6 +7,7 @@ import type { WorldContextValue } from './types'
 export const WorldContext = createContext<WorldContextValue>({
   unit: 1,
   gravity: [0, -9.81, 0],
+  ground: 0,
   palette: DEFAULT_PALETTE,
   fonts: DEFAULT_FONTS,
   time: DEFAULT_WORLD_TIME,

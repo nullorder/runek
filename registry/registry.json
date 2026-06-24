@@ -152,7 +152,7 @@
       "title": "Lake",
       "type": "registry:component",
       "category": "water",
-      "description": "Procedural animated-shader water surface (no textures).",
+      "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level.",
       "files": [{ "path": "packages/components/src/Lake.tsx", "target": "Lake.tsx" }]
     },
     {
@@ -202,6 +202,150 @@
       "category": "systems",
       "description": "Sun + hemisphere/ground fill with shadow configuration.",
       "files": [{ "path": "packages/components/src/LightRig.tsx", "target": "LightRig.tsx" }]
+    },
+    {
+      "name": "fence",
+      "title": "Fence",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Posts and rails with seeded weathering; encloses yards and paths. One footprint collider.",
+      "files": [{ "path": "packages/components/src/Fence.tsx", "target": "Fence.tsx" }]
+    },
+    {
+      "name": "bridge",
+      "title": "Bridge",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Plank deck spanning a gap, optionally arched, with railings and slab colliders that follow the deck.",
+      "files": [{ "path": "packages/components/src/Bridge.tsx", "target": "Bridge.tsx" }]
+    },
+    {
+      "name": "arch",
+      "title": "Arch",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Freestanding gateway: two piers and a semicircular arch of voussoirs. Composes with Wall.",
+      "files": [{ "path": "packages/components/src/Arch.tsx", "target": "Arch.tsx" }]
+    },
+    {
+      "name": "pillar",
+      "title": "Pillar",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Column with a plinth, a tapered (optionally fluted) shaft, and a capital.",
+      "files": [{ "path": "packages/components/src/Pillar.tsx", "target": "Pillar.tsx" }]
+    },
+    {
+      "name": "well",
+      "title": "Well",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Stone well with a dark pool, posts, a little pyramid roof, and a bucket on a rope.",
+      "files": [{ "path": "packages/components/src/Well.tsx", "target": "Well.tsx" }]
+    },
+    {
+      "name": "path",
+      "title": "Path",
+      "type": "registry:component",
+      "category": "terrain",
+      "description": "A meandering ribbon trail from seeded waypoints; decorative, laid just over the ground.",
+      "files": [{ "path": "packages/components/src/Path.tsx", "target": "Path.tsx" }]
+    },
+    {
+      "name": "bush",
+      "title": "Bush",
+      "type": "registry:component",
+      "category": "vegetation",
+      "description": "Clustered foliage blobs, seeded; the mid-height density between Grass and Trees.",
+      "files": [{ "path": "packages/components/src/Bush.tsx", "target": "Bush.tsx" }]
+    },
+    {
+      "name": "flowers",
+      "title": "Flowers",
+      "type": "registry:component",
+      "category": "vegetation",
+      "description": "Instanced seeded wildflowers (stem + colored head) scattered over a patch.",
+      "files": [{ "path": "packages/components/src/Flowers.tsx", "target": "Flowers.tsx" }]
+    },
+    {
+      "name": "hedge",
+      "title": "Hedge",
+      "type": "registry:component",
+      "category": "vegetation",
+      "description": "A trimmed green wall with seeded surface tufts; blocks like a Wall.",
+      "files": [{ "path": "packages/components/src/Hedge.tsx", "target": "Hedge.tsx" }]
+    },
+    {
+      "name": "fountain",
+      "title": "Fountain",
+      "type": "registry:component",
+      "category": "water",
+      "description": "Two-tier stone fountain with gently rippling water (a per-frame bob, no textures).",
+      "files": [{ "path": "packages/components/src/Fountain.tsx", "target": "Fountain.tsx" }]
+    },
+    {
+      "name": "bench",
+      "title": "Bench",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Slatted bench with an optional backrest; indoor or outdoor seating.",
+      "files": [{ "path": "packages/components/src/Bench.tsx", "target": "Bench.tsx" }]
+    },
+    {
+      "name": "bed",
+      "title": "Bed",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Bed with a frame, mattress, pillows, and a headboard.",
+      "files": [{ "path": "packages/components/src/Bed.tsx", "target": "Bed.tsx" }]
+    },
+    {
+      "name": "crate",
+      "title": "Crate",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Slatted wooden crate with seeded plank shades; stacks via a cuboid collider.",
+      "files": [{ "path": "packages/components/src/Crate.tsx", "target": "Crate.tsx" }]
+    },
+    {
+      "name": "barrel",
+      "title": "Barrel",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Staved barrel bellied at the middle, banded by metal hoops; convex-hull collider.",
+      "files": [{ "path": "packages/components/src/Barrel.tsx", "target": "Barrel.tsx" }]
+    },
+    {
+      "name": "plant",
+      "title": "Plant",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Potted plant: a tapered planter and a seeded cluster of foliage.",
+      "files": [{ "path": "packages/components/src/Plant.tsx", "target": "Plant.tsx" }]
+    },
+    {
+      "name": "clouds",
+      "title": "Clouds",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Drifting clouds built from clustered soft blobs (no textures); layer above a Sky.",
+      "files": [{ "path": "packages/components/src/Clouds.tsx", "target": "Clouds.tsx" }]
+    },
+    {
+      "name": "campfire",
+      "title": "Campfire",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Stone ring, a tepee of logs, and an animated flame with a warm flickering light.",
+      "files": [{ "path": "packages/components/src/Campfire.tsx", "target": "Campfire.tsx" }]
+    },
+    {
+      "name": "birds",
+      "title": "Birds",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "A loose flock circling overhead, each bird flapping on its own seeded orbit.",
+      "files": [{ "path": "packages/components/src/Birds.tsx", "target": "Birds.tsx" }]
     }
   ]
 }

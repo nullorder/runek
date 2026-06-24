@@ -1,6 +1,6 @@
 ---
 title: "Lake"
-summary: "Procedural animated-shader water surface (no textures)."
+summary: "Procedural animated-shader water surface (no textures); place its surface at or below ground level."
 category: component
 component: lake
 order: 100

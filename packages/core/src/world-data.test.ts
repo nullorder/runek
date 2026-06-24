@@ -42,9 +42,10 @@ describe('world-data', () => {
     expect(parseWorld(serializeWorld(withMeta))).toEqual(withMeta)
   })
 
-  it('round-trips world settings (time, timezone, avatar) with no loss', () => {
+  it('round-trips world settings (ground, time, timezone, avatar) with no loss', () => {
     const settings: WorldData = {
       version: 1,
+      ground: -0.5,
       time: '18:30',
       timezone: 'Asia/Kolkata',
       avatar: 'third',
@@ -80,6 +81,10 @@ describe('world-data', () => {
 
   it('rejects an unknown avatar value', () => {
     expect(() => parseWorld('{"version":1,"avatar":"bird","nodes":[]}')).toThrow()
+  })
+
+  it('rejects a non-number ground', () => {
+    expect(() => parseWorld('{"version":1,"ground":"low","nodes":[]}')).toThrow()
   })
 
   it('rejects a non-object fonts', () => {

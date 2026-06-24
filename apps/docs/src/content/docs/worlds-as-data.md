@@ -17,6 +17,7 @@ interface WorldData {
   meta?: WorldMeta // the world's identity (title, authors, license, source)
   unit?: number
   gravity?: [number, number, number]
+  ground?: number // baseline ground level (Y); floor + water default to it
   time?: string // pinned time-of-day "HH:MM" (reproducible day/night)
   timezone?: string // OR an IANA zone for a live, clock-driven day/night
   avatar?: 'first' | 'third' // default player camera view
@@ -76,6 +77,12 @@ set once on the world, read everywhere.
   `LightRig` follows it with golden-hour tints and dim moonlight.
 - **`avatar`** (`"first"` or `"third"`) is the default camera view. `Player` uses it
   unless its own `view` prop is set — an explicit prop always wins.
+- **`ground`** is the baseline ground level (a `Y` value, default `0`): the datum that
+  `Floor` and water like `Lake` default their placement to. In a coastal world it is
+  effectively your **sea level**, the terrain rises from it and the water sits at it,
+  so moving `ground` shifts a whole world's datum at once (a sunken basin, a plateau).
+  Open water sits at or below it (a floating lake is a bug); an explicit `position`
+  still wins.
 - **`fonts`** are the typefaces the world ships, keyed by role (`display` for
   titles and signage, `body` for labels). They are the one exception to the
   no-assets moat: components hold no fonts, so the world declares them and `Sign`

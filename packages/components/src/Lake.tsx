@@ -84,9 +84,11 @@ const FRAGMENT = /* glsl */ `
   }
 `
 
-/** Procedural animated water — no textures, decorative (no collider). */
+/** Procedural animated water (no textures), decorative (no collider). The local
+ *  origin is the water surface: place it at or below the surrounding ground so it
+ *  fills a depression rather than floating (CONTRACT §10). */
 export function Lake({
-  position = [0, 0, 0],
+  position,
   rotation = [0, 0, 0],
   size = [20, 20],
   colorDeep,
@@ -96,9 +98,11 @@ export function Lake({
   waveSpeed = 1,
   segments = 64,
 }: LakeProps) {
-  const { unit, palette } = useWorld()
+  const { unit, palette, ground } = useWorld()
   const deep = colorDeep ?? palette.waterDeep
   const shallow = colorShallow ?? palette.waterShallow
+  // Surface sits at the world ground baseline by default; explicit position wins.
+  const pos = position ?? [0, ground, 0]
   const w = size[0] * unit
   const d = size[1] * unit
   const matRef = useRef<THREE.ShaderMaterial>(null)
@@ -120,7 +124,7 @@ export function Lake({
   })
 
   return (
-    <mesh position={position} rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}>
+    <mesh position={pos} rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}>
       <planeGeometry args={[w, d, segments, segments]} />
       <shaderMaterial
         ref={matRef}

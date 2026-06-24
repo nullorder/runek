@@ -12,6 +12,9 @@ import type { AvatarView, Vec3, WorldFog } from './types'
 export interface WorldProps {
   unit?: number
   gravity?: Vec3
+  /** Baseline ground level (Y). Floor-sitting and water components default to it;
+   *  an explicit `position` still wins. Default 0. */
+  ground?: number
   keyboardMap?: KeyboardControlsEntry[]
   /** Render the default light rig. Set false to supply your own (e.g. <LightRig>). */
   lights?: boolean
@@ -43,6 +46,7 @@ export interface WorldProps {
 export function World({
   unit = 1,
   gravity = [0, -9.81, 0],
+  ground = 0,
   keyboardMap = defaultKeyboardMap,
   lights = true,
   palette,
@@ -60,12 +64,13 @@ export function World({
     () => ({
       unit,
       gravity,
+      ground,
       palette: { ...DEFAULT_PALETTE, ...palette },
       fonts: { ...DEFAULT_FONTS, ...fonts },
       time: resolveWorldTime({ time, timezone }),
       avatar,
     }),
-    [unit, gravity, palette, fonts, time, timezone, avatar],
+    [unit, gravity, ground, palette, fonts, time, timezone, avatar],
   )
 
   return (

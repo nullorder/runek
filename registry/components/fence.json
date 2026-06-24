@@ -1,0 +1,18 @@
+{
+  "name": "fence",
+  "title": "Fence",
+  "type": "registry:component",
+  "description": "Posts and rails with seeded weathering; encloses yards and paths. One footprint collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Fence.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useMemo } from 'react'\n\nexport interface FenceProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Total length along local X, in units. */\n  length?: number\n  height?: number\n  /** Spacing between posts, in units. */\n  postSpacing?: number\n  /** Number of horizontal rails. */\n  rails?: number\n  /** Defaults to the world palette's `wood` slot. */\n  color?: string\n  seed?: number\n}\n\ninterface Post {\n  x: number\n  /** Small seeded lean, for a weathered look. */\n  lean: number\n}\n\n/** A run of posts and rails. One footprint collider, not one body per post. */\nexport function Fence({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  length = 6,\n  height = 1.1,\n  postSpacing = 1.5,\n  rails = 2,\n  color,\n  seed = 1,\n}: FenceProps) {\n  const { unit, palette } = useWorld()\n  const woodColor = color ?? palette.wood\n  const L = length * unit\n  const h = height * unit\n  const postW = 0.1 * unit\n  const railT = 0.06 * unit\n  const depth = 0.08 * unit\n\n  const posts = useMemo<Post[]>(() => {\n    const next = rng(seed)\n    const span = postSpacing * unit\n    const n = Math.max(2, Math.round(L / span) + 1)\n    const step = L / (n - 1)\n    return Array.from({ length: n }, (_, i) => ({\n      x: -L / 2 + i * step,\n      lean: (next() - 0.5) * 0.05,\n    }))\n  }, [L, postSpacing, seed, unit])\n\n  const railYs = useMemo(\n    () => Array.from({ length: rails }, (_, i) => h * (0.85 - i * 0.42)),\n    [rails, h],\n  )\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[L / 2 + postW, h / 2, depth / 2]} position={[0, h / 2, 0]} />\n      {posts.map((p) => (\n        <mesh\n          key={`post-${p.x.toFixed(3)}`}\n          castShadow\n          receiveShadow\n          position={[p.x, h / 2, 0]}\n          rotation={[0, 0, p.lean]}\n        >\n          <boxGeometry args={[postW, h, depth]} />\n          <meshStandardMaterial color={woodColor} roughness={0.85} />\n        </mesh>\n      ))}\n      {railYs.map((y) => (\n        <mesh key={`rail-${y.toFixed(3)}`} castShadow receiveShadow position={[0, y, 0]}>\n          <boxGeometry args={[L, railT, railT]} />\n          <meshStandardMaterial color={woodColor} roughness={0.85} />\n        </mesh>\n      ))}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

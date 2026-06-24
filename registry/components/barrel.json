@@ -1,0 +1,18 @@
+{
+  "name": "barrel",
+  "title": "Barrel",
+  "type": "registry:component",
+  "description": "Staved barrel bellied at the middle, banded by metal hoops; convex-hull collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Barrel.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface BarrelProps {\n  position?: Vec3\n  rotation?: Vec3\n  radius?: number\n  height?: number\n  /** Stave color; defaults to the world palette's `wood` slot. */\n  color?: string\n  /** Hoop color; defaults to the world palette's `metal` slot. */\n  hoopColor?: string\n}\n\n/** A staved barrel: two frustums bellied at the middle, banded by metal hoops.\n *  A convex-hull collider matches the bulge. Crate's round sibling. */\nexport function Barrel({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  radius = 0.35,\n  height = 0.9,\n  color,\n  hoopColor,\n}: BarrelProps) {\n  const { unit, palette } = useWorld()\n  const wood = color ?? palette.wood\n  const hoop = hoopColor ?? palette.metal\n  const r = radius * unit\n  const h = height * unit\n  const rEnd = r * 0.82\n  const seg = 14\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"hull\" position={position} rotation={rotation}>\n      <mesh castShadow receiveShadow position={[0, h / 4, 0]}>\n        <cylinderGeometry args={[r, rEnd, h / 2, seg]} />\n        <meshStandardMaterial color={wood} roughness={0.85} flatShading />\n      </mesh>\n      <mesh castShadow receiveShadow position={[0, (3 * h) / 4, 0]}>\n        <cylinderGeometry args={[rEnd, r, h / 2, seg]} />\n        <meshStandardMaterial color={wood} roughness={0.85} flatShading />\n      </mesh>\n      {[0.12, 0.5, 0.88].map((f) => (\n        <mesh key={`hoop-${f}`} position={[0, h * f, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>\n          <torusGeometry args={[f === 0.5 ? r * 1.03 : rEnd * 1.06, 0.02 * h, 6, seg]} />\n          <meshStandardMaterial color={hoop} metalness={0.5} roughness={0.5} />\n        </mesh>\n      ))}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

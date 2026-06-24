@@ -1,0 +1,18 @@
+{
+  "name": "pillar",
+  "title": "Pillar",
+  "type": "registry:component",
+  "description": "Column with a plinth, a tapered (optionally fluted) shaft, and a capital.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Pillar.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface PillarProps {\n  position?: Vec3\n  rotation?: Vec3\n  height?: number\n  /** Shaft radius at the base, in units. */\n  radius?: number\n  /** Vertical flutes around the shaft; 0 = smooth. */\n  flutes?: number\n  /** Defaults to the world palette's `stone` slot. */\n  color?: string\n}\n\n/** A column: square plinth, tapered shaft, square capital. `flutes` facets the\n *  shaft (a fluted look) when set; 0 leaves it smooth. Builds porches, colonnades,\n *  and ruins. */\nexport function Pillar({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  height = 3,\n  radius = 0.28,\n  flutes = 0,\n  color,\n}: PillarProps) {\n  const { unit, palette } = useWorld()\n  const stone = color ?? palette.stone\n  const r = radius * unit\n  const h = height * unit\n  const plinthH = 0.08 * h\n  const capH = 0.1 * h\n  const shaftH = h - plinthH - capH\n  const seg = flutes > 0 ? flutes : 24\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[r, h / 2, r]} position={[0, h / 2, 0]} />\n\n      <mesh castShadow receiveShadow position={[0, plinthH / 2, 0]}>\n        <boxGeometry args={[r * 2.4, plinthH, r * 2.4]} />\n        <meshStandardMaterial color={stone} roughness={0.92} />\n      </mesh>\n\n      <mesh castShadow receiveShadow position={[0, plinthH + shaftH / 2, 0]}>\n        <cylinderGeometry args={[r * 0.85, r, shaftH, seg]} />\n        <meshStandardMaterial color={stone} roughness={0.92} flatShading={flutes > 0} />\n      </mesh>\n\n      <mesh castShadow receiveShadow position={[0, h - capH, 0]}>\n        <cylinderGeometry args={[r * 1.05, r * 0.85, capH * 0.5, 24]} />\n        <meshStandardMaterial color={stone} roughness={0.92} />\n      </mesh>\n      <mesh castShadow receiveShadow position={[0, h - capH * 0.25, 0]}>\n        <boxGeometry args={[r * 2.3, capH * 0.5, r * 2.3]} />\n        <meshStandardMaterial color={stone} roughness={0.92} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

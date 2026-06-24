@@ -1,0 +1,18 @@
+{
+  "name": "bush",
+  "title": "Bush",
+  "type": "registry:component",
+  "description": "Clustered foliage blobs, seeded; the mid-height density between Grass and Trees.",
+  "dependencies": [
+    "@runek/core@^0.9.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Bush.tsx",
+      "content": "import { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useMemo } from 'react'\nimport * as THREE from 'three'\n\nexport interface BushProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Overall radius, in units. */\n  radius?: number\n  /** Number of foliage blobs. */\n  blobs?: number\n  /** Defaults to the world palette's `foliage` slot. */\n  color?: string\n  seed?: number\n}\n\ninterface Blob {\n  pos: Vec3\n  r: number\n  color: string\n}\n\n/** A clustered shrub of overlapping foliage blobs: the mid-height density between\n *  Grass and Trees. Soft, so decorative (no collider). */\nexport function Bush({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  radius = 0.6,\n  blobs = 7,\n  color,\n  seed = 1,\n}: BushProps) {\n  const { unit, palette } = useWorld()\n  const foliage = color ?? palette.foliage\n  const R = radius * unit\n\n  const items = useMemo<Blob[]>(() => {\n    const next = rng(seed)\n    const base = new THREE.Color(foliage)\n    const tint = new THREE.Color()\n    return Array.from({ length: blobs }, () => {\n      const br = R * (0.45 + next() * 0.4)\n      const a = next() * Math.PI * 2\n      const rad = next() * R * 0.5\n      const shade = 0.8 + next() * 0.4\n      return {\n        pos: [Math.cos(a) * rad, br * 0.7 + next() * R * 0.3, Math.sin(a) * rad] as Vec3,\n        r: br,\n        color: tint.copy(base).multiplyScalar(shade).getStyle(),\n      }\n    })\n  }, [R, blobs, foliage, seed])\n\n  return (\n    <group position={position} rotation={rotation}>\n      {items.map((b) => (\n        <mesh\n          key={`blob-${b.pos[0].toFixed(3)}:${b.pos[1].toFixed(3)}`}\n          castShadow\n          receiveShadow\n          position={b.pos}\n        >\n          <icosahedronGeometry args={[b.r, 0]} />\n          <meshStandardMaterial color={b.color} flatShading roughness={0.95} />\n        </mesh>\n      ))}\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

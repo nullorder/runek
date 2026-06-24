@@ -28,6 +28,9 @@ export interface WorldContextValue {
   /** Meters per unit. Components scale their geometry by this. */
   unit: number
   gravity: Vec3
+  /** Baseline ground level (Y, in world units). Floor-sitting and water components
+   *  default their placement to it; an explicit `position` wins. Default 0. */
+  ground: number
   /** Resolved color slots components default their materials to. */
   palette: WorldPalette
   /** Resolved font roles (display, body) text components draw from. Every role

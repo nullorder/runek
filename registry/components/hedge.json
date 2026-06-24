@@ -1,0 +1,19 @@
+{
+  "name": "hedge",
+  "title": "Hedge",
+  "type": "registry:component",
+  "description": "A trimmed green wall with seeded surface tufts; blocks like a Wall.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Hedge.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useMemo } from 'react'\nimport * as THREE from 'three'\n\nexport interface HedgeProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Length along local X, in units. */\n  length?: number\n  height?: number\n  depth?: number\n  /** Defaults to the world palette's `foliage` slot. */\n  color?: string\n  seed?: number\n}\n\ninterface Tuft {\n  pos: Vec3\n  r: number\n  color: string\n}\n\n/** A trimmed green wall: a solid clipped box dressed with seeded surface tufts.\n *  It blocks like a Wall, so it owns a cuboid collider. Fence's vegetation cousin. */\nexport function Hedge({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  length = 4,\n  height = 1.2,\n  depth = 0.6,\n  color,\n  seed = 1,\n}: HedgeProps) {\n  const { unit, palette } = useWorld()\n  const foliage = color ?? palette.foliage\n  const L = length * unit\n  const H = height * unit\n  const D = depth * unit\n\n  const tufts = useMemo<Tuft[]>(() => {\n    const next = rng(seed)\n    const base = new THREE.Color(foliage)\n    const tint = new THREE.Color()\n    const n = Math.max(10, Math.round(length * 5))\n    return Array.from({ length: n }, () => {\n      const shade = 0.78 + next() * 0.44\n      const side = next() < 0.5 ? 1 : -1\n      return {\n        pos: [(next() - 0.5) * L, next() * H, (side * D) / 2] as Vec3,\n        r: (0.12 + next() * 0.13) * unit,\n        color: tint.copy(base).multiplyScalar(shade).getStyle(),\n      }\n    })\n  }, [L, H, D, length, foliage, seed, unit])\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[L / 2, H / 2, D / 2]} position={[0, H / 2, 0]} />\n      <mesh castShadow receiveShadow position={[0, H / 2, 0]}>\n        <boxGeometry args={[L, H, D]} />\n        <meshStandardMaterial color={foliage} roughness={0.95} flatShading />\n      </mesh>\n      {tufts.map((t) => (\n        <mesh\n          key={`tuft-${t.pos[0].toFixed(3)}:${t.pos[1].toFixed(3)}:${t.pos[2].toFixed(2)}`}\n          castShadow\n          position={t.pos}\n        >\n          <icosahedronGeometry args={[t.r, 0]} />\n          <meshStandardMaterial color={t.color} flatShading roughness={0.95} />\n        </mesh>\n      ))}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

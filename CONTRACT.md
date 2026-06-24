@@ -113,6 +113,10 @@ These govern the `WorldData` a component is placed into, not individual componen
   - **`avatar`** (`'first' | 'third'`) is the world's default camera view, read as
     `useWorld().avatar`; `Player` uses it when its own `view` is unset. An explicit
     component prop **MUST** win over the world default (as with palette colors).
+  - **`ground`** (a Y baseline, default 0) is the world's ground level, read as
+    `useWorld().ground` (in a coastal world, this baseline is your sea level).
+    Floor-sitting and water components **SHOULD** default their placement to it (open
+    water at or below it, per §10); an explicit `position` wins.
 - `parseWorld` **MUST** accept a world without `meta`, **MUST** pass `meta`, the
   settings above, and unknown fields through unchanged (light shape validation only),
   and a new optional field **MUST NOT** require a `version` bump.
@@ -121,6 +125,21 @@ These govern the `WorldData` a component is placed into, not individual componen
   selection, with an array-index fallback. Hand-authored worlds need not write ids.
 - `serializeWorld` **MUST** emit a canonical key order, so an unchanged node never
   churns the diff.
+
+## 10. Water
+
+- An **open water body** (e.g. `Lake`) **MUST** read as filling a depression, never
+  floating above the ground. Its local origin is the **water surface**, and a world
+  **MUST** place that surface **at or below** the surrounding ground level, with the
+  terrain forming the banks. A water sheet hovering over flat ground is a placement
+  bug, not a valid world.
+- A water component **SHOULD** treat its origin as the surface plane (so sinking it
+  is a single negative-Y placement) and **MUST NOT** assume it rests on top of the
+  ground. It **SHOULD** default its surface to `world.ground` (§9), so `<Lake />`
+  complies without an explicit `position`.
+- **Contained water** held in a component's own vessel (e.g. `Fountain`, `Well`) is
+  the exception: its surface sits inside the basin the component renders, because the
+  vessel, not the terrain, holds it.
 
 ---
 
@@ -136,4 +155,5 @@ These govern the `WorldData` a component is placed into, not individual componen
 - [ ] Color props default to world-palette slots; explicit colors still win
 - [ ] Repeated geometry is instanced, not one mesh per piece
 - [ ] Imports shared code from `@runek/core`; sibling deps declared; no app imports
+- [ ] Open water sits at/below ground (surface origin); contained water is in its vessel
 - [ ] `just check` passes (lint, typecheck, test, build)

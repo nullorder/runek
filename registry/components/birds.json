@@ -1,0 +1,19 @@
+{
+  "name": "birds",
+  "title": "Birds",
+  "type": "registry:component",
+  "description": "A loose flock circling overhead, each bird flapping on its own seeded orbit.",
+  "dependencies": [
+    "@react-three/fiber@^9.6.1",
+    "@runek/core@^0.9.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Birds.tsx",
+      "content": "import { useFrame } from '@react-three/fiber'\nimport { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useMemo, useRef } from 'react'\nimport type { Group } from 'three'\n\nexport interface BirdsProps {\n  position?: Vec3\n  rotation?: Vec3\n  count?: number\n  /** Orbit spread, in units. */\n  area?: number\n  height?: number\n  speed?: number\n  color?: string\n  seed?: number\n}\n\ninterface BirdSpec {\n  rx: number\n  rz: number\n  cx: number\n  cz: number\n  phase: number\n  y: number\n  flap: number\n  dir: number\n}\n\n/** A loose flock circling overhead, each bird flapping on its own seeded orbit.\n *  Motion and life for the sky. Decorative (no collider). */\nexport function Birds({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  count = 10,\n  area = 20,\n  height = 12,\n  speed = 1,\n  color = '#2a2a30',\n  seed = 1,\n}: BirdsProps) {\n  const { unit } = useWorld()\n  const A = area * unit\n  const hy = height * unit\n  const bodyRefs = useRef<(Group | null)[]>([])\n  const leftRefs = useRef<(Group | null)[]>([])\n  const rightRefs = useRef<(Group | null)[]>([])\n\n  const birds = useMemo<BirdSpec[]>(() => {\n    const next = rng(seed)\n    return Array.from({ length: count }, () => ({\n      rx: A * (0.3 + next() * 0.5),\n      rz: A * (0.3 + next() * 0.5),\n      cx: (next() - 0.5) * A * 0.4,\n      cz: (next() - 0.5) * A * 0.4,\n      phase: next() * Math.PI * 2,\n      y: hy * (0.8 + next() * 0.4),\n      flap: 7 + next() * 4,\n      dir: next() < 0.5 ? 1 : -1,\n    }))\n  }, [A, hy, count, seed])\n\n  useFrame(({ clock }) => {\n    const t = clock.elapsedTime * speed\n    birds.forEach((b, i) => {\n      const g = bodyRefs.current[i]\n      if (!g) return\n      const ang = b.phase + b.dir * t * 0.3\n      g.position.set(\n        b.cx + Math.cos(ang) * b.rx,\n        b.y + Math.sin(t * 0.8 + b.phase) * 0.4 * unit,\n        b.cz + Math.sin(ang) * b.rz,\n      )\n      const vx = -Math.sin(ang) * b.rx * b.dir\n      const vz = Math.cos(ang) * b.rz * b.dir\n      g.rotation.y = Math.atan2(vx, vz)\n      const flap = Math.sin(t * b.flap) * 0.6\n      const l = leftRefs.current[i]\n      const r = rightRefs.current[i]\n      if (l) l.rotation.z = 0.2 + flap\n      if (r) r.rotation.z = -0.2 - flap\n    })\n  })\n\n  const wingL = 0.35 * unit\n  return (\n    <group position={position} rotation={rotation}>\n      {birds.map((b, i) => (\n        <group\n          key={`bird-${b.phase.toFixed(4)}`}\n          ref={(el) => {\n            bodyRefs.current[i] = el\n          }}\n        >\n          <mesh castShadow>\n            <sphereGeometry args={[0.06 * unit, 6, 6]} />\n            <meshStandardMaterial color={color} />\n          </mesh>\n          <group\n            ref={(el) => {\n              leftRefs.current[i] = el\n            }}\n          >\n            <mesh position={[wingL / 2, 0, 0]} castShadow>\n              <boxGeometry args={[wingL, 0.01 * unit, 0.12 * unit]} />\n              <meshStandardMaterial color={color} />\n            </mesh>\n          </group>\n          <group\n            ref={(el) => {\n              rightRefs.current[i] = el\n            }}\n          >\n            <mesh position={[-wingL / 2, 0, 0]} castShadow>\n              <boxGeometry args={[wingL, 0.01 * unit, 0.12 * unit]} />\n              <meshStandardMaterial color={color} />\n            </mesh>\n          </group>\n        </group>\n      ))}\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

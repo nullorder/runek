@@ -1,0 +1,18 @@
+{
+  "name": "flowers",
+  "title": "Flowers",
+  "type": "registry:component",
+  "description": "Instanced seeded wildflowers (stem + colored head) scattered over a patch.",
+  "dependencies": [
+    "@runek/core@^0.9.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Flowers.tsx",
+      "content": "import { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useLayoutEffect, useMemo, useRef } from 'react'\nimport * as THREE from 'three'\n\nexport interface FlowersProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Patch extent `[width, depth]`, in units. */\n  area?: [number, number]\n  count?: number\n  height?: number\n  /** Stem color; defaults to the world palette's `foliage` slot. */\n  stemColor?: string\n  seed?: number\n}\n\ninterface Bloom {\n  x: number\n  z: number\n  h: number\n  hue: number\n}\n\nconst HUES = [12, 45, 0, 330, 280, 200]\n\n/** Instanced wildflowers scattered over a patch: a green stem plus a colored\n *  head, seeded so the same seed plants the same meadow. Decorative (no collider). */\nexport function Flowers({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  area = [6, 6],\n  count = 60,\n  height = 0.4,\n  stemColor,\n  seed = 1,\n}: FlowersProps) {\n  const { unit, palette } = useWorld()\n  const stem = stemColor ?? palette.foliage\n  const w = area[0] * unit\n  const d = area[1] * unit\n  const h = height * unit\n  const stemRef = useRef<THREE.InstancedMesh>(null)\n  const headRef = useRef<THREE.InstancedMesh>(null)\n\n  const blooms = useMemo<Bloom[]>(() => {\n    const next = rng(seed)\n    return Array.from({ length: count }, () => ({\n      x: (next() - 0.5) * w,\n      z: (next() - 0.5) * d,\n      h: h * (0.7 + next() * 0.6),\n      hue: next(),\n    }))\n  }, [w, d, h, count, seed])\n\n  useLayoutEffect(() => {\n    const sMesh = stemRef.current\n    const hMesh = headRef.current\n    if (!sMesh || !hMesh) return\n    const dummy = new THREE.Object3D()\n    const col = new THREE.Color()\n    blooms.forEach((b, i) => {\n      dummy.position.set(b.x, b.h / 2, b.z)\n      dummy.scale.set(1, b.h / h, 1)\n      dummy.updateMatrix()\n      sMesh.setMatrixAt(i, dummy.matrix)\n\n      dummy.position.set(b.x, b.h, b.z)\n      dummy.scale.set(1, 1, 1)\n      dummy.updateMatrix()\n      hMesh.setMatrixAt(i, dummy.matrix)\n      hMesh.setColorAt(i, col.setHSL(HUES[Math.floor(b.hue * HUES.length)] / 360, 0.7, 0.6))\n    })\n    sMesh.instanceMatrix.needsUpdate = true\n    hMesh.instanceMatrix.needsUpdate = true\n    if (hMesh.instanceColor) hMesh.instanceColor.needsUpdate = true\n  }, [blooms, h])\n\n  return (\n    <group position={position} rotation={rotation}>\n      <instancedMesh ref={stemRef} args={[undefined, undefined, count]} castShadow>\n        <cylinderGeometry args={[0.01 * unit, 0.012 * unit, h, 5]} />\n        <meshStandardMaterial color={stem} />\n      </instancedMesh>\n      <instancedMesh ref={headRef} args={[undefined, undefined, count]} castShadow>\n        <icosahedronGeometry args={[0.05 * unit, 0]} />\n        <meshStandardMaterial flatShading roughness={0.8} />\n      </instancedMesh>\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

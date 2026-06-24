@@ -1,0 +1,19 @@
+{
+  "name": "crate",
+  "title": "Crate",
+  "type": "registry:component",
+  "description": "Slatted wooden crate with seeded plank shades; stacks via a cuboid collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Crate.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useMemo } from 'react'\nimport * as THREE from 'three'\n\nexport interface CrateProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Edge length, in units. */\n  size?: number\n  /** Plank color; defaults to the world palette's `wood` slot. */\n  color?: string\n  seed?: number\n}\n\ninterface Beam {\n  pos: Vec3\n  size: Vec3\n  color: string\n}\n\n/** A slatted wooden crate: a paneled core inside a 12-edge plank frame, each plank\n *  seeded a slightly different shade. A clean cube with a cuboid collider, so it\n *  stacks. The world-building staple (see also Barrel). */\nexport function Crate({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  size = 0.8,\n  color,\n  seed = 1,\n}: CrateProps) {\n  const { unit, palette } = useWorld()\n  const wood = color ?? palette.wood\n  const s = size * unit\n  const b = 0.09 * s\n  const c = s / 2 - b / 2\n\n  const beams = useMemo<Beam[]>(() => {\n    const next = rng(seed)\n    const base = new THREE.Color(wood)\n    const tint = new THREE.Color()\n    const shade = () =>\n      tint\n        .copy(base)\n        .multiplyScalar(0.82 + next() * 0.32)\n        .getStyle()\n    const out: Beam[] = []\n    for (const sx of [-1, 1])\n      for (const sz of [-1, 1])\n        out.push({ pos: [sx * c, 0, sz * c], size: [b, s, b], color: shade() })\n    for (const sy of [-1, 1])\n      for (const sz of [-1, 1])\n        out.push({ pos: [0, sy * c, sz * c], size: [s, b, b], color: shade() })\n    for (const sy of [-1, 1])\n      for (const sx of [-1, 1])\n        out.push({ pos: [sx * c, sy * c, 0], size: [b, b, s], color: shade() })\n    return out\n  }, [s, b, c, wood, seed])\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[s / 2, s / 2, s / 2]} position={[0, s / 2, 0]} />\n      <group position={[0, s / 2, 0]}>\n        <mesh castShadow receiveShadow>\n          <boxGeometry args={[s * 0.9, s * 0.9, s * 0.9]} />\n          <meshStandardMaterial color={palette.woodDark} roughness={0.9} />\n        </mesh>\n        {beams.map((bm) => (\n          <mesh\n            key={`beam-${bm.pos[0].toFixed(2)}:${bm.pos[1].toFixed(2)}:${bm.pos[2].toFixed(2)}`}\n            castShadow\n            receiveShadow\n            position={bm.pos}\n          >\n            <boxGeometry args={bm.size} />\n            <meshStandardMaterial color={bm.color} roughness={0.85} />\n          </mesh>\n        ))}\n      </group>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "bed",
+  "title": "Bed",
+  "type": "registry:component",
+  "description": "Bed with a frame, mattress, pillows, and a headboard.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Bed.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface BedProps {\n  position?: Vec3\n  rotation?: Vec3\n  width?: number\n  length?: number\n  /** Frame color; defaults to the world palette's `wood` slot. */\n  color?: string\n  /** Bedding color; defaults to the world palette's `fabric` slot. */\n  beddingColor?: string\n}\n\n/** A bed: frame, mattress, pillows, and a headboard (at local -Z). Finishes a\n *  bedroom. Solid, so it owns one cuboid collider. */\nexport function Bed({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  width = 1.4,\n  length = 2,\n  color,\n  beddingColor,\n}: BedProps) {\n  const { unit, palette } = useWorld()\n  const wood = color ?? palette.wood\n  const bedding = beddingColor ?? palette.fabric\n  const W = width * unit\n  const L = length * unit\n  const frameH = 0.3 * unit\n  const mattH = 0.22 * unit\n  const headH = 0.9 * unit\n  const topY = frameH + mattH\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[W / 2, topY / 2, L / 2]} position={[0, topY / 2, 0]} />\n\n      <mesh castShadow receiveShadow position={[0, frameH / 2, 0]}>\n        <boxGeometry args={[W, frameH, L]} />\n        <meshStandardMaterial color={wood} roughness={0.85} />\n      </mesh>\n      <mesh castShadow receiveShadow position={[0, frameH + mattH / 2, 0]}>\n        <boxGeometry args={[W * 0.96, mattH, L * 0.94]} />\n        <meshStandardMaterial color={bedding} roughness={0.9} />\n      </mesh>\n      {[-1, 1].map((s) => (\n        <mesh\n          key={`pillow-${s}`}\n          castShadow\n          position={[s * W * 0.24, topY + 0.04 * unit, -L / 2 + 0.28 * unit]}\n        >\n          <boxGeometry args={[W * 0.4, 0.1 * unit, 0.32 * unit]} />\n          <meshStandardMaterial color=\"#f2ede2\" roughness={0.95} />\n        </mesh>\n      ))}\n      <mesh castShadow receiveShadow position={[0, headH / 2, -L / 2 - 0.04 * unit]}>\n        <boxGeometry args={[W, headH, 0.1 * unit]} />\n        <meshStandardMaterial color={wood} roughness={0.85} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

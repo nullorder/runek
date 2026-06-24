@@ -1,0 +1,18 @@
+{
+  "name": "arch",
+  "title": "Arch",
+  "type": "registry:component",
+  "description": "Freestanding gateway: two piers and a semicircular arch of voussoirs. Composes with Wall.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Arch.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\nimport { useMemo } from 'react'\n\nexport interface ArchProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Clear opening width, in units. */\n  width?: number\n  /** Height to the springline (top of the piers), in units. */\n  height?: number\n  depth?: number\n  /** Pier thickness, in units. */\n  thickness?: number\n  /** Voussoir blocks forming the semicircular arch. */\n  blocks?: number\n  /** Defaults to the world palette's `stone` slot. */\n  color?: string\n}\n\n/** A freestanding gateway: two piers and a semicircular arch of voussoirs.\n *  Composes with `Wall` for an entrance. The piers carry the colliders; the\n *  arch crown sits overhead. */\nexport function Arch({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  width = 2.4,\n  height = 2.6,\n  depth = 0.6,\n  thickness = 0.4,\n  blocks = 9,\n  color,\n}: ArchProps) {\n  const { unit, palette } = useWorld()\n  const stone = color ?? palette.stone\n  const w = width * unit\n  const h = height * unit\n  const d = depth * unit\n  const th = thickness * unit\n  const pierX = w / 2 + th / 2\n  const rMid = w / 2 + th / 2\n\n  const voussoirs = useMemo(() => {\n    const arc = ((Math.PI * rMid) / blocks) * 1.06\n    return Array.from({ length: blocks }, (_, i) => {\n      const a = ((i + 0.5) / blocks) * Math.PI\n      return { x: rMid * Math.cos(a), y: h + rMid * Math.sin(a), rot: a, arc }\n    })\n  }, [rMid, blocks, h])\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[th / 2, h / 2, d / 2]} position={[-pierX, h / 2, 0]} />\n      <CuboidCollider args={[th / 2, h / 2, d / 2]} position={[pierX, h / 2, 0]} />\n\n      {[-1, 1].map((s) => (\n        <mesh key={`pier-${s}`} castShadow receiveShadow position={[s * pierX, h / 2, 0]}>\n          <boxGeometry args={[th, h, d]} />\n          <meshStandardMaterial color={stone} roughness={0.9} />\n        </mesh>\n      ))}\n\n      {voussoirs.map((v) => (\n        <mesh\n          key={`v-${v.x.toFixed(3)}:${v.y.toFixed(3)}`}\n          castShadow\n          receiveShadow\n          position={[v.x, v.y, 0]}\n          rotation={[0, 0, v.rot]}\n        >\n          <boxGeometry args={[th, v.arc, d]} />\n          <meshStandardMaterial color={stone} roughness={0.9} />\n        </mesh>\n      ))}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

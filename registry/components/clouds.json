@@ -1,0 +1,19 @@
+{
+  "name": "clouds",
+  "title": "Clouds",
+  "type": "registry:component",
+  "description": "Drifting clouds built from clustered soft blobs (no textures); layer above a Sky.",
+  "dependencies": [
+    "@react-three/fiber@^9.6.1",
+    "@runek/core@^0.9.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Clouds.tsx",
+      "content": "import { useFrame } from '@react-three/fiber'\nimport { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useLayoutEffect, useMemo, useRef } from 'react'\nimport * as THREE from 'three'\n\nexport interface CloudsProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Number of clouds. */\n  count?: number\n  /** Spread `[width, depth]`, in units. */\n  area?: [number, number]\n  /** Height above the origin, in units. */\n  height?: number\n  /** Drift speed along +X, in units/sec (0 holds still). */\n  drift?: number\n  color?: string\n  seed?: number\n}\n\ninterface Puff {\n  pos: Vec3\n  r: number\n}\n\n/** Drifting clouds built from clustered soft blobs (no textures). Layer above a\n *  `Sky` for depth and motion. Decorative (no collider). */\nexport function Clouds({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  count = 8,\n  area = [80, 80],\n  height = 24,\n  drift = 0.6,\n  color = '#eef2f7',\n  seed = 1,\n}: CloudsProps) {\n  const { unit } = useWorld()\n  const w = area[0] * unit\n  const d = area[1] * unit\n  const hy = height * unit\n  const PER = 5\n  const total = count * PER\n  const ref = useRef<THREE.InstancedMesh>(null)\n  const groupRef = useRef<THREE.Group>(null)\n\n  const puffs = useMemo<Puff[]>(() => {\n    const next = rng(seed)\n    const out: Puff[] = []\n    for (let c = 0; c < count; c++) {\n      const cx = (next() - 0.5) * w\n      const cz = (next() - 0.5) * d\n      const cy = hy + (next() - 0.5) * 0.15 * hy\n      const scale = 1.4 + next() * 1.6\n      for (let p = 0; p < PER; p++) {\n        out.push({\n          pos: [\n            cx + (next() - 0.5) * 4 * scale * unit,\n            cy + (next() - 0.5) * 1.2 * scale * unit,\n            cz + (next() - 0.5) * 3 * scale * unit,\n          ] as Vec3,\n          r: (1.0 + next() * 1.2) * scale * unit,\n        })\n      }\n    }\n    return out\n  }, [count, w, d, hy, seed, unit])\n\n  useLayoutEffect(() => {\n    const mesh = ref.current\n    if (!mesh) return\n    const dummy = new THREE.Object3D()\n    puffs.forEach((p, i) => {\n      dummy.position.set(...p.pos)\n      dummy.scale.setScalar(p.r)\n      dummy.updateMatrix()\n      mesh.setMatrixAt(i, dummy.matrix)\n    })\n    mesh.instanceMatrix.needsUpdate = true\n  }, [puffs])\n\n  useFrame((_, delta) => {\n    const g = groupRef.current\n    if (!g || drift === 0) return\n    g.position.x += drift * unit * delta\n    if (g.position.x > w / 2) g.position.x -= w\n  })\n\n  return (\n    <group position={position} rotation={rotation}>\n      <group ref={groupRef}>\n        <instancedMesh ref={ref} args={[undefined, undefined, total]}>\n          <icosahedronGeometry args={[1, 1]} />\n          <meshStandardMaterial\n            color={color}\n            roughness={1}\n            transparent\n            opacity={0.92}\n            flatShading\n          />\n        </instancedMesh>\n      </group>\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "bench",
+  "title": "Bench",
+  "type": "registry:component",
+  "description": "Slatted bench with an optional backrest; indoor or outdoor seating.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Bench.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\n\nexport interface BenchProps {\n  position?: Vec3\n  rotation?: Vec3\n  length?: number\n  depth?: number\n  seatHeight?: number\n  /** Include a backrest. */\n  back?: boolean\n  /** Defaults to the world palette's `wood` slot. */\n  color?: string\n}\n\n/** A slatted bench, with an optional backrest. Indoor or outdoor seating. */\nexport function Bench({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  length = 1.6,\n  depth = 0.5,\n  seatHeight = 0.45,\n  back = true,\n  color,\n}: BenchProps) {\n  const { unit, palette } = useWorld()\n  const wood = color ?? palette.wood\n  const L = length * unit\n  const D = depth * unit\n  const sh = seatHeight * unit\n  const slatT = 0.04 * unit\n  const legW = 0.07 * unit\n  const SEAT_SLATS = 3\n  const slatD = (D / SEAT_SLATS) * 0.82\n  const backH = 0.5 * unit\n  const lx = L / 2 - legW\n  const lz = D / 2 - legW\n\n  const legs: Vec3[] = [\n    [-lx, sh / 2, -lz],\n    [lx, sh / 2, -lz],\n    [-lx, sh / 2, lz],\n    [lx, sh / 2, lz],\n  ]\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[L / 2, sh / 2, D / 2]} position={[0, sh / 2, 0]} />\n\n      {Array.from({ length: SEAT_SLATS }, (_, i) => {\n        const z = -D / 2 + (i + 0.5) * (D / SEAT_SLATS)\n        return (\n          <mesh key={`slat-${i}`} castShadow receiveShadow position={[0, sh, z]}>\n            <boxGeometry args={[L, slatT, slatD]} />\n            <meshStandardMaterial color={wood} roughness={0.85} />\n          </mesh>\n        )\n      })}\n\n      {legs.map((p) => (\n        <mesh key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`} castShadow position={p}>\n          <boxGeometry args={[legW, sh, legW]} />\n          <meshStandardMaterial color={wood} roughness={0.85} />\n        </mesh>\n      ))}\n\n      {back && (\n        <>\n          {[-1, 1].map((s) => (\n            <mesh\n              key={`support-${s}`}\n              castShadow\n              position={[s * lx, sh + backH / 2, -D / 2 + legW]}\n            >\n              <boxGeometry args={[legW, backH, legW]} />\n              <meshStandardMaterial color={wood} roughness={0.85} />\n            </mesh>\n          ))}\n          {[0.55, 0.9].map((f) => (\n            <mesh key={`backslat-${f}`} castShadow position={[0, sh + backH * f, -D / 2 + legW]}>\n              <boxGeometry args={[L, slatT, slatD * 0.8]} />\n              <meshStandardMaterial color={wood} roughness={0.85} />\n            </mesh>\n          ))}\n        </>\n      )}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

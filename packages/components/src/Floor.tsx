@@ -12,20 +12,22 @@ export interface FloorProps {
 }
 
 export function Floor({
-  position = [0, 0, 0],
+  position,
   rotation = [0, 0, 0],
   size = [8, 8],
   thickness = 0.2,
   color,
 }: FloorProps) {
-  const { unit, palette } = useWorld()
+  const { unit, palette, ground } = useWorld()
   const floorColor = color ?? palette.floor
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit
+  // Top surface sits at the world ground baseline by default; explicit position wins.
+  const pos = position ?? [0, ground, 0]
 
   return (
-    <RigidBody type="fixed" colliders="cuboid" position={position} rotation={rotation}>
+    <RigidBody type="fixed" colliders="cuboid" position={pos} rotation={rotation}>
       <mesh receiveShadow position={[0, -t / 2, 0]}>
         <boxGeometry args={[w, t, d]} />
         <meshStandardMaterial color={floorColor} />

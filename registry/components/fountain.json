@@ -1,0 +1,20 @@
+{
+  "name": "fountain",
+  "title": "Fountain",
+  "type": "registry:component",
+  "description": "Two-tier stone fountain with gently rippling water (a per-frame bob, no textures).",
+  "dependencies": [
+    "@react-three/fiber@^9.6.1",
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.9.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Fountain.tsx",
+      "content": "import { useFrame } from '@react-three/fiber'\nimport { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type Vec3 } from '@runek/core'\nimport { useRef } from 'react'\nimport type { Mesh } from 'three'\n\nexport interface FountainProps {\n  position?: Vec3\n  rotation?: Vec3\n  radius?: number\n  /** Stone color; defaults to the world palette's `stone` slot. */\n  color?: string\n  /** Water color; defaults to the world palette's `waterShallow` slot. */\n  waterColor?: string\n}\n\n/** A two-tier stone fountain with gently rippling water (a light per-frame bob,\n *  no textures). A plaza centerpiece. The basin is solid, so it owns a collider. */\nexport function Fountain({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  radius = 1.6,\n  color,\n  waterColor,\n}: FountainProps) {\n  const { unit, palette } = useWorld()\n  const stone = color ?? palette.stone\n  const water = waterColor ?? palette.waterShallow\n  const R = radius * unit\n  const basinH = 0.5 * unit\n  const topY = basinH + 1.0 * unit\n  const lowWater = useRef<Mesh>(null)\n  const topWater = useRef<Mesh>(null)\n\n  useFrame(({ clock }) => {\n    const t = clock.elapsedTime\n    if (lowWater.current)\n      lowWater.current.position.y = basinH * 0.7 + Math.sin(t * 1.6) * 0.01 * unit\n    if (topWater.current) topWater.current.position.y = topY + Math.sin(t * 2.1 + 1) * 0.008 * unit\n  })\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[R, basinH / 2, R]} position={[0, basinH / 2, 0]} />\n\n      <mesh castShadow receiveShadow position={[0, basinH / 2, 0]}>\n        <cylinderGeometry args={[R, R * 1.05, basinH, 28, 1, true]} />\n        <meshStandardMaterial color={stone} roughness={0.92} side={2} />\n      </mesh>\n      <mesh receiveShadow position={[0, 0.05 * unit, 0]}>\n        <cylinderGeometry args={[R, R, 0.1 * unit, 28]} />\n        <meshStandardMaterial color={stone} roughness={0.92} />\n      </mesh>\n      <mesh ref={lowWater} position={[0, basinH * 0.7, 0]} rotation={[-Math.PI / 2, 0, 0]}>\n        <circleGeometry args={[R * 0.92, 28]} />\n        <meshStandardMaterial\n          color={water}\n          transparent\n          opacity={0.8}\n          roughness={0.2}\n          metalness={0.1}\n        />\n      </mesh>\n\n      <mesh castShadow position={[0, basinH + 0.5 * unit, 0]}>\n        <cylinderGeometry args={[0.16 * unit, 0.22 * unit, 1.0 * unit, 16]} />\n        <meshStandardMaterial color={stone} roughness={0.92} />\n      </mesh>\n      <mesh castShadow position={[0, topY, 0]}>\n        <cylinderGeometry args={[R * 0.5, R * 0.35, 0.18 * unit, 24, 1, true]} />\n        <meshStandardMaterial color={stone} roughness={0.92} side={2} />\n      </mesh>\n      <mesh ref={topWater} position={[0, topY, 0]} rotation={[-Math.PI / 2, 0, 0]}>\n        <circleGeometry args={[R * 0.46, 24]} />\n        <meshStandardMaterial color={water} transparent opacity={0.85} roughness={0.2} />\n      </mesh>\n      <mesh castShadow position={[0, topY + 0.2 * unit, 0]}>\n        <sphereGeometry args={[0.1 * unit, 12, 12]} />\n        <meshStandardMaterial color={stone} roughness={0.9} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

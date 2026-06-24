@@ -1,0 +1,19 @@
+{
+  "name": "campfire",
+  "title": "Campfire",
+  "type": "registry:component",
+  "description": "Stone ring, a tepee of logs, and an animated flame with a warm flickering light.",
+  "dependencies": [
+    "@react-three/fiber@^9.6.1",
+    "@runek/core@^0.9.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Campfire.tsx",
+      "content": "import { useFrame } from '@react-three/fiber'\nimport { rng, useWorld, type Vec3 } from '@runek/core'\nimport { useMemo, useRef } from 'react'\nimport type { Group, PointLight } from 'three'\n\nexport interface CampfireProps {\n  position?: Vec3\n  rotation?: Vec3\n  radius?: number\n  /** Log color; defaults to the world palette's `wood` slot. */\n  logColor?: string\n  flameColor?: string\n  intensity?: number\n  seed?: number\n}\n\n/** A ring of stones, a tepee of logs, and an animated flame with a warm,\n *  flickering light: a night-time focal point that plays off the day/night system.\n *  Decorative (no collider). */\nexport function Campfire({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  radius = 0.5,\n  logColor,\n  flameColor = '#ff7a1a',\n  intensity = 14,\n  seed = 1,\n}: CampfireProps) {\n  const { unit, palette } = useWorld()\n  const wood = logColor ?? palette.wood\n  const stone = palette.stone\n  const R = radius * unit\n  const flameRef = useRef<Group>(null)\n  const lightRef = useRef<PointLight>(null)\n\n  const stones = useMemo(() => {\n    const next = rng(seed)\n    return Array.from({ length: 7 }, (_, i) => {\n      const a = (i / 7) * Math.PI * 2\n      return {\n        x: Math.cos(a) * R,\n        z: Math.sin(a) * R,\n        r: (0.07 + next() * 0.05) * unit,\n        rot: next() * Math.PI,\n      }\n    })\n  }, [R, seed, unit])\n\n  const logLen = R * 1.6\n  const logs = useMemo(() => Array.from({ length: 4 }, (_, i) => (i / 4) * Math.PI * 2 + 0.4), [])\n\n  useFrame(({ clock }) => {\n    const t = clock.elapsedTime\n    const n = Math.sin(t * 11) * 0.5 + Math.sin(t * 19 + 1) * 0.3 + Math.sin(t * 7 + 2) * 0.2\n    if (flameRef.current) {\n      flameRef.current.scale.y = 1 + n * 0.18\n      flameRef.current.position.x = n * 0.02 * unit\n    }\n    if (lightRef.current) lightRef.current.intensity = intensity * (1 + n * 0.25)\n  })\n\n  return (\n    <group position={position} rotation={rotation}>\n      {stones.map((s) => (\n        <mesh\n          key={`stone-${s.x.toFixed(3)}:${s.z.toFixed(3)}`}\n          castShadow\n          position={[s.x, s.r * 0.6, s.z]}\n          rotation={[s.rot, s.rot, 0]}\n        >\n          <icosahedronGeometry args={[s.r, 0]} />\n          <meshStandardMaterial color={stone} flatShading roughness={1} />\n        </mesh>\n      ))}\n\n      {logs.map((a) => (\n        <mesh\n          key={`log-${a.toFixed(3)}`}\n          castShadow\n          position={[Math.cos(a) * R * 0.4, logLen * 0.4, Math.sin(a) * R * 0.4]}\n          rotation={[Math.cos(a) * 0.5, 0, -Math.sin(a) * 0.5]}\n        >\n          <cylinderGeometry args={[0.05 * unit, 0.06 * unit, logLen, 7]} />\n          <meshStandardMaterial color={wood} roughness={0.9} />\n        </mesh>\n      ))}\n\n      <group ref={flameRef} position={[0, R * 0.5, 0]}>\n        <mesh position={[0, R * 0.5, 0]}>\n          <coneGeometry args={[R * 0.5, R * 1.6, 10]} />\n          <meshBasicMaterial color={flameColor} transparent opacity={0.85} toneMapped={false} />\n        </mesh>\n        <mesh position={[0, R * 0.45, 0]}>\n          <coneGeometry args={[R * 0.28, R * 1.1, 10]} />\n          <meshBasicMaterial color=\"#ffd84d\" transparent opacity={0.9} toneMapped={false} />\n        </mesh>\n      </group>\n\n      <pointLight\n        ref={lightRef}\n        position={[0, R * 0.9, 0]}\n        color=\"#ff9a3c\"\n        intensity={intensity}\n        distance={10 * unit}\n        decay={2}\n      />\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}
