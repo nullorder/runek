@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add house
 ```
 
-Pulls `door`, `floor`, `roof`, `wall`, `window`, `@runek/core@^0.6.0`.
+Pulls `door`, `floor`, `roof`, `wall`, `window`, `@runek/core@^0.8.0`.
 
 ## Use it
 

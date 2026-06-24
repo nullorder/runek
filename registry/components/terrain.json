@@ -5,7 +5,7 @@
   "description": "Procedural fbm-displaced ground with a matching trimesh collider and a flat build-pad option.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.6.0",
+    "@runek/core@^0.8.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 import type { WorldPalette } from './palette'
-import type { Vec3, WorldFog } from './types'
+import type { AvatarView, Vec3, WorldFog } from './types'
 
 export type JsonValue =
   | string
@@ -59,6 +59,12 @@ export interface WorldData {
   meta?: WorldMeta
   unit?: number
   gravity?: Vec3
+  /** Pinned time-of-day ("HH:MM", 24h) for a reproducible world. Drives day/night. */
+  time?: string
+  /** IANA timezone for a live, clock-driven day/night (used when `time` is unset). */
+  timezone?: string
+  /** World default camera view; `Player` reads it when its own `view` is unset. */
+  avatar?: AvatarView
   /** Color-slot overrides applied to every component in the world. */
   palette?: Partial<WorldPalette>
   fog?: WorldFog
@@ -79,9 +85,9 @@ function normalizeNode(node: WorldNode): WorldNode {
 
 /**
  * Serialize a world to pretty JSON text with a canonical, stable key order
- * (`version, meta, unit, gravity, palette, fog, nodes`; each node `type, id,
- * props, children`). Stable output means an unchanged node never churns the diff,
- * so PR reviews show only the real change.
+ * (`version, meta, unit, gravity, time, timezone, avatar, palette, fog, nodes`;
+ * each node `type, id, props, children`). Stable output means an unchanged node
+ * never churns the diff, so PR reviews show only the real change.
  */
 export function serializeWorld(data: WorldData): string {
   // Build with a fixed key insertion order (nodes last); a plain record lets us add
@@ -90,6 +96,9 @@ export function serializeWorld(data: WorldData): string {
   if (data.meta !== undefined) out.meta = data.meta
   if (data.unit !== undefined) out.unit = data.unit
   if (data.gravity !== undefined) out.gravity = data.gravity
+  if (data.time !== undefined) out.time = data.time
+  if (data.timezone !== undefined) out.timezone = data.timezone
+  if (data.avatar !== undefined) out.avatar = data.avatar
   if (data.palette !== undefined) out.palette = data.palette
   if (data.fog !== undefined) out.fog = data.fog
   out.nodes = data.nodes.map(normalizeNode)
@@ -115,6 +124,15 @@ export function parseWorld(json: string): WorldData {
     if ((meta as WorldMeta).authors !== undefined && !Array.isArray((meta as WorldMeta).authors)) {
       throw new Error('World "meta.authors" must be an array')
     }
+  }
+  if (data.time !== undefined && typeof data.time !== 'string') {
+    throw new Error('World "time" must be an "HH:MM" string')
+  }
+  if (data.timezone !== undefined && typeof data.timezone !== 'string') {
+    throw new Error('World "timezone" must be a string')
+  }
+  if (data.avatar !== undefined && data.avatar !== 'first' && data.avatar !== 'third') {
+    throw new Error('World "avatar" must be "first" or "third"')
   }
   return data
 }

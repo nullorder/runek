@@ -100,9 +100,18 @@ These govern the `WorldData` a component is placed into, not individual componen
 - `WorldData` **MAY** carry optional top-level fields the renderer reads (`unit`,
   `gravity`, `palette`, `fog`) plus **`meta`**, the world's identity (`title`,
   `description`, `authors[]`, `license`, `source`). Every one is optional and additive.
-- `parseWorld` **MUST** accept a world without `meta`, **MUST** pass `meta` and unknown
-  fields through unchanged (light shape validation only), and a new optional field
-  **MUST NOT** require a `version` bump.
+- A world **MAY** also declare runtime **settings** (the world's "rules") as top-level
+  fields, resolved onto `WorldContext` for components to read via `useWorld()`:
+  - **`time`** (`"HH:MM"`, 24h) pins a reproducible time-of-day; **`timezone`** (IANA)
+    instead tracks a live clock. Both resolve to `useWorld().time` (`{ hours, live,
+    timezone? }`). A day/night-aware component (e.g. `Sky`, `LightRig`) **SHOULD** read
+    it, and **MUST** still render with the default (a pinned midday) when unset.
+  - **`avatar`** (`'first' | 'third'`) is the world's default camera view, read as
+    `useWorld().avatar`; `Player` uses it when its own `view` is unset. An explicit
+    component prop **MUST** win over the world default (as with palette colors).
+- `parseWorld` **MUST** accept a world without `meta`, **MUST** pass `meta`, the
+  settings above, and unknown fields through unchanged (light shape validation only),
+  and a new optional field **MUST NOT** require a `version` bump.
 - A `WorldNode` **MAY** carry an optional stable **`id`**. The editor assigns ids to
   nodes that lack them and preserves existing ones; ids key React reconciliation and
   selection, with an array-index fallback. Hand-authored worlds need not write ids.

@@ -1,10 +1,12 @@
-import type { Vec3 } from '@runek/core'
+import { type AvatarView, useWorld, type Vec3 } from '@runek/core'
 import Ecctrl from 'ecctrl'
 
-export type PlayerView = 'first' | 'third'
+export type PlayerView = AvatarView
 
 export interface PlayerProps {
   position?: Vec3
+  /** Camera view. Unset defers to the world default (`<World avatar>`); falls back
+   *  to first-person. An explicit value here always wins. */
   view?: PlayerView
   /** Initial camera yaw in radians (0 faces +z). */
   yaw?: number
@@ -13,8 +15,9 @@ export interface PlayerProps {
 const CAPSULE_RADIUS = 0.3
 const CAPSULE_HALF_HEIGHT = 0.35
 
-export function Player({ position = [0, 3, 0], view = 'first', yaw = 0 }: PlayerProps) {
-  const firstPerson = view === 'first'
+export function Player({ position = [0, 3, 0], view, yaw = 0 }: PlayerProps) {
+  const { avatar } = useWorld()
+  const firstPerson = (view ?? avatar ?? 'first') === 'first'
 
   return (
     <Ecctrl

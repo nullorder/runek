@@ -4,14 +4,14 @@
   "type": "registry:component",
   "description": "First/third-person character controller (ecctrl wrapper).",
   "dependencies": [
-    "@runek/core@^0.6.0",
+    "@runek/core@^0.8.0",
     "ecctrl@^1.0.97"
   ],
   "registryDependencies": [],
   "files": [
     {
       "path": "Player.tsx",
-      "content": "import type { Vec3 } from '@runek/core'\nimport Ecctrl from 'ecctrl'\n\nexport type PlayerView = 'first' | 'third'\n\nexport interface PlayerProps {\n  position?: Vec3\n  view?: PlayerView\n  /** Initial camera yaw in radians (0 faces +z). */\n  yaw?: number\n}\n\nconst CAPSULE_RADIUS = 0.3\nconst CAPSULE_HALF_HEIGHT = 0.35\n\nexport function Player({ position = [0, 3, 0], view = 'first', yaw = 0 }: PlayerProps) {\n  const firstPerson = view === 'first'\n\n  return (\n    <Ecctrl\n      position={position}\n      mode=\"CameraBasedMovement\"\n      camInitDir={{ x: 0, y: yaw }}\n      capsuleRadius={CAPSULE_RADIUS}\n      capsuleHalfHeight={CAPSULE_HALF_HEIGHT}\n      camInitDis={firstPerson ? -0.01 : -5}\n      camMinDis={firstPerson ? -0.01 : -1.5}\n      camMaxDis={firstPerson ? -0.01 : -8}\n      turnVelMultiplier={firstPerson ? 1 : 0.2}\n      turnSpeed={firstPerson ? 100 : 15}\n      camFollowMult={firstPerson ? 1000 : 11}\n      camLerpMult={firstPerson ? 1000 : 25}\n    >\n      <mesh visible={!firstPerson} castShadow>\n        <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />\n        <meshStandardMaterial color=\"#4a90d9\" />\n      </mesh>\n    </Ecctrl>\n  )\n}\n",
+      "content": "import { type AvatarView, useWorld, type Vec3 } from '@runek/core'\nimport Ecctrl from 'ecctrl'\n\nexport type PlayerView = AvatarView\n\nexport interface PlayerProps {\n  position?: Vec3\n  /** Camera view. Unset defers to the world default (`<World avatar>`); falls back\n   *  to first-person. An explicit value here always wins. */\n  view?: PlayerView\n  /** Initial camera yaw in radians (0 faces +z). */\n  yaw?: number\n}\n\nconst CAPSULE_RADIUS = 0.3\nconst CAPSULE_HALF_HEIGHT = 0.35\n\nexport function Player({ position = [0, 3, 0], view, yaw = 0 }: PlayerProps) {\n  const { avatar } = useWorld()\n  const firstPerson = (view ?? avatar ?? 'first') === 'first'\n\n  return (\n    <Ecctrl\n      position={position}\n      mode=\"CameraBasedMovement\"\n      camInitDir={{ x: 0, y: yaw }}\n      capsuleRadius={CAPSULE_RADIUS}\n      capsuleHalfHeight={CAPSULE_HALF_HEIGHT}\n      camInitDis={firstPerson ? -0.01 : -5}\n      camMinDis={firstPerson ? -0.01 : -1.5}\n      camMaxDis={firstPerson ? -0.01 : -8}\n      turnVelMultiplier={firstPerson ? 1 : 0.2}\n      turnSpeed={firstPerson ? 100 : 15}\n      camFollowMult={firstPerson ? 1000 : 11}\n      camLerpMult={firstPerson ? 1000 : 25}\n    >\n      <mesh visible={!firstPerson} castShadow>\n        <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />\n        <meshStandardMaterial color=\"#4a90d9\" />\n      </mesh>\n    </Ecctrl>\n  )\n}\n",
       "type": "registry:component"
     }
   ]

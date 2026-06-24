@@ -42,16 +42,35 @@ describe('world-data', () => {
     expect(parseWorld(serializeWorld(withMeta))).toEqual(withMeta)
   })
 
+  it('round-trips world settings (time, timezone, avatar) with no loss', () => {
+    const settings: WorldData = {
+      version: 1,
+      time: '18:30',
+      timezone: 'Asia/Kolkata',
+      avatar: 'third',
+      nodes: [{ type: 'Player' }],
+    }
+    expect(parseWorld(serializeWorld(settings))).toEqual(settings)
+  })
+
   it('serializes keys in a canonical order regardless of input order', () => {
     const scrambled = {
       nodes: [{ props: { seed: 1 }, type: 'Terrain' }],
+      palette: { wood: '#000' },
+      time: '06:00',
       unit: 2,
       version: 1,
     } as WorldData
     const text = serializeWorld(scrambled)
     expect(text.indexOf('"version"')).toBeLessThan(text.indexOf('"unit"'))
-    expect(text.indexOf('"unit"')).toBeLessThan(text.indexOf('"nodes"'))
+    expect(text.indexOf('"unit"')).toBeLessThan(text.indexOf('"time"'))
+    expect(text.indexOf('"time"')).toBeLessThan(text.indexOf('"palette"'))
+    expect(text.indexOf('"palette"')).toBeLessThan(text.indexOf('"nodes"'))
     expect(text.indexOf('"type"')).toBeLessThan(text.indexOf('"props"'))
+  })
+
+  it('rejects an unknown avatar value', () => {
+    expect(() => parseWorld('{"version":1,"avatar":"bird","nodes":[]}')).toThrow()
   })
 
   it('rejects an unsupported version', () => {

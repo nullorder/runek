@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add window
 ```
 
-Pulls `@runek/core@^0.6.0`.
+Pulls `@runek/core@^0.8.0`.
 
 ## Use it
 

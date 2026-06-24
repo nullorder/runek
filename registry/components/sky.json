@@ -5,13 +5,14 @@
   "description": "Procedural atmosphere (drei Sky).",
   "dependencies": [
     "@react-three/drei@^10.7.7",
-    "@runek/core@^0.6.0"
+    "@react-three/fiber@^9.6.1",
+    "@runek/core@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [
     {
       "path": "Sky.tsx",
-      "content": "import { Sky as DreiSky } from '@react-three/drei'\nimport type { Vec3 } from '@runek/core'\n\nexport interface SkyProps {\n  /** Direction of the sun; also where the bright spot appears. */\n  sunPosition?: Vec3\n  turbidity?: number\n  rayleigh?: number\n}\n\n/** Procedural atmospheric sky (no textures). */\nexport function Sky({ sunPosition = [80, 30, 40], turbidity = 8, rayleigh = 1.4 }: SkyProps) {\n  return <DreiSky sunPosition={sunPosition} turbidity={turbidity} rayleigh={rayleigh} />\n}\n",
+      "content": "import { Sky as DreiSky, Stars } from '@react-three/drei'\nimport { useFrame } from '@react-three/fiber'\nimport { currentHours, sunState, useWorld, type Vec3 } from '@runek/core'\nimport { useState } from 'react'\n\nexport interface SkyProps {\n  /** Direction of the sun; also where the bright spot appears. Set this to pin the\n   *  sky to a fixed sun and bypass the world's day/night cycle. */\n  sunPosition?: Vec3\n  turbidity?: number\n  rayleigh?: number\n  /** Background when the sun is below the horizon. */\n  nightColor?: string\n}\n\n/**\n * Procedural atmospheric sky (no textures). With no explicit `sunPosition` it\n * follows the world's time-of-day (`<World time>` / `timezone`): the sun arcs\n * overhead by day, and at night the dome swaps to a dark sky with a procedural\n * starfield. Pass `sunPosition` to pin a fixed sun and opt out of the cycle.\n */\nexport function Sky({\n  sunPosition,\n  turbidity = 8,\n  rayleigh = 1.4,\n  nightColor = '#04060e',\n}: SkyProps) {\n  const { time } = useWorld()\n  const pinned = sunPosition !== undefined\n\n  // Sample time-of-day. A pinned world never changes; a live world advances slowly,\n  // so re-render only when the sun has moved enough to matter (~1 min of clock time).\n  const [hours, setHours] = useState(() => currentHours(time))\n  useFrame(() => {\n    if (pinned || !time.live) return\n    const h = currentHours(time)\n    setHours((prev) => (Math.abs(h - prev) > 0.02 ? h : prev))\n  })\n\n  if (pinned) {\n    return <DreiSky sunPosition={sunPosition} turbidity={turbidity} rayleigh={rayleigh} />\n  }\n\n  const sun = sunState(hours)\n  if (!sun.day) {\n    return (\n      <>\n        <color attach=\"background\" args={[nightColor]} />\n        <Stars radius={80} depth={50} count={2500} factor={4} saturation={0} fade speed={0.4} />\n      </>\n    )\n  }\n  return <DreiSky sunPosition={sun.position} turbidity={turbidity} rayleigh={rayleigh} />\n}\n",
       "type": "registry:component"
     }
   ]

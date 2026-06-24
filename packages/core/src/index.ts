@@ -6,7 +6,22 @@ export type { WorldPalette } from './palette'
 export { DEFAULT_PALETTE } from './palette'
 export type { Rng } from './rng'
 export { int, pick, range, rng, sub } from './rng'
-export type { Vec3, WorldComponentProps, WorldContextValue, WorldFog } from './types'
+export type { SunState, WorldTime } from './time'
+export {
+  clockHours,
+  currentHours,
+  DEFAULT_WORLD_TIME,
+  parseClockTime,
+  resolveWorldTime,
+  sunState,
+} from './time'
+export type {
+  AvatarView,
+  Vec3,
+  WorldComponentProps,
+  WorldContextValue,
+  WorldFog,
+} from './types'
 export { useWorld } from './useWorld'
 export type { WorldProps } from './World'
 export { World } from './World'

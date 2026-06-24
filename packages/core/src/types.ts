@@ -1,6 +1,11 @@
 import type { WorldPalette } from './palette'
+import type { WorldTime } from './time'
 
 export type Vec3 = [number, number, number]
+
+/** How the player camera frames the avatar. A world default `Player` reads when
+ *  its own `view` is unset; an explicit component `view` still wins. */
+export type AvatarView = 'first' | 'third'
 
 /** The contract every Runek component implements. */
 export interface WorldComponentProps {
@@ -24,4 +29,9 @@ export interface WorldContextValue {
   gravity: Vec3
   /** Resolved color slots components default their materials to. */
   palette: WorldPalette
+  /** Resolved time-of-day. Day/night-aware components (`Sky`, `LightRig`,
+   *  `Clock`) read this; defaults to a pinned midday. */
+  time: WorldTime
+  /** World default camera view for the player, if the world declares one. */
+  avatar?: AvatarView
 }

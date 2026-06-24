@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add bookshelf
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.6.0`, `three@^0.184.0`.
+Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.8.0`, `three@^0.184.0`.
 
 ## Use it
 

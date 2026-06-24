@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "Window with frame and translucent pane.",
   "dependencies": [
-    "@runek/core@^0.6.0"
+    "@runek/core@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [
