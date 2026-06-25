@@ -5,7 +5,7 @@
   "description": "Column with a plinth, a tapered (optionally fluted) shaft, and a capital.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.9.0"
+    "@runek/core@^0.10.0"
   ],
   "registryDependencies": [],
   "files": [

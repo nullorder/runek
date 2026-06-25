@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add lake
 ```
 
-Pulls `@react-three/fiber@^9.6.1`, `@runek/core@^0.9.0`, `three@^0.184.0`.
+Pulls `@react-three/fiber@^9.6.1`, `@runek/core@^0.10.0`, `three@^0.184.0`.
 
 ## Use it
 

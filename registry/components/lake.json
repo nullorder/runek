@@ -5,7 +5,7 @@
   "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.9.0",
+    "@runek/core@^0.10.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],
