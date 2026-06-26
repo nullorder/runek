@@ -19,7 +19,9 @@ export function WorldRenderer({ data, registry, ...worldProps }: WorldRendererPr
       <World
         unit={data.unit}
         gravity={data.gravity}
+        ground={data.ground}
         palette={data.palette}
+        fonts={data.fonts}
         fog={data.fog}
         time={data.time}
         timezone={data.timezone}

@@ -5,7 +5,7 @@
   "description": "Sun + hemisphere/ground fill with shadow configuration.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.10.0",
+    "@runek/core@^0.10.1",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

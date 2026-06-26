@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add flowers
 ```
 
-Pulls `@runek/core@^0.10.0`, `three@^0.184.0`.
+Pulls `@runek/core@^0.10.1`, `three@^0.184.0`.
 
 ## Use it
 

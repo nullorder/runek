@@ -5,7 +5,7 @@
   "description": "A trimmed green wall with seeded surface tufts; blocks like a Wall.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.0",
+    "@runek/core@^0.10.1",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

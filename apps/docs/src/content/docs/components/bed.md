@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add bed
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.1`.
 
 ## Use it
 

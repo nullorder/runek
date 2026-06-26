@@ -16,7 +16,7 @@
       "title": "Terrain",
       "type": "registry:component",
       "category": "terrain",
-      "description": "Procedural fbm-displaced ground with a matching trimesh collider and a flat build-pad option.",
+      "description": "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff.",
       "files": [{ "path": "packages/components/src/Terrain.tsx", "target": "Terrain.tsx" }]
     },
     {
@@ -154,6 +154,14 @@
       "category": "water",
       "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level.",
       "files": [{ "path": "packages/components/src/Lake.tsx", "target": "Lake.tsx" }]
+    },
+    {
+      "name": "ocean",
+      "title": "Ocean",
+      "type": "registry:component",
+      "category": "water",
+      "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground.",
+      "files": [{ "path": "packages/components/src/Ocean.tsx", "target": "Ocean.tsx" }]
     },
     {
       "name": "shore",

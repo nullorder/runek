@@ -1,6 +1,6 @@
 ---
 title: "Terrain"
-summary: "Procedural fbm-displaced ground with a matching trimesh collider and a flat build-pad option."
+summary: "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff."
 category: component
 component: terrain
 order: 100
@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add terrain
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.0`, `three@^0.184.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.1`, `three@^0.184.0`.
 
 ## Use it
 
@@ -40,6 +40,14 @@ export interface TerrainProps {
   frequency?: number
   /** Radius from center kept flat (for a build pad), in units. */
   flatRadius?: number
+  /** Radial island falloff (0 = off). When set, the ground domes up toward the center and
+   *  sinks below the world ground at its rim, so the mesh reads as a landmass surrounded by
+   *  water. The value is the fraction of the half-extent that stays land before the coast
+   *  (e.g. 0.8 = land out to 80% of the radius, then a shoreline into the sea). */
+  falloff?: number
+  /** Register a collider (default true). Set false for distant/backdrop terrain the player
+   *  never walks, to skip a large trimesh collider. */
+  collider?: boolean
   seed?: number
 }
 ```

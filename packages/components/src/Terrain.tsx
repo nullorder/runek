@@ -18,6 +18,14 @@ export interface TerrainProps {
   frequency?: number
   /** Radius from center kept flat (for a build pad), in units. */
   flatRadius?: number
+  /** Radial island falloff (0 = off). When set, the ground domes up toward the center and
+   *  sinks below the world ground at its rim, so the mesh reads as a landmass surrounded by
+   *  water. The value is the fraction of the half-extent that stays land before the coast
+   *  (e.g. 0.8 = land out to 80% of the radius, then a shoreline into the sea). */
+  falloff?: number
+  /** Register a collider (default true). Set false for distant/backdrop terrain the player
+   *  never walks, to skip a large trimesh collider. */
+  collider?: boolean
   seed?: number
 }
 
@@ -61,6 +69,8 @@ export function Terrain({
   resolution = 64,
   frequency = 0.04,
   flatRadius = 0,
+  falloff = 0,
+  collider = true,
   seed = 1,
 }: TerrainProps) {
   const { unit, palette } = useWorld()
@@ -75,35 +85,56 @@ export function Terrain({
     geo.rotateX(-Math.PI / 2)
     const noise = valueNoise(seed)
     const fr = flatRadius * unit
+    const half = Math.min(width, depth) / 2
+    const sink = (relief + 4) * unit
     const pos = geo.attributes.position
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i)
       const z = pos.getZ(i)
-      let h = (fbm(noise, x * frequency, z * frequency) - 0.5) * 2 * relief * unit
+      let h: number
+      if (falloff > 0) {
+        // Island mode: gentle land above the waterline, masked down to the deep at the rim.
+        const land = fbm(noise, x * frequency, z * frequency) * relief * unit
+        const rn = Math.hypot(x, z) / half
+        const mask = 1 - THREE.MathUtils.smoothstep(rn, falloff - 0.18, falloff)
+        h = land * mask - (1 - mask) * sink
+      } else {
+        h = (fbm(noise, x * frequency, z * frequency) - 0.5) * 2 * relief * unit
+      }
       if (fr > 0) h *= THREE.MathUtils.smoothstep(Math.hypot(x, z), fr, fr + 8 * unit)
       pos.setY(i, h)
     }
     pos.needsUpdate = true
     geo.computeVertexNormals()
     return geo
-  }, [width, depth, resolution, relief, frequency, flatRadius, seed, unit])
+  }, [width, depth, resolution, relief, frequency, flatRadius, falloff, seed, unit])
 
   if (displaced) {
-    return (
+    const mesh = (
+      <mesh geometry={displaced} receiveShadow castShadow>
+        <meshStandardMaterial color={groundColor} flatShading />
+      </mesh>
+    )
+    return collider ? (
       <RigidBody type="fixed" colliders="trimesh" position={position}>
-        <mesh geometry={displaced} receiveShadow castShadow>
-          <meshStandardMaterial color={groundColor} flatShading />
-        </mesh>
+        {mesh}
       </RigidBody>
+    ) : (
+      <group position={position}>{mesh}</group>
     )
   }
 
-  return (
+  const flat = (
+    <mesh receiveShadow position={[0, -t / 2, 0]}>
+      <boxGeometry args={[width, t, depth]} />
+      <meshStandardMaterial color={groundColor} />
+    </mesh>
+  )
+  return collider ? (
     <RigidBody type="fixed" colliders="cuboid" position={position}>
-      <mesh receiveShadow position={[0, -t / 2, 0]}>
-        <boxGeometry args={[width, t, depth]} />
-        <meshStandardMaterial color={groundColor} />
-      </mesh>
+      {flat}
     </RigidBody>
+  ) : (
+    <group position={position}>{flat}</group>
   )
 }

@@ -23,6 +23,7 @@ import { House } from './House'
 import { Lake } from './Lake'
 import { Lamp } from './Lamp'
 import { LightRig } from './LightRig'
+import { Ocean } from './Ocean'
 import { Path } from './Path'
 import { Pillar } from './Pillar'
 import { Plant } from './Plant'
@@ -69,6 +70,7 @@ export const registry: ComponentRegistry = {
   Lake,
   Lamp,
   LightRig,
+  Ocean,
   Path,
   Pillar,
   Plant,

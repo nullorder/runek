@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "First/third-person character controller (ecctrl wrapper).",
   "dependencies": [
-    "@runek/core@^0.10.0",
+    "@runek/core@^0.10.1",
     "ecctrl@^1.0.97"
   ],
   "registryDependencies": [],

@@ -5,7 +5,7 @@
   "description": "Posts and rails with seeded weathering; encloses yards and paths. One footprint collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.0"
+    "@runek/core@^0.10.1"
   ],
   "registryDependencies": [],
   "files": [

@@ -152,7 +152,9 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         {...worldProps}
         unit={data.unit}
         gravity={data.gravity}
+        ground={data.ground}
         palette={data.palette}
+        fonts={data.fonts}
         fog={data.fog}
         time={data.time}
         timezone={data.timezone}

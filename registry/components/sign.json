@@ -5,7 +5,7 @@
   "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core.",
   "dependencies": [
     "@react-three/drei@^10.7.7",
-    "@runek/core@^0.10.0"
+    "@runek/core@^0.10.1"
   ],
   "registryDependencies": [],
   "files": [
