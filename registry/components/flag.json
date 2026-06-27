@@ -1,0 +1,20 @@
+{
+  "name": "flag",
+  "title": "Flag",
+  "type": "registry:component",
+  "description": "A cloth flag on a pole; the cloth ripples per-frame, pinned at the luff. Thin pole collider.",
+  "dependencies": [
+    "@react-three/fiber@^9.6.1",
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.10.1",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Flag.tsx",
+      "content": "import { useFrame } from '@react-three/fiber'\nimport { CylinderCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type WorldComponentProps } from '@runek/core'\nimport { useMemo } from 'react'\nimport { DoubleSide, PlaneGeometry } from 'three'\n\nexport interface FlagProps extends WorldComponentProps {\n  /** Pole height, in units. */\n  poleHeight?: number\n  /** Flag width away from the pole (the fly), in units. */\n  fly?: number\n  /** Flag height (the drop), in units. */\n  drop?: number\n  /** Ripple speed. */\n  waveSpeed?: number\n  /** Ripple depth as a fraction of the fly. */\n  waveAmplitude?: number\n  /** Cloth color; defaults to the world palette's `fabric`. */\n  color?: string\n  /** Pole color; defaults to the palette's `wood`. */\n  poleColor?: string\n}\n\n/** A cloth flag on a pole. The cloth is a segmented plane rippled per-frame and pinned at the\n *  luff (pole side), so the wave grows toward the fly. The pole carries a thin collider; the\n *  cloth and finial are decorative. */\nexport function Flag({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  poleHeight = 6,\n  fly = 2.4,\n  drop = 1.5,\n  waveSpeed = 3,\n  waveAmplitude = 0.22,\n  color,\n  poleColor,\n}: FlagProps) {\n  const { unit, palette } = useWorld()\n  const cloth = color ?? palette.fabric\n  const pole = poleColor ?? palette.wood\n  const U = unit\n  const poleH = poleHeight * U\n  const flyW = fly * U\n  const dropH = drop * U\n  const poleR = 0.07 * U\n\n  const geo = useMemo(() => new PlaneGeometry(flyW, dropH, 18, 10), [flyW, dropH])\n\n  useFrame((state) => {\n    const t = state.clock.elapsedTime * waveSpeed\n    const p = geo.attributes.position\n    for (let i = 0; i < p.count; i++) {\n      const u = (p.getX(i) + flyW / 2) / flyW // 0 at luff, 1 at fly\n      const v = (p.getY(i) + dropH / 2) / dropH\n      const ripple = Math.sin(u * 11 - t) * 0.7 + Math.sin(u * 6 + v * 4 - t * 0.8) * 0.3\n      p.setZ(i, ripple * waveAmplitude * flyW * u)\n    }\n    p.needsUpdate = true\n    geo.computeVertexNormals()\n  })\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CylinderCollider args={[poleH / 2, poleR * 1.5]} position={[0, poleH / 2, 0]} />\n\n      {/* pole */}\n      <mesh position={[0, poleH / 2, 0]} castShadow>\n        <cylinderGeometry args={[poleR, poleR, poleH, 8]} />\n        <meshStandardMaterial color={pole} roughness={0.7} />\n      </mesh>\n\n      {/* finial */}\n      <mesh position={[0, poleH + 0.06 * U, 0]} castShadow>\n        <sphereGeometry args={[0.12 * U, 10, 8]} />\n        <meshStandardMaterial color={pole} metalness={0.2} roughness={0.5} />\n      </mesh>\n\n      {/* cloth */}\n      <mesh\n        geometry={geo}\n        position={[poleR + flyW / 2, poleH - dropH / 2 - 0.25 * U, 0]}\n        castShadow\n      >\n        <meshStandardMaterial color={cloth} side={DoubleSide} roughness={0.9} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

@@ -172,6 +172,14 @@
       "files": [{ "path": "packages/components/src/Shore.tsx", "target": "Shore.tsx" }]
     },
     {
+      "name": "sailboat",
+      "title": "Sailboat",
+      "type": "registry:component",
+      "category": "water",
+      "description": "A small procedural sailboat: a station-built low-poly hull, mast, boom, and mainsail, floating at the waterline with a gentle moored bob.",
+      "files": [{ "path": "packages/components/src/Sailboat.tsx", "target": "Sailboat.tsx" }]
+    },
+    {
       "name": "rocks",
       "title": "Rocks",
       "type": "registry:component",
@@ -220,6 +228,14 @@
       "files": [{ "path": "packages/components/src/Fence.tsx", "target": "Fence.tsx" }]
     },
     {
+      "name": "flag",
+      "title": "Flag",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A cloth flag on a pole; the cloth ripples per-frame, pinned at the luff. Thin pole collider.",
+      "files": [{ "path": "packages/components/src/Flag.tsx", "target": "Flag.tsx" }]
+    },
+    {
       "name": "bridge",
       "title": "Bridge",
       "type": "registry:component",
@@ -250,6 +266,22 @@
       "category": "structures",
       "description": "Stone well with a dark pool, posts, a little pyramid roof, and a bucket on a rope.",
       "files": [{ "path": "packages/components/src/Well.tsx", "target": "Well.tsx" }]
+    },
+    {
+      "name": "windmill",
+      "title": "Windmill",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A tapered tower with a conical cap and four sails that turn each frame; tower collider, seeded blade phase.",
+      "files": [{ "path": "packages/components/src/Windmill.tsx", "target": "Windmill.tsx" }]
+    },
+    {
+      "name": "dock",
+      "title": "Dock",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A plank jetty on pilings reaching out over water; walkable deck colliders, side stringers, and seaward mooring posts.",
+      "files": [{ "path": "packages/components/src/Dock.tsx", "target": "Dock.tsx" }]
     },
     {
       "name": "path",

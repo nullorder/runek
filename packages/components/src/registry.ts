@@ -12,8 +12,10 @@ import { Chair } from './Chair'
 import { Clock } from './Clock'
 import { Clouds } from './Clouds'
 import { Crate } from './Crate'
+import { Dock } from './Dock'
 import { Door } from './Door'
 import { Fence } from './Fence'
+import { Flag } from './Flag'
 import { Floor } from './Floor'
 import { Flowers } from './Flowers'
 import { Fountain } from './Fountain'
@@ -32,6 +34,7 @@ import { Rocks } from './Rocks'
 import { Roof } from './Roof'
 import { Room } from './Room'
 import { Rug } from './Rug'
+import { Sailboat } from './Sailboat'
 import { Shelf } from './Shelf'
 import { Shore } from './Shore'
 import { Sign } from './Sign'
@@ -42,6 +45,7 @@ import { Terrain } from './Terrain'
 import { Trees } from './Trees'
 import { Wall } from './Wall'
 import { Well } from './Well'
+import { Windmill } from './Windmill'
 import { Window } from './Window'
 
 /** The default Runek component registry: name → component, for data-driven rendering. */
@@ -59,8 +63,10 @@ export const registry: ComponentRegistry = {
   Clock,
   Clouds,
   Crate,
+  Dock,
   Door,
   Fence,
+  Flag,
   Floor,
   Flowers,
   Fountain,
@@ -79,6 +85,7 @@ export const registry: ComponentRegistry = {
   Roof,
   Room,
   Rug,
+  Sailboat,
   Shelf,
   Shore,
   Sign,
@@ -89,5 +96,6 @@ export const registry: ComponentRegistry = {
   Trees,
   Wall,
   Well,
+  Windmill,
   Window,
 }
