@@ -5,7 +5,7 @@
   "description": "Drifting clouds built from clustered soft blobs (no textures); layer above a Sky.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.10.1",
+    "@runek/core@^0.10.2",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

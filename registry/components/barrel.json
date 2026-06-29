@@ -5,7 +5,7 @@
   "description": "Staved barrel bellied at the middle, banded by metal hoops; convex-hull collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.1"
+    "@runek/core@^0.10.2"
   ],
   "registryDependencies": [],
   "files": [

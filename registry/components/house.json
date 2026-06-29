@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "Composed dwelling: walls with openings, floor, roof, door, and windows.",
   "dependencies": [
-    "@runek/core@^0.10.1"
+    "@runek/core@^0.10.2"
   ],
   "registryDependencies": [
     "door",

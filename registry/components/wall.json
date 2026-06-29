@@ -5,7 +5,7 @@
   "description": "Wall segment with door/window openings and a fixed collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.1"
+    "@runek/core@^0.10.2"
   ],
   "registryDependencies": [],
   "files": [

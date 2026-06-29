@@ -23,6 +23,10 @@ export interface SailboatProps extends WorldComponentProps {
   bob?: boolean
   /** Solid hull collider. */
   collider?: boolean
+  /** Render the hull/rig as a bare visual, with no `RigidBody` or collider — for a parent
+   *  controller (e.g. a steerable vehicle) that owns the physics body. When false, `position`
+   *  and `rotation` place the visual directly and the `collider` prop is ignored. Default true. */
+  physics?: boolean
   /** Hull color; defaults to the world palette's `wood`. */
   color?: string
   /** Deck, mast, and boom color; defaults to the palette's `woodDark`. */
@@ -92,6 +96,7 @@ export function Sailboat({
   sail = true,
   bob = true,
   collider = true,
+  physics = true,
   color,
   trimColor,
   sailColor = '#eee6d0',
@@ -127,6 +132,45 @@ export function Sailboat({
     boat.current.rotation.x = Math.sin(t * 0.6 + 1) * 0.02
   })
 
+  // The hull, mast, boom, and sail. `boat` is the group the bob animates, so any placement
+  // (the RigidBody, or the bare-visual wrapper) goes on a parent, never on this group.
+  const rig = (
+    <group ref={boat}>
+      {/* hull */}
+      <mesh geometry={hull} castShadow receiveShadow>
+        <meshStandardMaterial color={hullColor} side={DoubleSide} flatShading roughness={0.8} />
+      </mesh>
+
+      {/* mast */}
+      <mesh position={[0, fb + mastH / 2, mastZ]} castShadow>
+        <cylinderGeometry args={[0.05 * U, 0.06 * U, mastH, 8]} />
+        <meshStandardMaterial color={trim} roughness={0.7} />
+      </mesh>
+
+      {/* boom + mainsail, swung out a touch and pivoting at the mast */}
+      <group position={[0, fb, mastZ]} rotation={[0, boomAngle, 0]}>
+        <mesh position={[0, goose, -boomL / 2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.04 * U, 0.04 * U, boomL, 6]} />
+          <meshStandardMaterial color={trim} roughness={0.7} />
+        </mesh>
+        {sail && (
+          <mesh geometry={main} castShadow>
+            <meshStandardMaterial color={sailColor} side={DoubleSide} roughness={0.9} />
+          </mesh>
+        )}
+      </group>
+    </group>
+  )
+
+  // Bare visual: a parent controller owns the physics body and places this.
+  if (!physics) {
+    return (
+      <group position={position} rotation={rotation}>
+        {rig}
+      </group>
+    )
+  }
+
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       {collider && (
@@ -135,31 +179,7 @@ export function Sailboat({
           position={[0, (fb - dr) / 2, 0]}
         />
       )}
-      <group ref={boat}>
-        {/* hull */}
-        <mesh geometry={hull} castShadow receiveShadow>
-          <meshStandardMaterial color={hullColor} side={DoubleSide} flatShading roughness={0.8} />
-        </mesh>
-
-        {/* mast */}
-        <mesh position={[0, fb + mastH / 2, mastZ]} castShadow>
-          <cylinderGeometry args={[0.05 * U, 0.06 * U, mastH, 8]} />
-          <meshStandardMaterial color={trim} roughness={0.7} />
-        </mesh>
-
-        {/* boom + mainsail, swung out a touch and pivoting at the mast */}
-        <group position={[0, fb, mastZ]} rotation={[0, boomAngle, 0]}>
-          <mesh position={[0, goose, -boomL / 2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-            <cylinderGeometry args={[0.04 * U, 0.04 * U, boomL, 6]} />
-            <meshStandardMaterial color={trim} roughness={0.7} />
-          </mesh>
-          {sail && (
-            <mesh geometry={main} castShadow>
-              <meshStandardMaterial color={sailColor} side={DoubleSide} roughness={0.9} />
-            </mesh>
-          )}
-        </group>
-      </group>
+      {rig}
     </RigidBody>
   )
 }

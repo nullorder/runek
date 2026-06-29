@@ -99,21 +99,26 @@ check-gh-login:
     @gh auth status >/dev/null 2>&1 && echo "✓ gh authenticated" || { echo "✗ not logged in to GitHub — run 'gh auth login'"; exit 1; }
 
 # Publish @runek/core to npm (imported by copied components; the component
-# source itself ships via the registry deploy, not npm)
-publish-core:
-    @echo "Publishing @runek/core v{{version}} to npm..."
+# source itself ships via the registry deploy, not npm). A non-empty CHANNEL
+# (alpha/beta/rc) publishes under that dist-tag instead of `latest`.
+publish-core CHANNEL="":
+    @echo "Publishing @runek/core v{{version}} to npm{{ if CHANNEL != "" { " (dist-tag: " + CHANNEL + ")" } else { "" } }}..."
     pnpm --filter @runek/core build
-    pnpm --filter @runek/core publish --access public --no-git-checks
+    pnpm --filter @runek/core publish --access public --no-git-checks {{ if CHANNEL != "" { "--tag " + CHANNEL } else { "" } }}
 
-# Publish the @runek/cli CLI to npm (the `runek` bin lives here)
-publish-cli:
-    @echo "Publishing @runek/cli v{{version}} to npm..."
+# Publish the @runek/cli CLI to npm (the `runek` bin lives here). A non-empty
+# CHANNEL (alpha/beta/rc) publishes under that dist-tag instead of `latest`.
+publish-cli CHANNEL="":
+    @echo "Publishing @runek/cli v{{version}} to npm{{ if CHANNEL != "" { " (dist-tag: " + CHANNEL + ")" } else { "" } }}..."
     pnpm --filter @runek/cli build
     node packages/cli/dist/index.js --help > /dev/null
-    pnpm --filter @runek/cli publish --access public --no-git-checks
+    pnpm --filter @runek/cli publish --access public --no-git-checks {{ if CHANNEL != "" { "--tag " + CHANNEL } else { "" } }}
 
-# Tag the release and create a GitHub release with auto-generated notes
-gh-release:
+# Tag the release and create a GitHub release with auto-generated notes. The
+# release is marked a GitHub pre-release when a CHANNEL (alpha/beta/rc) is set
+# OR the version is a patch (X.Y.Z with Z != 0). Patch releases still publish to
+# npm `latest`; this only keeps GitHub's "Latest release" badge on minor/major.
+gh-release CHANNEL="":
     #!/usr/bin/env bash
     set -euo pipefail
     if ! git rev-parse "v{{version}}" >/dev/null 2>&1; then
@@ -125,24 +130,60 @@ gh-release:
     git push origin "v{{version}}"
     read -r -p "Release title [v{{version}}]: " title </dev/tty || true
     title="${title:-v{{version}}}"
-    gh release create "v{{version}}" --title "$title" --generate-notes
+    prerelease_flag=""
+    if [ -n "{{CHANNEL}}" ]; then
+        prerelease_flag="--prerelease"
+        echo "→ marking GitHub release as a pre-release ({{CHANNEL}} channel)"
+    else
+        ver="{{version}}"; ver="${ver%%-*}"; patch="${ver##*.}"
+        if [ "$patch" != "0" ]; then
+            prerelease_flag="--prerelease"
+            echo "→ marking GitHub release as a pre-release (patch release)"
+        fi
+    fi
+    gh release create "v{{version}}" --title "$title" --generate-notes $prerelease_flag
     echo "✓ https://github.com/{{repo}}/releases/tag/v{{version}}"
 
+# Validate the release channel and that it agrees with the package version.
+# CHANNEL must be empty (stable) or one of alpha/beta/rc. A prerelease channel
+# requires a prerelease version (e.g. 0.11.0-alpha.0), and a prerelease version
+# requires a channel — this guards against shipping a prerelease to `latest`.
+_validate-channel CHANNEL="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    case "{{CHANNEL}}" in
+        ""|alpha|beta|rc) ;;
+        *) echo "✗ invalid channel '{{CHANNEL}}' — use alpha, beta, or rc (or omit for stable)"; exit 1 ;;
+    esac
+    if [ -n "{{CHANNEL}}" ] && [[ "{{version}}" != *-* ]]; then
+        echo "✗ channel '{{CHANNEL}}' but v{{version}} is not a prerelease — run e.g. 'just version X.Y.Z-{{CHANNEL}}.0' first"
+        exit 1
+    fi
+    if [ -z "{{CHANNEL}}" ] && [[ "{{version}}" == *-* ]]; then
+        echo "✗ v{{version}} looks like a prerelease — pass a channel: 'just publish alpha' (or beta/rc)"
+        exit 1
+    fi
+    echo "✓ channel: {{ if CHANNEL != "" { CHANNEL } else { "stable (latest)" } }} for v{{version}}"
+
 # Full release: gate → npm (@runek/core + CLI) → git tag + GitHub release.
-# Component source goes live by deploying the docs site (serves /r).
-publish: prepare-publish check-npm-login check-gh-login publish-core publish-cli gh-release
-    @echo "✓ Released v{{version}}: @runek/core + @runek/cli on npm, tagged, GitHub release created."
+# Component source goes live by deploying the docs site (serves /r). Pass a
+# CHANNEL (alpha/beta/rc) to ship a prerelease: npm publishes under that
+# dist-tag and the GitHub release is marked pre-release, e.g. `just publish rc`.
+publish CHANNEL="": (_validate-channel CHANNEL) prepare-publish check-npm-login check-gh-login (publish-core CHANNEL) (publish-cli CHANNEL) (gh-release CHANNEL)
+    @echo "✓ Released v{{version}}{{ if CHANNEL != "" { " (" + CHANNEL + " prerelease)" } else { "" } }}: @runek/core + @runek/cli on npm, tagged, GitHub release created."
     @echo "  Next: deploy apps/docs to publish the registry at https://runek.nullorder.org/r"
 
 # What `just publish` does, and the version it would cut
 publish-help:
-    @echo "just publish — cut release v{{version}}:"
+    @echo "just publish [CHANNEL] — cut release v{{version}}:"
+    @echo "  CHANNEL: empty = stable (latest); alpha/beta/rc = prerelease (npm dist-tag + GitHub pre-release)"
+    @echo "  0. _validate-channel verify CHANNEL is valid and agrees with the version"
     @echo "  1. prepare-publish   regenerate registry + full gate (fails on uncommitted changes)"
     @echo "  2. check-*-login     verify npm + GitHub credentials"
     @echo "  3. publish-core      build + npm publish @runek/core (public)"
     @echo "  4. publish-cli       build + npm publish @runek/cli (public)"
-    @echo "  5. gh-release        git tag v{{version}} + GitHub release (auto notes)"
-    @echo "  Set the version first with: just version X.Y.Z"
+    @echo "  5. gh-release        git tag v{{version}} + GitHub release (auto notes); pre-release if CHANNEL set or a patch (X.Y.Z, Z!=0)"
+    @echo "  Set the version first with: just version X.Y.Z  (or X.Y.Z-alpha.0 for a prerelease)"
 
 # Remove build output and installed dependencies
 clean:
