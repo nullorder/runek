@@ -30,6 +30,7 @@ import { Path } from './Path'
 import { Pillar } from './Pillar'
 import { Plant } from './Plant'
 import { Player } from './Player'
+import { Portal } from './Portal'
 import { Rocks } from './Rocks'
 import { Roof } from './Roof'
 import { Room } from './Room'
@@ -38,6 +39,7 @@ import { Sailboat } from './Sailboat'
 import { Shelf } from './Shelf'
 import { Shore } from './Shore'
 import { Sign } from './Sign'
+import { Signpost } from './Signpost'
 import { Sky } from './Sky'
 import { Staircase } from './Staircase'
 import { Table } from './Table'
@@ -81,6 +83,7 @@ export const registry: ComponentRegistry = {
   Pillar,
   Plant,
   Player,
+  Portal,
   Rocks,
   Roof,
   Room,
@@ -89,6 +92,7 @@ export const registry: ComponentRegistry = {
   Shelf,
   Shore,
   Sign,
+  Signpost,
   Sky,
   Staircase,
   Table,

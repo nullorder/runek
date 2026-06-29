@@ -1,0 +1,20 @@
+{
+  "name": "signpost",
+  "title": "Signpost",
+  "type": "registry:component",
+  "description": "A wooden post-and-plank signboard carrying a name in the world's display font; the post sits behind the board so the text reads clean.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.10.4"
+  ],
+  "registryDependencies": [
+    "sign"
+  ],
+  "files": [
+    {
+      "path": "Signpost.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type WorldComponentProps } from '@runek/core'\nimport { Sign } from './Sign'\n\nexport interface SignpostProps extends WorldComponentProps {\n  /**\n   * The name shown on the board. A plain string, **not** `children`: a world renderer overrides a\n   * node's `children` prop with its nested nodes, so text authored in JSON must be a named prop to\n   * survive. Empty by default — `<Signpost />` is a blank board.\n   */\n  name?: string\n  /** Post height, in units. */\n  height?: number\n  /** Board width, in units. */\n  width?: number\n  /** Post + board wood color; defaults to the palette's `wood`. */\n  color?: string\n  /** Name color; defaults to the palette's `sand` (legible on the wood). */\n  textColor?: string\n  /** Name cap height, in units. */\n  size?: number\n}\n\n/**\n * A roadside signboard: a wooden post and a plank carrying a name in the world's display font.\n * The post sits **behind** the plank so it never crosses the text, and the board is single-sided\n * (its front faces local +Z) — rotate it to face the reader. The post is the only collider.\n */\nexport function Signpost({\n  name = '',\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  height = 2.6,\n  width = 3.4,\n  color,\n  textColor,\n  size = 0.5,\n}: SignpostProps) {\n  const { unit, palette } = useWorld()\n  const wood = color ?? palette.wood\n  const ink = textColor ?? palette.sand\n  const H = height * unit\n  const W = width * unit\n  const boardH = 0.95 * unit\n  const boardY = H - boardH / 2\n  const boardD = 0.12 * unit\n  const postR = 0.1 * unit\n  // The post sits wholly behind the plank (overlapping it a touch) so it never crosses the front\n  // face where the name is drawn.\n  const postZ = -(boardD / 2 + postR - 0.03 * unit)\n  const boardZ = boardD / 2 + 0.02 * unit\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[postR, H / 2, postR]} position={[0, H / 2, postZ]} />\n\n      {/* post — behind the plank, clear of the text */}\n      <mesh position={[0, H / 2, postZ]} castShadow>\n        <cylinderGeometry args={[postR, postR, H, 8]} />\n        <meshStandardMaterial color={palette.woodDark} roughness={0.85} />\n      </mesh>\n\n      {/* plank */}\n      <mesh position={[0, boardY, 0]} castShadow receiveShadow>\n        <boxGeometry args={[W, boardH, boardD]} />\n        <meshStandardMaterial color={wood} roughness={0.8} />\n      </mesh>\n\n      {/* the name, on the clear front face */}\n      {name && (\n        <Sign position={[0, boardY, boardZ]} size={size} variant=\"display\" color={ink}>\n          {name}\n        </Sign>\n      )}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

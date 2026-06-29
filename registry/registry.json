@@ -12,6 +12,14 @@
       "files": [{ "path": "packages/components/src/Player.tsx", "target": "Player.tsx" }]
     },
     {
+      "name": "portal",
+      "title": "Portal",
+      "type": "registry:component",
+      "category": "systems",
+      "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports.",
+      "files": [{ "path": "packages/components/src/Portal.tsx", "target": "Portal.tsx" }]
+    },
+    {
       "name": "terrain",
       "title": "Terrain",
       "type": "registry:component",
@@ -114,6 +122,14 @@
       "category": "interiors",
       "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core.",
       "files": [{ "path": "packages/components/src/Sign.tsx", "target": "Sign.tsx" }]
+    },
+    {
+      "name": "signpost",
+      "title": "Signpost",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A wooden post-and-plank signboard carrying a name in the world's display font; the post sits behind the board so the text reads clean.",
+      "files": [{ "path": "packages/components/src/Signpost.tsx", "target": "Signpost.tsx" }]
     },
     {
       "name": "lamp",

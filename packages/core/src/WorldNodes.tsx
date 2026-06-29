@@ -15,13 +15,15 @@ export function WorldNodes({ nodes, registry }: WorldNodesProps) {
           console.warn(`[runek] Unknown component "${node.type}" — skipped.`)
           return null
         }
-        const children = node.children?.length ? (
-          <WorldNodes nodes={node.children} registry={registry} />
-        ) : null
-        return (
+        // Pass nested child nodes as children only when present; otherwise render with no
+        // children expression so `props.children` (e.g. a `Sign`'s text authored in JSON)
+        // flows through instead of being clobbered by a null child.
+        return node.children?.length ? (
           <Component key={node.id ?? index} {...node.props}>
-            {children}
+            <WorldNodes nodes={node.children} registry={registry} />
           </Component>
+        ) : (
+          <Component key={node.id ?? index} {...node.props} />
         )
       })}
     </>
