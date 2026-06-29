@@ -5,9 +5,7 @@ category: guide
 order: 12
 ---
 
-`<World>` is the root of every Runek scene. It wires up the React Three Fiber
-canvas, a default light rig, the Rapier physics world, and keyboard controls, then
-exposes scene-wide settings to its children through context.
+`<World>` is the root of every Runek scene. It wires up the React Three Fiber canvas, a default light rig, the Rapier physics world, and keyboard controls, then exposes scene-wide settings to its children through context.
 
 ```tsx
 import { World } from '@runek/core'
@@ -23,8 +21,7 @@ import { Player } from './runek/Player'
 ## What it sets up
 
 - A `<Canvas>` with shadows and a sensible default camera.
-- A default **light rig** (ambient + a shadow-casting sun). Turn it off with
-  `lights={false}` to supply your own — e.g. `<LightRig>`.
+- A default **light rig** (ambient + a shadow-casting sun). Turn it off with `lights={false}` to supply your own — e.g. `<LightRig>`.
 - A Rapier `<Physics>` world. Every component registers its colliders here.
 - `KeyboardControls` so `<Player>` (and your own input) work out of the box.
 
@@ -41,9 +38,7 @@ import { Player } from './runek/Player'
 
 ## The palette
 
-Components default their colors to named slots — `wood`, `wall`, `foliage`,
-`waterDeep`, and friends — read from context. Override any subset on `<World>`
-and the whole scene re-themes; explicit color props on a component still win:
+Components default their colors to named slots — `wood`, `wall`, `foliage`, `waterDeep`, and friends — read from context. Override any subset on `<World>` and the whole scene re-themes; explicit color props on a component still win:
 
 ```tsx
 <World palette={{ wood: '#7a5a40', foliage: '#557d3c' }}>
@@ -70,5 +65,4 @@ function MyThing() {
 }
 ```
 
-Next: [the component contract](/docs/the-component-contract) — the rules every
-component follows.
+Next: [the component contract](/docs/the-component-contract) — the rules every component follows.

@@ -5,7 +5,7 @@
   "description": "Bed with a frame, mattress, pillows, and a headboard.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.2"
+    "@runek/core@^0.10.4"
   ],
   "registryDependencies": [],
   "files": [

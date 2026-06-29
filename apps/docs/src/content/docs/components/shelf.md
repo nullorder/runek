@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add shelf
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.1`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.4`.
 
 ## Use it
 
@@ -45,4 +45,4 @@ export interface ShelfProps {
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add shelf</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/shelf)**.
+Browse the whole catalog in the **[gallery →](/gallery)**.

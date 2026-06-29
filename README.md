@@ -4,10 +4,7 @@
 
 > *Worlds, one rune at a time.*
 
-[![@runek/core on npm](https://img.shields.io/npm/v/%40runek%2Fcore?logo=npm&label=%40runek%2Fcore&color=cb3837)](https://www.npmjs.com/package/@runek/core)
-[![@runek/cli on npm](https://img.shields.io/npm/v/%40runek%2Fcli?logo=npm&label=%40runek%2Fcli&color=cb3837)](https://www.npmjs.com/package/@runek/cli)
-[![node](https://img.shields.io/node/v/%40runek%2Fcli?logo=nodedotjs&logoColor=white)](https://nodejs.org)
-[![license: MIT](https://img.shields.io/npm/l/%40runek%2Fcore?color=blue)](./LICENSE)
+[![@runek/core on npm](https://img.shields.io/npm/v/%40runek%2Fcore?logo=npm&label=%40runek%2Fcore&color=cb3837)](https://www.npmjs.com/package/@runek/core) [![@runek/cli on npm](https://img.shields.io/npm/v/%40runek%2Fcli?logo=npm&label=%40runek%2Fcli&color=cb3837)](https://www.npmjs.com/package/@runek/cli) [![node](https://img.shields.io/node/v/%40runek%2Fcli?logo=nodedotjs&logoColor=white)](https://nodejs.org) [![license: MIT](https://img.shields.io/npm/l/%40runek%2Fcore?color=blue)](./LICENSE)
 
 Runek is a source registry of procedural 3D components for [React Three Fiber](https://r3f.docs.pmnd.rs/) — pull a component's source into your project and own it (shadcn-style). Every component — a bookshelf, a lake, a whole house — generates its own geometry from props and a `seed`. No binary assets, no model files, no CDN. A whole world is just data: diffable, forkable, version-controlled like any repo.
 
@@ -19,11 +16,7 @@ Think **"shadcn for 3D worlds."**
 
 ## Demo: Helicon
 
-[**Helicon**](https://helicon.nullorder.org) is the showcase world — a walkable,
-editable procedural island built **entirely from Runek components**, with its
-whole scene defined as a single JSON file. It consumes Runek exactly the way your
-project would: `@runek/core` from npm plus component source copied via
-`@runek/cli`, so it doubles as a worked end-to-end example of the workflow below.
+[**Helicon**](https://helicon.nullorder.org) is the showcase world — a walkable, editable procedural island built **entirely from Runek components**, with its whole scene defined as a single JSON file. It consumes Runek exactly the way your project would: `@runek/core` from npm plus component source copied via `@runek/cli`, so it doubles as a worked end-to-end example of the workflow below.
 
 **[Walk Helicon →](https://helicon.nullorder.org)** · [Source on GitHub](https://github.com/nullorder/helicon)
 
@@ -45,9 +38,7 @@ npx @runek/cli add player terrain bookshelf  # pulls source + deps into your pro
 npx @runek/cli list                          # browse the catalog
 ```
 
-`add` copies editable component source into your project (default `src/runek/`),
-resolves dependencies, and installs the npm packages it needs, including
-`@runek/core`.
+`add` copies editable component source into your project (default `src/runek/`), resolves dependencies, and installs the npm packages it needs, including `@runek/core`.
 
 ## Compose your first world
 
@@ -90,14 +81,11 @@ just docs         # run the docs site (the in-repo dev harness)
 just check        # full gate: lint + typecheck + test + build
 ```
 
-Run `just` to list every recipe. Requires Node 24 (pinned in `.nvmrc`) and pnpm.
-Built on React 19, React Three Fiber 9, Rapier, ecctrl, and drei.
+Run `just` to list every recipe. Requires Node 24 (pinned in `.nvmrc`) and pnpm. Built on React 19, React Three Fiber 9, Rapier, ecctrl, and drei.
 
 ## Contributing
 
-Component contributions are welcome. Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md)
-for the dev setup and the step-by-step "add a component" flow, and check your work
-against the [component contract](./CONTRACT.md).
+Component contributions are welcome. Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the dev setup and the step-by-step "add a component" flow, and check your work against the [component contract](./CONTRACT.md).
 
 [![made with Pixelspace](https://pixelspace.anirudha.dev/badge.svg)](https://pixelspace.anirudha.dev)
 

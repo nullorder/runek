@@ -5,7 +5,7 @@
   "description": "Stone well with a dark pool, posts, a little pyramid roof, and a bucket on a rope.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.2"
+    "@runek/core@^0.10.4"
   ],
   "registryDependencies": [],
   "files": [

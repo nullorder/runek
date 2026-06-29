@@ -1,0 +1,80 @@
+---
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+type World = {
+  name: string
+  url: string
+  domain: string
+  slug: string
+  description: string
+}
+
+// Open worlds built with Runek. Add one here (and open a PR) to feature it.
+const worlds: World[] = [
+  {
+    name: 'Helicon',
+    url: 'https://helicon.nullorder.org',
+    domain: 'helicon.nullorder.org',
+    slug: 'helicon',
+    description: 'An explorable world built with Runek.',
+  },
+  {
+    name: 'One Piece World',
+    url: 'https://onepiece.anirudha.dev',
+    domain: 'onepiece.anirudha.dev',
+    slug: 'onepiece',
+    description: 'A One Piece-inspired world you can walk and sail, explored island by island.',
+  },
+]
+
+// Auto-detect an optional screenshot dropped into public/showcase/<slug>.<ext>;
+// fall back to a gradient when none is present. Checked at build time (cwd = apps/docs).
+const exts = ['webp', 'avif', 'png', 'jpg', 'jpeg', 'gif']
+const shotFor = (slug: string): string | null => {
+  for (const ext of exts) {
+    if (existsSync(join(process.cwd(), 'public', 'showcase', `${slug}.${ext}`))) {
+      return `/showcase/${slug}.${ext}`
+    }
+  }
+  return null
+}
+const cards = worlds.map((w) => ({ ...w, shot: shotFor(w.slug) }))
+---
+
+<BaseLayout
+  title="Showcase — Runek"
+  description="Open worlds built with Runek — explore them live."
+>
+  <main class="showcase">
+    <header class="showcase-head">
+      <p class="eyebrow">Showcase</p>
+      <h1>Worlds built with Runek</h1>
+      <p class="summary">
+        Open, explorable worlds made with Runek components. Built one? <a href="https://github.com/nullorder/runek">Open a PR</a> to add it here.
+      </p>
+    </header>
+
+    <div class="world-grid">
+      {
+        cards.map((w) => (
+          <a class="world-card" href={w.url} target="_blank" rel="noopener noreferrer">
+            <div
+              class="world-shot"
+              style={w.shot ? `background-image: url('${w.shot}')` : undefined}
+            >
+              {!w.shot && <span class="world-shot__name">{w.name}</span>}
+            </div>
+            <div class="world-meta">
+              <h2>{w.name}</h2>
+              <p class="world-domain">{w.domain}</p>
+              <p class="world-desc">{w.description}</p>
+              <span class="world-visit">Visit world →</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </main>
+</BaseLayout>

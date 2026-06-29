@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add well
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.1`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.4`.
 
 ## Use it
 
@@ -45,4 +45,4 @@ export interface WellProps {
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add well</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/well)**.
+Browse the whole catalog in the **[gallery →](/gallery)**.

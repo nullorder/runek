@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content'
+import ComponentPreview from '../../components/gallery/ComponentPreview.tsx'
 import DocLayout from '../../layouts/DocLayout.astro'
 
 export async function getStaticPaths() {
@@ -9,6 +10,8 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props
 const { Content } = await render(entry)
+// Component docs carry a live, slowly rotating preview of the real component.
+const isComponent = entry.data.category === 'component' && Boolean(entry.data.component)
 ---
 
 <DocLayout
@@ -17,5 +20,12 @@ const { Content } = await render(entry)
   eyebrow={entry.data.category}
   slug={entry.id}
 >
+  {
+    isComponent && (
+      <div class="doc-preview" data-pagefind-ignore>
+        <ComponentPreview client:visible title={entry.data.title} />
+      </div>
+    )
+  }
   <Content />
 </DocLayout>

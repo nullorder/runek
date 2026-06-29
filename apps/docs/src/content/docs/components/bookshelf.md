@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add bookshelf
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.1`, `three@^0.184.0`.
+Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.4`, `three@^0.184.0`.
 
 ## Use it
 
@@ -64,4 +64,4 @@ export interface BookshelfProps {
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add bookshelf</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/bookshelf)**.
+Browse the whole catalog in the **[gallery →](/gallery)**.

@@ -92,9 +92,7 @@ const manifest = `{
         </h1>
         <p class="rune">worlds, one rune at a time</p>
         <p class="tagline">
-          A source registry of <b>procedural 3D components</b> for React Three Fiber.
-          Every artifact generates its own geometry from props and a seed — no models,
-          no textures, no CDN. Pull the source. Own the world.
+          A source registry of <b>procedural 3D components</b> for React Three Fiber. Every artifact generates its own geometry from props and a seed — no models, no textures, no CDN. Pull the source. Own the world.
         </p>
         <div class="cta">
           <a class="btn primary" href="/library">Enter the library →</a>
@@ -201,9 +199,7 @@ const manifest = `{
         <p class="eyebrow">worlds as data</p>
         <h2>A world is a file</h2>
         <p>
-          Because every component is deterministic, a whole walkable world serializes to plain
-          JSON — palette, fog, and all. Diff it, fork it, review it in a pull request, hand it
-          to an agent.
+          Because every component is deterministic, a whole walkable world serializes to plain JSON — palette, fog, and all. Diff it, fork it, review it in a pull request, hand it to an agent.
         </p>
         <p class="manifest-links">
           <a href="/docs/worlds-as-data">Read the spec →</a>
@@ -218,20 +214,13 @@ const manifest = `{
     <section class="index">
       <p class="eyebrow">registry index</p>
       <h2>{components.length} artifacts · {categories.length} wings</h2>
-      <div class="index-grid">
-        {categories.map((category) => (
-          <div class="wing">
-            <h3>{category}</h3>
-            <ul>
-              {components
-                .filter((c) => c.category === category)
-                .map((c) => (
-                  <li><a href={`/gallery/${c.name}`}>{c.title}</a></li>
-                ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      <p class="index-lede">
+        Every artifact is procedural, seeded, and asset-free. Browse them all in the gallery, spin each one in 3D, and copy its source.
+      </p>
+      <ul class="index-wings">
+        {categories.map((category) => <li>{category}</li>)}
+      </ul>
+      <a class="btn primary" href="/gallery">Browse the gallery →</a>
     </section>
 
     <!-- ::: closing band ::: -->
@@ -444,7 +433,6 @@ const manifest = `{
   .tagline {
     color: var(--muted);
     font-size: 1.08rem;
-    max-width: 46ch;
     margin: 1rem 0 0;
     animation: fadeup 0.6s ease 0.95s both;
   }
@@ -715,51 +703,30 @@ const manifest = `{
     margin: 0 auto;
     padding: 1rem 1.5rem 4rem;
   }
-  .index-grid {
-    margin-top: 1.6rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 1rem;
+  .index-lede {
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 0 0 1.6rem;
   }
-  .wing {
+  .index-wings {
+    list-style: none;
+    margin: 0 0 2rem;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .index-wings li {
     border: 1px solid var(--border);
     border-left: 2px solid var(--green-line);
-    border-radius: 0 10px 10px 0;
+    border-radius: 0 6px 6px 0;
     background: var(--bg-soft);
-    padding: 0.9rem 1rem 1rem;
-  }
-  .wing h3 {
-    margin: 0 0 0.5rem;
+    padding: 0.3rem 0.7rem;
     font-family: var(--mono);
-    font-weight: 600;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--blue);
-  }
-  .wing ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .wing a {
-    display: block;
-    padding: 0.13rem 0;
-    color: var(--muted);
-    font-size: 0.88rem;
-  }
-  .wing a:hover {
-    color: var(--green);
-    text-decoration: none;
-  }
-  .wing a::before {
-    content: "▸ ";
-    color: var(--green);
-    opacity: 0;
-    transition: opacity 0.1s ease;
-  }
-  .wing a:hover::before {
-    opacity: 1;
   }
 
   /* ── closing band ───────────────────────────────────── */
@@ -843,9 +810,6 @@ const manifest = `{
     }
     .spec {
       padding: 1.2rem 1.1rem 1.3rem;
-    }
-    .index-grid {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     }
     .band {
       padding: 3.2rem 1.1rem 3.6rem;

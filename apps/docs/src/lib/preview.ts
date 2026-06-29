@@ -7,6 +7,8 @@ export type PreviewConfig = {
   target?: [number, number, number]
   /** Extra props passed to the component (merged over `{ seed }`). */
   props?: Record<string, unknown>
+  /** Canvas background override — a contrasting backdrop for dark/low-contrast components. */
+  background?: string
   /** Non-visual system component — show a note instead of a canvas. */
   skip?: boolean
   note?: string
@@ -71,15 +73,18 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   Crate: { camera: [2.2, 2, 2.6], target: [0, 0.4, 0] },
   Barrel: { camera: [2, 1.7, 2.4], target: [0, 0.45, 0] },
   Plant: { camera: [1.8, 1.5, 2.2], target: [0, 0.5, 0] },
+  Windmill: { camera: [7, 6, 13], target: [0, 5.5, 0] },
+  Portal: { camera: [3.5, 2.6, 7.5], target: [0, 2.4, 0] },
   Clouds: {
-    camera: [0, 3, 11],
+    camera: [0, 3, 14],
     target: [0, 3, 0],
-    props: { height: 3, area: [12, 6], count: 4, drift: 0 },
+    props: { height: 3, area: [5, 2.5], count: 3, drift: 0 },
   },
   Campfire: { camera: [2.2, 1.8, 2.6], target: [0, 0.5, 0] },
   Birds: {
     camera: [0, 3.5, 11],
     target: [0, 3.5, 0],
+    background: '#8ea6c8',
     props: { count: 8, area: 5, height: 3.5, speed: 1.5 },
   },
 }

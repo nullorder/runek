@@ -5,8 +5,7 @@ category: guide
 order: 10
 ---
 
-Runek ships as a source registry. The `runek` CLI copies editable component source
-into your project and installs what it needs.
+Runek ships as a source registry. The `runek` CLI copies editable component source into your project and installs what it needs.
 
 ## Install components
 
@@ -16,14 +15,11 @@ npx @runek/cli add player terrain bookshelf  # pulls source + installs deps
 npx @runek/cli list                          # browse the catalog
 ```
 
-`add` resolves dependencies for you: it installs `@runek/core` (the `<World>`
-provider, seeded `rng`, and contract types) from npm, and `house` pulls the walls,
-floor, roof, door, and window it composes from as source.
+`add` resolves dependencies for you: it installs `@runek/core` (the `<World>` provider, seeded `rng`, and contract types) from npm, and `house` pulls the walls, floor, roof, door, and window it composes from as source.
 
 ## Compose a world
 
-The CLI copies components into `src/runek/` by default; they import the runtime
-from `@runek/core`, which it installs for you:
+The CLI copies components into `src/runek/` by default; they import the runtime from `@runek/core`, which it installs for you:
 
 ```tsx
 import { World } from '@runek/core'
@@ -42,11 +38,8 @@ export function FirstWorld() {
 }
 ```
 
-`<World>` sets up the canvas, lighting, physics, and keyboard controls. `<Player>`
-is a first-person controller by default — drop in and walk.
+`<World>` sets up the canvas, lighting, physics, and keyboard controls. `<Player>` is a first-person controller by default — drop in and walk.
 
 ## Same seed, same world
 
-Geometry is a pure function of props and `seed`. The same `seed` produces the same
-bookshelf — the same books, the same arrangement — on every machine, every render.
-Change the seed to roll a new variation; commit the number to lock it forever.
+Geometry is a pure function of props and `seed`. The same `seed` produces the same bookshelf — the same books, the same arrangement — on every machine, every render. Change the seed to roll a new variation; commit the number to lock it forever.

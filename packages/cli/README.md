@@ -2,11 +2,7 @@
 
 **Procedural 3D components for React Three Fiber — pull the source, own the world.**
 
-[Runek](https://runek.nullorder.org) is a source registry of procedural,
-seeded R3F components ("shadcn for 3D worlds"). Every component — a
-bookshelf, a lake, a whole house — generates its geometry from props and a
-`seed`. No models, no textures, no CDN. This CLI copies editable component
-**source** into your project; you own the files.
+[Runek](https://runek.nullorder.org) is a source registry of procedural, seeded R3F components ("shadcn for 3D worlds"). Every component — a bookshelf, a lake, a whole house — generates its geometry from props and a `seed`. No models, no textures, no CDN. This CLI copies editable component **source** into your project; you own the files.
 
 ## Usage
 
@@ -16,9 +12,7 @@ npx @runek/cli add player terrain bookshelf  # pull source + deps into your proj
 npx @runek/cli list                          # browse the catalog
 ```
 
-`add` resolves registry dependencies recursively (every component pulls
-`core`), rewrites the `@runek/core` import to your local copy, and installs
-the npm packages the components need via your detected package manager.
+`add` resolves registry dependencies recursively (every component pulls `core`), rewrites the `@runek/core` import to your local copy, and installs the npm packages the components need via your detected package manager.
 
 Then compose a world:
 
@@ -52,9 +46,6 @@ Same `seed` → same world, every time.
 
 ## Links
 
-[Docs](https://runek.nullorder.org/docs) ·
-[Component gallery](https://runek.nullorder.org/gallery) ·
-[Walk the library](https://runek.nullorder.org/library) ·
-[GitHub](https://github.com/nullorder/runek)
+[Docs](https://runek.nullorder.org/docs) · [Component gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library) · [GitHub](https://github.com/nullorder/runek)
 
 MIT © nullorder

@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A meandering ribbon trail from seeded waypoints; decorative, laid just over the ground.",
   "dependencies": [
-    "@runek/core@^0.10.2",
+    "@runek/core@^0.10.4",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

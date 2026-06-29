@@ -1,6 +1,6 @@
 {
   "name": "@runek/cli",
-  "version": "0.10.2",
+  "version": "0.10.4",
   "publishConfig": {
     "access": "public"
   },

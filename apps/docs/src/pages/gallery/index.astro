@@ -28,8 +28,7 @@ const groups = order
       <p class="eyebrow">Gallery</p>
       <h1>Every component, live</h1>
       <p class="summary">
-        Each preview is the real component, generated from a seed — drag to orbit. Open one for
-        its props, dependencies, and source.
+        Each preview is the real component, generated from a seed — drag to orbit. Open one for its props, install, and source.
       </p>
     </header>
 
@@ -42,7 +41,7 @@ const groups = order
               <div class="card">
                 <ComponentPreview client:visible title={item.title} />
                 <div class="card-meta">
-                  <a class="card-title" href={`/gallery/${item.name}`}>
+                  <a class="card-title" href={`/docs/components/${item.name}`}>
                     {item.title}
                   </a>
                   <p>{item.description}</p>

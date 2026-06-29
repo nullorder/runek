@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add player
 ```
 
-Pulls `@runek/core@^0.10.1`, `ecctrl@^1.0.97`.
+Pulls `@runek/core@^0.10.4`, `ecctrl@^1.0.97`.
 
 ## Use it
 
@@ -43,4 +43,4 @@ export interface PlayerProps {
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add player</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/player)**.
+Browse the whole catalog in the **[gallery →](/gallery)**.

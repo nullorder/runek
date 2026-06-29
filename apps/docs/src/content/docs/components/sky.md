@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sky
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@runek/core@^0.10.1`.
+Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@runek/core@^0.10.4`.
 
 ## Use it
 
@@ -44,4 +44,4 @@ export interface SkyProps {
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add sky</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/sky)**.
+Browse the whole catalog in the **[gallery →](/gallery)**.

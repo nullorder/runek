@@ -5,9 +5,7 @@ category: guide
 order: 20
 ---
 
-Every component is a deterministic function of its props, so an entire scene can be
-described as **data** — a list of `{ type, props }` — then rendered, saved, diffed,
-and edited like any file.
+Every component is a deterministic function of its props, so an entire scene can be described as **data** — a list of `{ type, props }` — then rendered, saved, diffed, and edited like any file.
 
 ## The shape
 
@@ -49,15 +47,11 @@ A small world:
 }
 ```
 
-The look of a world is data too: `palette` re-themes every component at once and
-`fog` sets the atmosphere — both diff as cleanly as any node.
+The look of a world is data too: `palette` re-themes every component at once and `fog` sets the atmosphere — both diff as cleanly as any node.
 
 ## World settings (the rules)
 
-A handful of top-level fields are the world's **rules**: values components read
-through `useWorld()` to decide how the world looks and plays, not geometry. They
-resolve onto the world context the same way `unit`, `gravity`, and `palette` do —
-set once on the world, read everywhere.
+A handful of top-level fields are the world's **rules**: values components read through `useWorld()` to decide how the world looks and plays, not geometry. They resolve onto the world context the same way `unit`, `gravity`, and `palette` do — set once on the world, read everywhere.
 
 ```json
 {
@@ -68,29 +62,12 @@ set once on the world, read everywhere.
 }
 ```
 
-- **`time`** pins a fixed time-of-day (`"HH:MM"`, 24-hour), so the world is fully
-  reproducible: the same file lights the same way every time. **`timezone`** (an IANA
-  zone like `"Asia/Kolkata"`) makes the world *live* instead — the day/night state
-  tracks the real clock, an explicit exception to determinism. A pin wins if both are
-  set. Day/night-aware components read the resolved value as `useWorld().time`: `Sky`
-  arcs the sun overhead by day and swaps to a dark, starlit dome at night, and
-  `LightRig` follows it with golden-hour tints and dim moonlight.
-- **`avatar`** (`"first"` or `"third"`) is the default camera view. `Player` uses it
-  unless its own `view` prop is set — an explicit prop always wins.
-- **`ground`** is the baseline ground level (a `Y` value, default `0`): the datum that
-  `Floor` and water like `Lake` default their placement to. In a coastal world it is
-  effectively your **sea level**, the terrain rises from it and the water sits at it,
-  so moving `ground` shifts a whole world's datum at once (a sunken basin, a plateau).
-  Open water sits at or below it (a floating lake is a bug); an explicit `position`
-  still wins.
-- **`fonts`** are the typefaces the world ships, keyed by role (`display` for
-  titles and signage, `body` for labels). They are the one exception to the
-  no-assets moat: components hold no fonts, so the world declares them and `Sign`
-  draws from them. An undeclared role falls back to the pixel font bundled in
-  `@runek/core`, so `Sign` always renders even with no `fonts` set.
+- **`time`** pins a fixed time-of-day (`"HH:MM"`, 24-hour), so the world is fully reproducible: the same file lights the same way every time. **`timezone`** (an IANA zone like `"Asia/Kolkata"`) makes the world *live* instead — the day/night state tracks the real clock, an explicit exception to determinism. A pin wins if both are set. Day/night-aware components read the resolved value as `useWorld().time`: `Sky` arcs the sun overhead by day and swaps to a dark, starlit dome at night, and `LightRig` follows it with golden-hour tints and dim moonlight.
+- **`avatar`** (`"first"` or `"third"`) is the default camera view. `Player` uses it unless its own `view` prop is set — an explicit prop always wins.
+- **`ground`** is the baseline ground level (a `Y` value, default `0`): the datum that `Floor` and water like `Lake` default their placement to. In a coastal world it is effectively your **sea level**, the terrain rises from it and the water sits at it, so moving `ground` shifts a whole world's datum at once (a sunken basin, a plateau). Open water sits at or below it (a floating lake is a bug); an explicit `position` still wins.
+- **`fonts`** are the typefaces the world ships, keyed by role (`display` for titles and signage, `body` for labels). They are the one exception to the no-assets moat: components hold no fonts, so the world declares them and `Sign` draws from them. An undeclared role falls back to the pixel font bundled in `@runek/core`, so `Sign` always renders even with no `fonts` set.
 
-Every setting is optional with a sensible default (a bright midday, first-person), so
-a world that declares none renders exactly as before.
+Every setting is optional with a sensible default (a bright midday, first-person), so a world that declares none renders exactly as before.
 
 ## Render it
 
@@ -107,14 +84,11 @@ const world = parseWorld(await (await fetch('/my.world.json')).text())
 
 ## Save it
 
-`serializeWorld(data)` returns pretty JSON. The runtime editor
-(`<WorldEditor>`) edits a `WorldData` live and exports it with the same call,
-so a world round-trips: render, edit, serialize, commit.
+`serializeWorld(data)` returns pretty JSON. The runtime editor (`<WorldEditor>`) edits a `WorldData` live and exports it with the same call, so a world round-trips: render, edit, serialize, commit.
 
 ## Identity & contribution
 
-A world is a creative work, so its identity travels *in the file* under `meta`
-(the way `package.json` carries a package's name, author, and `repository`):
+A world is a creative work, so its identity travels *in the file* under `meta` (the way `package.json` carries a package's name, author, and `repository`):
 
 ```ts
 interface WorldMeta {
@@ -126,21 +100,10 @@ interface WorldMeta {
 }
 ```
 
-`meta` is optional, and so is every field within it. When present, both
-`<WorldRenderer>` (walk) and `<WorldEditor>` (edit) show a small **ⓘ** that opens an
-"About this world" panel with the title, authors, license, and a link to the source
-repo. A world with no `meta` still renders.
+`meta` is optional, and so is every field within it. When present, both `<WorldRenderer>` (walk) and `<WorldEditor>` (edit) show a small **ⓘ** that opens an "About this world" panel with the title, authors, license, and a link to the source repo. A world with no `meta` still renders.
 
-When `meta.source` points at a GitHub repo, the editor also gains a **Contribute**
-action with two paths. *Fork this world* opens GitHub's fork page for your own
-deployable copy. *Suggest changes upstream* downloads the edited JSON plus a PNG
-snapshot of the view and opens GitHub's edit-file URL, which auto-forks for
-non-collaborators, so your change becomes a normal pull request with no backend,
-account, or token. Non-GitHub hosts fall back to opening the repo.
+When `meta.source` points at a GitHub repo, the editor also gains a **Contribute** action with two paths. *Fork this world* opens GitHub's fork page for your own deployable copy. *Suggest changes upstream* downloads the edited JSON plus a PNG snapshot of the view and opens GitHub's edit-file URL, which auto-forks for non-collaborators, so your change becomes a normal pull request with no backend, account, or token. Non-GitHub hosts fall back to opening the repo.
 
 ## Stable node ids
 
-Each `WorldNode` can carry an optional `id`. You don't write these by hand: the editor
-assigns one to any node missing it on load and preserves the rest. Ids give nodes a
-durable identity across edits, and `serializeWorld` writes keys in a canonical order,
-so a pull request shows only what actually changed.
+Each `WorldNode` can carry an optional `id`. You don't write these by hand: the editor assigns one to any node missing it on load and preserves the rest. Ids give nodes a durable identity across edits, and `serializeWorld` writes keys in a canonical order, so a pull request shows only what actually changed.

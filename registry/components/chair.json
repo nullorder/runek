@@ -5,7 +5,7 @@
   "description": "Chair with seat, back, and legs.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.2"
+    "@runek/core@^0.10.4"
   ],
   "registryDependencies": [],
   "files": [

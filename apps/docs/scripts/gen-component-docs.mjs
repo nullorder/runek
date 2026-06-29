@@ -60,7 +60,7 @@ ${propsMatch ? `\n## Props\n\n\`\`\`ts\n${propsMatch[0]}\n\`\`\`\n` : ''}
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add ${item.name}</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/${item.name})**.
+Browse the whole catalog in the **[gallery →](/gallery)**.
 `
 
   writeFileSync(join(outDir, `${item.name}.md`), body)

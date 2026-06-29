@@ -148,6 +148,9 @@ h1,
   display: block;
   transition: transform 0.25s ease;
 }
+.site-nav .brand:hover {
+  text-decoration: none;
+}
 .site-nav .brand:hover img {
   transform: rotate(-8deg) scale(1.08);
 }
@@ -281,6 +284,7 @@ h1,
 
 /* Prev/next pager at the foot of a doc */
 .doc-pager {
+  clear: both;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
@@ -315,11 +319,6 @@ h1,
   content: "// ";
   color: var(--green);
   font-family: var(--mono);
-}
-.back {
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  color: var(--muted);
 }
 .explore-3d {
   font-family: var(--mono);
@@ -457,7 +456,6 @@ pre.astro-code code {
   color: var(--green);
 }
 .gallery-head .summary {
-  max-width: 62ch;
   margin: 0;
 }
 .gallery-section {
@@ -552,66 +550,127 @@ pre.astro-code code {
   line-height: 1.5;
 }
 
-/* Gallery detail */
-.detail {
-  max-width: 820px;
+/* Showcase — open worlds built with Runek */
+.showcase {
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 5rem;
+  padding: 3rem 1.5rem 5rem;
 }
-.detail h1 {
-  font-size: clamp(1.7rem, 5vw, 2.4rem);
-  margin: 0.4rem 0 0.5rem;
+.showcase-head {
+  margin-bottom: 2.2rem;
+}
+.showcase-head h1 {
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
   color: var(--green);
+  margin: 0.3rem 0 0.6rem;
 }
-.detail h2 {
-  margin-top: 2.5rem;
-  border-top: 1px solid var(--border);
-  padding-top: 1.4rem;
-  font-size: 1.2rem;
+.showcase-head .summary {
+  color: var(--muted);
+  line-height: 1.6;
 }
-.detail h2::before {
-  content: "// ";
-  color: var(--green);
-  font-family: var(--mono);
+.world-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.6rem;
 }
-.detail .summary {
-  margin-top: 0;
+@media (max-width: 640px) {
+  .world-grid {
+    grid-template-columns: 1fr;
+  }
 }
-.detail-links {
+.world-card {
   display: flex;
-  gap: 1rem;
-  font-family: var(--mono);
-  font-size: 0.85rem;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--panel);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
-.detail-preview {
-  height: clamp(300px, 55vw, 440px);
-  margin-top: 1.5rem;
+.world-card:hover {
+  border-color: var(--green-line);
+  box-shadow: 0 0 30px var(--green-soft);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+.world-shot {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(120% 120% at 18% 0%, var(--green-soft), transparent 55%),
+    linear-gradient(135deg, #0f1b22, #0b0f17 60%, #131022);
+  background-size: cover;
+  background-position: center;
+}
+.world-shot__name {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  letter-spacing: 0.08em;
+  color: var(--green);
+  text-shadow: 0 0 24px var(--green-soft);
+  opacity: 0.9;
+}
+.world-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem 1.2rem;
+}
+.world-meta h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.world-domain {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--blue);
+}
+.world-desc {
+  margin: 0.2rem 0 0.7rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.world-visit {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--green);
+}
+
+/* Live component preview, floated to the right of a component doc's text */
+.doc-preview {
+  float: right;
+  width: 40%;
+  max-width: 40%;
+  height: clamp(220px, 26vw, 340px);
+  margin: 0.4rem 0 1.4rem 1.8rem;
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   background: #05080d;
 }
-.detail-preview .preview {
+.doc-preview .preview {
   height: 100%;
   border-bottom: none;
 }
-.detail .deps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  align-items: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-.detail .deps code {
-  color: var(--blue);
-}
-.detail details summary {
-  cursor: pointer;
-  font-family: var(--mono);
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 0.7rem;
+@media (max-width: 640px) {
+  .doc-preview {
+    float: none;
+    width: auto;
+    max-width: none;
+    margin: 1.2rem 0 1.6rem;
+  }
 }
 
 /* Footer */

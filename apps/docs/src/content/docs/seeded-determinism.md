@@ -5,9 +5,7 @@ category: guide
 order: 16
 ---
 
-Procedural variety in Runek is **deterministic**: a component's randomness comes
-from a single `seed`, so the same seed always produces the same result. Commit the
-number and the world is locked forever; change it to roll a new variation.
+Procedural variety in Runek is **deterministic**: a component's randomness comes from a single `seed`, so the same seed always produces the same result. Commit the number and the world is locked forever; change it to roll a new variation.
 
 ## The RNG
 
@@ -34,9 +32,7 @@ pick(next, ['oak', 'pine'])  // a stable choice from a list
 
 ## Stable child seeds
 
-When a component composes others (a `House` placing `Window`s), derive child seeds
-with `sub(seed, n)` so each child is deterministic *and* distinct — without
-threading the same stream through everything:
+When a component composes others (a `House` placing `Window`s), derive child seeds with `sub(seed, n)` so each child is deterministic *and* distinct — without threading the same stream through everything:
 
 ```tsx
 import { sub } from '@runek/core'

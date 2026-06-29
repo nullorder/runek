@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add path
 ```
 
-Pulls `@runek/core@^0.10.1`, `three@^0.184.0`.
+Pulls `@runek/core@^0.10.4`, `three@^0.184.0`.
 
 ## Use it
 
@@ -48,4 +48,4 @@ export interface PathProps {
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add path</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/path)**.
+Browse the whole catalog in the **[gallery →](/gallery)**.

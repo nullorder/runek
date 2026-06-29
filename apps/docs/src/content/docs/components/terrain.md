@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add terrain
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.1`, `three@^0.184.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.4`, `three@^0.184.0`.
 
 ## Use it
 
@@ -60,4 +60,4 @@ export interface TerrainProps {
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add terrain</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/terrain)**.
+Browse the whole catalog in the **[gallery →](/gallery)**.

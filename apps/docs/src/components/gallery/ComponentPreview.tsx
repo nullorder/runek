@@ -50,7 +50,7 @@ export default function ComponentPreview({ title, detail = false }: Props) {
     <div ref={ref} className="preview">
       {inView && (
         <Canvas shadows dpr={[1, 1.5]} camera={{ position: cfg.camera ?? DEFAULT_CAMERA, fov: 50 }}>
-          <color attach="background" args={['#0e1117']} />
+          <color attach="background" args={[cfg.background ?? '#0e1117']} />
           <WorldContext.Provider
             value={{
               unit: 1,

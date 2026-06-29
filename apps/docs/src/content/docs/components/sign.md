@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sign
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.10.1`.
+Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.10.4`.
 
 ## Use it
 
@@ -61,4 +61,4 @@ export interface SignProps {
 <span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add sign</code> fetches.</span>
 </a>
 
-See it live with editable props in the **[gallery →](/gallery/sign)**.
+Browse the whole catalog in the **[gallery →](/gallery)**.
