@@ -22,7 +22,8 @@ for (const item of components) {
     readFileSync(join(registryDir, 'components', `${item.name}.json`), 'utf8'),
   )
   const source = manifest.files[0]?.content ?? ''
-  const propsMatch = source.match(/export interface \w*Props \{[\s\S]*?\n\}/)
+  // Match with or without an `extends` clause between the name and the brace.
+  const propsMatch = source.match(/export interface \w*Props[^{]*\{[\s\S]*?\n\}/)
   const hasSeed = /\bseed\b/.test(propsMatch?.[0] ?? '')
   const deps = [...manifest.registryDependencies, ...manifest.dependencies]
 

@@ -1,0 +1,17 @@
+{
+  "name": "road",
+  "title": "Road",
+  "type": "registry:component",
+  "description": "A paved street: a flat stone deck with low kerbs, draped on the ground like Path; decorative (no collider).",
+  "dependencies": [
+    "@runek/core@^0.10.4"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Road.tsx",
+      "content": "import { useWorld, type WorldComponentProps } from '@runek/core'\n\nexport interface RoadProps extends WorldComponentProps {\n  /** Length along local Z, in units. */\n  length?: number\n  /** Width along local X, in units. */\n  width?: number\n  /** Deck color; defaults to the palette's `stone`. */\n  color?: string\n  /** Kerb color; defaults to the palette's `woodDark`. */\n  kerbColor?: string\n}\n\n/**\n * A paved street: a flat stone deck with low kerbs along both edges, laid in the XZ plane and\n * draped just above the ground. Straight along local Z. Decorative, like `Path` — it owns no\n * collider; you walk the terrain beneath it. For a meandering dirt trail, use `Path`.\n */\nexport function Road({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  length = 12,\n  width = 3,\n  color,\n  kerbColor,\n}: RoadProps) {\n  const { unit, palette } = useWorld()\n  const deck = color ?? palette.stone\n  const kerb = kerbColor ?? palette.woodDark\n  const L = length * unit\n  const W = width * unit\n  const kerbW = 0.18 * unit\n  const kerbH = 0.12 * unit\n  const edge = W / 2 - kerbW / 2\n\n  return (\n    <group position={[position[0], position[1] + 0.03 * unit, position[2]]} rotation={rotation}>\n      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>\n        <planeGeometry args={[W, L]} />\n        <meshStandardMaterial color={deck} roughness={1} />\n      </mesh>\n      <mesh receiveShadow castShadow position={[edge, kerbH / 2, 0]}>\n        <boxGeometry args={[kerbW, kerbH, L]} />\n        <meshStandardMaterial color={kerb} roughness={1} />\n      </mesh>\n      <mesh receiveShadow castShadow position={[-edge, kerbH / 2, 0]}>\n        <boxGeometry args={[kerbW, kerbH, L]} />\n        <meshStandardMaterial color={kerb} roughness={1} />\n      </mesh>\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

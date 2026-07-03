@@ -1,0 +1,19 @@
+{
+  "name": "cliff",
+  "title": "Cliff",
+  "type": "registry:component",
+  "description": "A rocky promontory: a low-poly, seed-jittered truncated cone with a flattish plateau and a convex-hull collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.10.4",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Cliff.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { useWorld, type WorldComponentProps } from '@runek/core'\nimport { useEffect, useMemo } from 'react'\nimport { CylinderGeometry } from 'three'\n\nexport interface CliffProps extends WorldComponentProps {\n  /** Base radius at the waterline, in units. */\n  radius?: number\n  /** Plateau (top) radius, in units. */\n  topRadius?: number\n  /** Height from the base to the plateau, in units. */\n  height?: number\n  /** Radial facets — fewer reads as blockier rock. */\n  segments?: number\n  /** Surface jitter, as a fraction of a facet. */\n  rough?: number\n  /** Rock color; defaults to the palette's `stone`. */\n  color?: string\n}\n\n/**\n * A rocky promontory: a low-poly truncated cone, vertex-jittered by `seed`, rising from the\n * waterline to a flattish plateau you can stand on. A convex-hull collider blocks the steep sides\n * and carries the top. Sink the base below the water in placement so it reads as rising from the\n * sea. (Convex — true overhangs aren't modelled.)\n */\nexport function Cliff({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  seed = 1,\n  radius = 10,\n  topRadius = 6,\n  height = 12,\n  segments = 8,\n  rough = 0.35,\n  color,\n}: CliffProps) {\n  const { unit, palette } = useWorld()\n  const rock = color ?? palette.stone\n  const R = radius * unit\n  const Rt = topRadius * unit\n  const Hgt = height * unit\n\n  const geometry = useMemo(() => {\n    const g = new CylinderGeometry(Rt, R, Hgt, segments, 3, false)\n    g.translate(0, Hgt / 2, 0) // base at local y=0\n    const amp = rough * (R / segments)\n    // Jitter keyed on vertex position (not draw order): the cylinder's cap and wall duplicate\n    // vertices at the same location, and independent offsets would tear cracks between them.\n    const jitter = (x: number, y: number, z: number, k: number) => {\n      let h =\n        (seed ^\n          Math.imul(Math.round(x * 64), 374761393) ^\n          Math.imul(Math.round(y * 64), 668265263) ^\n          Math.imul(Math.round(z * 64), 1274126177) ^\n          Math.imul(k + 1, 2246822519)) >>>\n        0\n      h = Math.imul(h ^ (h >>> 13), 1274126177)\n      return (((h ^ (h >>> 16)) >>> 0) / 4294967296) * 2 - 1\n    }\n    const pos = g.attributes.position\n    for (let i = 0; i < pos.count; i++) {\n      const x = pos.getX(i)\n      const y = pos.getY(i)\n      const z = pos.getZ(i)\n      const top = y > Hgt - 0.01 // keep the plateau roughly flat for standing\n      pos.setX(i, x + jitter(x, y, z, 0) * amp)\n      pos.setZ(i, z + jitter(x, y, z, 1) * amp)\n      pos.setY(i, y + jitter(x, y, z, 2) * amp * (top ? 0.1 : 0.5))\n    }\n    pos.needsUpdate = true\n    g.computeVertexNormals()\n    return g\n  }, [R, Rt, Hgt, segments, rough, seed])\n\n  useEffect(() => () => geometry.dispose(), [geometry])\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"hull\" position={position} rotation={rotation}>\n      <mesh geometry={geometry} castShadow receiveShadow>\n        <meshStandardMaterial color={rock} roughness={1} flatShading />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

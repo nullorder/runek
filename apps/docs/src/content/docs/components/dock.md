@@ -22,6 +22,21 @@ import { Dock } from './runek/Dock'
 <Dock position={[0, 0, 0]} />
 ```
 
+## Props
+
+```ts
+export interface DockProps extends WorldComponentProps {
+  /** How far the jetty reaches out from the shore (local +Z), in units. */
+  length?: number
+  /** Walkway width (local X), in units. */
+  width?: number
+  /** How deep the pilings sink below the deck surface, in units. */
+  depth?: number
+  /** Deck color; defaults to the world palette's `wood`. */
+  color?: string
+}
+```
+
 ## Registry manifest
 
 <a class="manifest-card" href="https://runek.nullorder.org/r/components/dock.json">

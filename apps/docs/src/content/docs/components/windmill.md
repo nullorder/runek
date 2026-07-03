@@ -22,6 +22,25 @@ import { Windmill } from './runek/Windmill'
 <Windmill position={[0, 0, 0]} />
 ```
 
+## Props
+
+```ts
+export interface WindmillProps extends WorldComponentProps {
+  /** Tower height, in units. */
+  height?: number
+  /** Tower base radius, in units. */
+  radius?: number
+  /** Sail (blade) length, in units. */
+  sailLength?: number
+  /** Sail rotation speed, in radians per second. */
+  sailSpeed?: number
+  /** Tower color (defaults to the world palette's `wall`). */
+  color?: string
+  /** Cap, door, and sail-frame color (defaults to the world palette's `wood`). */
+  trimColor?: string
+}
+```
+
 ## Registry manifest
 
 <a class="manifest-card" href="https://runek.nullorder.org/r/components/windmill.json">

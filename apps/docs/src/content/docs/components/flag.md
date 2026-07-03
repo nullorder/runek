@@ -22,6 +22,27 @@ import { Flag } from './runek/Flag'
 <Flag position={[0, 0, 0]} />
 ```
 
+## Props
+
+```ts
+export interface FlagProps extends WorldComponentProps {
+  /** Pole height, in units. */
+  poleHeight?: number
+  /** Flag width away from the pole (the fly), in units. */
+  fly?: number
+  /** Flag height (the drop), in units. */
+  drop?: number
+  /** Ripple speed. */
+  waveSpeed?: number
+  /** Ripple depth as a fraction of the fly. */
+  waveAmplitude?: number
+  /** Cloth color; defaults to the world palette's `fabric`. */
+  color?: string
+  /** Pole color; defaults to the palette's `wood`. */
+  poleColor?: string
+}
+```
+
 ## Registry manifest
 
 <a class="manifest-card" href="https://runek.nullorder.org/r/components/flag.json">

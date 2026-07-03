@@ -44,6 +44,14 @@
       "files": [{ "path": "packages/components/src/House.tsx", "target": "House.tsx" }]
     },
     {
+      "name": "hut",
+      "title": "Hut",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A round hut: a post-ribbed wall on a stone base, a framed doorway and window, under a shaggy thatch cone; one cylinder collider.",
+      "files": [{ "path": "packages/components/src/Hut.tsx", "target": "Hut.tsx" }]
+    },
+    {
       "name": "wall",
       "title": "Wall",
       "type": "registry:component",
@@ -92,6 +100,14 @@
       "files": [{ "path": "packages/components/src/Staircase.tsx", "target": "Staircase.tsx" }]
     },
     {
+      "name": "stool",
+      "title": "Stool",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A round bar stool: a disc seat on three splayed legs; a thin cylinder collider.",
+      "files": [{ "path": "packages/components/src/Stool.tsx", "target": "Stool.tsx" }]
+    },
+    {
       "name": "table",
       "title": "Table",
       "type": "registry:component",
@@ -100,12 +116,28 @@
       "files": [{ "path": "packages/components/src/Table.tsx", "target": "Table.tsx" }]
     },
     {
+      "name": "tent",
+      "title": "Tent",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "An A-frame ridge tent: striped wind-rippled fabric, entrance flaps pinned open, guy ropes and stakes; solid sides and back, open front.",
+      "files": [{ "path": "packages/components/src/Tent.tsx", "target": "Tent.tsx" }]
+    },
+    {
       "name": "chair",
       "title": "Chair",
       "type": "registry:component",
       "category": "interiors",
       "description": "Chair with seat, back, and legs.",
       "files": [{ "path": "packages/components/src/Chair.tsx", "target": "Chair.tsx" }]
+    },
+    {
+      "name": "counter",
+      "title": "Counter",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider.",
+      "files": [{ "path": "packages/components/src/Counter.tsx", "target": "Counter.tsx" }]
     },
     {
       "name": "clock",
@@ -202,6 +234,14 @@
       "category": "environment",
       "description": "Faceted rocks with convex-hull colliders (seeded scatter).",
       "files": [{ "path": "packages/components/src/Rocks.tsx", "target": "Rocks.tsx" }]
+    },
+    {
+      "name": "cliff",
+      "title": "Cliff",
+      "type": "registry:component",
+      "category": "terrain",
+      "description": "A rocky promontory: a low-poly, seed-jittered truncated cone with a flattish plateau and a convex-hull collider.",
+      "files": [{ "path": "packages/components/src/Cliff.tsx", "target": "Cliff.tsx" }]
     },
     {
       "name": "sky",
@@ -306,6 +346,14 @@
       "category": "terrain",
       "description": "A meandering ribbon trail from seeded waypoints; decorative, laid just over the ground.",
       "files": [{ "path": "packages/components/src/Path.tsx", "target": "Path.tsx" }]
+    },
+    {
+      "name": "road",
+      "title": "Road",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A paved street: a flat stone deck with low kerbs, draped on the ground like Path; decorative (no collider).",
+      "files": [{ "path": "packages/components/src/Road.tsx", "target": "Road.tsx" }]
     },
     {
       "name": "bush",

@@ -1,0 +1,18 @@
+{
+  "name": "counter",
+  "title": "Counter",
+  "type": "registry:component",
+  "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.10.4"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Counter.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type WorldComponentProps } from '@runek/core'\n\nexport interface CounterProps extends WorldComponentProps {\n  /** Length along local X, in units. */\n  length?: number\n  /** Counter height, in units. */\n  height?: number\n  /** Depth along local Z, in units. */\n  depth?: number\n  /** Body color; defaults to the palette's `wood`. */\n  color?: string\n  /** Worktop color; defaults to the palette's `woodDark`. */\n  topColor?: string\n}\n\n/**\n * A service / bar counter: a solid body under a worktop that overhangs the front (local +Z), where\n * stools tuck in. One cuboid collider — you can't walk through it. Pair with `Stool` and a `Shelf`.\n */\nexport function Counter({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  length = 3,\n  height = 1.1,\n  depth = 0.6,\n  color,\n  topColor,\n}: CounterProps) {\n  const { unit, palette } = useWorld()\n  const body = color ?? palette.wood\n  const top = topColor ?? palette.woodDark\n  const L = length * unit\n  const H = height * unit\n  const D = depth * unit\n  const topT = 0.08 * unit\n  const overhang = 0.14 * unit\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[L / 2, H / 2, D / 2]} position={[0, H / 2, 0]} />\n\n      {/* body */}\n      <mesh position={[0, (H - topT) / 2, 0]} castShadow receiveShadow>\n        <boxGeometry args={[L, H - topT, D]} />\n        <meshStandardMaterial color={body} roughness={0.8} />\n      </mesh>\n\n      {/* worktop, overhanging the front (+Z) for knee room */}\n      <mesh position={[0, H - topT / 2, overhang / 2]} castShadow receiveShadow>\n        <boxGeometry args={[L + 0.06 * unit, topT, D + overhang]} />\n        <meshStandardMaterial color={top} roughness={0.55} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

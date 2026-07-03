@@ -32,6 +32,10 @@ export interface PlayerProps {
   view?: PlayerView
   /** Initial camera yaw in radians (0 faces +z). */
   yaw?: number
+  /** Custom avatar visual, replacing the default capsule. Size it to the capsule
+   *  envelope (~1.3 units tall, centered at the character origin); it is hidden in
+   *  first-person view. In world JSON, nest it as a child node of the Player. */
+  children?: ReactNode
 }
 ```
 

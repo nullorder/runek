@@ -1,0 +1,18 @@
+{
+  "name": "stool",
+  "title": "Stool",
+  "type": "registry:component",
+  "description": "A round bar stool: a disc seat on three splayed legs; a thin cylinder collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.10.4"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Stool.tsx",
+      "content": "import { CylinderCollider, RigidBody } from '@react-three/rapier'\nimport { useWorld, type WorldComponentProps } from '@runek/core'\n\nexport interface StoolProps extends WorldComponentProps {\n  /** Seat height above the ground, in units. */\n  height?: number\n  /** Seat radius, in units. */\n  radius?: number\n  /** Color; defaults to the palette's `wood`. */\n  color?: string\n}\n\nconst LEGS = [0, 1, 2].map((i) => (i / 3) * Math.PI * 2)\n\n/** A round bar stool: a disc seat on three splayed legs. A thin cylinder collider. */\nexport function Stool({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  height = 0.95,\n  radius = 0.24,\n  color,\n}: StoolProps) {\n  const { unit, palette } = useWorld()\n  const wood = color ?? palette.wood\n  const H = height * unit\n  const R = radius * unit\n  const seatT = 0.07 * unit\n  const legR = 0.035 * unit\n  const spread = R * 0.78\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CylinderCollider args={[H / 2, R * 0.6]} position={[0, H / 2, 0]} />\n\n      {/* seat */}\n      <mesh position={[0, H - seatT / 2, 0]} castShadow receiveShadow>\n        <cylinderGeometry args={[R, R, seatT, 16]} />\n        <meshStandardMaterial color={wood} roughness={0.7} />\n      </mesh>\n\n      {/* legs */}\n      {LEGS.map((a) => (\n        <mesh\n          key={`leg-${a.toFixed(3)}`}\n          position={[Math.cos(a) * spread, (H - seatT) / 2, Math.sin(a) * spread]}\n          castShadow\n        >\n          <cylinderGeometry args={[legR, legR, H - seatT, 6]} />\n          <meshStandardMaterial color={wood} roughness={0.8} />\n        </mesh>\n      ))}\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

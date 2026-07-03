@@ -33,6 +33,13 @@ export interface PathProps {
   width?: number
   /** Lateral meander amplitude, in units. */
   meander?: number
+  /** Total height climbed from the near end (local −Z) to the far end (+Z), in units. For a
+   *  trail that gains height as it winds; the ribbon rises linearly along its length. */
+  rise?: number
+  /** Explicit elevation profile, in units: evenly spaced samples from the near end (local −Z)
+   *  to the far end (+Z), linearly interpolated along the ribbon. Overrides `rise`. Author it
+   *  from the terrain the trail crosses so the ribbon hugs the ground it climbs. */
+  heights?: number[]
   /** Defaults to the world palette's `ground` slot. */
   color?: string
   segments?: number

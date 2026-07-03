@@ -22,6 +22,29 @@ import { Signpost } from './runek/Signpost'
 <Signpost position={[0, 0, 0]} />
 ```
 
+## Props
+
+```ts
+export interface SignpostProps extends WorldComponentProps {
+  /**
+   * The name shown on the board. A plain string, **not** `children`: a world renderer overrides a
+   * node's `children` prop with its nested nodes, so text authored in JSON must be a named prop to
+   * survive. Empty by default — `<Signpost />` is a blank board.
+   */
+  name?: string
+  /** Post height, in units. */
+  height?: number
+  /** Board width, in units. */
+  width?: number
+  /** Post + board wood color; defaults to the palette's `wood`. */
+  color?: string
+  /** Name color; defaults to the palette's `sand` (legible on the wood). */
+  textColor?: string
+  /** Name cap height, in units. */
+  size?: number
+}
+```
+
 ## Registry manifest
 
 <a class="manifest-card" href="https://runek.nullorder.org/r/components/signpost.json">

@@ -1,5 +1,6 @@
 import { type AvatarView, useWorld, type Vec3 } from '@runek/core'
 import Ecctrl from 'ecctrl'
+import type { ReactNode } from 'react'
 
 export type PlayerView = AvatarView
 
@@ -10,12 +11,16 @@ export interface PlayerProps {
   view?: PlayerView
   /** Initial camera yaw in radians (0 faces +z). */
   yaw?: number
+  /** Custom avatar visual, replacing the default capsule. Size it to the capsule
+   *  envelope (~1.3 units tall, centered at the character origin); it is hidden in
+   *  first-person view. In world JSON, nest it as a child node of the Player. */
+  children?: ReactNode
 }
 
 const CAPSULE_RADIUS = 0.3
 const CAPSULE_HALF_HEIGHT = 0.35
 
-export function Player({ position = [0, 3, 0], view, yaw = 0 }: PlayerProps) {
+export function Player({ position = [0, 3, 0], view, yaw = 0, children }: PlayerProps) {
   const { avatar } = useWorld()
   const firstPerson = (view ?? avatar ?? 'first') === 'first'
 
@@ -34,10 +39,14 @@ export function Player({ position = [0, 3, 0], view, yaw = 0 }: PlayerProps) {
       camFollowMult={firstPerson ? 1000 : 11}
       camLerpMult={firstPerson ? 1000 : 25}
     >
-      <mesh visible={!firstPerson} castShadow>
-        <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />
-        <meshStandardMaterial color="#4a90d9" />
-      </mesh>
+      <group visible={!firstPerson}>
+        {children ?? (
+          <mesh castShadow>
+            <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />
+            <meshStandardMaterial color="#4a90d9" />
+          </mesh>
+        )}
+      </group>
     </Ecctrl>
   )
 }
