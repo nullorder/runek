@@ -20,6 +20,14 @@
       "files": [{ "path": "packages/components/src/Portal.tsx", "target": "Portal.tsx" }]
     },
     {
+      "name": "compass",
+      "title": "Compass",
+      "type": "registry:component",
+      "category": "systems",
+      "description": "A screen-fixed HUD compass: a glassy dial in a corner of the canvas whose rose card swings with the camera heading, with a fixed lubber line and an optional wind + bearing readout — works with any traversal that drives the camera (on foot or at a vehicle's chase-cam).",
+      "files": [{ "path": "packages/components/src/Compass.tsx", "target": "Compass.tsx" }]
+    },
+    {
       "name": "terrain",
       "title": "Terrain",
       "type": "registry:component",
