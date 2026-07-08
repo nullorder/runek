@@ -4,6 +4,7 @@ import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { rng, useWorld, type Vec3 } from '@runek/core'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { Sign } from './Sign'
 
 /**
  * An addressable book on the shelf. JSON-serializable so a whole shelf of
@@ -49,6 +50,15 @@ export interface BookshelfProps {
   books?: BookSpec[]
   /** Called with the clicked book. When omitted, a book's `href` is navigated to. */
   onBookSelect?: (book: BookSpec) => void
+  /**
+   * Section label rendered above the shelf, e.g. `"Guides"`. Drawn as a `Sign`
+   * in the world's `display` face.
+   */
+  label?: string
+  /** Label color. Defaults to the world palette's `accent` slot. */
+  labelColor?: string
+  /** Label cap height in units. */
+  labelSize?: number
 }
 
 interface Book {
@@ -79,6 +89,9 @@ export function Bookshelf({
   seed = 1,
   books: bookSpecs,
   onBookSelect,
+  label,
+  labelColor,
+  labelSize = 0.08,
 }: BookshelfProps) {
   const { unit, palette } = useWorld()
   const frameColor = color ?? palette.wood
@@ -264,6 +277,18 @@ export function Bookshelf({
           <meshStandardMaterial color={frameColor} />
         </mesh>
       ))}
+
+      {/* Section label floating just above the shelf, on its front plane. */}
+      {label && (
+        <Sign
+          position={[0, h / 2 + 0.05 * unit, d / 2]}
+          size={labelSize}
+          color={labelColor}
+          anchorY="bottom"
+        >
+          {label}
+        </Sign>
+      )}
 
       {/* all books in one draw call */}
       {books.length > 0 && (

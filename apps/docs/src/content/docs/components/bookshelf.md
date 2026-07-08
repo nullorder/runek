@@ -53,6 +53,15 @@ export interface BookshelfProps {
   books?: BookSpec[]
   /** Called with the clicked book. When omitted, a book's `href` is navigated to. */
   onBookSelect?: (book: BookSpec) => void
+  /**
+   * Section label rendered above the shelf, e.g. `"Guides"`. Drawn as a `Sign`
+   * in the world's `display` face.
+   */
+  label?: string
+  /** Label color. Defaults to the world palette's `accent` slot. */
+  labelColor?: string
+  /** Label cap height in units. */
+  labelSize?: number
 }
 ```
 
