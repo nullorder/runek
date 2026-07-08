@@ -4,19 +4,26 @@ import { marked } from 'marked'
 import LibraryWorld from '../components/world/LibraryWorld.tsx'
 import '../styles/global.css'
 
-// The library is the guides reading room; the full component catalog is the gallery.
-// Markdown is rendered to HTML here (build time) and read in-world; marked never
-// reaches the client bundle.
-const docs = (await getCollection('docs'))
+// The library is the guides reading room; the gallery wing displays the full
+// component catalog with an integration guide per exhibit. Markdown is rendered
+// to HTML here (build time) and read in-world; marked never reaches the client
+// bundle.
+const all = await getCollection('docs')
+const toMeta = (d: (typeof all)[number]) => ({
+  slug: d.id,
+  title: d.data.title,
+  summary: d.data.summary ?? '',
+  category: d.data.category,
+  component: d.data.component,
+  body: marked.parse(d.body ?? '', { async: false }) as string,
+})
+const docs = all
   .filter((d) => d.data.category === 'intro' || d.data.category === 'guide')
   .sort((a, b) => a.data.order - b.data.order)
-  .map((d) => ({
-    slug: d.id,
-    title: d.data.title,
-    summary: d.data.summary ?? '',
-    category: d.data.category,
-    body: marked.parse(d.body ?? '', { async: false }) as string,
-  }))
+  .map(toMeta)
+const componentDocs = all
+  .filter((d) => d.data.category === 'component' && d.data.component)
+  .map(toMeta)
 ---
 
 <!doctype html>
@@ -33,6 +40,6 @@ const docs = (await getCollection('docs'))
   </head>
   <body>
     <a class="world-back" href="/">← home</a>
-    <LibraryWorld client:only="react" docs={docs} />
+    <LibraryWorld client:only="react" docs={docs} componentDocs={componentDocs} />
   </body>
 </html>

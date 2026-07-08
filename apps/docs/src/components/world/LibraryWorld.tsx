@@ -2,22 +2,26 @@ import {
   type BookSpec,
   Bookshelf,
   Clock,
+  Floor,
   Lamp,
   LightRig,
   Player,
-  Room,
   Rug,
   Sign,
   Sky,
+  Wall,
 } from '@runek/components'
 import { World, type WorldPalette } from '@runek/core'
 import { useEffect, useMemo, useState } from 'react'
+import GalleryWing from './GalleryWing'
 
 export type DocMeta = {
   slug: string
   title: string
   summary: string
   category: string
+  /** Registry name (lowercase) of the component this doc describes. */
+  component?: string
   /** Pre-rendered HTML of the doc body (built with `marked` in library.astro). */
   body?: string
 }
@@ -156,7 +160,14 @@ function clockZoneLabel(): string {
   }
 }
 
-export default function LibraryWorld({ docs }: { docs: DocMeta[] }) {
+export default function LibraryWorld({
+  docs,
+  componentDocs = [],
+}: {
+  docs: DocMeta[]
+  /** One doc per registry component — the gallery wing's guide books. */
+  componentDocs?: DocMeta[]
+}) {
   const [selected, setSelected] = useState<DocMeta | null>(null)
 
   // One clickable spine per doc; ids are slugs so a select maps back to its doc.
@@ -185,11 +196,39 @@ export default function LibraryWorld({ docs }: { docs: DocMeta[] }) {
             renders the dark dome + starfield itself. */}
         <Sky />
         <LightRig sunPosition={[4, 16, -8]} sunColor="#fff4e0" sunIntensity={1.7} ambient={0.6} />
-        <Room size={[14, 14]} height={4.5} doorWidth={0} />
 
-        {/* "RUNEK" painted on each side wall, facing the room. */}
-        <WallWord position={[-6.78, 2.7, 0]} rotation={[0, Math.PI / 2, 0]} />
+        {/* The reading room, composed from Walls (not Room) so the right (-x)
+            wall can take a doorway into the gallery wing. Same 14×14 footprint,
+            walls at ±6.9 with 0.2 thickness, open to the night sky. */}
+        <Floor size={[14, 14]} color={LIBRARY_PALETTE.wall} />
+        <Wall position={[0, 0, -6.9]} width={14} height={4.5} />
+        <Wall position={[0, 0, 6.9]} width={14} height={4.5} />
+        <Wall position={[6.9, 0, 0]} rotation={[0, Math.PI / 2, 0]} width={14} height={4.5} />
+        <Wall
+          position={[-6.9, 0, 0]}
+          rotation={[0, Math.PI / 2, 0]}
+          width={14}
+          height={4.5}
+          opening={{ width: 2.4, height: 3 }}
+        />
+
+        {/* "RUNEK" painted on the left (+x) wall; the right wall hosts the
+            gallery doorway instead, with a lintel sign facing the room. */}
         <WallWord position={[6.78, 2.7, 0]} rotation={[0, -Math.PI / 2, 0]} />
+        <Sign
+          position={[-6.78, 3.35, 0]}
+          rotation={[0, Math.PI / 2, 0]}
+          size={0.14}
+          letterSpacing={0.02}
+          color="#e3cd96"
+        >
+          Component Gallery
+        </Sign>
+
+        {/* The gallery wing beyond the doorway: every component on display,
+            each with its integration guide. Selecting a guide opens the same
+            reader the shelf books use. */}
+        <GalleryWing componentDocs={componentDocs} onSelect={setSelected} />
 
         {/* The Runek mark on the far wall, above the shelves — the room's focal point. */}
         <RunekEmblem position={[0, 3.2, 6.78]} />
