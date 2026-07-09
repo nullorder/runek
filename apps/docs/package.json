@@ -1,13 +1,13 @@
 {
   "name": "@runek/docs",
-  "version": "0.10.4",
+  "version": "0.11.0",
   "description": "Runek documentation site — flat docs + a walkable 3D library world (Astro + R3F).",
   "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "node scripts/sync-registry.mjs && astro dev",
-    "build": "node scripts/sync-registry.mjs && astro build && pagefind --site dist",
+    "build": "node scripts/sync-registry.mjs && astro build && pagefind --site dist && rm -f dist/pagefind/pagefind-ui.js dist/pagefind/pagefind-ui.css dist/pagefind/pagefind-modular-ui.js dist/pagefind/pagefind-modular-ui.css",
     "preview": "astro preview",
     "typecheck": "astro check",
     "sync-registry": "node scripts/sync-registry.mjs"

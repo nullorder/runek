@@ -31,7 +31,12 @@ const next = current >= 0 && current < docs.length - 1 ? docs[current + 1] : nul
 <BaseLayout title={`${title} — Runek`} description={summary}>
   <div class="doc-shell">
     <aside class="doc-sidebar">
-      <div class="doc-search" id="docsearch"></div>
+      {/* show-keyboard-hints="false": the hint chips need ~220px and overflow this
+          narrow column; the mobile modal below keeps its own hints. The modal owns
+          mod+k, so the searchbox takes "/" (its shortcut chip displays whichever). */}
+      <div class="doc-search" data-pf-theme="dark">
+        <pagefind-searchbox show-sub-results show-keyboard-hints="false" shortcut="/"></pagefind-searchbox>
+      </div>
       <nav aria-label="Documentation">
         {
           groups.map((group) => (
@@ -53,6 +58,12 @@ const next = current >= 0 && current < docs.length - 1 ? docs[current + 1] : nul
     </aside>
 
     <article class="doc" data-pagefind-body>
+      {/* Mobile-only search entry: the sidebar (and its searchbox) is hidden ≤900px. */}
+      {/* instance="modal" keeps this decoupled from the sidebar searchbox — a shared
+          instance would sync queries and pop the sidebar dropdown open behind the modal. */}
+      <div class="doc-search-mobile" data-pf-theme="dark" data-pagefind-ignore>
+        <pagefind-modal-trigger instance="modal" hide-shortcut></pagefind-modal-trigger>
+      </div>
       {eyebrow && <p class="eyebrow">{eyebrow}</p>}
       <h1>{title}</h1>
       {summary && <p class="summary">{summary}</p>}
@@ -69,24 +80,21 @@ const next = current >= 0 && current < docs.length - 1 ? docs[current + 1] : nul
     </article>
   </div>
 
+  {/* Search modal, opened by the mobile trigger or mod+k anywhere on the page.
+      Lives outside .doc-shell so hiding the trigger never hides the modal. */}
+  <div class="doc-search-modal" data-pf-theme="dark">
+    <pagefind-modal instance="modal"></pagefind-modal>
+  </div>
+
   {/* Pagefind search: assets are emitted into dist/pagefind by `pagefind --site dist`
-      (production build only), so this is gated on PROD to avoid dev 404s. */}
+      (production build only), so this is gated on PROD to avoid dev 404s. The script
+      defines the <pagefind-searchbox> custom element; in dev it stays undefined and
+      renders nothing. */}
   {
     import.meta.env.PROD && (
       <Fragment>
-        <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
-        <script is:inline src="/pagefind/pagefind-ui.js" />
-        <script is:inline>
-          window.addEventListener('DOMContentLoaded', () => {
-            if (window.PagefindUI) {
-              new window.PagefindUI({
-                element: '#docsearch',
-                showSubResults: true,
-                showImages: false,
-              })
-            }
-          })
-        </script>
+        <link rel="stylesheet" href="/pagefind/pagefind-component-ui.css" />
+        <script is:inline type="module" src="/pagefind/pagefind-component-ui.js" />
       </Fragment>
     )
   }

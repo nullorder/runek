@@ -255,23 +255,38 @@ h1,
   color: var(--green);
 }
 
-/* Pagefind search box in the docs sidebar, themed to the terminal palette.
-   These --pagefind-ui-* custom properties are Pagefind's documented theming API. */
-.doc-search {
-  margin-bottom: 1.6rem;
-  --pagefind-ui-scale: 0.8;
-  --pagefind-ui-primary: var(--green);
-  --pagefind-ui-text: var(--text);
-  --pagefind-ui-background: var(--panel-2);
-  --pagefind-ui-border: var(--border);
-  --pagefind-ui-tag: var(--panel);
-  --pagefind-ui-border-width: 1px;
-  --pagefind-ui-border-radius: 6px;
-  --pagefind-ui-font: var(--mono);
+/* Pagefind search surfaces (sidebar searchbox, mobile trigger, modal), themed to
+   the terminal palette. These --pf-* custom properties are the Component UI's
+   documented theming API; data-pf-theme="dark" (set on the wrappers) supplies dark
+   defaults for the rest. Two-part selectors outrank Pagefind's [data-pf-theme] rules. */
+.doc-sidebar .doc-search,
+.doc-search-mobile[data-pf-theme],
+.doc-search-modal[data-pf-theme] {
+  --pf-font: var(--mono);
+  --pf-text: var(--text);
+  --pf-text-secondary: var(--muted);
+  --pf-text-muted: var(--muted);
+  --pf-background: var(--panel-2);
+  --pf-border: var(--border);
+  --pf-border-focus: var(--green-line);
+  --pf-border-radius: 6px;
+  --pf-hover: var(--green-soft);
+  --pf-mark: var(--green);
+  --pf-skeleton: var(--panel);
+  --pf-skeleton-shine: var(--border);
+  --pf-outline-focus: var(--green);
+  --pf-input-height: 32px;
+  --pf-input-font-size: 0.85rem;
+  --pf-summary-font-size: 0.7rem;
+  --pf-result-title-font-size: 0.8rem;
+  --pf-result-excerpt-font-size: 0.75rem;
 }
-.doc-search .pagefind-ui__search-input {
-  background: var(--panel);
-  font-size: 0.85rem;
+.doc-sidebar .doc-search {
+  margin-bottom: 1.6rem;
+}
+/* The modal trigger is the mobile stand-in for the hidden sidebar searchbox. */
+.doc-search-mobile {
+  display: none;
 }
 @media (max-width: 900px) {
   .doc-shell {
@@ -279,6 +294,10 @@ h1,
   }
   .doc-sidebar {
     display: none;
+  }
+  .doc-search-mobile {
+    display: block;
+    margin-bottom: 1.4rem;
   }
 }
 
