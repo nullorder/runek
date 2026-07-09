@@ -5,7 +5,7 @@
   "description": "A plank jetty on pilings reaching out over water; walkable deck colliders, side stringers, and seaward mooring posts.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.4"
+    "@runek/core@^0.11.0"
   ],
   "registryDependencies": [],
   "files": [

@@ -5,7 +5,7 @@
   "description": "Stone ring, a tepee of logs, and an animated flame with a warm flickering light.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.10.4",
+    "@runek/core@^0.11.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

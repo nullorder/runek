@@ -5,7 +5,7 @@
   "description": "Procedural analog wall clock; hands track the system clock or a given IANA timezone.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.10.4",
+    "@runek/core@^0.11.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

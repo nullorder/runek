@@ -5,7 +5,7 @@
   "description": "A rocky promontory: a low-poly, seed-jittered truncated cone with a flattish plateau and a convex-hull collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.4",
+    "@runek/core@^0.11.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

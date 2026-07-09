@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "Clustered foliage blobs, seeded; the mid-height density between Grass and Trees.",
   "dependencies": [
-    "@runek/core@^0.10.4",
+    "@runek/core@^0.11.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

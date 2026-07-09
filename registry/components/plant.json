@@ -5,7 +5,7 @@
   "description": "Potted plant: a tapered planter and a seeded cluster of foliage.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.10.4",
+    "@runek/core@^0.11.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

@@ -1,8 +1,71 @@
+import { useKeyboardControls } from '@react-three/drei'
+import { useFrame, useThree } from '@react-three/fiber'
 import { type AvatarView, useWorld, type Vec3 } from '@runek/core'
 import Ecctrl from 'ecctrl'
-import type { ReactNode } from 'react'
+import { type ReactNode, useRef } from 'react'
+import type { Object3D } from 'three'
 
 export type PlayerView = AvatarView
+
+// Keyboard look. ecctrl only moves its camera from mouse/touch/gamepad — there are no key
+// actions for it — so we drive its camera rig ourselves from the `turnLeft`/`turnRight` and
+// `lookUp`/`lookDown` actions in the keyboard map (see `keyboardMap` in `@runek/core`). Yaw is
+// the pivot's `rotation.y`; pitch is the follow-cam's `rotation.x` plus a matching reposition
+// along a vertical arc, exactly as ecctrl's own mouse handler does. ecctrl writes these only on
+// pointer input (never per frame in CameraBasedMovement), so our additions compose cleanly with
+// mouse-drag. Third-person only: it drives the follow-cam orbit; a map without these actions
+// (or first-person, where there is no orbit) simply leaves the camera to mouse control.
+const TURN_SPEED = 1.8 // yaw, radians/second
+const LOOK_SPEED = 1.2 // pitch, radians/second
+// Pitch clamp — mirrors ecctrl's camLowLimit / camUpLimit defaults (we pass neither to Ecctrl).
+const CAM_LOW = -1.3
+const CAM_UP = 1.5
+
+function CameraKeyLook() {
+  const scene = useThree((s) => s.scene)
+  const [, getKeys] = useKeyboardControls()
+  const pivot = useRef<Object3D | null>(null)
+
+  useFrame((_, dt) => {
+    // ecctrl's camera pivot is a bare Object3D added to the scene whose single child is the
+    // (childless) follow-cam, offset back along z by the camera distance. Match on that shape
+    // and cache; until it mounts (or if the match ever misses) mouse-drag still turns, so a
+    // miss just no-ops rather than breaking.
+    if (!pivot.current) {
+      pivot.current =
+        scene.children.find(
+          (o) =>
+            o.type === 'Object3D' &&
+            o.children.length === 1 &&
+            o.children[0].type === 'Object3D' &&
+            o.children[0].children.length === 0 &&
+            // The follow-cam sits offset back along z (≈ third-person camera distance),
+            // which distinguishes ecctrl's pivot from other bare Object3Ds at the origin.
+            Math.abs(o.children[0].position.z) > 1,
+        ) ?? null
+      if (!pivot.current) return
+    }
+    const step = Math.min(dt, 0.05)
+    const keys = getKeys() as Record<string, boolean>
+
+    // Yaw. Match mouse-drag's sign: dragging right decrements rotation.y, so ArrowRight does too.
+    const turn = (keys.turnLeft ? 1 : 0) - (keys.turnRight ? 1 : 0)
+    if (turn) pivot.current.rotation.y += turn * TURN_SPEED * step
+
+    // Pitch. ArrowUp lowers the follow-cam to look up; ArrowDown raises it to look down. Repeat
+    // ecctrl's mouse-pitch math on the follow-cam so the camera orbits the same vertical arc.
+    const pitch = (keys.lookDown ? 1 : 0) - (keys.lookUp ? 1 : 0)
+    if (pitch) {
+      const cam = pivot.current.children[0]
+      const vy = Math.min(Math.max(cam.rotation.x + pitch * LOOK_SPEED * step, CAM_LOW), CAM_UP)
+      const dist = cam.position.length()
+      cam.rotation.x = vy
+      cam.position.y = -dist * Math.sin(-vy)
+      cam.position.z = -dist * Math.cos(-vy)
+    }
+  })
+  return null
+}
 
 export interface PlayerProps {
   position?: Vec3
@@ -47,6 +110,7 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
           </mesh>
         )}
       </group>
+      <CameraKeyLook />
     </Ecctrl>
   )
 }
