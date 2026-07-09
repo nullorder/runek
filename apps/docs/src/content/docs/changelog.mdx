@@ -1,0 +1,16 @@
+---
+title: Changelog
+summary: Every published release and the unreleased changes on main.
+category: reference
+order: 90
+---
+
+import { Content as Changelog } from '../../../../../CHANGELOG.md'
+
+{/* Single source of truth: this page renders the repository's root CHANGELOG.md
+    verbatim. The wrapper class hides the file's own H1 (the layout already
+    renders the page title). */}
+
+<div class="changelog-embed">
+  <Changelog />
+</div>

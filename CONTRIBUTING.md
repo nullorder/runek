@@ -97,5 +97,6 @@ Dependency direction is one-way: `app → components → core`.
 
 - Keep PRs focused; one component or one concern per PR.
 - `just check` must be green.
+- Log user-facing changes in [`CHANGELOG.md`](./CHANGELOG.md) under **[Unreleased]**, in the matching [Keep a Changelog](https://keepachangelog.com) category (Added / Changed / Fixed / Removed). A new component is one **Added** line; internal-only chores can skip this.
 - Write self-contained commit messages and PR descriptions — assume the reader has no internal context.
 - By contributing, you agree your work is licensed under the project's [MIT license](./LICENSE).

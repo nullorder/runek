@@ -301,6 +301,12 @@ h1,
   }
 }
 
+/* The changelog page renders the repo's root CHANGELOG.md verbatim; hide the
+   file's own H1, since the layout already renders the page title. */
+.changelog-embed > h1:first-child {
+  display: none;
+}
+
 /* Prev/next pager at the foot of a doc */
 .doc-pager {
   clear: both;

@@ -52,6 +52,7 @@ Both are centralized — do not hand-edit them in individual `package.json` file
 - **Dependency versions** live in one place: the `catalog:` block in `pnpm-workspace.yaml`. Every `package.json` references `"catalog:"` instead of a literal version. To bump a dependency (e.g. three.js), edit its catalog entry **once**, then `just install`.
 - **Package versions** are kept in lockstep across all workspace packages. Change them with **`just version X.Y.Z`** (writes every `package.json` via `scripts/set-version.mjs`) — never edit a `version` field by hand.
 - Releases: **`just publish`** runs the gate, npm-publishes the `runek` CLI, tags `vX.Y.Z`, and creates a GitHub release (`just publish-help` shows the steps). The component library ships as source via the registry, which goes live by deploying `apps/docs` (serves `/r`).
+- **Changelog:** [CHANGELOG.md](CHANGELOG.md) follows [Keep a Changelog](https://keepachangelog.com) + semver. Every user-facing change (new component or prop, behavior change, fix, CLI or release tooling) gets an entry under `## [Unreleased]` in the matching category (Added / Changed / Fixed / Removed), with breaking changes marked **Breaking:**. Internal-only chores can skip it. At release, the Unreleased section is retitled to the new version (with its compare link and date) and a fresh Unreleased section starts. The docs site renders this same file at `/docs/changelog` via `apps/docs/src/content/docs/changelog.mdx`.
 
 ## Core principles (the moat — never compromise these)
 
