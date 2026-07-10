@@ -1,6 +1,6 @@
 import { Html } from '@react-three/drei'
 import { RigidBody } from '@react-three/rapier'
-import { Floor, Lake, Lamp, registry, Rocks, Rug, Sign, Trees, Wall } from '@runek/components'
+import { Floor, Lake, Lamp, Rocks, Rug, registry, Sign, Trees, Wall } from '@runek/components'
 import { type ComponentType, useMemo, useState } from 'react'
 import { DEFAULT_CAMERA, PREVIEW } from '../../lib/preview'
 import type { DocMeta } from './LibraryWorld'
@@ -78,13 +78,7 @@ function miniScale(name: string): number {
   return Math.min(1, 2.3 / dist)
 }
 
-function GuideBook({
-  doc,
-  onSelect,
-}: {
-  doc: DocMeta
-  onSelect: (doc: DocMeta) => void
-}) {
+function GuideBook({ doc, onSelect }: { doc: DocMeta; onSelect: (doc: DocMeta) => void }) {
   const [hot, setHot] = useState(false)
   return (
     <group>
