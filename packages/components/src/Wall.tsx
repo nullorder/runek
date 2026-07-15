@@ -20,7 +20,8 @@ export interface WallProps {
   thickness?: number
   /** Defaults to the world palette's `wall` slot. */
   color?: string
-  opening?: WallOpening
+  /** Holes cut into the wall (doors, windows). Must not overlap horizontally. */
+  openings?: WallOpening[]
 }
 
 interface Segment {
@@ -32,25 +33,36 @@ interface Segment {
 
 const EPS = 1e-4
 
-function segments(width: number, height: number, opening?: WallOpening): Segment[] {
-  if (!opening) return [{ x: 0, y: height / 2, w: width, h: height }]
+function segments(width: number, height: number, openings?: WallOpening[]): Segment[] {
+  if (!openings?.length) return [{ x: 0, y: height / 2, w: width, h: height }]
 
-  const { offset = 0, width: ow, height: oh, sill = 0 } = opening
-  const left = offset - ow / 2
-  const right = offset + ow / 2
-  const top = sill + oh
+  const sorted = [...openings].sort((a, b) => (a.offset ?? 0) - (b.offset ?? 0))
   const out: Segment[] = []
+  // Left edge of the un-emitted remainder; advances past each opening in turn.
+  let cursor = -width / 2
 
-  const leftW = left + width / 2
-  if (leftW > EPS) out.push({ x: (-width / 2 + left) / 2, y: height / 2, w: leftW, h: height })
+  for (const opening of sorted) {
+    const { offset = 0, width: ow, height: oh, sill = 0 } = opening
+    const left = Math.max(offset - ow / 2, cursor)
+    const right = Math.min(offset + ow / 2, width / 2)
+    if (right - left <= EPS) continue
 
-  const rightW = width / 2 - right
-  if (rightW > EPS) out.push({ x: (right + width / 2) / 2, y: height / 2, w: rightW, h: height })
+    const pierW = left - cursor
+    if (pierW > EPS) out.push({ x: cursor + pierW / 2, y: height / 2, w: pierW, h: height })
 
-  if (sill > EPS) out.push({ x: offset, y: sill / 2, w: ow, h: sill })
+    const mid = (left + right) / 2
+    const clampedW = right - left
+    if (sill > EPS) out.push({ x: mid, y: sill / 2, w: clampedW, h: sill })
 
-  const topH = height - top
-  if (topH > EPS) out.push({ x: offset, y: (top + height) / 2, w: ow, h: topH })
+    const top = sill + oh
+    const topH = height - top
+    if (topH > EPS) out.push({ x: mid, y: (top + height) / 2, w: clampedW, h: topH })
+
+    cursor = right
+  }
+
+  const lastW = width / 2 - cursor
+  if (lastW > EPS) out.push({ x: cursor + lastW / 2, y: height / 2, w: lastW, h: height })
 
   return out
 }
@@ -62,19 +74,19 @@ export function Wall({
   height = 3,
   thickness = 0.2,
   color,
-  opening,
+  openings,
 }: WallProps) {
   const { unit, palette } = useWorld()
   const wallColor = color ?? palette.wall
   const w = width * unit
   const h = height * unit
   const t = thickness * unit
-  const scaled: WallOpening | undefined = opening && {
-    offset: (opening.offset ?? 0) * unit,
-    width: opening.width * unit,
-    height: opening.height * unit,
-    sill: (opening.sill ?? 0) * unit,
-  }
+  const scaled = openings?.map((o) => ({
+    offset: (o.offset ?? 0) * unit,
+    width: o.width * unit,
+    height: o.height * unit,
+    sill: (o.sill ?? 0) * unit,
+  }))
 
   return (
     <RigidBody type="fixed" colliders="cuboid" position={position} rotation={rotation}>

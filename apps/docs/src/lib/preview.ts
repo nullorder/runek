@@ -17,9 +17,11 @@ export type PreviewConfig = {
 export const DEFAULT_CAMERA: [number, number, number] = [3.4, 2.6, 4.4]
 export const DEFAULT_TARGET: [number, number, number] = [0, 0.9, 0]
 
-/** Components whose geometry visibly changes with `seed` — these get the re-roll control. */
+/** Components whose geometry visibly changes with `seed` — these get the re-roll control.
+ *  (`House` qualifies as a composite: its seed cascades to seeded children like `Plant`.) */
 export const SEEDED = new Set([
   'Bookshelf',
+  'House',
   'Bush',
   'Crate',
   'Flowers',
@@ -52,7 +54,8 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   Trees: { camera: [6, 6, 8], target: [0, 3, 0], props: { count: 1 } },
   Rocks: { camera: [6, 4, 7], target: [0, 0.5, 0] },
   Room: { camera: [10, 7, 12], target: [0, 1.5, 0] },
-  House: { camera: [11, 7, 13], target: [0, 2, 0] },
+  House: { camera: [13, 9, 15], target: [0, 3, 0] },
+  Level: { camera: [10, 7, 12], target: [0, 1.5, 0] },
   Staircase: { camera: [5, 4.5, 6], target: [0, 1.2, 0] },
   Wall: { camera: [5, 3.5, 6], target: [0, 1.4, 0] },
   Roof: { camera: [6, 4, 7], target: [0, 1, 0] },

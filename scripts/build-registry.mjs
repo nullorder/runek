@@ -51,6 +51,15 @@ for (const item of index.items) {
   const registryDeps = new Set()
 
   for (const file of files) {
+    if (item.type === 'registry:composite') {
+      // A composite is a data arrangement: its registry dependencies are the
+      // component types its nodes reference (PascalCase type = source basename).
+      for (const type of nodeTypes(JSON.parse(file.content).nodes ?? [])) {
+        const dep = basenameToItem.get(type)
+        if (dep && dep !== item.name) registryDeps.add(dep)
+      }
+      continue
+    }
     for (const spec of imports(file.content)) {
       classify(spec, item.name, deps, registryDeps)
     }
@@ -77,10 +86,22 @@ console.log(`\nWrote ${index.items.length} manifests (${fileCount} files) to reg
 
 // --- helpers ---------------------------------------------------------------
 
+/** Every component type referenced by an arrangement's nodes, recursively. */
+function nodeTypes(nodes, into = new Set()) {
+  for (const node of nodes) {
+    if (node.type) into.add(node.type)
+    if (node.children) nodeTypes(node.children, into)
+  }
+  return into
+}
+
 /** Expand one index file entry into one-or-more manifest files with content. */
 function expand(file, item) {
   const abs = join(root, file.path)
-  const fileType = item.type === 'registry:lib' ? 'registry:lib' : 'registry:component'
+  const fileType =
+    item.type === 'registry:lib' || item.type === 'registry:composite'
+      ? item.type
+      : 'registry:component'
   if (statSync(abs).isDirectory()) {
     return sources(abs).map((src) => ({
       path: posix.join(file.target, relative(abs, src).split(/[/\\]/).join('/')),

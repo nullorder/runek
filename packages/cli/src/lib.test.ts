@@ -53,4 +53,20 @@ describe('resolveItems', () => {
     const [bookshelf] = await resolveItems(localRegistry, ['bookshelf'])
     expect(bookshelf.dependencies.some((d) => d.startsWith('@runek/core@'))).toBe(true)
   })
+
+  it('resolves a composite: its arrangement JSON plus the parts it references', async () => {
+    const manifests = await resolveItems(localRegistry, ['house'])
+    const house = manifests.find((m) => m.name === 'house')
+    expect(house?.type).toBe('registry:composite')
+    expect(house?.files.map((f) => f.path)).toEqual(['composites/house.json'])
+    const arrangement = JSON.parse(house?.files[0].content ?? '')
+    expect(arrangement.kind).toBe('composite')
+    expect(Array.isArray(arrangement.nodes)).toBe(true)
+    // parts arrive as ordinary component manifests, dependencies first
+    const names = manifests.map((m) => m.name)
+    for (const part of ['level', 'door', 'window', 'roof', 'staircase', 'plant']) {
+      expect(names.indexOf(part)).toBeGreaterThanOrEqual(0)
+      expect(names.indexOf(part)).toBeLessThan(names.indexOf('house'))
+    }
+  })
 })

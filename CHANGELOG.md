@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Composites**: a new registry kind holding a named *arrangement* of
+  component nodes as JSON instead of code. A world places one node
+  (`{ "type": "House" }`); the renderer expands the arrangement in place,
+  and an instance `seed` deterministically re-rolls children that don't
+  pin their own. The editor lists composites in its add menu and gains an
+  **Unpack** action that replaces an instance with an editable `Group`
+  subtree. `runek add <composite>` copies the arrangement JSON plus the
+  source of every part it references. (CONTRACT §11.)
+- `Level` component: a stackable wall ring plus optional slab, with
+  per-side wall configs (openings, color, or an omitted side) and a
+  stairwell hole — the unit buildings are composed from.
+- `Floor` gains a rectangular `opening` (a stairwell hole); the slab
+  splits into strips around it so collision matches the visual.
+- Built-in `Group` node type in worlds-as-data: a plain transform
+  container for children.
+- Gable `Roof`s cap their open end triangles (`ends`, default on) with
+  wall-colored prisms, so the attic no longer shows the sky
+  ([Roof migration guide](https://runek.nullorder.org/docs/components/roof#migrate)
+  for keeping the old open look).
+- `scripts/migrate-buildings.mjs`: bakes pre-composite `House`/`Room`
+  nodes (with non-default props) into equivalent part arrangements.
+- Docs: "The building kit" guide; the library world's gallery wing ends
+  at a walkable two-level show home built from the `house` composite.
+- Docs: component pages gain a **Migrate** section — a side-by-side
+  before/after panel per version bump. Four components carry a
+  0.11.0 → 0.12.0 guide:
+  [`Wall`](https://runek.nullorder.org/docs/components/wall#migrate),
+  [`House`](https://runek.nullorder.org/docs/components/house#migrate),
+  [`Room`](https://runek.nullorder.org/docs/components/room#migrate), and
+  [`Roof`](https://runek.nullorder.org/docs/components/roof#migrate).
+  Entries live in `apps/docs/scripts/migrations.mjs` and accumulate
+  across versions.
 - `Hut`, `Tent`, `Counter`, `Stool`, `Road`, and `Cliff` components.
 - `Compass` HUD component: a screen-fixed dial that tracks the camera
   heading, with an optional wind and bearing readout.
@@ -23,6 +55,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** `House` and `Room` are no longer coded components — the
+  registry names now resolve to composites (the default `house` is a
+  two-level dwelling with a working staircase). Worlds that placed them
+  with default props keep rendering; worlds that relied on non-default
+  props can bake the old look with `scripts/migrate-buildings.mjs`.
+  `HouseProps`/`RoomProps` are gone from `@runek/components`. Migration
+  guides:
+  [House](https://runek.nullorder.org/docs/components/house#migrate),
+  [Room](https://runek.nullorder.org/docs/components/room#migrate).
+- **Breaking:** `Wall`'s single `opening` prop is replaced by
+  `openings: WallOpening[]` — one wall can now carry a door and windows
+  together. Migration (`opening: X` → `openings: [X]`):
+  [Wall migration guide](https://runek.nullorder.org/docs/components/wall#migrate).
 - **Breaking:** the default `keyboardMap` in `@runek/core` no longer
   binds the arrow keys to movement. WASD moves the character; the arrow
   keys steer the camera.

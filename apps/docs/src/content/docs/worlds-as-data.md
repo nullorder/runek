@@ -82,6 +82,11 @@ const world = parseWorld(await (await fetch('/my.world.json')).text())
 <WorldRenderer data={world} registry={registry} />
 ```
 
+Two node types resolve without a component behind them:
+
+- **Composites** — a registry entry can be a data arrangement instead of code (`House`, `Room`). The renderer expands the arrangement in place, inside a group carrying the node's `position`/`rotation`; an instance `seed` re-rolls unpinned children deterministically. See [the building kit](/docs/building-kit).
+- **`Group`** — a built-in transform container (`position`, `rotation`, `children`), what the editor's **Unpack** leaves behind when you break a composite instance open for per-instance edits.
+
 ## Save it
 
 `serializeWorld(data)` returns pretty JSON. The runtime editor (`<WorldEditor>`) edits a `WorldData` live and exports it with the same call, so a world round-trips: render, edit, serialize, commit.

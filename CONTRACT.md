@@ -74,6 +74,16 @@ These govern the `WorldData` a component is placed into, not individual componen
 - A water component **SHOULD** treat its origin as the surface plane (so sinking it is a single negative-Y placement) and **MUST NOT** assume it rests on top of the ground. It **SHOULD** default its surface to `world.ground` (§9), so `<Lake />` complies without an explicit `position`.
 - **Contained water** held in a component's own vessel (e.g. `Fountain`, `Well`) is the exception: its surface sits inside the basin the component renders, because the vessel, not the terrain, holds it.
 
+## 11. Composites
+
+A **composite** is a registry item whose payload is a *data arrangement* of component nodes (`kind: "composite"`, a `nodes: WorldNode[]` array) rather than source code — `house` and `room` are the canonical examples. The renderer expands an instance eagerly into a group carrying the instance's `position`/`rotation`.
+
+- A composite's `nodes` **MUST** be plain, JSON-serializable `WorldNode`s. No callbacks, no template variables — a composite is one concrete arrangement; variation comes from the instance `seed` and from unpacking.
+- Every `type` a composite references **MUST** be a registry item (or the built-in `Group`), and each one **MUST** be declared as a `registryDependency` (derived automatically by the registry build from the node types).
+- Seeds follow §2's derivation rule at the data level: an instance `seed` gives each child that doesn't pin its own seed a stable `sub(seed, index)`. A composite **MUST NOT** rely on all children sharing one seed.
+- Colliders, units, palette, and the no-assets rule (§4–§7) are satisfied by the referenced components; a composite adds no geometry of its own.
+- The optional `bounds` field (`[w, h, d]` in units) is **reserved** for the future streaming/LOD pass; authors **MAY** declare it, renderers currently ignore it.
+
 ---
 
 ## Conformance checklist

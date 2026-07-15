@@ -1,6 +1,7 @@
 import { Html } from '@react-three/drei'
 import { RigidBody } from '@react-three/rapier'
 import { Floor, Lake, Lamp, Rocks, Rug, registry, Sign, Trees, Wall } from '@runek/components'
+import { isCompositeDef, WorldNodes } from '@runek/core'
 import { type ComponentType, useMemo, useState } from 'react'
 import { DEFAULT_CAMERA, PREVIEW } from '../../lib/preview'
 import type { DocMeta } from './LibraryWorld'
@@ -63,11 +64,25 @@ const NORTH_Z = WIDTH / 2 + 0.1 // window wall center
 
 type Exhibit = {
   name: string
-  Component: ComponentType<Record<string, unknown>>
   props: Record<string, unknown>
   scale: number
   lift: number
   doc?: DocMeta
+}
+
+/** One miniature: a component renders directly; a composite expands via the renderer. */
+function Mini({ name, props }: { name: string; props: Record<string, unknown> }) {
+  const entry = registry[name]
+  if (isCompositeDef(entry)) {
+    return (
+      <WorldNodes
+        nodes={[{ type: name, props: { seed: 7, ...(props as Record<string, never>) } }]}
+        registry={registry}
+      />
+    )
+  }
+  const Component = entry as ComponentType<Record<string, unknown>>
+  return <Component seed={7} {...props} />
 }
 
 /** Miniature scale from the 2D gallery's tuned camera distance: a preview
@@ -140,7 +155,7 @@ function ExhibitStand({
   position: [number, number, number]
   onSelect: (doc: DocMeta) => void
 }) {
-  const { name, Component, props, scale, lift } = exhibit
+  const { name, props, scale, lift } = exhibit
   return (
     // Backed against the south wall, facing the window (+z).
     <group position={position}>
@@ -154,7 +169,7 @@ function ExhibitStand({
 
       {/* the miniature, live and procedural like everything else */}
       <group position={[0, 0.86 + lift * scale, 0]} scale={scale}>
-        <Component seed={7} {...props} />
+        <Mini name={name} props={props} />
       </group>
 
       {/* nameplate just proud of the wall face behind the pedestal */}
@@ -181,13 +196,12 @@ export default function GalleryWing({
 }) {
   const exhibits = useMemo<Exhibit[]>(() => {
     const bySlug = new Map(componentDocs.map((d) => [d.component ?? '', d]))
-    return Object.entries(registry)
-      .filter(([name]) => !EXCLUDE.has(name))
-      .map(([name, Component]) => {
+    return Object.keys(registry)
+      .filter((name) => !EXCLUDE.has(name))
+      .map((name) => {
         const tune = TUNE[name]
         return {
           name,
-          Component: Component as ComponentType<Record<string, unknown>>,
           props: { ...PREVIEW[name]?.props, ...tune?.props },
           scale: tune?.scale ?? miniScale(name),
           lift: tune?.lift ?? 0,
@@ -226,13 +240,15 @@ export default function GalleryWing({
         position={[centerX, 0, NORTH_Z]}
         width={length + 0.4}
         height={HEIGHT}
-        opening={{ width: windowWidth, height: glassHeight, sill }}
+        openings={[{ width: windowWidth, height: glassHeight, sill }]}
       />
+      {/* the far end cap, with a doorway out to the show home on the lawn */}
       <Wall
         position={[endX - 0.1, 0, 0]}
         rotation={[0, Math.PI / 2, 0]}
         width={WIDTH + 0.6}
         height={HEIGHT}
+        openings={[{ width: 1.3, height: 2.4 }]}
       />
 
       {/* glazing: a translucent pane filling the opening, with a thin collider */}
@@ -270,6 +286,24 @@ export default function GalleryWing({
       ))}
       <Rocks position={[ENTRY_X - 0.5 * length, 0, NORTH_Z + 6]} seed={11} />
       <Rocks position={[ENTRY_X - 0.92 * length, 0, NORTH_Z + 10]} seed={12} />
+
+      {/* the show home: a walkable House composite just past the end doorway —
+          step out of the tunnel, in through its front door, and up the stairs.
+          (A hair below the tunnel floor so the coplanar lawns never z-fight.) */}
+      <Floor size={[13, 13]} position={[endX - 6, -0.01, 1]} color="#2e4234" />
+      <WorldNodes
+        nodes={[
+          {
+            type: 'House',
+            props: {
+              position: [endX - 6.5, 0, 1],
+              rotation: [0, Math.PI / 2, 0],
+              seed: 3,
+            },
+          },
+        ]}
+        registry={registry}
+      />
 
       {/* a runner rug the length of the walk, and lamps to read the exhibits by */}
       <Rug position={[centerX, 0.01, 0.7]} size={[length - 6, 2]} seed={9} />

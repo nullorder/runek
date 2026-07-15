@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add hut
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.4`, `three@^0.184.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.12.0`, `three@^0.184.0`.
 
 ## Use it
 

@@ -395,6 +395,40 @@ h1,
   color: var(--muted);
 }
 
+/* Migration guide — before/after across a version bump, side by side.
+   Columns are just a tag + the code block, so the pre stays the visual box. */
+.migration {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+  align-items: start;
+  margin: 1.1rem 0 0.3rem;
+}
+.migration__col {
+  min-width: 0; /* long code lines scroll inside their column */
+}
+.migration__tag {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.migration__col--after .migration__tag {
+  color: var(--green);
+}
+.migration__col--after pre.astro-code {
+  border-color: var(--green-line);
+}
+.migration :is(.code-block, pre.astro-code) {
+  margin: 0.55rem 0 0.9rem;
+}
+@media (max-width: 900px) {
+  .migration {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Inline + block code */
 code {
   font-family: var(--mono);

@@ -5,7 +5,7 @@
   "description": "Plank deck spanning a gap, optionally arched, with railings and slab colliders that follow the deck.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.11.0"
+    "@runek/core@^0.12.0"
   ],
   "registryDependencies": [],
   "files": [

@@ -39,11 +39,20 @@ export type { WorldRendererProps } from './WorldRenderer'
 export { WorldRenderer } from './WorldRenderer'
 export type {
   ComponentRegistry,
+  CompositeDef,
   JsonValue,
+  RegistryEntry,
   WorldAuthor,
   WorldData,
   WorldMeta,
   WorldNode,
   WorldSource,
 } from './world-data'
-export { assignNodeIds, parseWorld, serializeWorld } from './world-data'
+export {
+  assignNodeIds,
+  isCompositeDef,
+  parseWorld,
+  seedCompositeNodes,
+  serializeWorld,
+  unpackComposite,
+} from './world-data'

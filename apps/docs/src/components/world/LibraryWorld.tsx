@@ -209,7 +209,7 @@ export default function LibraryWorld({
           rotation={[0, Math.PI / 2, 0]}
           width={14}
           height={4.5}
-          opening={{ width: 2.4, height: 3 }}
+          openings={[{ width: 2.4, height: 3 }]}
         />
 
         {/* "RUNEK" painted on the left (+x) wall; the right wall hosts the

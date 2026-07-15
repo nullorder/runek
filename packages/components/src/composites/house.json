@@ -1,0 +1,91 @@
+{
+  "kind": "composite",
+  "name": "House",
+  "description": "A two-level dwelling arranged from parts: wall rings with door and window openings, a staircase through the upper floor, a gable roof, and a plant by the door.",
+  "bounds": [9.6, 7.2, 7.6],
+  "nodes": [
+    {
+      "type": "Level",
+      "props": {
+        "size": [9, 7],
+        "height": 3,
+        "walls": {
+          "front": {
+            "openings": [
+              { "width": 1, "height": 2.1 },
+              { "offset": -3, "width": 1.3, "height": 1.2, "sill": 1 },
+              { "offset": 3, "width": 1.3, "height": 1.2, "sill": 1 }
+            ]
+          },
+          "left": { "openings": [{ "width": 1.3, "height": 1.2, "sill": 1 }] },
+          "right": { "openings": [{ "width": 1.3, "height": 1.2, "sill": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "Level",
+      "props": {
+        "position": [0, 3, 0],
+        "size": [9, 7],
+        "height": 2.6,
+        "walls": {
+          "front": {
+            "openings": [
+              { "offset": -3, "width": 1.3, "height": 1.1, "sill": 0.9 },
+              { "offset": 3, "width": 1.3, "height": 1.1, "sill": 0.9 }
+            ]
+          },
+          "left": { "openings": [{ "width": 1.3, "height": 1.1, "sill": 0.9 }] },
+          "right": { "openings": [{ "width": 1.3, "height": 1.1, "sill": 0.9 }] }
+        },
+        "floor": { "opening": { "x": 3.7, "z": -1.95, "width": 1.4, "depth": 3.1 } }
+      }
+    },
+    {
+      "type": "Staircase",
+      "props": {
+        "position": [3.7, 0, -3.4],
+        "steps": 10,
+        "totalHeight": 3,
+        "width": 1.3,
+        "depth": 3
+      }
+    },
+    {
+      "type": "Door",
+      "props": { "position": [0, 0, 3.5], "width": 1, "height": 2.1, "openAngle": -1.1 }
+    },
+    { "type": "Window", "props": { "position": [-3, 1, 3.5], "width": 1.3, "height": 1.2 } },
+    { "type": "Window", "props": { "position": [3, 1, 3.5], "width": 1.3, "height": 1.2 } },
+    {
+      "type": "Window",
+      "props": { "position": [-4.5, 1, 0], "rotation": [0, 1.5708, 0], "width": 1.3, "height": 1.2 }
+    },
+    {
+      "type": "Window",
+      "props": { "position": [4.5, 1, 0], "rotation": [0, 1.5708, 0], "width": 1.3, "height": 1.2 }
+    },
+    { "type": "Window", "props": { "position": [-3, 3.9, 3.5], "width": 1.3, "height": 1.1 } },
+    { "type": "Window", "props": { "position": [3, 3.9, 3.5], "width": 1.3, "height": 1.1 } },
+    {
+      "type": "Window",
+      "props": {
+        "position": [-4.5, 3.9, 0],
+        "rotation": [0, 1.5708, 0],
+        "width": 1.3,
+        "height": 1.1
+      }
+    },
+    {
+      "type": "Window",
+      "props": {
+        "position": [4.5, 3.9, 0],
+        "rotation": [0, 1.5708, 0],
+        "width": 1.3,
+        "height": 1.1
+      }
+    },
+    { "type": "Roof", "props": { "position": [0, 5.6, 0], "size": [9, 7], "style": "gable" } },
+    { "type": "Plant", "props": { "position": [-3.5, 0, 2.3] } }
+  ]
+}

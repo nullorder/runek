@@ -32,7 +32,7 @@ pick(next, ['oak', 'pine'])  // a stable choice from a list
 
 ## Stable child seeds
 
-When a component composes others (a `House` placing `Window`s), derive child seeds with `sub(seed, n)` so each child is deterministic *and* distinct — without threading the same stream through everything:
+When a component composes others (a `Hut` framing its doorway, a composite instance seeding its arrangement), derive child seeds with `sub(seed, n)` so each child is deterministic *and* distinct — without threading the same stream through everything:
 
 ```tsx
 import { sub } from '@runek/core'

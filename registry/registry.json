@@ -38,18 +38,25 @@
     {
       "name": "room",
       "title": "Room",
-      "type": "registry:component",
+      "type": "registry:composite",
       "category": "structures",
-      "description": "Four walls + floor with a doorway and fixed colliders; optional roof.",
-      "files": [{ "path": "packages/components/src/Room.tsx", "target": "Room.tsx" }]
+      "description": "Composite: four walls and a floor with a doorway, arranged from one Level. Unpack to customize.",
+      "files": [
+        { "path": "packages/components/src/composites/room.json", "target": "composites/room.json" }
+      ]
     },
     {
       "name": "house",
       "title": "House",
-      "type": "registry:component",
+      "type": "registry:composite",
       "category": "structures",
-      "description": "Composed dwelling: walls with openings, floor, roof, door, and windows.",
-      "files": [{ "path": "packages/components/src/House.tsx", "target": "House.tsx" }]
+      "description": "Composite: a two-level dwelling arranged from parts (Levels, Door, Windows, Staircase, gable Roof, Plant). Unpack to customize.",
+      "files": [
+        {
+          "path": "packages/components/src/composites/house.json",
+          "target": "composites/house.json"
+        }
+      ]
     },
     {
       "name": "hut",
@@ -72,8 +79,16 @@
       "title": "Floor",
       "type": "registry:component",
       "category": "structures",
-      "description": "Flat floor slab with a fixed collider.",
+      "description": "Flat floor slab with a fixed collider; optional stairwell opening.",
       "files": [{ "path": "packages/components/src/Floor.tsx", "target": "Floor.tsx" }]
+    },
+    {
+      "name": "level",
+      "title": "Level",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A stackable wall ring plus optional slab: per-side openings, sides that can be omitted, and a stairwell hole — the unit a building is composed from.",
+      "files": [{ "path": "packages/components/src/Level.tsx", "target": "Level.tsx" }]
     },
     {
       "name": "roof",

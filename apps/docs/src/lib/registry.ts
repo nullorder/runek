@@ -30,9 +30,11 @@ export function getIndex(): { items: IndexItem[] } {
   return JSON.parse(readFileSync(join(registryDir, 'registry.json'), 'utf8'))
 }
 
-/** Only the renderable components (everything except the `core` lib). */
+/** The renderable catalog: components and composites (everything except libs). */
 export function getComponents(): IndexItem[] {
-  return getIndex().items.filter((i) => i.type === 'registry:component')
+  return getIndex().items.filter(
+    (i) => i.type === 'registry:component' || i.type === 'registry:composite',
+  )
 }
 
 export function getManifest(name: string): Manifest {

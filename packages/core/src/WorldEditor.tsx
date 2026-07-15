@@ -6,11 +6,15 @@ import type { Vec3 } from './types'
 import { World, type WorldProps } from './World'
 import { WorldAbout } from './WorldAbout'
 import { WorldContribute } from './WorldContribute'
+import { WorldNodes } from './WorldNodes'
 import {
   assignNodeIds,
   type ComponentRegistry,
+  isCompositeDef,
   type JsonValue,
+  seedCompositeNodes,
   serializeWorld,
+  unpackComposite,
   type WorldData,
   type WorldNode,
 } from './world-data'
@@ -111,6 +115,23 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
     setSelected(null)
   }
 
+  /** The selected node, when it's a composite instance that can be unpacked. */
+  const selectedComposite = (() => {
+    if (!selected) return null
+    const node = data.nodes[selected.index]
+    const entry = node ? registry[node.type] : undefined
+    return isCompositeDef(entry) ? { node, def: entry } : null
+  })()
+
+  const unpackSelected = () => {
+    if (!selected || !selectedComposite) return
+    const nodes = data.nodes.map((node, i) =>
+      i === selected.index ? unpackComposite(node, selectedComposite.def) : node,
+    )
+    apply(assignNodeIds({ ...data, nodes }))
+    setSelected(null)
+  }
+
   const commitTransform = () => {
     if (!selected) return
     const { position, rotation } = selected.object
@@ -184,9 +205,11 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         selected={selected?.index ?? null}
         canUndo={history.current.length > 0}
         canContribute={canContribute}
+        canUnpack={selectedComposite !== null}
         onAdd={addNode}
         onDuplicate={duplicateSelected}
         onDelete={deleteSelected}
+        onUnpack={unpackSelected}
         onUndo={undo}
         onContribute={() => setContributeOpen(true)}
       />
@@ -212,24 +235,64 @@ function EditableNodes({ nodes, registry, onSelect }: EditableNodesProps) {
     <>
       {nodes.map((node, index) => {
         if (SKIPPED.has(node.type)) return null
-        const Component = registry[node.type]
-        if (!Component) return null
 
+        const { position, rotation, ...rest } = node.props ?? {}
+        const select =
+          (index: number) =>
+          // biome-ignore lint/suspicious/noExplicitAny: r3f event typing is looser than the DOM's
+          (event: any) => {
+            event.stopPropagation()
+            onSelect(index, event.eventObject)
+          }
+
+        // The built-in Group (e.g. an unpacked composite): one selectable subtree.
+        if (node.type === 'Group') {
+          return (
+            // biome-ignore lint/a11y/noStaticElementInteractions: <group> is a three.js object, not a DOM element
+            <group
+              key={node.id ?? index}
+              position={asVec3(position) ?? [0, 0, 0]}
+              rotation={asVec3(rotation) ?? [0, 0, 0]}
+              onClick={select(index)}
+            >
+              {node.children?.length ? (
+                <WorldNodes nodes={node.children} registry={registry} />
+              ) : null}
+            </group>
+          )
+        }
+
+        const entry = registry[node.type]
+        if (!entry) return null
+
+        // A composite instance: expand its arrangement, selectable as a whole.
+        if (isCompositeDef(entry)) {
+          const arrangement = seedCompositeNodes(entry.nodes, rest.seed as number | undefined)
+          return (
+            // biome-ignore lint/a11y/noStaticElementInteractions: <group> is a three.js object, not a DOM element
+            <group
+              key={node.id ?? index}
+              position={asVec3(position) ?? [0, 0, 0]}
+              rotation={asVec3(rotation) ?? [0, 0, 0]}
+              onClick={select(index)}
+            >
+              <WorldNodes nodes={arrangement} registry={registry} />
+            </group>
+          )
+        }
+
+        const Component = entry
         if (NON_SELECTABLE.has(node.type)) {
           return <Component key={node.id ?? index} {...node.props} />
         }
 
-        const { position, rotation, ...rest } = node.props ?? {}
         return (
           // biome-ignore lint/a11y/noStaticElementInteractions: <group> is a three.js object, not a DOM element
           <group
             key={node.id ?? index}
             position={asVec3(position) ?? [0, 0, 0]}
             rotation={asVec3(rotation) ?? [0, 0, 0]}
-            onClick={(event) => {
-              event.stopPropagation()
-              onSelect(index, event.eventObject)
-            }}
+            onClick={select(index)}
           >
             <Component {...rest} />
           </group>
@@ -348,9 +411,11 @@ interface EditorToolbarProps {
   selected: number | null
   canUndo: boolean
   canContribute: boolean
+  canUnpack: boolean
   onAdd: (type: string) => void
   onDuplicate: () => void
   onDelete: () => void
+  onUnpack: () => void
   onUndo: () => void
   onContribute: () => void
 }
@@ -363,9 +428,11 @@ function EditorToolbar({
   selected,
   canUndo,
   canContribute,
+  canUnpack,
   onAdd,
   onDuplicate,
   onDelete,
+  onUnpack,
   onUndo,
   onContribute,
 }: EditorToolbarProps) {
@@ -438,6 +505,16 @@ function EditorToolbar({
       >
         Delete
       </button>
+      {canUnpack && (
+        <button
+          type="button"
+          style={button(false)}
+          onClick={onUnpack}
+          title="Replace this composite instance with its editable arrangement"
+        >
+          Unpack
+        </button>
+      )}
       <button
         type="button"
         style={button(false, !canUndo)}

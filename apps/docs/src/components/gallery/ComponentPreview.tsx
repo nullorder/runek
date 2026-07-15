@@ -2,14 +2,42 @@ import { OrbitControls } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { registry } from '@runek/components'
-import { DEFAULT_FONTS, DEFAULT_PALETTE, DEFAULT_WORLD_TIME, WorldContext } from '@runek/core'
+import {
+  DEFAULT_FONTS,
+  DEFAULT_PALETTE,
+  DEFAULT_WORLD_TIME,
+  isCompositeDef,
+  WorldContext,
+  WorldNodes,
+} from '@runek/core'
 import { type ComponentType, type ReactNode, useEffect, useRef, useState } from 'react'
 import type { Group } from 'three'
 import { DEFAULT_CAMERA, DEFAULT_TARGET, PREVIEW, SEEDED } from '../../lib/preview'
 
 type Props = { title: string; detail?: boolean }
 
-const components = registry as unknown as Record<string, ComponentType<Record<string, unknown>>>
+/** A component renders directly; a composite expands through the renderer path. */
+function PreviewSubject({
+  title,
+  seed,
+  props,
+}: {
+  title: string
+  seed: number
+  props?: Record<string, unknown>
+}) {
+  const entry = registry[title]
+  if (isCompositeDef(entry)) {
+    return (
+      <WorldNodes
+        nodes={[{ type: title, props: { seed, ...(props as Record<string, never>) } }]}
+        registry={registry}
+      />
+    )
+  }
+  const Component = entry as ComponentType<Record<string, unknown>>
+  return <Component seed={seed} {...props} />
+}
 
 function Spin({ children, enabled }: { children: ReactNode; enabled: boolean }) {
   const ref = useRef<Group>(null)
@@ -24,7 +52,7 @@ export default function ComponentPreview({ title, detail = false }: Props) {
   const [inView, setInView] = useState(false)
   const [seed, setSeed] = useState(3)
   const cfg = PREVIEW[title] ?? {}
-  const Component = components[title]
+  const entry = registry[title]
 
   // Mount the canvas only while on screen so we never exceed the browser's
   // WebGL context limit as the grid scrolls.
@@ -38,7 +66,7 @@ export default function ComponentPreview({ title, detail = false }: Props) {
     return () => io.disconnect()
   }, [])
 
-  if (cfg.skip || !Component) {
+  if (cfg.skip || !entry) {
     return (
       <div ref={ref} className="preview preview--empty">
         <span>{cfg.note ?? 'No standalone preview.'}</span>
@@ -65,7 +93,7 @@ export default function ComponentPreview({ title, detail = false }: Props) {
             <directionalLight position={[6, 10, 6]} intensity={1.5} castShadow />
             <Physics paused>
               <Spin enabled={!detail}>
-                <Component seed={seed} {...cfg.props} />
+                <PreviewSubject title={title} seed={seed} props={cfg.props} />
               </Spin>
             </Physics>
             <OrbitControls

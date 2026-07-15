@@ -1,6 +1,6 @@
 ---
 title: "Floor"
-summary: "Flat floor slab with a fixed collider."
+summary: "Flat floor slab with a fixed collider; optional stairwell opening."
 category: component
 component: floor
 order: 100
@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add floor
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.10.4`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.12.0`.
 
 ## Use it
 
@@ -31,6 +31,8 @@ export interface FloorProps {
   /** `[width, depth]` in units. The top surface sits at the component origin. */
   size?: [number, number]
   thickness?: number
+  /** A hole in the slab (stairwell); the slab splits into strips around it. */
+  opening?: FloorOpening
   /** Defaults to the world palette's `floor` slot. */
   color?: string
 }

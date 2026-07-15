@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import type { WorldFonts } from './font'
 import type { WorldPalette } from './palette'
+import { sub } from './rng'
 import type { AvatarView, Vec3, WorldFog } from './types'
 
 export type JsonValue =
@@ -78,8 +79,65 @@ export interface WorldData {
   nodes: WorldNode[]
 }
 
+/**
+ * A composite: a named arrangement of component nodes, held in a registry as data
+ * instead of code. A world places it as one reference node (`{ type: "House" }`);
+ * the renderer expands it eagerly into its arrangement.
+ */
+export interface CompositeDef {
+  kind: 'composite'
+  name?: string
+  description?: string
+  /** Reserved for the future streaming/LOD pass: impostor box `[w, h, d]` in units. */
+  bounds?: [number, number, number]
+  nodes: WorldNode[]
+}
+
 // biome-ignore lint/suspicious/noExplicitAny: a registry holds components with heterogeneous prop types
-export type ComponentRegistry = Record<string, ComponentType<any>>
+export type RegistryEntry = ComponentType<any> | CompositeDef
+
+export type ComponentRegistry = Record<string, RegistryEntry>
+
+/** True when a registry entry is a composite arrangement rather than a component. */
+export function isCompositeDef(entry: RegistryEntry | undefined): entry is CompositeDef {
+  return (
+    typeof entry === 'object' &&
+    entry !== null &&
+    (entry as CompositeDef).kind === 'composite' &&
+    Array.isArray((entry as CompositeDef).nodes)
+  )
+}
+
+/**
+ * Apply a composite instance's `seed` to its arrangement: children that don't pin
+ * their own seed get a stable derived one (`sub(seed, index)`), so one instance seed
+ * re-rolls the whole arrangement deterministically. Without a seed, nodes pass
+ * through unchanged.
+ */
+export function seedCompositeNodes(nodes: WorldNode[], seed?: number): WorldNode[] {
+  if (seed === undefined) return nodes
+  return nodes.map((node, index) =>
+    node.props?.seed !== undefined
+      ? node
+      : { ...node, props: { ...node.props, seed: sub(seed, index) } },
+  )
+}
+
+/**
+ * Expand a composite instance node into an editable `Group` subtree (the editor's
+ * "unpack"). The instance transform moves to the group; an instance seed is baked
+ * into the children so the unpacked result renders identically. The copy carries no
+ * ids — run the result through `assignNodeIds`.
+ */
+export function unpackComposite(node: WorldNode, def: CompositeDef): WorldNode {
+  const props = node.props ?? {}
+  const out: WorldNode = { type: 'Group', props: {} }
+  if (props.position !== undefined) out.props = { ...out.props, position: props.position }
+  if (props.rotation !== undefined) out.props = { ...out.props, rotation: props.rotation }
+  const seeded = seedCompositeNodes(def.nodes, props.seed as number | undefined)
+  out.children = JSON.parse(JSON.stringify(seeded)) as WorldNode[]
+  return out
+}
 
 /** Recreate a node with its keys in canonical order, recursing into children. */
 function normalizeNode(node: WorldNode): WorldNode {

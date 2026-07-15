@@ -13,6 +13,8 @@ The **source registry** (shadcn-style: pull editable component source into your 
 
 Source `content` is stored verbatim. Components import `@runek/core` from npm (each manifest declares it as a `dependency`, pinned to core's version), so there is no import to rewrite and manifests stay layout-agnostic. `core` is not a registry item; only components are copied.
 
+Two item `type`s exist: **`registry:component`** (a `.tsx` source file) and **`registry:composite`** (`house`, `room`) — a data *arrangement* of component nodes stored as JSON (see [CONTRACT §11](../CONTRACT.md)). A composite's `registryDependencies` are derived from the node `type`s its arrangement references, so `add house` pulls the arrangement plus every part it uses.
+
 ## Using it
 
 ```bash

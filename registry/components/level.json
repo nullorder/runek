@@ -1,0 +1,20 @@
+{
+  "name": "level",
+  "title": "Level",
+  "type": "registry:component",
+  "description": "A stackable wall ring plus optional slab: per-side openings, sides that can be omitted, and a stairwell hole — the unit a building is composed from.",
+  "dependencies": [
+    "@runek/core@^0.12.0"
+  ],
+  "registryDependencies": [
+    "floor",
+    "wall"
+  ],
+  "files": [
+    {
+      "path": "Level.tsx",
+      "content": "import { useWorld, type Vec3 } from '@runek/core'\nimport { Floor, type FloorOpening } from './Floor'\nimport { Wall, type WallOpening } from './Wall'\n\n/** One side of a level's wall ring. */\nexport interface LevelWallConfig {\n  /** Set `false` to leave this side open (porch, lean-to). */\n  present?: boolean\n  openings?: WallOpening[]\n  /** Defaults to the level `color`, then the world palette's `wall` slot. */\n  color?: string\n}\n\n/** Per-side wall configs: front is +z, back is -z, left is -x, right is +x. */\nexport interface LevelWalls {\n  front?: LevelWallConfig\n  back?: LevelWallConfig\n  left?: LevelWallConfig\n  right?: LevelWallConfig\n}\n\nexport interface LevelFloorConfig {\n  opening?: FloorOpening\n  thickness?: number\n  /** Defaults to the world palette's `floor` slot. */\n  color?: string\n}\n\nexport interface LevelProps {\n  position?: Vec3\n  rotation?: Vec3\n  /** Interior footprint `[width, depth]`, in units. */\n  size?: [number, number]\n  height?: number\n  thickness?: number\n  /** Per-side wall configs; an omitted side renders a solid wall. */\n  walls?: LevelWalls\n  /** The slab underfoot; `false` for none, or a config with a stairwell `opening`. */\n  floor?: boolean | LevelFloorConfig\n  /** Defaults to the world palette's `wall` slot. */\n  color?: string\n  /** Reserved for procedural variation. */\n  seed?: number\n}\n\nconst SIDE_TURN: Vec3 = [0, Math.PI / 2, 0]\n\n/**\n * One ring of walls plus an optional slab — the stackable unit of a building.\n * Its origin is the base of its walls, so level N sits at the summed height of\n * the levels below it. Composes `Wall` and `Floor`.\n */\nexport function Level({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  size = [8, 8],\n  height = 3,\n  thickness = 0.2,\n  walls,\n  floor = true,\n  color,\n}: LevelProps) {\n  const { unit } = useWorld()\n  const [w, d] = size\n  const halfW = (w / 2) * unit\n  const halfD = (d / 2) * unit\n  const floorConfig = floor === true ? {} : floor\n\n  const side = (config: LevelWallConfig | undefined, pos: Vec3, turned: boolean, width: number) =>\n    config?.present === false ? null : (\n      <Wall\n        position={pos}\n        rotation={turned ? SIDE_TURN : undefined}\n        width={width}\n        height={height}\n        thickness={thickness}\n        color={config?.color ?? color}\n        openings={config?.openings}\n      />\n    )\n\n  return (\n    <group position={position} rotation={rotation}>\n      {floorConfig && (\n        <Floor\n          position={[0, 0, 0]}\n          size={size}\n          thickness={floorConfig.thickness ?? thickness}\n          opening={floorConfig.opening}\n          color={floorConfig.color}\n        />\n      )}\n      {side(walls?.front, [0, 0, halfD], false, w)}\n      {side(walls?.back, [0, 0, -halfD], false, w)}\n      {side(walls?.left, [-halfW, 0, 0], true, d)}\n      {side(walls?.right, [halfW, 0, 0], true, d)}\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

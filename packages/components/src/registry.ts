@@ -1,4 +1,4 @@
-import type { ComponentRegistry } from '@runek/core'
+import type { ComponentRegistry, CompositeDef } from '@runek/core'
 import { Arch } from './Arch'
 import { Barrel } from './Barrel'
 import { Bed } from './Bed'
@@ -15,6 +15,8 @@ import { Clouds } from './Clouds'
 import { Compass } from './Compass'
 import { Counter } from './Counter'
 import { Crate } from './Crate'
+import houseComposite from './composites/house.json'
+import roomComposite from './composites/room.json'
 import { Dock } from './Dock'
 import { Door } from './Door'
 import { Fence } from './Fence'
@@ -24,10 +26,10 @@ import { Flowers } from './Flowers'
 import { Fountain } from './Fountain'
 import { Grass } from './Grass'
 import { Hedge } from './Hedge'
-import { House } from './House'
 import { Hut } from './Hut'
 import { Lake } from './Lake'
 import { Lamp } from './Lamp'
+import { Level } from './Level'
 import { LightRig } from './LightRig'
 import { Ocean } from './Ocean'
 import { Path } from './Path'
@@ -38,7 +40,6 @@ import { Portal } from './Portal'
 import { Road } from './Road'
 import { Rocks } from './Rocks'
 import { Roof } from './Roof'
-import { Room } from './Room'
 import { Rug } from './Rug'
 import { Sailboat } from './Sailboat'
 import { Shelf } from './Shelf'
@@ -84,10 +85,13 @@ export const registry: ComponentRegistry = {
   Fountain,
   Grass,
   Hedge,
-  House,
+  // Composites: data-only arrangements of the parts below, expanded by the renderer.
+  // (JSON imports infer wide types — number[] vs the bounds tuple — hence the two-step cast.)
+  House: houseComposite as unknown as CompositeDef,
   Hut,
   Lake,
   Lamp,
+  Level,
   LightRig,
   Ocean,
   Path,
@@ -98,7 +102,7 @@ export const registry: ComponentRegistry = {
   Road,
   Rocks,
   Roof,
-  Room,
+  Room: roomComposite as unknown as CompositeDef,
   Rug,
   Sailboat,
   Shelf,
