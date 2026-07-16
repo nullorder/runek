@@ -1,6 +1,6 @@
 ---
 title: "Player"
-summary: "First/third-person character controller (ecctrl wrapper)."
+summary: "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings."
 category: component
 component: player
 order: 100

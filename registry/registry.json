@@ -8,7 +8,7 @@
       "title": "Player",
       "type": "registry:component",
       "category": "character",
-      "description": "First/third-person character controller (ecctrl wrapper).",
+      "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings.",
       "files": [{ "path": "packages/components/src/Player.tsx", "target": "Player.tsx" }]
     },
     {

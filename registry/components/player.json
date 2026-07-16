@@ -2,7 +2,7 @@
   "name": "player",
   "title": "Player",
   "type": "registry:component",
-  "description": "First/third-person character controller (ecctrl wrapper).",
+  "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings.",
   "dependencies": [
     "@react-three/drei@^10.7.7",
     "@react-three/fiber@^9.6.1",

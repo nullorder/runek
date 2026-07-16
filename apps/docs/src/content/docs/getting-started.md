@@ -38,7 +38,7 @@ export function FirstWorld() {
 }
 ```
 
-`<World>` sets up the canvas, lighting, physics, and keyboard controls. `<Player>` is a first-person controller by default — drop in and walk.
+`<World>` sets up the canvas, lighting, physics, and keyboard controls. `<Player>` is a first-person controller by default — drop in and walk: WASD moves, the arrow keys or a mouse-drag steer the camera. The world's [`avatar` and `controls` settings](/docs/the-world-provider#controls) change the view and the bindings.
 
 ## Same seed, same world
 

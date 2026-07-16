@@ -334,7 +334,7 @@ export default function LibraryWorld({
           <b>WASD</b> move
         </span>
         <span>
-          <b>drag</b> look
+          <b>arrows/drag</b> look
         </span>
         <span>
           <b>click</b> a book
