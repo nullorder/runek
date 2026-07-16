@@ -4,6 +4,7 @@ import { Barrel } from './Barrel'
 import { Bed } from './Bed'
 import { Bench } from './Bench'
 import { Birds } from './Birds'
+import { Book } from './Book'
 import { Bookshelf } from './Bookshelf'
 import { Bridge } from './Bridge'
 import { Bush } from './Bush'
@@ -65,6 +66,7 @@ export const registry: ComponentRegistry = {
   Bed,
   Bench,
   Birds,
+  Book,
   Bookshelf,
   Bridge,
   Bush,

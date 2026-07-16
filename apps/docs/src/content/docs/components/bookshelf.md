@@ -32,6 +32,7 @@ export interface BookshelfProps {
   width?: number
   height?: number
   depth?: number
+  /** Number of rows. Defaults to 3; set 1 or 2 for a shorter case. */
   shelves?: number
   /**
    * Fraction of shelf space filled with procedural decoration, 0–1. Defaults to

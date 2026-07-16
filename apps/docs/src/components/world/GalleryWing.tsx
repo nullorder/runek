@@ -1,8 +1,7 @@
-import { Html } from '@react-three/drei'
 import { RigidBody } from '@react-three/rapier'
-import { Floor, Lake, Lamp, Rocks, Rug, registry, Sign, Trees, Wall } from '@runek/components'
+import { Book, Floor, Lake, Lamp, Rocks, Rug, registry, Sign, Trees, Wall } from '@runek/components'
 import { isCompositeDef, WorldNodes } from '@runek/core'
-import { type ComponentType, useMemo, useState } from 'react'
+import { type ComponentType, useMemo } from 'react'
 import { DEFAULT_CAMERA, PREVIEW } from '../../lib/preview'
 import type { DocMeta } from './LibraryWorld'
 
@@ -94,7 +93,6 @@ function miniScale(name: string): number {
 }
 
 function GuideBook({ doc, onSelect }: { doc: DocMeta; onSelect: (doc: DocMeta) => void }) {
-  const [hot, setHot] = useState(false)
   return (
     <group>
       {/* reading stand */}
@@ -102,46 +100,19 @@ function GuideBook({ doc, onSelect }: { doc: DocMeta; onSelect: (doc: DocMeta) =
         <boxGeometry args={[0.12, 0.6, 0.12]} />
         <meshStandardMaterial color="#3a2c1d" roughness={0.8} />
       </mesh>
-      {/* the guide, angled toward the visitor */}
-      <mesh
-        castShadow
-        position={[0, 0.63, 0]}
-        rotation={[-0.5, 0, 0]}
-        scale={hot ? 1.15 : 1}
-        onClick={(e) => {
-          e.stopPropagation()
-          onSelect(doc)
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation()
-          setHot(true)
-          document.body.style.cursor = 'pointer'
-        }}
-        onPointerOut={() => {
-          setHot(false)
-          document.body.style.cursor = 'auto'
-        }}
-      >
-        <boxGeometry args={[0.34, 0.07, 0.26]} />
-        <meshStandardMaterial color={hot ? '#f0c084' : '#e0a96d'} roughness={0.7} />
-      </mesh>
-      {hot && (
-        <Html position={[0, 0.95, 0]} center distanceFactor={6} zIndexRange={[30, 0]}>
-          <div
-            style={{
-              padding: '2px 8px',
-              borderRadius: 6,
-              background: 'rgba(10, 14, 20, 0.85)',
-              color: '#f4efe6',
-              font: '500 12px/1.4 system-ui, sans-serif',
-              whiteSpace: 'nowrap',
-              pointerEvents: 'none',
-            }}
-          >
-            {doc.title}
-          </div>
-        </Html>
-      )}
+      {/* the guide, opened on the stand and angled toward the visitor; the Book
+          component owns the hover pop, cursor, and title label */}
+      <group position={[0, 0.62, 0]} rotation={[-0.5, 0, 0]}>
+        <Book
+          pose="open"
+          width={0.17}
+          height={0.26}
+          thickness={0.06}
+          color="#e0a96d"
+          title={doc.title}
+          onSelect={() => onSelect(doc)}
+        />
+      </group>
     </group>
   )
 }

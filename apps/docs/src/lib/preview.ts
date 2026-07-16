@@ -20,6 +20,7 @@ export const DEFAULT_TARGET: [number, number, number] = [0, 0.9, 0]
 /** Components whose geometry visibly changes with `seed` — these get the re-roll control.
  *  (`House` qualifies as a composite: its seed cascades to seeded children like `Plant`.) */
 export const SEEDED = new Set([
+  'Book',
   'Bookshelf',
   'House',
   'Bush',
@@ -38,6 +39,7 @@ export const SEEDED = new Set([
 export const PREVIEW: Record<string, PreviewConfig> = {
   // Empty by default now; show the decorative fill variant in the gallery.
   Bookshelf: { props: { fill: 0.7 } },
+  Book: { camera: [0.5, 0.45, 0.7], target: [0, 0.06, 0] },
   Clock: { camera: [0, 0, 2.4], target: [0, 0, 0] },
   Sign: {
     camera: [0, 0, 3],

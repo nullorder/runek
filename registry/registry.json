@@ -219,6 +219,14 @@
       "files": [{ "path": "packages/components/src/Bookshelf.tsx", "target": "Bookshelf.tsx" }]
     },
     {
+      "name": "book",
+      "title": "Book",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A single procedural book — standing, lying, or open — with a seeded cover and optional click interaction; the standalone sibling of Bookshelf's instanced spines.",
+      "files": [{ "path": "packages/components/src/Book.tsx", "target": "Book.tsx" }]
+    },
+    {
       "name": "lake",
       "title": "Lake",
       "type": "registry:component",

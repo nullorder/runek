@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content'
 import { marked } from 'marked'
+import changelogRaw from '../../../../CHANGELOG.md?raw'
 import LibraryWorld from '../components/world/LibraryWorld.tsx'
 import '../styles/global.css'
 
@@ -9,16 +10,22 @@ import '../styles/global.css'
 // to HTML here (build time) and read in-world; marked never reaches the client
 // bundle.
 const all = await getCollection('docs')
+// The changelog entry is an MDX shim that imports the root CHANGELOG.md; the
+// in-world reader needs real markdown, so substitute the source file (minus its
+// own H1 — the reader already shows the title).
+const rawBody = (d: { id: string; body?: string }) =>
+  d.id === 'changelog' ? changelogRaw.replace(/^# .*\n/, '') : (d.body ?? '')
 const toMeta = (d: (typeof all)[number]) => ({
   slug: d.id,
   title: d.data.title,
   summary: d.data.summary ?? '',
   category: d.data.category,
   component: d.data.component,
-  body: marked.parse(d.body ?? '', { async: false }) as string,
+  body: marked.parse(rawBody(d), { async: false }) as string,
 })
+const SHELVED = new Set(['intro', 'guide', 'reference'])
 const docs = all
-  .filter((d) => d.data.category === 'intro' || d.data.category === 'guide')
+  .filter((d) => SHELVED.has(d.data.category))
   .sort((a, b) => a.data.order - b.data.order)
   .map(toMeta)
 const componentDocs = all

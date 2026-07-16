@@ -93,7 +93,10 @@ arrangement (a `Group` of ordinary nodes) for per-instance customization.
         "depth": 3
       }
     },
-    { "type": "Door", "props": { "position": [0, 0, 3.5], "width": 1, "height": 2.1, "openAngle": -1.1 } },
+    {
+      "type": "Door",
+      "props": { "position": [0, 0, 3.5], "width": 1, "height": 2.1, "openAngle": -1.1 }
+    },
     { "type": "Window", "props": { "position": [-3, 1, 3.5], "width": 1.3, "height": 1.2 } },
     { "type": "Window", "props": { "position": [3, 1, 3.5], "width": 1.3, "height": 1.2 } },
     {
@@ -108,11 +111,21 @@ arrangement (a `Group` of ordinary nodes) for per-instance customization.
     { "type": "Window", "props": { "position": [3, 3.9, 3.5], "width": 1.3, "height": 1.1 } },
     {
       "type": "Window",
-      "props": { "position": [-4.5, 3.9, 0], "rotation": [0, 1.5708, 0], "width": 1.3, "height": 1.1 }
+      "props": {
+        "position": [-4.5, 3.9, 0],
+        "rotation": [0, 1.5708, 0],
+        "width": 1.3,
+        "height": 1.1
+      }
     },
     {
       "type": "Window",
-      "props": { "position": [4.5, 3.9, 0], "rotation": [0, 1.5708, 0], "width": 1.3, "height": 1.1 }
+      "props": {
+        "position": [4.5, 3.9, 0],
+        "rotation": [0, 1.5708, 0],
+        "width": 1.3,
+        "height": 1.1
+      }
     },
     { "type": "Roof", "props": { "position": [0, 5.6, 0], "size": [9, 7], "style": "gable" } },
     { "type": "Plant", "props": { "position": [-3.5, 0, 2.3] } }

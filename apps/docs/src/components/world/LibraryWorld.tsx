@@ -42,13 +42,18 @@ const LIBRARY_PALETTE: Partial<WorldPalette> = {
   accent: '#c2a05a',
 }
 
-/** The four doc shelves on the far wall; the docs are dealt across them in order. */
+/** The four doc shelves on the far wall. Each shelf holds one labeled category
+ * section (guides span two shelves: `slot` n `of` m), so a new doc only ever
+ * joins its own section instead of reshuffling every shelf. */
 const WALL_SHELVES = [
-  { x: -5, seed: 3 },
-  { x: -3.4, seed: 7 },
-  { x: 3.4, seed: 11 },
-  { x: 5, seed: 17 },
+  { x: -5, seed: 3, label: 'Intro', category: 'intro', slot: 0, of: 1 },
+  { x: -3.4, seed: 7, label: 'Guides', category: 'guide', slot: 0, of: 2 },
+  { x: 3.4, seed: 11, label: 'Guides', category: 'guide', slot: 1, of: 2 },
+  { x: 5, seed: 17, label: 'Reference', category: 'reference', slot: 0, of: 1 },
 ]
+
+/** Rows per wall case (the Bookshelf default); books spread across them. */
+const SHELF_ROWS = 3
 
 /** Runek's display face, served from the docs public dir. The world declares it
  * as its `display` font, and every `Sign` draws from there. troika needs ttf/otf
@@ -171,12 +176,24 @@ export default function LibraryWorld({
   const [selected, setSelected] = useState<DocMeta | null>(null)
 
   // One clickable spine per doc; ids are slugs so a select maps back to its doc.
-  const books = useMemo<BookSpec[]>(
+  // Books are grouped per shelf by the shelf's category section, in reading
+  // order, and spread across the case's rows top-to-bottom (e.g. on Reference,
+  // the CLI reference sits on the top row and the changelog on the bottom).
+  const shelfBooks = useMemo<BookSpec[][]>(
     () =>
-      docs.map((doc) => ({ id: doc.slug, title: doc.title, color: CATEGORY_COLOR[doc.category] })),
+      WALL_SHELVES.map(({ category, slot, of }) => {
+        const section = docs.filter((doc) => doc.category === category)
+        const size = Math.ceil(section.length / of)
+        const chunk = section.slice(slot * size, (slot + 1) * size)
+        return chunk.map((doc, i) => ({
+          id: doc.slug,
+          title: doc.title,
+          color: CATEGORY_COLOR[doc.category],
+          shelf: Math.round((i * (SHELF_ROWS - 1)) / Math.max(1, chunk.length - 1)),
+        }))
+      }),
     [docs],
   )
-  const perShelf = Math.ceil(books.length / WALL_SHELVES.length)
   const zone = useMemo(clockZoneLabel, [])
   const openDoc = (book: BookSpec) => {
     const doc = docs.find((d) => d.slug === book.id)
@@ -272,17 +289,19 @@ export default function LibraryWorld({
         />
 
         {/* The doc shelves lining the far wall: every book is a clickable doc,
-            dealt across the four shelves in reading order. */}
-        {WALL_SHELVES.map(({ x, seed }, i) => (
+            grouped into labeled category sections. */}
+        {WALL_SHELVES.map(({ x, seed, label, category }, i) => (
           <Bookshelf
             key={x}
-            position={[x, 0.8, 6.5]}
+            position={[x, 0.9, 6.5]}
             rotation={[0, Math.PI, 0]}
             width={1.1}
-            height={1.6}
-            shelves={2}
+            height={1.8}
+            shelves={SHELF_ROWS}
             seed={seed}
-            books={books.slice(i * perShelf, (i + 1) * perShelf)}
+            label={label}
+            labelColor={CATEGORY_COLOR[category]}
+            books={shelfBooks[i]}
             onBookSelect={openDoc}
           />
         ))}

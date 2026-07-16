@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Docs library: the reading-room shelves are labeled category sections
+  (Intro / Guides / Reference) instead of an unlabeled even deal, so a
+  new doc only joins its own section rather than reshuffling every
+  shelf. Reference docs (CLI, changelog) now shelve too, and the
+  changelog book reads the root `CHANGELOG.md` in-world. Books spread
+  across each case's rows (the CLI reference sits on the Reference
+  shelf's top row, the changelog on its bottom).
+- `BookSpec.shelf`: pin a `Bookshelf` book to a specific row (0 = top,
+  clamped); books without a row keep auto-packing bottom-up around the
+  placed ones.
+- `Book` component: a single procedural book — `standing`, `lying`, or
+  `open` — with a seeded cloth cover and optional `href`/`onSelect`
+  interaction (hover pop + title label). The standalone, placeable
+  sibling of `Bookshelf`'s instanced spines; decorative, no collider.
+  The gallery wing's guide books now use it (open, on their stands).
+
 - **Composites**: a new registry kind holding a named *arrangement* of
   component nodes as JSON instead of code. A world places one node
   (`{ "type": "House" }`); the renderer expands the arrangement in place,
@@ -55,6 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `Bookshelf` defaults to 3 rows (`shelves` was 4); pass `shelves={1}`
+  or `shelves={2}` for a shorter case, or any other count.
 - **Breaking:** `House` and `Room` are no longer coded components — the
   registry names now resolve to composites (the default `house` is a
   two-level dwelling with a working staircase). Worlds that placed them
