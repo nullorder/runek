@@ -168,10 +168,13 @@ function clockZoneLabel(): string {
 export default function LibraryWorld({
   docs,
   componentDocs = [],
+  version,
 }: {
   docs: DocMeta[]
   /** One doc per registry component — the gallery wing's guide books. */
   componentDocs?: DocMeta[]
+  /** Current Runek version, painted under the wall mark (e.g. "0.13.0"). */
+  version?: string
 }) {
   const [selected, setSelected] = useState<DocMeta | null>(null)
 
@@ -232,6 +235,18 @@ export default function LibraryWorld({
         {/* "RUNEK" painted on the left (+x) wall; the right wall hosts the
             gallery doorway instead, with a lintel sign facing the room. */}
         <WallWord position={[6.78, 2.7, 0]} rotation={[0, -Math.PI / 2, 0]} />
+        {/* the current version, painted small beneath the mark */}
+        {version && (
+          <Sign
+            position={[6.78, 1.45, 0]}
+            rotation={[0, -Math.PI / 2, 0]}
+            size={0.16}
+            letterSpacing={0.06}
+            color={RUNE_GREEN}
+          >
+            {`v${version}`}
+          </Sign>
+        )}
         <Sign
           position={[-6.78, 3.35, 0]}
           rotation={[0, Math.PI / 2, 0]}

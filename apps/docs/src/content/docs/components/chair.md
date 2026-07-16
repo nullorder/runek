@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add chair
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.12.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`.
 
 ## Use it
 

@@ -9,12 +9,13 @@ export type PlayerView = AvatarView
 
 // Keyboard look. ecctrl only moves its camera from mouse/touch/gamepad — there are no key
 // actions for it — so we drive its camera rig ourselves from the `turnLeft`/`turnRight` and
-// `lookUp`/`lookDown` actions in the keyboard map (see `keyboardMap` in `@runek/core`). Yaw is
-// the pivot's `rotation.y`; pitch is the follow-cam's `rotation.x` plus a matching reposition
-// along a vertical arc, exactly as ecctrl's own mouse handler does. ecctrl writes these only on
-// pointer input (never per frame in CameraBasedMovement), so our additions compose cleanly with
-// mouse-drag. Third-person only: it drives the follow-cam orbit; a map without these actions
-// (or first-person, where there is no orbit) simply leaves the camera to mouse control.
+// `lookUp`/`lookDown` actions in the world's controls (see `DEFAULT_CONTROLS` in `@runek/core`).
+// Yaw is the pivot's `rotation.y`; pitch is the follow-cam's `rotation.x` plus a matching
+// reposition along a vertical arc, exactly as ecctrl's own mouse handler does — the same math
+// ecctrl runs in both views, so this works first- and third-person alike. ecctrl writes these
+// only on pointer input (never per frame in CameraBasedMovement), so our additions compose
+// cleanly with mouse-drag. A world whose controls omit these actions leaves the camera entirely
+// to the mouse.
 const TURN_SPEED = 1.8 // yaw, radians/second
 const LOOK_SPEED = 1.2 // pitch, radians/second
 // Pitch clamp — mirrors ecctrl's camLowLimit / camUpLimit defaults (we pass neither to Ecctrl).
@@ -39,9 +40,11 @@ function CameraKeyLook() {
             o.children.length === 1 &&
             o.children[0].type === 'Object3D' &&
             o.children[0].children.length === 0 &&
-            // The follow-cam sits offset back along z (≈ third-person camera distance),
-            // which distinguishes ecctrl's pivot from other bare Object3Ds at the origin.
-            Math.abs(o.children[0].position.z) > 1,
+            // The follow-cam sits offset back along -z (the third-person camera
+            // distance, or -0.01 in first person). Sign + shape identify ecctrl's
+            // pivot in both views without tying keyboard look to one of them.
+            o.children[0].position.x === 0 &&
+            o.children[0].position.z < -0.001,
         ) ?? null
       if (!pivot.current) return
     }

@@ -100,9 +100,10 @@ function GuideBook({ doc, onSelect }: { doc: DocMeta; onSelect: (doc: DocMeta) =
         <boxGeometry args={[0.12, 0.6, 0.12]} />
         <meshStandardMaterial color="#3a2c1d" roughness={0.8} />
       </mesh>
-      {/* the guide, opened on the stand and angled toward the visitor; the Book
-          component owns the hover pop, cursor, and title label */}
-      <group position={[0, 0.62, 0]} rotation={[-0.5, 0, 0]}>
+      {/* the guide, opened on the stand and angled toward the visitor in the
+          corridor (+z); the Book component owns the hover pop, cursor, and
+          title label */}
+      <group position={[0, 0.62, 0]} rotation={[0.5, 0, 0]}>
         <Book
           pose="open"
           width={0.17}

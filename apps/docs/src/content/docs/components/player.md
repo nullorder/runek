@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add player
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@runek/core@^0.12.0`, `ecctrl@^1.0.97`, `three@^0.184.0`.
+Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@runek/core@^0.13.0`, `ecctrl@^1.0.97`, `three@^0.184.0`.
 
 ## Use it
 

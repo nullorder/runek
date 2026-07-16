@@ -4,7 +4,7 @@ import { Physics } from '@react-three/rapier'
 import { type ReactNode, useMemo } from 'react'
 import { WorldContext } from './context'
 import { DEFAULT_FONTS, type WorldFonts } from './font'
-import { keyboardMap as defaultKeyboardMap } from './keyboard'
+import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { resolveWorldTime } from './time'
 import type { AvatarView, Vec3, WorldFog } from './types'
@@ -15,6 +15,12 @@ export interface WorldProps {
   /** Baseline ground level (Y). Floor-sitting and water components default to it;
    *  an explicit `position` still wins. Default 0. */
   ground?: number
+  /** Remap input bindings: a partial action → `KeyboardEvent.code[]` map merged
+   *  over the defaults (serializable — travels in world files as `controls`).
+   *  Unknown action names become custom bindings components can read. */
+  controls?: WorldControls
+  /** Low-level escape hatch: a complete drei keyboard map, passed verbatim.
+   *  Wins over `controls` when given. Prefer `controls`, which serializes. */
   keyboardMap?: KeyboardControlsEntry[]
   /** Render the default light rig. Set false to supply your own (e.g. <LightRig>). */
   lights?: boolean
@@ -47,7 +53,8 @@ export function World({
   unit = 1,
   gravity = [0, -9.81, 0],
   ground = 0,
-  keyboardMap = defaultKeyboardMap,
+  controls,
+  keyboardMap,
   lights = true,
   palette,
   fonts,
@@ -60,6 +67,21 @@ export function World({
   debug = false,
   children,
 }: WorldProps) {
+  // An explicit keyboardMap wins verbatim; otherwise the world's partial
+  // `controls` merge over the defaults. The context always reflects the
+  // bindings actually in effect, so components can read/display them.
+  const resolvedControls = useMemo(
+    () =>
+      keyboardMap
+        ? Object.fromEntries(keyboardMap.map((entry) => [entry.name, entry.keys]))
+        : resolveControls(controls),
+    [keyboardMap, controls],
+  )
+  const inputMap = useMemo(
+    () => keyboardMap ?? controlsToMap(resolvedControls),
+    [keyboardMap, resolvedControls],
+  )
+
   const context = useMemo(
     () => ({
       unit,
@@ -69,12 +91,13 @@ export function World({
       fonts: { ...DEFAULT_FONTS, ...fonts },
       time: resolveWorldTime({ time, timezone }),
       avatar,
+      controls: resolvedControls,
     }),
-    [unit, gravity, ground, palette, fonts, time, timezone, avatar],
+    [unit, gravity, ground, palette, fonts, time, timezone, avatar, resolvedControls],
   )
 
   return (
-    <KeyboardControls map={keyboardMap}>
+    <KeyboardControls map={inputMap}>
       <Canvas
         shadows
         camera={{ position: [6, 4, 6], fov: 60 }}

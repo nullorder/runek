@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shelf. Reference docs (CLI, changelog) now shelve too, and the
   changelog book reads the root `CHANGELOG.md` in-world. Books spread
   across each case's rows (the CLI reference sits on the Reference
-  shelf's top row, the changelog on its bottom).
+  shelf's top row, the changelog on its bottom). The painted RUNEK
+  mark carries the current version beneath it.
 - `BookSpec.shelf`: pin a `Bookshelf` book to a specific row (0 = top,
   clamped); books without a row keep auto-packing bottom-up around the
   placed ones.
@@ -24,6 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   interaction (hover pop + title label). The standalone, placeable
   sibling of `Bookshelf`'s instanced spines; decorative, no collider.
   The gallery wing's guide books now use it (open, on their stands).
+- **`controls`: input bindings are a world setting.** A partial
+  `action → KeyboardEvent.code[]` map merged over the defaults, on
+  `WorldData`/`<World>` and resolved at `useWorld().controls` — remap
+  for AZERTY (`{ "forward": ["KeyW", "KeyZ"] }`), disable an action
+  with `[]`, or add custom action names your own components read via
+  `useKeyboardControls`. Orthogonal to `avatar`; the JSX `keyboardMap`
+  prop remains the verbatim escape hatch and wins when given.
 
 - **Composites**: a new registry kind holding a named *arrangement* of
   component nodes as JSON instead of code. A world places one node
@@ -71,6 +79,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Arrow-key camera look now works in **first person** too (it was
+  third-person only): Left/Right turn, Up/Down look, in both views,
+  composing with mouse-drag as before.
 - `Bookshelf` defaults to 3 rows (`shelves` was 4); pass `shelves={1}`
   or `shelves={2}` for a shorter case, or any other count.
 - **Breaking:** `House` and `Room` are no longer coded components — the

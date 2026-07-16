@@ -19,6 +19,7 @@ interface WorldData {
   time?: string // pinned time-of-day "HH:MM" (reproducible day/night)
   timezone?: string // OR an IANA zone for a live, clock-driven day/night
   avatar?: 'first' | 'third' // default player camera view
+  controls?: Record<string, string[]> // input remap: action → KeyboardEvent.codes
   palette?: Partial<WorldPalette> // color-slot overrides for the whole world
   fonts?: Partial<WorldFonts> // fonts the world ships, by role (display, body)
   fog?: { color: string; near: number; far: number }
@@ -64,6 +65,7 @@ A handful of top-level fields are the world's **rules**: values components read 
 
 - **`time`** pins a fixed time-of-day (`"HH:MM"`, 24-hour), so the world is fully reproducible: the same file lights the same way every time. **`timezone`** (an IANA zone like `"Asia/Kolkata"`) makes the world *live* instead — the day/night state tracks the real clock, an explicit exception to determinism. A pin wins if both are set. Day/night-aware components read the resolved value as `useWorld().time`: `Sky` arcs the sun overhead by day and swaps to a dark, starlit dome at night, and `LightRig` follows it with golden-hour tints and dim moonlight.
 - **`avatar`** (`"first"` or `"third"`) is the default camera view. `Player` uses it unless its own `view` prop is set — an explicit prop always wins.
+- **`controls`** remaps input bindings: a partial `action → KeyboardEvent.code[]` map merged over the defaults (WASD moves, arrow keys turn/look — in either view). Declare only what you change (`{ "forward": ["KeyW", "KeyZ"] }` for AZERTY), bind `[]` to disable an action, or add unknown action names as custom bindings your own components read via `useKeyboardControls`. Components see the resolved map at `useWorld().controls`. Controls are orthogonal to `avatar`: bindings behave the same in every view.
 - **`ground`** is the baseline ground level (a `Y` value, default `0`): the datum that `Floor` and water like `Lake` default their placement to. In a coastal world it is effectively your **sea level**, the terrain rises from it and the water sits at it, so moving `ground` shifts a whole world's datum at once (a sunken basin, a plateau). Open water sits at or below it (a floating lake is a bug); an explicit `position` still wins.
 - **`fonts`** are the typefaces the world ships, keyed by role (`display` for titles and signage, `body` for labels). They are the one exception to the no-assets moat: components hold no fonts, so the world declares them and `Sign` draws from them. An undeclared role falls back to the pixel font bundled in `@runek/core`, so `Sign` always renders even with no `fonts` set.
 

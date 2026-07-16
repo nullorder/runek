@@ -25,7 +25,15 @@ type Selection = { index: number; object: Object3D } | null
 export interface WorldEditorProps
   extends Omit<
     WorldProps,
-    'children' | 'unit' | 'gravity' | 'palette' | 'fog' | 'time' | 'timezone' | 'avatar'
+    | 'children'
+    | 'unit'
+    | 'gravity'
+    | 'palette'
+    | 'fog'
+    | 'time'
+    | 'timezone'
+    | 'avatar'
+    | 'controls'
   > {
   data: WorldData
   registry: ComponentRegistry
@@ -180,6 +188,7 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         time={data.time}
         timezone={data.timezone}
         avatar={data.avatar}
+        controls={data.controls}
         preserveDrawingBuffer={canContribute}
         onPointerMissed={() => setSelected(null)}
       >

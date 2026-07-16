@@ -33,8 +33,28 @@ import { Player } from './runek/Player'
 | `gravity` | `[x, y, z]` | `[0, -9.81, 0]` | Physics gravity. |
 | `lights` | `boolean` | `true` | Render the default lights. Set `false` to use your own. |
 | `palette` | `Partial<WorldPalette>` | built-in | Override color slots; every component re-themes at once. |
+| `controls` | `Record<string, string[]>` | built-in | Remap input bindings (action → key codes); serializable. |
 | `fog` | `{ color, near, far }` | off | Linear distance fog; pair the color with the sky's horizon. |
 | `debug` | `boolean` | `false` | Draw Rapier collider wireframes. |
+
+## Controls
+
+Input bindings are a world setting, not a hardcode. The defaults move with
+WASD and steer the camera with the arrow keys (Left/Right turn, Up/Down look
+— in first *and* third person, composing with mouse-drag). Override any
+subset; the rest keep their defaults:
+
+```tsx
+<World controls={{ forward: ['KeyW', 'KeyZ'], leftward: ['KeyA', 'KeyQ'] }}>
+  {/* AZERTY-friendly: ZQSD moves too */}
+</World>
+```
+
+Keys are `KeyboardEvent.code` names. Bind an action to `[]` to disable it, or
+add your own action names — they become bindings any component can read with
+drei's `useKeyboardControls`. The resolved map is available to components at
+`useWorld().controls`. For a completely custom drei map there's still the
+low-level `keyboardMap` prop, which wins verbatim when given.
 
 ## The palette
 

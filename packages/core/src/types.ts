@@ -1,4 +1,5 @@
 import type { WorldFonts } from './font'
+import type { WorldControls } from './keyboard'
 import type { WorldPalette } from './palette'
 import type { WorldTime } from './time'
 
@@ -42,4 +43,8 @@ export interface WorldContextValue {
   time: WorldTime
   /** World default camera view for the player, if the world declares one. */
   avatar?: AvatarView
+  /** Resolved input bindings (action → `KeyboardEvent.code`s): the world's
+   *  `controls` over the defaults, or derived from an explicit `keyboardMap`.
+   *  Components can read it to consume or display the actual bindings. */
+  controls: WorldControls
 }

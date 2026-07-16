@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import type { WorldFonts } from './font'
+import type { WorldControls } from './keyboard'
 import type { WorldPalette } from './palette'
 import { sub } from './rng'
 import type { AvatarView, Vec3, WorldFog } from './types'
@@ -70,6 +71,9 @@ export interface WorldData {
   timezone?: string
   /** World default camera view; `Player` reads it when its own `view` is unset. */
   avatar?: AvatarView
+  /** Input-binding overrides (action → `KeyboardEvent.code`s), merged over the
+   *  defaults. Unknown action names become custom bindings components can read. */
+  controls?: WorldControls
   /** Color-slot overrides applied to every component in the world. */
   palette?: Partial<WorldPalette>
   /** Fonts the world ships, by role (`display`, `body`). Text components draw from
@@ -150,9 +154,10 @@ function normalizeNode(node: WorldNode): WorldNode {
 
 /**
  * Serialize a world to pretty JSON text with a canonical, stable key order
- * (`version, meta, unit, gravity, ground, time, timezone, avatar, palette, fonts,
- * fog, nodes`; each node `type, id, props, children`). Stable output means an
- * unchanged node never churns the diff, so PR reviews show only the real change.
+ * (`version, meta, unit, gravity, ground, time, timezone, avatar, controls,
+ * palette, fonts, fog, nodes`; each node `type, id, props, children`). Stable
+ * output means an unchanged node never churns the diff, so PR reviews show only
+ * the real change.
  */
 export function serializeWorld(data: WorldData): string {
   // Build with a fixed key insertion order (nodes last); a plain record lets us add
@@ -165,6 +170,7 @@ export function serializeWorld(data: WorldData): string {
   if (data.time !== undefined) out.time = data.time
   if (data.timezone !== undefined) out.timezone = data.timezone
   if (data.avatar !== undefined) out.avatar = data.avatar
+  if (data.controls !== undefined) out.controls = data.controls
   if (data.palette !== undefined) out.palette = data.palette
   if (data.fonts !== undefined) out.fonts = data.fonts
   if (data.fog !== undefined) out.fog = data.fog
@@ -203,6 +209,17 @@ export function parseWorld(json: string): WorldData {
   }
   if (data.ground !== undefined && typeof data.ground !== 'number') {
     throw new Error('World "ground" must be a number')
+  }
+  if (data.controls !== undefined) {
+    const controls = data.controls as unknown
+    if (typeof controls !== 'object' || controls === null || Array.isArray(controls)) {
+      throw new Error('World "controls" must be an object of action to key codes')
+    }
+    for (const keys of Object.values(controls as Record<string, unknown>)) {
+      if (!Array.isArray(keys) || keys.some((k) => typeof k !== 'string')) {
+        throw new Error('World "controls" values must be arrays of key-code strings')
+      }
+    }
   }
   if (data.fonts !== undefined) {
     const fonts = data.fonts as unknown

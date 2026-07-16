@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { registry } from '@runek/components'
 import {
+  DEFAULT_CONTROLS,
   DEFAULT_FONTS,
   DEFAULT_PALETTE,
   DEFAULT_WORLD_TIME,
@@ -87,6 +88,7 @@ export default function ComponentPreview({ title, detail = false }: Props) {
               palette: DEFAULT_PALETTE,
               fonts: DEFAULT_FONTS,
               time: DEFAULT_WORLD_TIME,
+              controls: DEFAULT_CONTROLS,
             }}
           >
             <ambientLight intensity={0.7} />

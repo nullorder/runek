@@ -6,7 +6,15 @@ import type { ComponentRegistry, WorldData } from './world-data'
 export interface WorldRendererProps
   extends Omit<
     WorldProps,
-    'children' | 'unit' | 'gravity' | 'palette' | 'fog' | 'time' | 'timezone' | 'avatar'
+    | 'children'
+    | 'unit'
+    | 'gravity'
+    | 'palette'
+    | 'fog'
+    | 'time'
+    | 'timezone'
+    | 'avatar'
+    | 'controls'
   > {
   data: WorldData
   registry: ComponentRegistry
@@ -26,6 +34,7 @@ export function WorldRenderer({ data, registry, ...worldProps }: WorldRendererPr
         time={data.time}
         timezone={data.timezone}
         avatar={data.avatar}
+        controls={data.controls}
         {...worldProps}
       >
         <WorldNodes nodes={data.nodes} registry={registry} />

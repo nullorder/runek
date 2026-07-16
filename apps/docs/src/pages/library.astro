@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content'
 import { marked } from 'marked'
 import changelogRaw from '../../../../CHANGELOG.md?raw'
+import core from '../../../../packages/core/package.json'
 import LibraryWorld from '../components/world/LibraryWorld.tsx'
 import '../styles/global.css'
 
@@ -47,6 +48,11 @@ const componentDocs = all
   </head>
   <body>
     <a class="world-back" href="/">← home</a>
-    <LibraryWorld client:only="react" docs={docs} componentDocs={componentDocs} />
+    <LibraryWorld
+      client:only="react"
+      docs={docs}
+      componentDocs={componentDocs}
+      version={core.version}
+    />
   </body>
 </html>
