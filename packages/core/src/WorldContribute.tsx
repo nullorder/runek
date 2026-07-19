@@ -53,9 +53,14 @@ export function WorldContribute({ data, onClose }: WorldContributeProps) {
   }, [onClose])
 
   const downloadJson = () => downloadText(serializeWorld(data), 'world.json')
-  const downloadSnapshot = () => {
+  /** The two artifacts a PR wants, in one click: the world file plus a PNG of the
+   *  current view for the description. JSON goes first so the essential file lands
+   *  even if the browser blocks the second download; the snapshot is best-effort —
+   *  a canvas that can't be read (no `preserveDrawingBuffer`) still yields the JSON. */
+  const downloadEdits = () => {
+    downloadJson()
     const png = captureSnapshot()
-    if (png) downloadHref(png, 'world-snapshot.png')
+    if (png) downloadHref(png, 'snapshot.png')
   }
   const open = (url: string) => window.open(url, '_blank', 'noopener,noreferrer')
 
@@ -86,11 +91,8 @@ export function WorldContribute({ data, onClose }: WorldContributeProps) {
               <Step n={1}>
                 Download your edits and a snapshot of this view.
                 <div style={ACTIONS}>
-                  <button type="button" style={PRIMARY} onClick={downloadJson}>
-                    Download world.json
-                  </button>
-                  <button type="button" style={PRIMARY} onClick={downloadSnapshot}>
-                    Download snapshot.png
+                  <button type="button" style={PRIMARY} onClick={downloadEdits}>
+                    Download world.json + snapshot.png
                   </button>
                 </div>
               </Step>
