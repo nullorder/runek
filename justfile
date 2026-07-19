@@ -114,7 +114,9 @@ publish-cli CHANNEL="":
     node packages/cli/dist/index.js --help > /dev/null
     pnpm --filter @runek/cli publish --access public --no-git-checks {{ if CHANNEL != "" { "--tag " + CHANNEL } else { "" } }}
 
-# Tag the release and create a GitHub release with auto-generated notes. The
+# Tag the release and create a GitHub release. Notes default to GitHub's
+# auto-generated changelog; the recipe prompts for the source and can instead
+# use this version's CHANGELOG.md section or notes typed into $EDITOR. The
 # release is marked a GitHub pre-release when a CHANNEL (alpha/beta/rc) is set
 # OR the version is a patch (X.Y.Z with Z != 0). Patch releases still publish to
 # npm `latest`; this only keeps GitHub's "Latest release" badge on minor/major.
@@ -141,7 +143,41 @@ gh-release CHANNEL="":
             echo "→ marking GitHub release as a pre-release (patch release)"
         fi
     fi
-    gh release create "v{{version}}" --title "$title" --generate-notes $prerelease_flag
+    echo "Release notes for v{{version}}:"
+    echo "  [g] generate from commits (default)"
+    echo "  [c] use the CHANGELOG.md section for v{{version}}"
+    echo "  [e] write my own in \$EDITOR (${EDITOR:-vi})"
+    notes_choice=""
+    read -r -p "Notes source [g/c/e]: " notes_choice </dev/tty || true
+    notes_file=""
+    notes_args=(--generate-notes)
+    case "${notes_choice:-g}" in
+        c|C)
+            notes_file="$(mktemp "${TMPDIR:-/tmp}/runek-notes.XXXXXX")"
+            awk '/^## \[{{version}}\]/{f=1;next} /^## \[/{f=0} f' CHANGELOG.md >"$notes_file"
+            if grep -q '[^[:space:]]' "$notes_file"; then
+                notes_args=(--notes-file "$notes_file")
+                echo "→ notes from CHANGELOG.md [v{{version}}]"
+            else
+                echo "→ no CHANGELOG.md section for v{{version}}; using generated notes"
+            fi
+            ;;
+        e|E)
+            notes_file="$(mktemp "${TMPDIR:-/tmp}/runek-notes.XXXXXX")"
+            "${EDITOR:-vi}" "$notes_file" </dev/tty >/dev/tty 2>&1 || true
+            if grep -q '[^[:space:]]' "$notes_file"; then
+                notes_args=(--notes-file "$notes_file")
+                echo "→ notes from your editor buffer"
+            else
+                echo "→ empty buffer; using generated notes"
+            fi
+            ;;
+        *)
+            echo "→ generated notes"
+            ;;
+    esac
+    gh release create "v{{version}}" --title "$title" "${notes_args[@]}" $prerelease_flag
+    [ -z "$notes_file" ] || rm -f "$notes_file"
     echo "✓ https://github.com/{{repo}}/releases/tag/v{{version}}"
 
 # Validate the release channel and that it agrees with the package version.
@@ -182,7 +218,7 @@ publish-help:
     @echo "  2. check-*-login     verify npm + GitHub credentials"
     @echo "  3. publish-core      build + npm publish @runek/core (public)"
     @echo "  4. publish-cli       build + npm publish @runek/cli (public)"
-    @echo "  5. gh-release        git tag v{{version}} + GitHub release (auto notes); pre-release if CHANNEL set or a patch (X.Y.Z, Z!=0)"
+    @echo "  5. gh-release        git tag v{{version}} + GitHub release (prompts for notes: generated/CHANGELOG/editor); pre-release if CHANNEL set or a patch (X.Y.Z, Z!=0)"
     @echo "  Set the version first with: just version X.Y.Z  (or X.Y.Z-alpha.0 for a prerelease)"
 
 # Remove build output and installed dependencies

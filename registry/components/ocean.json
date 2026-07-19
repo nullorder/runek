@@ -5,7 +5,7 @@
   "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.13.0",
+    "@runek/core@^0.12.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

@@ -5,7 +5,7 @@
   "description": "Table with a top and four legs.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0"
+    "@runek/core@^0.12.0"
   ],
   "registryDependencies": [],
   "files": [

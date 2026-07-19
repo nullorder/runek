@@ -5,7 +5,7 @@
   "description": "A single procedural book — standing, lying, or open — with a seeded cover and optional click interaction; the standalone sibling of Bookshelf's instanced spines.",
   "dependencies": [
     "@react-three/drei@^10.7.7",
-    "@runek/core@^0.13.0"
+    "@runek/core@^0.12.0"
   ],
   "registryDependencies": [],
   "files": [

@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nullorder/runek/compare/v0.10.4...HEAD)
+## [Unreleased](https://github.com/nullorder/runek/compare/v0.12.0...HEAD)
+
+## [0.12.0](https://github.com/nullorder/runek/compare/v0.11.0...v0.12.0) - 2026-07-19
 
 ### Added
 
@@ -32,7 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `[]`, or add custom action names your own components read via
   `useKeyboardControls`. Orthogonal to `avatar`; the JSX `keyboardMap`
   prop remains the verbatim escape hatch and wins when given.
-
 - **Composites**: a new registry kind holding a named *arrangement* of
   component nodes as JSON instead of code. A world places one node
   (`{ "type": "House" }`); the renderer expands the arrangement in place,
@@ -65,17 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [`Roof`](https://runek.nullorder.org/docs/components/roof#migrate).
   Entries live in `apps/docs/scripts/migrations.mjs` and accumulate
   across versions.
-- `Hut`, `Tent`, `Counter`, `Stool`, `Road`, and `Cliff` components.
-- `Compass` HUD component: a screen-fixed dial that tracks the camera
-  heading, with an optional wind and bearing readout.
-- `Bookshelf` gains a `label` prop (plus `labelColor` and `labelSize`)
-  that draws a `Sign` floating above the shelf frame.
-- `Path` gains a `heights` elevation profile so trails can follow the
-  terrain they climb.
-- `Player` gains a `children` slot for a custom avatar that replaces the
-  default capsule and hides in first-person view.
-- Keyboard camera control: Left/Right arrows turn (yaw) and Up/Down
-  arrows look (pitch), composing with mouse drag.
 
 ### Changed
 
@@ -97,6 +87,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `openings: WallOpening[]` — one wall can now carry a door and windows
   together. Migration (`opening: X` → `openings: [X]`):
   [Wall migration guide](https://runek.nullorder.org/docs/components/wall#migrate).
+
+## [0.11.0](https://github.com/nullorder/runek/compare/v0.10.4...v0.11.0) - 2026-07-10
+
+### Added
+
+- `Hut`, `Tent`, `Counter`, `Stool`, `Road`, and `Cliff` components.
+- `Compass` HUD component: a screen-fixed dial that tracks the camera
+  heading, with an optional wind and bearing readout.
+- `Bookshelf` gains a `label` prop (plus `labelColor` and `labelSize`)
+  that draws a `Sign` floating above the shelf frame.
+- `Path` gains a `heights` elevation profile so trails can follow the
+  terrain they climb.
+- `Player` gains a `children` slot for a custom avatar that replaces the
+  default capsule and hides in first-person view.
+- Keyboard camera control: Left/Right arrows turn (yaw) and Up/Down
+  arrows look (pitch), composing with mouse drag.
+
+### Changed
+
 - **Breaking:** the default `keyboardMap` in `@runek/core` no longer
   binds the arrow keys to movement. WASD moves the character; the arrow
   keys steer the camera.
