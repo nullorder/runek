@@ -16,6 +16,7 @@ import { Clouds } from './Clouds'
 import { Compass } from './Compass'
 import { Counter } from './Counter'
 import { Crate } from './Crate'
+import { CurvedWall } from './CurvedWall'
 import houseComposite from './composites/house.json'
 import roomComposite from './composites/room.json'
 import { Dock } from './Dock'
@@ -33,10 +34,12 @@ import { Lamp } from './Lamp'
 import { Level } from './Level'
 import { LightRig } from './LightRig'
 import { Ocean } from './Ocean'
+import { Palm } from './Palm'
 import { Path } from './Path'
 import { Pillar } from './Pillar'
 import { Plant } from './Plant'
 import { Player } from './Player'
+import { Pool } from './Pool'
 import { Portal } from './Portal'
 import { Road } from './Road'
 import { Rocks } from './Rocks'
@@ -48,6 +51,7 @@ import { Shore } from './Shore'
 import { Sign } from './Sign'
 import { Signpost } from './Signpost'
 import { Sky } from './Sky'
+import { Slab } from './Slab'
 import { Staircase } from './Staircase'
 import { Stool } from './Stool'
 import { Table } from './Table'
@@ -78,6 +82,7 @@ export const registry: ComponentRegistry = {
   Compass,
   Counter,
   Crate,
+  CurvedWall,
   Dock,
   Door,
   Fence,
@@ -96,10 +101,12 @@ export const registry: ComponentRegistry = {
   Level,
   LightRig,
   Ocean,
+  Palm,
   Path,
   Pillar,
   Plant,
   Player,
+  Pool,
   Portal,
   Road,
   Rocks,
@@ -112,6 +119,7 @@ export const registry: ComponentRegistry = {
   Sign,
   Signpost,
   Sky,
+  Slab,
   Staircase,
   Stool,
   Table,

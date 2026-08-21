@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.12.0...HEAD)
 
+### Added
+
+- `Slab` component: a rounded structural plate (`pill` or `disc`) for
+  curved-modernist floor decks, cantilevered roofs, terraces, or a lawn
+  disc. Walkable, one convex-hull collider; top surface at the origin
+  like `Floor`.
+- `CurvedWall` component: an arc of wall around the origin — `solid`
+  concrete or a floor-to-ceiling `glass` curtain wall with mullions and
+  rails. Instanced chords, each carrying a cuboid collider; compose
+  several arcs to leave door gaps.
+- `Pool` component: a built swimming pool flush with the deck — coping
+  rim, walkable plastered basin with corner exit steps, translucent
+  water just under the lip.
+- `Palm` component: a coconut palm with a leaning bowed trunk and a
+  crown of drooping instanced fronds; seed drives lean, spread, and the
+  coconut cluster.
+
 ## [0.12.0](https://github.com/nullorder/runek/compare/v0.11.0...v0.12.0) - 2026-07-19
 
 ### Added
