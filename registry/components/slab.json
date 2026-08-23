@@ -1,0 +1,19 @@
+{
+  "name": "slab",
+  "title": "Slab",
+  "type": "registry:component",
+  "description": "A rounded structural plate (pill or ellipse) for curved-modernist decks, cantilevered roofs, terraces, or a lawn disc. Walkable, with a single convex-hull collider.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.12.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Slab.tsx",
+      "content": "import { RigidBody } from '@react-three/rapier'\nimport { useWorld, type WorldComponentProps } from '@runek/core'\nimport { useEffect, useMemo } from 'react'\nimport { ExtrudeGeometry, Shape } from 'three'\n\nexport type SlabShape = 'pill' | 'disc'\n\nexport interface SlabProps extends WorldComponentProps {\n  /** Footprint `[width, depth]`, in units. The top surface sits at the component origin. */\n  size?: [number, number]\n  /** `pill` is a rounded rectangle, `disc` an ellipse. */\n  shape?: SlabShape\n  /** Pill corner radius, in units; clamped to half the smaller extent (a full stadium). */\n  cornerRadius?: number\n  thickness?: number\n  /** Curve smoothness of the rounded edges. */\n  curveSegments?: number\n  /** Defaults to the world palette's `wall` slot. */\n  color?: string\n}\n\n/**\n * A rounded structural plate: an extruded pill or ellipse you can stack into curved-modernist\n * floor decks, cantilevered roofs, terraces, or a lawn disc. Convex by construction, so a single\n * hull collider carries it. Flat-topped and walkable; the top surface sits at the origin like\n * `Floor`, so decks and their furniture share a Y.\n */\nexport function Slab({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  size = [8, 8],\n  shape = 'pill',\n  cornerRadius,\n  thickness = 0.35,\n  curveSegments = 24,\n  color,\n}: SlabProps) {\n  const { unit, palette } = useWorld()\n  const slabColor = color ?? palette.wall\n  const w = size[0] * unit\n  const d = size[1] * unit\n  const t = thickness * unit\n  const r = Math.min((cornerRadius ?? Math.min(size[0], size[1]) / 2) * unit, Math.min(w, d) / 2)\n\n  const geometry = useMemo(() => {\n    const outline = new Shape()\n    if (shape === 'disc') {\n      outline.absellipse(0, 0, w / 2, d / 2, 0, Math.PI * 2, false, 0)\n    } else {\n      const hw = w / 2\n      const hd = d / 2\n      outline.moveTo(-hw + r, -hd)\n      outline.lineTo(hw - r, -hd)\n      outline.absarc(hw - r, -hd + r, r, -Math.PI / 2, 0, false)\n      outline.lineTo(hw, hd - r)\n      outline.absarc(hw - r, hd - r, r, 0, Math.PI / 2, false)\n      outline.lineTo(-hw + r, hd)\n      outline.absarc(-hw + r, hd - r, r, Math.PI / 2, Math.PI, false)\n      outline.lineTo(-hw, -hd + r)\n      outline.absarc(-hw + r, -hd + r, r, Math.PI, Math.PI * 1.5, false)\n    }\n    const g = new ExtrudeGeometry(outline, { depth: t, bevelEnabled: false, curveSegments })\n    g.rotateX(-Math.PI / 2) // shape XY → world XZ, extrusion → up\n    g.translate(0, -t, 0) // top surface at the origin\n    return g\n  }, [shape, w, d, r, t, curveSegments])\n\n  useEffect(() => () => geometry.dispose(), [geometry])\n\n  return (\n    <RigidBody type=\"fixed\" colliders=\"hull\" position={position} rotation={rotation}>\n      <mesh geometry={geometry} castShadow receiveShadow>\n        <meshStandardMaterial color={slabColor} />\n      </mesh>\n    </RigidBody>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

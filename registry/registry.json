@@ -83,6 +83,22 @@
       "files": [{ "path": "packages/components/src/Floor.tsx", "target": "Floor.tsx" }]
     },
     {
+      "name": "curvedwall",
+      "title": "CurvedWall",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "An arc of wall around the origin — solid concrete or a floor-to-ceiling glass curtain wall with mullions. Compose several arcs to leave door gaps; chords carry cuboid colliders.",
+      "files": [{ "path": "packages/components/src/CurvedWall.tsx", "target": "CurvedWall.tsx" }]
+    },
+    {
+      "name": "slab",
+      "title": "Slab",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A rounded structural plate (pill or ellipse) for curved-modernist decks, cantilevered roofs, terraces, or a lawn disc. Walkable, with a single convex-hull collider.",
+      "files": [{ "path": "packages/components/src/Slab.tsx", "target": "Slab.tsx" }]
+    },
+    {
       "name": "level",
       "title": "Level",
       "type": "registry:component",
@@ -235,6 +251,14 @@
       "files": [{ "path": "packages/components/src/Lake.tsx", "target": "Lake.tsx" }]
     },
     {
+      "name": "pool",
+      "title": "Pool",
+      "type": "registry:component",
+      "category": "water",
+      "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner exit steps, and a translucent water surface.",
+      "files": [{ "path": "packages/components/src/Pool.tsx", "target": "Pool.tsx" }]
+    },
+    {
       "name": "ocean",
       "title": "Ocean",
       "type": "registry:component",
@@ -297,6 +321,14 @@
       "category": "vegetation",
       "description": "L-system trees grown by a 3D turtle, deterministic from seed.",
       "files": [{ "path": "packages/components/src/Trees.tsx", "target": "Trees.tsx" }]
+    },
+    {
+      "name": "palm",
+      "title": "Palm",
+      "type": "registry:component",
+      "category": "vegetation",
+      "description": "A coconut palm: leaning bowed trunk and a crown of drooping instanced fronds, deterministic from seed.",
+      "files": [{ "path": "packages/components/src/Palm.tsx", "target": "Palm.tsx" }]
     },
     {
       "name": "lightrig",
