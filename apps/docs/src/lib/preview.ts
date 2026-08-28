@@ -29,6 +29,7 @@ export const SEEDED = new Set([
   'Grass',
   'Hedge',
   'Path',
+  'Person',
   'Plant',
   'Rocks',
   'Rug',
@@ -86,6 +87,7 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     props: { height: 3, area: [5, 2.5], count: 3, drift: 0 },
   },
   Campfire: { camera: [2.2, 1.8, 2.6], target: [0, 0.5, 0] },
+  Person: { camera: [1.6, 1.6, 2.6], target: [0, 0.95, 0], props: { kind: 'merchant' } },
   Birds: {
     camera: [0, 3.5, 11],
     target: [0, 3.5, 0],

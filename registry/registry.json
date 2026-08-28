@@ -9,23 +9,38 @@
       "type": "registry:component",
       "category": "character",
       "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings.",
-      "files": [{ "path": "packages/components/src/Player.tsx", "target": "Player.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Player.tsx",
+          "target": "Player.tsx"
+        }
+      ]
     },
     {
       "name": "portal",
       "title": "Portal",
       "type": "registry:component",
       "category": "systems",
-      "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports.",
-      "files": [{ "path": "packages/components/src/Portal.tsx", "target": "Portal.tsx" }]
+      "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through \u2014 for world-to-world travel, level transitions, and teleports.",
+      "files": [
+        {
+          "path": "packages/components/src/Portal.tsx",
+          "target": "Portal.tsx"
+        }
+      ]
     },
     {
       "name": "compass",
       "title": "Compass",
       "type": "registry:component",
       "category": "systems",
-      "description": "A screen-fixed HUD compass: a glassy dial in a corner of the canvas whose rose card swings with the camera heading, with a fixed lubber line and an optional wind + bearing readout — works with any traversal that drives the camera (on foot or at a vehicle's chase-cam).",
-      "files": [{ "path": "packages/components/src/Compass.tsx", "target": "Compass.tsx" }]
+      "description": "A screen-fixed HUD compass: a glassy dial in a corner of the canvas whose rose card swings with the camera heading, with a fixed lubber line and an optional wind + bearing readout \u2014 works with any traversal that drives the camera (on foot or at a vehicle's chase-cam).",
+      "files": [
+        {
+          "path": "packages/components/src/Compass.tsx",
+          "target": "Compass.tsx"
+        }
+      ]
     },
     {
       "name": "terrain",
@@ -33,7 +48,12 @@
       "type": "registry:component",
       "category": "terrain",
       "description": "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff.",
-      "files": [{ "path": "packages/components/src/Terrain.tsx", "target": "Terrain.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Terrain.tsx",
+          "target": "Terrain.tsx"
+        }
+      ]
     },
     {
       "name": "room",
@@ -42,7 +62,10 @@
       "category": "structures",
       "description": "Composite: four walls and a floor with a doorway, arranged from one Level. Unpack to customize.",
       "files": [
-        { "path": "packages/components/src/composites/room.json", "target": "composites/room.json" }
+        {
+          "path": "packages/components/src/composites/room.json",
+          "target": "composites/room.json"
+        }
       ]
     },
     {
@@ -64,7 +87,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "A round hut: a post-ribbed wall on a stone base, a framed doorway and window, under a shaggy thatch cone; one cylinder collider.",
-      "files": [{ "path": "packages/components/src/Hut.tsx", "target": "Hut.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Hut.tsx",
+          "target": "Hut.tsx"
+        }
+      ]
     },
     {
       "name": "wall",
@@ -72,7 +100,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Wall segment with door/window openings and a fixed collider.",
-      "files": [{ "path": "packages/components/src/Wall.tsx", "target": "Wall.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Wall.tsx",
+          "target": "Wall.tsx"
+        }
+      ]
     },
     {
       "name": "floor",
@@ -80,15 +113,25 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Flat floor slab with a fixed collider; optional stairwell opening.",
-      "files": [{ "path": "packages/components/src/Floor.tsx", "target": "Floor.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Floor.tsx",
+          "target": "Floor.tsx"
+        }
+      ]
     },
     {
       "name": "curvedwall",
       "title": "CurvedWall",
       "type": "registry:component",
       "category": "structures",
-      "description": "An arc of wall around the origin — solid concrete or a floor-to-ceiling glass curtain wall with mullions. Compose several arcs to leave door gaps; chords carry cuboid colliders.",
-      "files": [{ "path": "packages/components/src/CurvedWall.tsx", "target": "CurvedWall.tsx" }]
+      "description": "An arc of wall around the origin \u2014 solid concrete or a floor-to-ceiling glass curtain wall with mullions. Compose several arcs to leave door gaps; chords carry cuboid colliders.",
+      "files": [
+        {
+          "path": "packages/components/src/CurvedWall.tsx",
+          "target": "CurvedWall.tsx"
+        }
+      ]
     },
     {
       "name": "slab",
@@ -96,15 +139,25 @@
       "type": "registry:component",
       "category": "structures",
       "description": "A rounded structural plate (pill or ellipse) for curved-modernist decks, cantilevered roofs, terraces, or a lawn disc. Walkable, with a single convex-hull collider.",
-      "files": [{ "path": "packages/components/src/Slab.tsx", "target": "Slab.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Slab.tsx",
+          "target": "Slab.tsx"
+        }
+      ]
     },
     {
       "name": "level",
       "title": "Level",
       "type": "registry:component",
       "category": "structures",
-      "description": "A stackable wall ring plus optional slab: per-side openings, sides that can be omitted, and a stairwell hole — the unit a building is composed from.",
-      "files": [{ "path": "packages/components/src/Level.tsx", "target": "Level.tsx" }]
+      "description": "A stackable wall ring plus optional slab: per-side openings, sides that can be omitted, and a stairwell hole \u2014 the unit a building is composed from.",
+      "files": [
+        {
+          "path": "packages/components/src/Level.tsx",
+          "target": "Level.tsx"
+        }
+      ]
     },
     {
       "name": "roof",
@@ -112,7 +165,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Flat or gable roof.",
-      "files": [{ "path": "packages/components/src/Roof.tsx", "target": "Roof.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Roof.tsx",
+          "target": "Roof.tsx"
+        }
+      ]
     },
     {
       "name": "door",
@@ -120,7 +178,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Door panel within a frame.",
-      "files": [{ "path": "packages/components/src/Door.tsx", "target": "Door.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Door.tsx",
+          "target": "Door.tsx"
+        }
+      ]
     },
     {
       "name": "window",
@@ -128,7 +191,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Window with frame and translucent pane.",
-      "files": [{ "path": "packages/components/src/Window.tsx", "target": "Window.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Window.tsx",
+          "target": "Window.tsx"
+        }
+      ]
     },
     {
       "name": "staircase",
@@ -136,7 +204,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Stepped staircase with per-step colliders.",
-      "files": [{ "path": "packages/components/src/Staircase.tsx", "target": "Staircase.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Staircase.tsx",
+          "target": "Staircase.tsx"
+        }
+      ]
     },
     {
       "name": "stool",
@@ -144,7 +217,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "A round bar stool: a disc seat on three splayed legs; a thin cylinder collider.",
-      "files": [{ "path": "packages/components/src/Stool.tsx", "target": "Stool.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Stool.tsx",
+          "target": "Stool.tsx"
+        }
+      ]
     },
     {
       "name": "table",
@@ -152,7 +230,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Table with a top and four legs.",
-      "files": [{ "path": "packages/components/src/Table.tsx", "target": "Table.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Table.tsx",
+          "target": "Table.tsx"
+        }
+      ]
     },
     {
       "name": "tent",
@@ -160,7 +243,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "An A-frame ridge tent: striped wind-rippled fabric, entrance flaps pinned open, guy ropes and stakes; solid sides and back, open front.",
-      "files": [{ "path": "packages/components/src/Tent.tsx", "target": "Tent.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Tent.tsx",
+          "target": "Tent.tsx"
+        }
+      ]
     },
     {
       "name": "chair",
@@ -168,7 +256,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Chair with seat, back, and legs.",
-      "files": [{ "path": "packages/components/src/Chair.tsx", "target": "Chair.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Chair.tsx",
+          "target": "Chair.tsx"
+        }
+      ]
     },
     {
       "name": "counter",
@@ -176,7 +269,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider.",
-      "files": [{ "path": "packages/components/src/Counter.tsx", "target": "Counter.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Counter.tsx",
+          "target": "Counter.tsx"
+        }
+      ]
     },
     {
       "name": "clock",
@@ -184,7 +282,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Procedural analog wall clock; hands track the system clock or a given IANA timezone.",
-      "files": [{ "path": "packages/components/src/Clock.tsx", "target": "Clock.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Clock.tsx",
+          "target": "Clock.tsx"
+        }
+      ]
     },
     {
       "name": "sign",
@@ -192,7 +295,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core.",
-      "files": [{ "path": "packages/components/src/Sign.tsx", "target": "Sign.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Sign.tsx",
+          "target": "Sign.tsx"
+        }
+      ]
     },
     {
       "name": "signpost",
@@ -200,7 +308,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "A wooden post-and-plank signboard carrying a name in the world's display font; the post sits behind the board so the text reads clean.",
-      "files": [{ "path": "packages/components/src/Signpost.tsx", "target": "Signpost.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Signpost.tsx",
+          "target": "Signpost.tsx"
+        }
+      ]
     },
     {
       "name": "lamp",
@@ -208,7 +321,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Lamp that emits a point light.",
-      "files": [{ "path": "packages/components/src/Lamp.tsx", "target": "Lamp.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Lamp.tsx",
+          "target": "Lamp.tsx"
+        }
+      ]
     },
     {
       "name": "rug",
@@ -216,7 +334,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Procedural striped rug (seeded stripes, no textures).",
-      "files": [{ "path": "packages/components/src/Rug.tsx", "target": "Rug.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Rug.tsx",
+          "target": "Rug.tsx"
+        }
+      ]
     },
     {
       "name": "shelf",
@@ -224,7 +347,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Wall shelf with planks.",
-      "files": [{ "path": "packages/components/src/Shelf.tsx", "target": "Shelf.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Shelf.tsx",
+          "target": "Shelf.tsx"
+        }
+      ]
     },
     {
       "name": "bookshelf",
@@ -232,15 +360,25 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Procedurally generated bookshelf with seeded books and one cuboid collider.",
-      "files": [{ "path": "packages/components/src/Bookshelf.tsx", "target": "Bookshelf.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Bookshelf.tsx",
+          "target": "Bookshelf.tsx"
+        }
+      ]
     },
     {
       "name": "book",
       "title": "Book",
       "type": "registry:component",
       "category": "interiors",
-      "description": "A single procedural book — standing, lying, or open — with a seeded cover and optional click interaction; the standalone sibling of Bookshelf's instanced spines.",
-      "files": [{ "path": "packages/components/src/Book.tsx", "target": "Book.tsx" }]
+      "description": "A single procedural book \u2014 standing, lying, or open \u2014 with a seeded cover and optional click interaction; the standalone sibling of Bookshelf's instanced spines.",
+      "files": [
+        {
+          "path": "packages/components/src/Book.tsx",
+          "target": "Book.tsx"
+        }
+      ]
     },
     {
       "name": "lake",
@@ -248,7 +386,12 @@
       "type": "registry:component",
       "category": "water",
       "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level.",
-      "files": [{ "path": "packages/components/src/Lake.tsx", "target": "Lake.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Lake.tsx",
+          "target": "Lake.tsx"
+        }
+      ]
     },
     {
       "name": "pool",
@@ -256,7 +399,12 @@
       "type": "registry:component",
       "category": "water",
       "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner exit steps, and a translucent water surface.",
-      "files": [{ "path": "packages/components/src/Pool.tsx", "target": "Pool.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Pool.tsx",
+          "target": "Pool.tsx"
+        }
+      ]
     },
     {
       "name": "ocean",
@@ -264,7 +412,12 @@
       "type": "registry:component",
       "category": "water",
       "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground.",
-      "files": [{ "path": "packages/components/src/Ocean.tsx", "target": "Ocean.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Ocean.tsx",
+          "target": "Ocean.tsx"
+        }
+      ]
     },
     {
       "name": "shore",
@@ -272,7 +425,12 @@
       "type": "registry:component",
       "category": "water",
       "description": "Sloped beach/shore strip to meet a Lake.",
-      "files": [{ "path": "packages/components/src/Shore.tsx", "target": "Shore.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Shore.tsx",
+          "target": "Shore.tsx"
+        }
+      ]
     },
     {
       "name": "sailboat",
@@ -280,7 +438,12 @@
       "type": "registry:component",
       "category": "water",
       "description": "A small procedural sailboat: a station-built low-poly hull, mast, boom, and mainsail, floating at the waterline with a gentle moored bob.",
-      "files": [{ "path": "packages/components/src/Sailboat.tsx", "target": "Sailboat.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Sailboat.tsx",
+          "target": "Sailboat.tsx"
+        }
+      ]
     },
     {
       "name": "rocks",
@@ -288,7 +451,12 @@
       "type": "registry:component",
       "category": "environment",
       "description": "Faceted rocks with convex-hull colliders (seeded scatter).",
-      "files": [{ "path": "packages/components/src/Rocks.tsx", "target": "Rocks.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Rocks.tsx",
+          "target": "Rocks.tsx"
+        }
+      ]
     },
     {
       "name": "cliff",
@@ -296,7 +464,12 @@
       "type": "registry:component",
       "category": "terrain",
       "description": "A rocky promontory: a low-poly, seed-jittered truncated cone with a flattish plateau and a convex-hull collider.",
-      "files": [{ "path": "packages/components/src/Cliff.tsx", "target": "Cliff.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Cliff.tsx",
+          "target": "Cliff.tsx"
+        }
+      ]
     },
     {
       "name": "sky",
@@ -304,7 +477,12 @@
       "type": "registry:component",
       "category": "environment",
       "description": "Procedural atmosphere (drei Sky).",
-      "files": [{ "path": "packages/components/src/Sky.tsx", "target": "Sky.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Sky.tsx",
+          "target": "Sky.tsx"
+        }
+      ]
     },
     {
       "name": "grass",
@@ -312,7 +490,12 @@
       "type": "registry:component",
       "category": "environment",
       "description": "Instanced grass blades (seeded scatter).",
-      "files": [{ "path": "packages/components/src/Grass.tsx", "target": "Grass.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Grass.tsx",
+          "target": "Grass.tsx"
+        }
+      ]
     },
     {
       "name": "trees",
@@ -320,7 +503,12 @@
       "type": "registry:component",
       "category": "vegetation",
       "description": "L-system trees grown by a 3D turtle, deterministic from seed.",
-      "files": [{ "path": "packages/components/src/Trees.tsx", "target": "Trees.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Trees.tsx",
+          "target": "Trees.tsx"
+        }
+      ]
     },
     {
       "name": "palm",
@@ -328,7 +516,12 @@
       "type": "registry:component",
       "category": "vegetation",
       "description": "A coconut palm: leaning bowed trunk and a crown of drooping instanced fronds, deterministic from seed.",
-      "files": [{ "path": "packages/components/src/Palm.tsx", "target": "Palm.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Palm.tsx",
+          "target": "Palm.tsx"
+        }
+      ]
     },
     {
       "name": "lightrig",
@@ -336,7 +529,12 @@
       "type": "registry:component",
       "category": "systems",
       "description": "Sun + hemisphere/ground fill with shadow configuration.",
-      "files": [{ "path": "packages/components/src/LightRig.tsx", "target": "LightRig.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/LightRig.tsx",
+          "target": "LightRig.tsx"
+        }
+      ]
     },
     {
       "name": "fence",
@@ -344,7 +542,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Posts and rails with seeded weathering; encloses yards and paths. One footprint collider.",
-      "files": [{ "path": "packages/components/src/Fence.tsx", "target": "Fence.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Fence.tsx",
+          "target": "Fence.tsx"
+        }
+      ]
     },
     {
       "name": "flag",
@@ -352,7 +555,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "A cloth flag on a pole; the cloth ripples per-frame, pinned at the luff. Thin pole collider.",
-      "files": [{ "path": "packages/components/src/Flag.tsx", "target": "Flag.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Flag.tsx",
+          "target": "Flag.tsx"
+        }
+      ]
     },
     {
       "name": "bridge",
@@ -360,7 +568,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Plank deck spanning a gap, optionally arched, with railings and slab colliders that follow the deck.",
-      "files": [{ "path": "packages/components/src/Bridge.tsx", "target": "Bridge.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Bridge.tsx",
+          "target": "Bridge.tsx"
+        }
+      ]
     },
     {
       "name": "arch",
@@ -368,7 +581,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Freestanding gateway: two piers and a semicircular arch of voussoirs. Composes with Wall.",
-      "files": [{ "path": "packages/components/src/Arch.tsx", "target": "Arch.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Arch.tsx",
+          "target": "Arch.tsx"
+        }
+      ]
     },
     {
       "name": "pillar",
@@ -376,7 +594,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Column with a plinth, a tapered (optionally fluted) shaft, and a capital.",
-      "files": [{ "path": "packages/components/src/Pillar.tsx", "target": "Pillar.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Pillar.tsx",
+          "target": "Pillar.tsx"
+        }
+      ]
     },
     {
       "name": "well",
@@ -384,7 +607,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "Stone well with a dark pool, posts, a little pyramid roof, and a bucket on a rope.",
-      "files": [{ "path": "packages/components/src/Well.tsx", "target": "Well.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Well.tsx",
+          "target": "Well.tsx"
+        }
+      ]
     },
     {
       "name": "windmill",
@@ -392,7 +620,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "A tapered tower with a conical cap and four sails that turn each frame; tower collider, seeded blade phase.",
-      "files": [{ "path": "packages/components/src/Windmill.tsx", "target": "Windmill.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Windmill.tsx",
+          "target": "Windmill.tsx"
+        }
+      ]
     },
     {
       "name": "dock",
@@ -400,7 +633,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "A plank jetty on pilings reaching out over water; walkable deck colliders, side stringers, and seaward mooring posts.",
-      "files": [{ "path": "packages/components/src/Dock.tsx", "target": "Dock.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Dock.tsx",
+          "target": "Dock.tsx"
+        }
+      ]
     },
     {
       "name": "path",
@@ -408,7 +646,12 @@
       "type": "registry:component",
       "category": "terrain",
       "description": "A meandering ribbon trail from seeded waypoints; decorative, laid just over the ground.",
-      "files": [{ "path": "packages/components/src/Path.tsx", "target": "Path.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Path.tsx",
+          "target": "Path.tsx"
+        }
+      ]
     },
     {
       "name": "road",
@@ -416,7 +659,12 @@
       "type": "registry:component",
       "category": "structures",
       "description": "A paved street: a flat stone deck with low kerbs, draped on the ground like Path; decorative (no collider).",
-      "files": [{ "path": "packages/components/src/Road.tsx", "target": "Road.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Road.tsx",
+          "target": "Road.tsx"
+        }
+      ]
     },
     {
       "name": "bush",
@@ -424,7 +672,12 @@
       "type": "registry:component",
       "category": "vegetation",
       "description": "Clustered foliage blobs, seeded; the mid-height density between Grass and Trees.",
-      "files": [{ "path": "packages/components/src/Bush.tsx", "target": "Bush.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Bush.tsx",
+          "target": "Bush.tsx"
+        }
+      ]
     },
     {
       "name": "flowers",
@@ -432,7 +685,12 @@
       "type": "registry:component",
       "category": "vegetation",
       "description": "Instanced seeded wildflowers (stem + colored head) scattered over a patch.",
-      "files": [{ "path": "packages/components/src/Flowers.tsx", "target": "Flowers.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Flowers.tsx",
+          "target": "Flowers.tsx"
+        }
+      ]
     },
     {
       "name": "hedge",
@@ -440,7 +698,12 @@
       "type": "registry:component",
       "category": "vegetation",
       "description": "A trimmed green wall with seeded surface tufts; blocks like a Wall.",
-      "files": [{ "path": "packages/components/src/Hedge.tsx", "target": "Hedge.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Hedge.tsx",
+          "target": "Hedge.tsx"
+        }
+      ]
     },
     {
       "name": "fountain",
@@ -448,7 +711,12 @@
       "type": "registry:component",
       "category": "water",
       "description": "Two-tier stone fountain with gently rippling water (a per-frame bob, no textures).",
-      "files": [{ "path": "packages/components/src/Fountain.tsx", "target": "Fountain.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Fountain.tsx",
+          "target": "Fountain.tsx"
+        }
+      ]
     },
     {
       "name": "bench",
@@ -456,7 +724,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Slatted bench with an optional backrest; indoor or outdoor seating.",
-      "files": [{ "path": "packages/components/src/Bench.tsx", "target": "Bench.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Bench.tsx",
+          "target": "Bench.tsx"
+        }
+      ]
     },
     {
       "name": "bed",
@@ -464,7 +737,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Bed with a frame, mattress, pillows, and a headboard.",
-      "files": [{ "path": "packages/components/src/Bed.tsx", "target": "Bed.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Bed.tsx",
+          "target": "Bed.tsx"
+        }
+      ]
     },
     {
       "name": "crate",
@@ -472,7 +750,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Slatted wooden crate with seeded plank shades; stacks via a cuboid collider.",
-      "files": [{ "path": "packages/components/src/Crate.tsx", "target": "Crate.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Crate.tsx",
+          "target": "Crate.tsx"
+        }
+      ]
     },
     {
       "name": "barrel",
@@ -480,7 +763,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Staved barrel bellied at the middle, banded by metal hoops; convex-hull collider.",
-      "files": [{ "path": "packages/components/src/Barrel.tsx", "target": "Barrel.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Barrel.tsx",
+          "target": "Barrel.tsx"
+        }
+      ]
     },
     {
       "name": "plant",
@@ -488,7 +776,12 @@
       "type": "registry:component",
       "category": "interiors",
       "description": "Potted plant: a tapered planter and a seeded cluster of foliage.",
-      "files": [{ "path": "packages/components/src/Plant.tsx", "target": "Plant.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Plant.tsx",
+          "target": "Plant.tsx"
+        }
+      ]
     },
     {
       "name": "clouds",
@@ -496,7 +789,12 @@
       "type": "registry:component",
       "category": "environment",
       "description": "Drifting clouds built from clustered soft blobs (no textures); layer above a Sky.",
-      "files": [{ "path": "packages/components/src/Clouds.tsx", "target": "Clouds.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Clouds.tsx",
+          "target": "Clouds.tsx"
+        }
+      ]
     },
     {
       "name": "campfire",
@@ -504,7 +802,12 @@
       "type": "registry:component",
       "category": "environment",
       "description": "Stone ring, a tepee of logs, and an animated flame with a warm flickering light.",
-      "files": [{ "path": "packages/components/src/Campfire.tsx", "target": "Campfire.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Campfire.tsx",
+          "target": "Campfire.tsx"
+        }
+      ]
     },
     {
       "name": "birds",
@@ -512,7 +815,25 @@
       "type": "registry:component",
       "category": "environment",
       "description": "A loose flock circling overhead, each bird flapping on its own seeded orbit.",
-      "files": [{ "path": "packages/components/src/Birds.tsx", "target": "Birds.tsx" }]
+      "files": [
+        {
+          "path": "packages/components/src/Birds.tsx",
+          "target": "Birds.tsx"
+        }
+      ]
+    },
+    {
+      "name": "person",
+      "title": "Person",
+      "type": "registry:component",
+      "category": "character",
+      "description": "A proportioned, clothed, articulated figure generated from a seed: style templates (anime by default, realistic as the alternate), role presets, gender/age/build silhouettes, hair, outfits, hats and accessories, swappable cosmetic skins (named presets or custom bundles), poses, idle breathing, and a head that turns to watch you. Place one at a spawn point, or use it as the Player's third-person body.",
+      "files": [
+        {
+          "path": "packages/components/src/Person.tsx",
+          "target": "Person.tsx"
+        }
+      ]
     }
   ]
 }
