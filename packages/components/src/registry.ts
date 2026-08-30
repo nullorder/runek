@@ -36,6 +36,7 @@ import { LightRig } from './LightRig'
 import { Ocean } from './Ocean'
 import { Palm } from './Palm'
 import { Path } from './Path'
+import { Person } from './Person'
 import { Pillar } from './Pillar'
 import { Plant } from './Plant'
 import { Player } from './Player'
@@ -103,6 +104,7 @@ export const registry: ComponentRegistry = {
   Ocean,
   Palm,
   Path,
+  Person,
   Pillar,
   Plant,
   Player,

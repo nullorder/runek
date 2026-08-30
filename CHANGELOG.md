@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Person` component: a procedural human figure, so worlds can have
+  people in them. The body is built from smooth lathe surfaces (tapered
+  limbs, one hip-to-shoulder torso profile) on an articulated joint rig
+  that breathes, shifts its weight, blinks, and turns its head to watch
+  you; detail drops to a cheap silhouette past ~18 units. A `style`
+  template sets the whole look: `anime` (default; bigger head, large
+  lit eyes, tapered chin, longer legs, chunky fringe) or `realistic`
+  (canonical 7.5-head proportions). Traits resolve explicit prop first,
+  then the `skin` cosmetic bundle, then the `kind` role preset
+  (villager, merchant, guard, sailor, farmer, noble, scholar,
+  traveler), then the seed, so `<Person seed={3} />` is a complete
+  villager and every prop narrows it: `gender`, `age`, `height`,
+  `build`, `skinTone`, `hair`, `facialHair`, `outfit`, clothing colors,
+  `hat`, `accessories`, and `pose`. `skin` (a `PersonSkin`) bundles
+  clothes, colors, headwear, hair, and accessories as one plain-JSON
+  prop, so an editor or in-world UI can swap a figure's whole look in
+  a single write; nine named presets ship as `PERSON_SKINS` (festival,
+  harvest, winter, voyage, ceremony, atelier, pirate, bartender,
+  sailor — wardrobe only, never hair), and `skin` accepts a preset
+  name (`"winter"`) or a bundle. `position` is the spawn point; one capsule collider
+  makes the figure solid, and `physics={false}` yields a bare visual
+  you can hand to `Player` as a third-person body. Movement and
+  dialogue come later.
+
 - `Slab` component: a rounded structural plate (`pill` or `disc`) for
   curved-modernist floor decks, cantilevered roofs, terraces, or a lawn
   disc. Walkable, one convex-hull collider; top surface at the origin

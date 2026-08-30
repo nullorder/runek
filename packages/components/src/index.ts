@@ -68,6 +68,24 @@ export type { PalmProps } from './Palm'
 export { Palm } from './Palm'
 export type { PathProps } from './Path'
 export { Path } from './Path'
+export type {
+  PersonAccessory,
+  PersonAge,
+  PersonBuild,
+  PersonDetail,
+  PersonFacialHair,
+  PersonGender,
+  PersonHair,
+  PersonHat,
+  PersonKind,
+  PersonOutfit,
+  PersonPose,
+  PersonProps,
+  PersonSkin,
+  PersonSkinName,
+  PersonStyle,
+} from './Person'
+export { PERSON_SKINS, Person } from './Person'
 export type { PillarProps } from './Pillar'
 export { Pillar } from './Pillar'
 export type { PlantProps } from './Plant'
