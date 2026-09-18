@@ -1,6 +1,6 @@
 {
   "name": "@runek/docs",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Runek documentation site — flat docs + a walkable 3D library world (Astro + R3F).",
   "license": "MIT",
   "private": true,

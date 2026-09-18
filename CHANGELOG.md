@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nullorder/runek/compare/v0.12.0...HEAD)
+## [Unreleased](https://github.com/nullorder/runek/compare/v0.13.0...HEAD)
+
+## [0.13.0](https://github.com/nullorder/runek/compare/v0.12.0...v0.13.0) - 2026-09-18
 
 ### Added
 
@@ -47,6 +49,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Palm` component: a coconut palm with a leaning bowed trunk and a
   crown of drooping instanced fronds; seed drives lean, spread, and the
   coconut cluster.
+- Docs library: a librarian and a traveler now stand in the reading
+  room, and the player's third-person body is a `Person`.
+
+### Fixed
+
+- Contribute modal: "Suggest changes upstream" downloads `world.json`
+  and `snapshot.png` with one button instead of two, so the snapshot
+  that step 4 asks for is no longer skipped. The PNG is now named
+  `snapshot.png` to match the instructions (was `world-snapshot.png`).
 
 ## [0.12.0](https://github.com/nullorder/runek/compare/v0.11.0...v0.12.0) - 2026-07-19
 

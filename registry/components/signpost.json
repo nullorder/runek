@@ -5,7 +5,7 @@
   "description": "A wooden post-and-plank signboard carrying a name in the world's display font; the post sits behind the board so the text reads clean.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.12.0"
+    "@runek/core@^0.13.0"
   ],
   "registryDependencies": [
     "sign"

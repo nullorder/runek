@@ -1,6 +1,6 @@
 {
   "name": "runek",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "private": true,
   "description": "Procedural 3D components for the web. Compose walkable worlds from code.",
   "license": "MIT",

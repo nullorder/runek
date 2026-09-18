@@ -5,7 +5,7 @@
   "description": "A coconut palm: leaning bowed trunk and a crown of drooping instanced fronds, deterministic from seed.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.12.0",
+    "@runek/core@^0.13.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],
