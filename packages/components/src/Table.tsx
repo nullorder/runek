@@ -54,3 +54,5 @@ export function Table({
     </RigidBody>
   )
 }
+
+Table.groundSitting = true

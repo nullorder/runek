@@ -1,9 +1,9 @@
 import type { ComponentType } from 'react'
-import type { WorldFonts } from './font'
-import type { WorldControls } from './keyboard'
-import type { WorldPalette } from './palette'
-import { sub } from './rng'
-import type { AvatarView, Vec3, WorldFog } from './types'
+import type { WorldFonts } from './font.ts'
+import type { WorldControls } from './keyboard.ts'
+import type { WorldPalette } from './palette.ts'
+import { sub } from './rng.ts'
+import type { AvatarView, Vec3, WorldFog } from './types.ts'
 
 export type JsonValue =
   | string
@@ -51,6 +51,10 @@ export interface WorldNode {
    *  worlds; the editor fills it in (see `assignNodeIds`). Drives React keys,
    *  selection, and minimal PR diffs. */
   id?: string
+  /** Measure `position[1]` from the ground instead of absolutely: `ground` is an offset above
+   *  the terrain at the node's (x, z), `surface` above whatever is highest there (terrain, a
+   *  dock, a floor). Resolved by the renderer; the file keeps the authored offset. */
+  anchor?: 'ground' | 'surface'
   props?: Record<string, JsonValue>
   children?: WorldNode[]
 }
@@ -94,6 +98,8 @@ export interface CompositeDef {
   description?: string
   /** Reserved for the future streaming/LOD pass: impostor box `[w, h, d]` in units. */
   bounds?: [number, number, number]
+  /** Stands on the ground: the world check flags an instance that is buried or floating. */
+  groundSitting?: boolean
   nodes: WorldNode[]
 }
 
@@ -147,6 +153,7 @@ export function unpackComposite(node: WorldNode, def: CompositeDef): WorldNode {
 function normalizeNode(node: WorldNode): WorldNode {
   const out: WorldNode = { type: node.type }
   if (node.id !== undefined) out.id = node.id
+  if (node.anchor !== undefined) out.anchor = node.anchor
   if (node.props !== undefined) out.props = node.props
   if (node.children !== undefined) out.children = node.children.map(normalizeNode)
   return out
@@ -155,7 +162,7 @@ function normalizeNode(node: WorldNode): WorldNode {
 /**
  * Serialize a world to pretty JSON text with a canonical, stable key order
  * (`version, meta, unit, gravity, ground, time, timezone, avatar, controls,
- * palette, fonts, fog, nodes`; each node `type, id, props, children`). Stable
+ * palette, fonts, fog, nodes`; each node `type, id, anchor, props, children`). Stable
  * output means an unchanged node never churns the diff, so PR reviews show only
  * the real change.
  */
@@ -232,7 +239,19 @@ export function parseWorld(json: string): WorldData {
       }
     }
   }
+  validateAnchors(data.nodes)
   return data
+}
+
+function validateAnchors(nodes: WorldNode[]): void {
+  for (const node of nodes) {
+    if (node.anchor !== undefined && node.anchor !== 'ground' && node.anchor !== 'surface') {
+      throw new Error(
+        `Node "anchor" must be "ground" or "surface" (got ${JSON.stringify(node.anchor)})`,
+      )
+    }
+    if (node.children) validateAnchors(node.children)
+  }
 }
 
 /** Collect every existing node id in the tree into `into`. */

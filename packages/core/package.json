@@ -28,6 +28,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./data": {
+      "types": "./src/data.ts",
+      "default": "./src/data.ts"
     }
   },
   "publishConfig": {
@@ -38,6 +42,10 @@
       ".": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "./data": {
+        "types": "./dist/data.d.ts",
+        "default": "./dist/data.js"
       }
     }
   },

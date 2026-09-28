@@ -1,12 +1,15 @@
 import { OrbitControls, TransformControls } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
-import { type CSSProperties, useEffect, useRef, useState } from 'react'
+import { type ComponentRef, type CSSProperties, useEffect, useRef, useState } from 'react'
 import type { Object3D } from 'three'
+import { GroundContext } from './context'
+import { ANCHOR_KINDS, type GroundIndex, type NodeAnchor } from './ground'
 import type { Vec3 } from './types'
 import { World, type WorldProps } from './World'
 import { WorldAbout } from './WorldAbout'
 import { WorldContribute } from './WorldContribute'
 import { WorldNodes } from './WorldNodes'
+import { useGroundIndex } from './WorldRenderer'
 import {
   assignNodeIds,
   type ComponentRegistry,
@@ -47,6 +50,12 @@ const SKIPPED = new Set(['Player'])
 
 const HISTORY_LIMIT = 100
 
+/** The gizmo handle being dragged ("X", "XZ", …); typed private upstream, public at runtime. */
+const activeAxis = (controls: unknown) =>
+  (controls as { axis?: string | null } | null)?.axis ?? null
+
+const round = (n: number) => Math.round(n * 1000) / 1000
+
 const asVec3 = (value: JsonValue | undefined): Vec3 | undefined =>
   Array.isArray(value) && value.length === 3 ? (value as unknown as Vec3) : undefined
 
@@ -75,6 +84,8 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
   const [mode, setMode] = useState<TransformMode>('translate')
   const [contributeOpen, setContributeOpen] = useState(false)
   const history = useRef<WorldData[]>([])
+  const ground = useGroundIndex(data, registry)
+  const gizmo = useRef<ComponentRef<typeof TransformControls>>(null)
 
   /** Contribution is offered only when the world declares where it lives. */
   const canContribute = !!data.meta?.source?.url
@@ -98,6 +109,43 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
       i === index ? { ...node, props: { ...node.props, ...patch } } : node,
     )
     apply({ ...data, nodes })
+  }
+
+  const replaceNode = (index: number, node: WorldNode) =>
+    apply({ ...data, nodes: data.nodes.map((n, i) => (i === index ? node : n)) })
+
+  /** Height under a top-level node's (x, z) for an anchor, never counting the node itself. */
+  const heightAt = (node: WorldNode, x: number, z: number, anchor: NodeAnchor) =>
+    ground.groundAt(x, z, { kinds: ANCHOR_KINDS[anchor], exclude: node.id })
+
+  /** Where a top-level node stands in world space, anchored or not. */
+  const placement = (index: number) => {
+    const node = data.nodes[index]
+    const at = asVec3(node.props?.position) ?? [0, 0, 0]
+    const y = node.anchor ? (ground.position(`${index}`)?.[1] ?? at[1]) : at[1]
+    return { node, at, y }
+  }
+
+  /** Change the selection's anchor, keeping it where it stands. */
+  const setAnchor = (anchor: NodeAnchor | undefined) => {
+    if (!selected) return
+    const { node, at, y } = placement(selected.index)
+    const offset = anchor ? y - heightAt(node, at[0], at[2], anchor) : y
+    const next: WorldNode = {
+      ...node,
+      props: { ...node.props, position: [at[0], round(offset), at[2]] },
+    }
+    if (anchor) next.anchor = anchor
+    else delete next.anchor
+    replaceNode(selected.index, next)
+  }
+
+  /** Seat the selection on the ground (or the highest surface) under it. */
+  const dropSelected = (anchor: NodeAnchor) => {
+    if (!selected) return
+    const { node, at } = placement(selected.index)
+    const y = node.anchor ? 0 : heightAt(node, at[0], at[2], anchor)
+    patchNode(selected.index, { position: [at[0], round(y), at[2]] })
   }
 
   const addNode = (type: string) => {
@@ -140,13 +188,27 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
     setSelected(null)
   }
 
+  // Dragging an anchored node slides it along the ground: X/Z move freely and it stays at its
+  // offset; a drag on the Y handle edits the offset instead.
+  const followGround = (axis: string | null) => {
+    if (!selected || mode !== 'translate' || axis?.includes('Y')) return
+    const node = data.nodes[selected.index]
+    if (!node?.anchor) return
+    const { position } = selected.object
+    const offset = asVec3(node.props?.position)?.[1] ?? 0
+    position.y = heightAt(node, position.x, position.z, node.anchor) + offset
+  }
+
   const commitTransform = () => {
     if (!selected) return
+    const node = data.nodes[selected.index]
     const { position, rotation } = selected.object
-    const r = (n: number) => Math.round(n * 1000) / 1000
+    const y = node?.anchor
+      ? position.y - heightAt(node, position.x, position.z, node.anchor)
+      : position.y
     patchNode(selected.index, {
-      position: [r(position.x), r(position.y), r(position.z)],
-      rotation: [r(rotation.x), r(rotation.y), r(rotation.z)],
+      position: [round(position.x), round(y), round(position.z)],
+      rotation: [round(rotation.x), round(rotation.y), round(rotation.z)],
     })
   }
 
@@ -193,13 +255,22 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         onPointerMissed={() => setSelected(null)}
       >
         <OrbitControls makeDefault />
-        <EditableNodes
-          nodes={data.nodes}
-          registry={registry}
-          onSelect={(index, object) => setSelected({ index, object })}
-        />
+        <GroundContext.Provider value={ground}>
+          <EditableNodes
+            nodes={data.nodes}
+            registry={registry}
+            ground={ground}
+            onSelect={(index, object) => setSelected({ index, object })}
+          />
+        </GroundContext.Provider>
         {selected && (
-          <TransformControls object={selected.object} mode={mode} onMouseUp={commitTransform} />
+          <TransformControls
+            ref={gizmo}
+            object={selected.object}
+            mode={mode}
+            onObjectChange={() => followGround(activeAxis(gizmo.current))}
+            onMouseUp={commitTransform}
+          />
         )}
       </World>
 
@@ -215,6 +286,9 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         canUndo={history.current.length > 0}
         canContribute={canContribute}
         canUnpack={selectedComposite !== null}
+        anchor={selected ? (data.nodes[selected.index]?.anchor ?? 'none') : null}
+        onAnchor={(value) => setAnchor(value === 'none' ? undefined : value)}
+        onDrop={dropSelected}
         onAdd={addNode}
         onDuplicate={duplicateSelected}
         onDelete={deleteSelected}
@@ -236,16 +310,19 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
 interface EditableNodesProps {
   nodes: WorldNode[]
   registry: ComponentRegistry
+  ground: GroundIndex
   onSelect: (index: number, object: Object3D) => void
 }
 
-function EditableNodes({ nodes, registry, onSelect }: EditableNodesProps) {
+function EditableNodes({ nodes, registry, ground, onSelect }: EditableNodesProps) {
   return (
     <>
       {nodes.map((node, index) => {
         if (SKIPPED.has(node.type)) return null
 
-        const { position, rotation, ...rest } = node.props ?? {}
+        const path = `${index}`
+        const { position: authored, rotation, ...rest } = node.props ?? {}
+        const position = (node.anchor && ground.position(path)) || authored
         const select =
           (index: number) =>
           // biome-ignore lint/suspicious/noExplicitAny: r3f event typing is looser than the DOM's
@@ -265,7 +342,7 @@ function EditableNodes({ nodes, registry, onSelect }: EditableNodesProps) {
               onClick={select(index)}
             >
               {node.children?.length ? (
-                <WorldNodes nodes={node.children} registry={registry} />
+                <WorldNodes nodes={node.children} registry={registry} ground={ground} path={path} />
               ) : null}
             </group>
           )
@@ -285,14 +362,20 @@ function EditableNodes({ nodes, registry, onSelect }: EditableNodesProps) {
               rotation={asVec3(rotation) ?? [0, 0, 0]}
               onClick={select(index)}
             >
-              <WorldNodes nodes={arrangement} registry={registry} />
+              <WorldNodes
+                nodes={arrangement}
+                registry={registry}
+                ground={ground}
+                path={path}
+                prefix="a"
+              />
             </group>
           )
         }
 
         const Component = entry
         if (NON_SELECTABLE.has(node.type)) {
-          return <Component key={node.id ?? index} {...node.props} />
+          return <Component key={node.id ?? index} {...node.props} position={position} />
         }
 
         return (
@@ -421,6 +504,10 @@ interface EditorToolbarProps {
   canUndo: boolean
   canContribute: boolean
   canUnpack: boolean
+  /** The selection's anchor, or null with nothing selected. */
+  anchor: NodeAnchor | 'none' | null
+  onAnchor: (anchor: NodeAnchor | 'none') => void
+  onDrop: (anchor: NodeAnchor) => void
   onAdd: (type: string) => void
   onDuplicate: () => void
   onDelete: () => void
@@ -438,6 +525,9 @@ function EditorToolbar({
   canUndo,
   canContribute,
   canUnpack,
+  anchor,
+  onAnchor,
+  onDrop,
   onAdd,
   onDuplicate,
   onDelete,
@@ -523,6 +613,38 @@ function EditorToolbar({
         >
           Unpack
         </button>
+      )}
+      {anchor !== null && (
+        <>
+          <span style={DIVIDER} />
+          <select
+            style={SELECT}
+            value={anchor}
+            onChange={(event) => onAnchor(event.target.value as NodeAnchor | 'none')}
+            title="Measure this node's Y from the ground instead of absolutely"
+          >
+            <option value="none">Anchor: none</option>
+            <option value="ground">Anchor: ground</option>
+            <option value="surface">Anchor: surface</option>
+          </select>
+          <button
+            type="button"
+            style={button(false)}
+            onClick={() => onDrop('ground')}
+            title="Seat the selection on the terrain under it"
+          >
+            Drop to ground
+          </button>
+          <button
+            type="button"
+            style={button(false)}
+            onClick={() => onDrop('surface')}
+            title="Seat the selection on the highest surface under it (terrain, dock, floor)"
+          >
+            Drop to surface
+          </button>
+          <span style={DIVIDER} />
+        </>
       )}
       <button
         type="button"

@@ -1,3 +1,6 @@
+import { useEffect, useMemo } from 'react'
+import { GroundContext } from './context'
+import { createGroundIndex, type GroundIndex } from './ground'
 import { World, type WorldProps } from './World'
 import { WorldAbout } from './WorldAbout'
 import { WorldNodes } from './WorldNodes'
@@ -20,8 +23,18 @@ export interface WorldRendererProps
   registry: ComponentRegistry
 }
 
+/** The world's ground index, rebuilt when the data changes, with its warnings logged once. */
+export function useGroundIndex(data: WorldData, registry: ComponentRegistry): GroundIndex {
+  const index = useMemo(() => createGroundIndex(data, registry), [data, registry])
+  useEffect(() => {
+    for (const warning of index.warnings) console.warn(warning)
+  }, [index])
+  return index
+}
+
 /** Render a `WorldData` object inside a `<World>`, resolving each node via the registry. */
 export function WorldRenderer({ data, registry, ...worldProps }: WorldRendererProps) {
+  const ground = useGroundIndex(data, registry)
   return (
     <>
       <World
@@ -37,7 +50,9 @@ export function WorldRenderer({ data, registry, ...worldProps }: WorldRendererPr
         controls={data.controls}
         {...worldProps}
       >
-        <WorldNodes nodes={data.nodes} registry={registry} />
+        <GroundContext.Provider value={ground}>
+          <WorldNodes nodes={data.nodes} registry={registry} ground={ground} />
+        </GroundContext.Provider>
       </World>
       <WorldAbout meta={data.meta} />
     </>

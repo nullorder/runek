@@ -82,3 +82,5 @@ export function Fence({
     </RigidBody>
   )
 }
+
+Fence.groundSitting = true

@@ -75,3 +75,5 @@ export function Arch({
     </RigidBody>
   )
 }
+
+Arch.groundSitting = true

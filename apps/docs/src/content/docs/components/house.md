@@ -45,6 +45,7 @@ arrangement (a `Group` of ordinary nodes) for per-instance customization.
   "name": "House",
   "description": "A two-level dwelling arranged from parts: wall rings with door and window openings, a staircase through the upper floor, a gable roof, and a plant by the door.",
   "bounds": [9.6, 7.2, 7.6],
+  "groundSitting": true,
   "nodes": [
     {
       "type": "Level",

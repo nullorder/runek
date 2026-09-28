@@ -58,3 +58,5 @@ export function Chair({
     </RigidBody>
   )
 }
+
+Chair.groundSitting = true

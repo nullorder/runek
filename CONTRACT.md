@@ -67,13 +67,15 @@ These govern the `WorldData` a component is placed into, not individual componen
   - **`controls`** (a partial action → `KeyboardEvent.code[]` map, merged over the defaults) remaps input bindings and **MAY** declare unknown action names, which become custom bindings any component can read via drei's `useKeyboardControls`. The resolved map is exposed as `useWorld().controls` — a component displaying or consuming bindings **SHOULD** read it rather than hardcode keys. The bindings are orthogonal to `avatar`: an action behaves the same in every view. `<World keyboardMap>` (JSX-only, verbatim) remains the low-level escape hatch and wins when given.
 - `parseWorld` **MUST** accept a world without `meta`, **MUST** pass `meta`, the settings above, and unknown fields through unchanged (light shape validation only), and a new optional field **MUST NOT** require a `version` bump.
 - A `WorldNode` **MAY** carry an optional stable **`id`**. The editor assigns ids to nodes that lack them and preserves existing ones; ids key React reconciliation and selection, with an array-index fallback. Hand-authored worlds need not write ids.
-- `serializeWorld` **MUST** emit a canonical key order, so an unchanged node never churns the diff.
+- A `WorldNode` **MAY** carry an optional **`anchor`** (`'ground' | 'surface'`). Anchored, `position[1]` is an offset above the ground at the node's (x, z): `ground` counts terrain surfaces, `surface` also counts decks (§12). Absent means absolute. The renderer resolves it through the world's surfaces and hands the component an absolute `position`, so a component **MUST NOT** need to know it was anchored. `serializeWorld` **MUST** keep the authored offset, never the resolved Y. Under a parent tilted more than ~1°, an anchor is treated as absolute (with a dev warning).
+- `serializeWorld` **MUST** emit a canonical key order (each node `type, id, anchor, props, children`), so an unchanged node never churns the diff.
 
 ## 10. Water
 
 - An **open water body** (e.g. `Lake`) **MUST** read as filling a depression, never floating above the ground. Its local origin is the **water surface**, and a world **MUST** place that surface **at or below** the surrounding ground level, with the terrain forming the banks. A water sheet hovering over flat ground is a placement bug, not a valid world.
 - A water component **SHOULD** treat its origin as the surface plane (so sinking it is a single negative-Y placement) and **MUST NOT** assume it rests on top of the ground. It **SHOULD** default its surface to `world.ground` (§9), so `<Lake />` complies without an explicit `position`.
 - **Contained water** held in a component's own vessel (e.g. `Fountain`, `Well`) is the exception: its surface sits inside the basin the component renders, because the vessel, not the terrain, holds it.
+- The rule is checkable: an open water component **SHOULD** publish a `water` surface with a `rim` (§12), and `runek check-world` flags water that stands above the ground at its rim.
 
 ## 11. Composites
 
@@ -84,6 +86,17 @@ A **composite** is a registry item whose payload is a *data arrangement* of comp
 - Seeds follow §2's derivation rule at the data level: an instance `seed` gives each child that doesn't pin its own seed a stable `sub(seed, index)`. A composite **MUST NOT** rely on all children sharing one seed.
 - Colliders, units, palette, and the no-assets rule (§4–§7) are satisfied by the referenced components; a composite adds no geometry of its own.
 - The optional `bounds` field (`[w, h, d]` in units) is **reserved** for the future streaming/LOD pass; authors **MAY** declare it, renderers currently ignore it.
+- A composite that stands on the ground **SHOULD** declare `"groundSitting": true`, so the world check flags a buried or floating instance (§12). Its parts' surfaces (a `Floor` inside a `house`) need nothing extra.
+
+## 12. Surfaces
+
+The ground is queryable: `groundAt(x, z)` (and `useGround()` inside a world) returns the highest walkable top at a point, computed from the same pure functions that build the meshes, with no raycasts. Components opt in by publishing what they are.
+
+- A component whose top is walkable ground or deck **SHOULD** publish a `SurfaceDef` as a static property, `Component.surface = { kind, build }`, where `kind` is `terrain` (ground proper), `deck` (a built top: dock, floor, slab), or `water` (open water, §10). `build(props, { unit, ground })` returns the height of the top at local (x, z), or `null` off it.
+- `build` **MUST** be pure and **MUST** agree with the component's collider to within 1 cm. For a displaced mesh that means interpolating the rendered triangles (float32 vertices, the same diagonal), not the idealized field; the mesh and the query **SHOULD** share one height function.
+- The surface math **MUST** live in a plain-TS sibling module (`surfaces/<name>.ts`) with no React, three.js, or physics imports, shipped as one of the component's registry files. Node tooling (`runek check-world`) imports it directly.
+- A component that stands on the ground (people, trees, furniture, buildings) **SHOULD** declare `Component.groundSitting = true`, so the world check knows it may be neither buried nor floating. Things that fly, hover, or are placed in the air (`Birds`, `Clouds`, `Sky`, `Sign`) **MUST NOT**.
+- A component with a displaced collider **SHOULD** build it in the same render as its mesh (e.g. an explicit `TrimeshCollider`), not through automatic colliders, which arrive a commit later and let a spawning dynamic body fall through.
 
 ---
 
@@ -100,4 +113,5 @@ A **composite** is a registry item whose payload is a *data arrangement* of comp
 - [ ] Repeated geometry is instanced, not one mesh per piece
 - [ ] Imports shared code from `@runek/core`; sibling deps declared; no app imports
 - [ ] Open water sits at/below ground (surface origin); contained water is in its vessel
+- [ ] A walkable top publishes `Component.surface` (pure, from `surfaces/<name>.ts`, within 1 cm of the collider); a ground-standing component sets `Component.groundSitting = true`
 - [ ] `just check` passes (lint, typecheck, test, build)

@@ -1,8 +1,30 @@
-export { WorldContext } from './context'
+export { GroundContext, WorldContext } from './context'
 export type { GitHubSource } from './contribute'
 export { editFileUrl, forkUrl, parseGitHubSource } from './contribute'
 export type { WorldFonts } from './font'
 export { DEFAULT_FONT, DEFAULT_FONTS } from './font'
+export type {
+  CheckWorldOptions,
+  GroundEntry,
+  GroundIndex,
+  GroundQuery,
+  GroundQueryOptions,
+  GroundRegistry,
+  NodeAnchor,
+  SurfaceDef,
+  SurfaceFn,
+  SurfaceKind,
+  SurfaceWorld,
+  WorldIssue,
+  WorldIssueKind,
+} from './ground'
+export {
+  ANCHOR_KINDS,
+  checkWorld,
+  createGroundIndex,
+  GROUND_TOLERANCE,
+  groundAt,
+} from './ground'
 export type { WorldControls } from './keyboard'
 export { controlsToMap, DEFAULT_CONTROLS, keyboardMap, resolveControls } from './keyboard'
 export type { WorldPalette } from './palette'
@@ -25,6 +47,7 @@ export type {
   WorldContextValue,
   WorldFog,
 } from './types'
+export { useGround } from './useGround'
 export { useWorld } from './useWorld'
 export type { WorldProps } from './World'
 export { World } from './World'
@@ -35,9 +58,9 @@ export { WorldContribute } from './WorldContribute'
 export type { WorldEditorProps } from './WorldEditor'
 export { WorldEditor } from './WorldEditor'
 export type { WorldNodesProps } from './WorldNodes'
-export { WorldNodes } from './WorldNodes'
+export { nodePath, WorldNodes } from './WorldNodes'
 export type { WorldRendererProps } from './WorldRenderer'
-export { WorldRenderer } from './WorldRenderer'
+export { useGroundIndex, WorldRenderer } from './WorldRenderer'
 export type {
   ComponentRegistry,
   CompositeDef,

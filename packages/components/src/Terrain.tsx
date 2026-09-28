@@ -1,10 +1,17 @@
-import { RigidBody } from '@react-three/rapier'
+import { RigidBody, TrimeshCollider } from '@react-three/rapier'
 import { useWorld, type Vec3 } from '@runek/core'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
+import {
+  TERRAIN_DEFAULTS,
+  type TerrainShape,
+  terrainHeight,
+  terrainSurface,
+} from './surfaces/terrain'
 
 export interface TerrainProps {
   position?: Vec3
+  rotation?: Vec3
   /** Ground extent `[width, depth]`, in units. */
   size?: [number, number]
   thickness?: number
@@ -29,49 +36,32 @@ export interface TerrainProps {
   seed?: number
 }
 
-function valueNoise(seed: number) {
-  const hash = (x: number, y: number) => {
-    let h = (seed ^ Math.imul(x, 374761393) ^ Math.imul(y, 668265263)) >>> 0
-    h = Math.imul(h ^ (h >>> 13), 1274126177)
-    return ((h ^ (h >>> 16)) >>> 0) / 4294967296
-  }
-  return (x: number, y: number) => {
-    const x0 = Math.floor(x)
-    const y0 = Math.floor(y)
-    const fx = x - x0
-    const fy = y - y0
-    const sx = fx * fx * (3 - 2 * fx)
-    const sy = fy * fy * (3 - 2 * fy)
-    const top = hash(x0, y0) + (hash(x0 + 1, y0) - hash(x0, y0)) * sx
-    const bot = hash(x0, y0 + 1) + (hash(x0 + 1, y0 + 1) - hash(x0, y0 + 1)) * sx
-    return top + (bot - top) * sy
-  }
-}
-
-function fbm(noise: (x: number, y: number) => number, x: number, y: number) {
-  let value = 0
-  let amp = 0.5
-  let freq = 1
-  for (let octave = 0; octave < 4; octave++) {
-    value += amp * noise(x * freq, y * freq)
-    amp *= 0.5
-    freq *= 2
-  }
-  return value
+/** The displaced ground mesh, raised from the same height field the ground query reads. */
+export function terrainGeometry(shape: TerrainShape, unit: number): THREE.PlaneGeometry {
+  const { size = TERRAIN_DEFAULTS.size, resolution = TERRAIN_DEFAULTS.resolution } = shape
+  const geo = new THREE.PlaneGeometry(size[0] * unit, size[1] * unit, resolution, resolution)
+  geo.rotateX(-Math.PI / 2)
+  const height = terrainHeight(shape, unit)
+  const pos = geo.attributes.position
+  for (let i = 0; i < pos.count; i++) pos.setY(i, height(pos.getX(i), pos.getZ(i)))
+  pos.needsUpdate = true
+  geo.computeVertexNormals()
+  return geo
 }
 
 export function Terrain({
   position = [0, 0, 0],
-  size = [40, 40],
+  rotation = [0, 0, 0],
+  size = TERRAIN_DEFAULTS.size,
   thickness = 0.4,
   color,
-  relief = 0,
-  resolution = 64,
-  frequency = 0.04,
-  flatRadius = 0,
-  falloff = 0,
+  relief = TERRAIN_DEFAULTS.relief,
+  resolution = TERRAIN_DEFAULTS.resolution,
+  frequency = TERRAIN_DEFAULTS.frequency,
+  flatRadius = TERRAIN_DEFAULTS.flatRadius,
+  falloff = TERRAIN_DEFAULTS.falloff,
   collider = true,
-  seed = 1,
+  seed = TERRAIN_DEFAULTS.seed,
 }: TerrainProps) {
   const { unit, palette } = useWorld()
   const groundColor = color ?? palette.ground
@@ -79,35 +69,18 @@ export function Terrain({
   const depth = size[1] * unit
   const t = thickness * unit
 
-  const displaced = useMemo(() => {
-    if (relief <= 0) return null
-    const geo = new THREE.PlaneGeometry(width, depth, resolution, resolution)
-    geo.rotateX(-Math.PI / 2)
-    const noise = valueNoise(seed)
-    const fr = flatRadius * unit
-    const half = Math.min(width, depth) / 2
-    const sink = (relief + 4) * unit
-    const pos = geo.attributes.position
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i)
-      const z = pos.getZ(i)
-      let h: number
-      if (falloff > 0) {
-        // Island mode: gentle land above the waterline, masked down to the deep at the rim.
-        const land = fbm(noise, x * frequency, z * frequency) * relief * unit
-        const rn = Math.hypot(x, z) / half
-        const mask = 1 - THREE.MathUtils.smoothstep(rn, falloff - 0.18, falloff)
-        h = land * mask - (1 - mask) * sink
-      } else {
-        h = (fbm(noise, x * frequency, z * frequency) - 0.5) * 2 * relief * unit
-      }
-      if (fr > 0) h *= THREE.MathUtils.smoothstep(Math.hypot(x, z), fr, fr + 8 * unit)
-      pos.setY(i, h)
-    }
-    pos.needsUpdate = true
-    geo.computeVertexNormals()
-    return geo
-  }, [width, depth, resolution, relief, frequency, flatRadius, falloff, seed, unit])
+  const [sizeX, sizeZ] = size
+  const displaced = useMemo(
+    () =>
+      relief > 0
+        ? terrainGeometry(
+            { size: [sizeX, sizeZ], relief, resolution, frequency, flatRadius, falloff, seed },
+            unit,
+          )
+        : null,
+    [sizeX, sizeZ, resolution, relief, frequency, flatRadius, falloff, seed, unit],
+  )
+  useEffect(() => () => displaced?.dispose(), [displaced])
 
   if (displaced) {
     const mesh = (
@@ -115,12 +88,22 @@ export function Terrain({
         <meshStandardMaterial color={groundColor} flatShading />
       </mesh>
     )
+    // The trimesh is built here rather than with colliders="trimesh", which derives it in an
+    // effect one commit after mount: a dynamic body spawned over the terrain could fall through.
     return collider ? (
-      <RigidBody type="fixed" colliders="trimesh" position={position}>
+      <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
+        <TrimeshCollider
+          args={[
+            displaced.attributes.position.array,
+            (displaced.index as THREE.BufferAttribute).array,
+          ]}
+        />
         {mesh}
       </RigidBody>
     ) : (
-      <group position={position}>{mesh}</group>
+      <group position={position} rotation={rotation}>
+        {mesh}
+      </group>
     )
   }
 
@@ -131,10 +114,14 @@ export function Terrain({
     </mesh>
   )
   return collider ? (
-    <RigidBody type="fixed" colliders="cuboid" position={position}>
+    <RigidBody type="fixed" colliders="cuboid" position={position} rotation={rotation}>
       {flat}
     </RigidBody>
   ) : (
-    <group position={position}>{flat}</group>
+    <group position={position} rotation={rotation}>
+      {flat}
+    </group>
   )
 }
+
+Terrain.surface = terrainSurface

@@ -352,3 +352,5 @@ export function Bookshelf({
     </RigidBody>
   )
 }
+
+Bookshelf.groundSitting = true

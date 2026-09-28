@@ -253,3 +253,5 @@ export function Tent({
     </RigidBody>
   )
 }
+
+Tent.groundSitting = true

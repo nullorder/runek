@@ -16,6 +16,7 @@ Runek components all follow the same small contract. Honor it and a component is
 5. **No assets.** Geometry and color come from code; no `.glb`, no textures.
 6. **Default colors from the palette.** Read `palette` from `useWorld()` and use its slots (`wood`, `wall`, `foliage`, …) as your color defaults; an explicit color prop always wins. One palette swap then re-themes the whole world.
 7. **Instance repeated geometry.** Books, branches, blades — render them as one `InstancedMesh`, not one mesh per piece, so worlds stay cheap at scale.
+8. **Publish your surface.** If people can stand on your component, attach `Component.surface` (its walkable top, as a pure function in a `surfaces/<name>.ts` module). If it stands on the ground, set `Component.groundSitting = true`. That's what lets worlds anchor to it and `runek check-world` catch buried or floating props.
 
 ## A minimal compliant component
 

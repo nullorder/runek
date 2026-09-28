@@ -107,3 +107,5 @@ export function Campfire({
     </group>
   )
 }
+
+Campfire.groundSitting = true

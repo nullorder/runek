@@ -29,6 +29,7 @@ interface WorldData {
 interface WorldNode {
   type: string // a registry key, e.g. "Bookshelf"
   id?: string // stable identity; the editor fills this in (see below)
+  anchor?: 'ground' | 'surface' // position[1] is an offset above the ground here
   props?: Record<string, JsonValue>
   children?: WorldNode[]
 }
@@ -110,6 +111,16 @@ interface WorldMeta {
 `meta` is optional, and so is every field within it. When present, both `<WorldRenderer>` (walk) and `<WorldEditor>` (edit) show a small **ⓘ** that opens an "About this world" panel with the title, authors, license, and a link to the source repo. A world with no `meta` still renders.
 
 When `meta.source` points at a GitHub repo, the editor also gains a **Contribute** action with two paths. *Fork this world* opens GitHub's fork page for your own deployable copy. *Suggest changes upstream* downloads the edited JSON plus a PNG snapshot of the view and opens GitHub's edit-file URL, which auto-forks for non-collaborators, so your change becomes a normal pull request with no backend, account, or token. Non-GitHub hosts fall back to opening the repo.
+
+## Anchored nodes
+
+On uneven `Terrain`, a fixed Y is only right where the ground happens to be that high. An `anchor` makes `position[1]` an offset above the ground at the node's (x, z) instead: `"ground"` stands on terrain, `"surface"` on whatever is highest there (terrain, a dock, a floor).
+
+```json
+{ "type": "Person", "anchor": "ground", "props": { "position": [3.2, 0, 115.4], "seed": 123 } }
+```
+
+The file keeps the offset, so moving or reseeding the terrain re-seats everything anchored to it. See [Placing things on uneven ground](/docs/placing-things-on-uneven-ground).
 
 ## Stable node ids
 

@@ -1,6 +1,6 @@
 ---
 title: "Terrain"
-summary: "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff."
+summary: "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff. Its surface is queryable (`useGround`, anchors, `runek check-world`)."
 category: component
 component: terrain
 order: 100
@@ -27,6 +27,7 @@ import { Terrain } from './runek/Terrain'
 ```ts
 export interface TerrainProps {
   position?: Vec3
+  rotation?: Vec3
   /** Ground extent `[width, depth]`, in units. */
   size?: [number, number]
   thickness?: number

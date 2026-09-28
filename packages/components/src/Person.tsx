@@ -1293,3 +1293,5 @@ export function Person({
     </RigidBody>
   )
 }
+
+Person.groundSitting = true

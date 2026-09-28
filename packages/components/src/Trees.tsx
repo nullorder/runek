@@ -193,3 +193,5 @@ export function Trees({
     </RigidBody>
   )
 }
+
+Trees.groundSitting = true

@@ -45,6 +45,7 @@ arrangement (a `Group` of ordinary nodes) for per-instance customization.
   "name": "Room",
   "description": "Four walls and a floor with a front doorway — one Level with an opening. Unpack it to add a ceiling, windows, or more openings.",
   "bounds": [8, 3, 8],
+  "groundSitting": true,
   "nodes": [
     {
       "type": "Level",

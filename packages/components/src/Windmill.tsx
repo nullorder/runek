@@ -103,3 +103,5 @@ export function Windmill({
     </RigidBody>
   )
 }
+
+Windmill.groundSitting = true

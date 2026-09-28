@@ -10,7 +10,7 @@
   "files": [
     {
       "path": "composites/room.json",
-      "content": "{\n  \"kind\": \"composite\",\n  \"name\": \"Room\",\n  \"description\": \"Four walls and a floor with a front doorway — one Level with an opening. Unpack it to add a ceiling, windows, or more openings.\",\n  \"bounds\": [8, 3, 8],\n  \"nodes\": [\n    {\n      \"type\": \"Level\",\n      \"props\": {\n        \"size\": [8, 8],\n        \"height\": 3,\n        \"walls\": {\n          \"front\": { \"openings\": [{ \"width\": 1.4, \"height\": 2 }] }\n        }\n      }\n    }\n  ]\n}\n",
+      "content": "{\n  \"kind\": \"composite\",\n  \"name\": \"Room\",\n  \"description\": \"Four walls and a floor with a front doorway — one Level with an opening. Unpack it to add a ceiling, windows, or more openings.\",\n  \"bounds\": [8, 3, 8],\n  \"groundSitting\": true,\n  \"nodes\": [\n    {\n      \"type\": \"Level\",\n      \"props\": {\n        \"size\": [8, 8],\n        \"height\": 3,\n        \"walls\": {\n          \"front\": { \"openings\": [{ \"width\": 1.4, \"height\": 2 }] }\n        }\n      }\n    }\n  ]\n}\n",
       "type": "registry:composite"
     }
   ]
