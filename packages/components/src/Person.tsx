@@ -10,7 +10,15 @@ import {
   type WorldComponentProps,
 } from '@runek/core'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Color, DoubleSide, type Group, LatheGeometry, Vector2, Vector3 } from 'three'
+import {
+  Color,
+  DoubleSide,
+  type Group,
+  LatheGeometry,
+  type Object3D,
+  Vector2,
+  Vector3,
+} from 'three'
 import { Sign } from './Sign'
 
 /** Preset bundles: outfit, hat, and accessories for a role. */
@@ -193,9 +201,10 @@ export interface PersonProps extends WorldComponentProps {
   pose?: PersonPose
   /** Breathing, weight shift, and blinking. */
   idle?: boolean
-  /** Turn the head toward the camera when it comes within `lookRadius`. */
+  /** Turn the head toward the player's avatar (or the camera, when no `Player` is mounted)
+   *  when it comes within `lookRadius`. */
   lookAt?: boolean
-  /** How close the camera must be for `lookAt` to engage, in units. */
+  /** How close the avatar must be for `lookAt` to engage, in units. */
   lookRadius?: number
   /** Floating name above the head. */
   label?: string
@@ -386,6 +395,11 @@ const LOD_NEAR = 15
 const MAX_YAW = 1.2
 const MAX_PITCH = 0.4
 
+const isInside = (o: Object3D, ancestor: Object3D) => {
+  for (let p = o.parent; p; p = p.parent) if (p === ancestor) return true
+  return false
+}
+
 /** Nudge a palette color per figure, so a crowd defaulting to one slot isn't a uniform. */
 function tint(hex: string, r: Rng): string {
   const c = new Color(hex)
@@ -488,7 +502,7 @@ export function Person({
   physics = true,
   detail = 'auto',
 }: PersonProps) {
-  const { unit, palette, ground } = useWorld()
+  const { unit, palette, ground, player } = useWorld()
   // A placed figure stands on the world's ground baseline; a bare visual is positioned by
   // whatever parent owns it (a `Player` capsule, a vehicle), so it starts at its own origin.
   const at: Vec3 = position ?? (physics ? [0, ground, 0] : [0, 0, 0])
@@ -672,16 +686,21 @@ export function Person({
       eyes.current.scale.y = blink < 0.1 ? 0.12 : 1
     }
 
-    // Head tracking: the camera position in the head's own parent space gives yaw and pitch
-    // directly. Outside the radius, or behind the shoulder, the head eases back to neutral.
+    // Head tracking: the target in the head's own parent space gives yaw and pitch directly.
+    // The target is the player's avatar when a `Player` is mounted (in third person the camera
+    // trails behind it), else the camera. Outside the radius, or behind the shoulder, the head
+    // eases back to neutral. A figure that *is* the avatar's body has nobody to watch.
     if (headRef.current) {
       const h = headRef.current
       // Yaw before pitch, so looking up while turned doesn't roll the head.
       if (h.rotation.order !== 'YXZ') h.rotation.order = 'YXZ'
       let yaw = idle ? sway * 0.05 : 0
       let pitch = 0
-      if (lookAt && h.parent) {
-        scratch.copy(state.camera.position)
+      const avatar = player?.current
+      const self = avatar?.parent != null && isInside(h, avatar.parent)
+      if (lookAt && h.parent && !self) {
+        if (avatar) avatar.getWorldPosition(scratch)
+        else scratch.copy(state.camera.position)
         h.parent.worldToLocal(scratch).sub(h.position)
         const flat = Math.hypot(scratch.x, scratch.z)
         const wanted = Math.atan2(scratch.x, scratch.z)

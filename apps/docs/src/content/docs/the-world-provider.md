@@ -85,4 +85,9 @@ function MyThing() {
 }
 ```
 
+While a `Player` is mounted, `useWorld().player?.current` is its avatar (an `Object3D` at eye
+height), so a component can react to where the player *is* rather than where the camera is.
+In third person those differ: the camera trails a few meters behind. Read it inside
+`useFrame`, and fall back to the camera when it's `null` (no `Player`, e.g. an orbit view).
+
 Next: [the component contract](/docs/the-component-contract) — the rules every component follows.

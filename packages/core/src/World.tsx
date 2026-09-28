@@ -1,7 +1,8 @@
 import { KeyboardControls, type KeyboardControlsEntry } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
-import { type ReactNode, useMemo } from 'react'
+import { type ReactNode, useMemo, useRef } from 'react'
+import type { Object3D } from 'three'
 import { WorldContext } from './context'
 import { DEFAULT_FONTS, type WorldFonts } from './font'
 import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
@@ -82,6 +83,8 @@ export function World({
     [keyboardMap, resolvedControls],
   )
 
+  const player = useRef<Object3D | null>(null)
+
   const context = useMemo(
     () => ({
       unit,
@@ -92,6 +95,7 @@ export function World({
       time: resolveWorldTime({ time, timezone }),
       avatar,
       controls: resolvedControls,
+      player,
     }),
     [unit, gravity, ground, palette, fonts, time, timezone, avatar, resolvedControls],
   )
