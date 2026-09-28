@@ -2,7 +2,7 @@ import { useKeyboardControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { type AvatarView, useWorld, type Vec3 } from '@runek/core'
 import Ecctrl from 'ecctrl'
-import { type ReactNode, useRef } from 'react'
+import { type ReactNode, useEffect, useRef } from 'react'
 import type { Object3D } from 'three'
 
 export type PlayerView = AvatarView
@@ -85,10 +85,24 @@ export interface PlayerProps {
 
 const CAPSULE_RADIUS = 0.3
 const CAPSULE_HALF_HEIGHT = 0.35
+// Where the avatar's eyes sit on the capsule: what others look at when they look at the player.
+const EYE_HEIGHT = 0.5
 
 export function Player({ position = [0, 3, 0], view, yaw = 0, children }: PlayerProps) {
-  const { avatar } = useWorld()
+  const { avatar, player } = useWorld()
   const firstPerson = (view ?? avatar ?? 'first') === 'first'
+  const eyes = useRef<Object3D>(null)
+
+  // Publish the avatar so the world can react to the player rather than the camera. Only clear
+  // the slot if it's still ours, so a remount elsewhere isn't wiped by this unmount.
+  useEffect(() => {
+    if (!player) return
+    const anchor = eyes.current
+    player.current = anchor
+    return () => {
+      if (player.current === anchor) player.current = null
+    }
+  }, [player])
 
   return (
     <Ecctrl
@@ -113,6 +127,7 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
           </mesh>
         )}
       </group>
+      <object3D ref={eyes} position={[0, EYE_HEIGHT, 0]} />
       <CameraKeyLook />
     </Ecctrl>
   )

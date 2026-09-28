@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add person
 ```
 
-Pulls `sign`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.12.0`, `three@^0.184.0`.
+Pulls `sign`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -61,9 +61,10 @@ export interface PersonProps extends WorldComponentProps {
   pose?: PersonPose
   /** Breathing, weight shift, and blinking. */
   idle?: boolean
-  /** Turn the head toward the camera when it comes within `lookRadius`. */
+  /** Turn the head toward the player's avatar (or the camera, when no `Player` is mounted)
+   *  when it comes within `lookRadius`. */
   lookAt?: boolean
-  /** How close the camera must be for `lookAt` to engage, in units. */
+  /** How close the avatar must be for `lookAt` to engage, in units. */
   lookRadius?: number
   /** Floating name above the head. */
   label?: string

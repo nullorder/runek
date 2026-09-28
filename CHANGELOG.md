@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.13.0...HEAD)
 
+### Added
+
+- `useWorld().player`: a ref to the mounted `Player`'s avatar (at eye
+  height), or `null` when there's no `Player`. Components can react to
+  where the player stands instead of where the camera is.
+
+### Changed
+
+- `Person` turns its head toward the player's avatar, not the camera.
+  In third person the camera trails behind, so figures used to look
+  past you; now they meet your avatar's eyes, and `lookRadius` is
+  measured from the avatar. Without a `Player` (e.g. an orbit view) it
+  still watches the camera. A `Person` used as the `Player`'s own body
+  no longer tries to track anything.
+
 ## [0.13.0](https://github.com/nullorder/runek/compare/v0.12.0...v0.13.0) - 2026-09-18
 
 ### Added

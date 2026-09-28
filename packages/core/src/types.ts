@@ -1,3 +1,5 @@
+import type { RefObject } from 'react'
+import type { Object3D } from 'three'
 import type { WorldFonts } from './font'
 import type { WorldControls } from './keyboard'
 import type { WorldPalette } from './palette'
@@ -47,4 +49,9 @@ export interface WorldContextValue {
    *  `controls` over the defaults, or derived from an explicit `keyboardMap`.
    *  Components can read it to consume or display the actual bindings. */
   controls: WorldControls
+  /** The player's avatar, published by `Player` while one is mounted (`null` otherwise).
+   *  A mutable ref, not state: read `player.current` inside `useFrame` for where the
+   *  player *is*, which in third person is not where the camera is. Absent under a
+   *  hand-rolled provider, where components fall back to the camera. */
+  player?: RefObject<Object3D | null>
 }
