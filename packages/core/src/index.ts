@@ -1,4 +1,4 @@
-export { GroundContext, WorldContext } from './context'
+export { GroundContext, PlayerMotionContext, WorldContext } from './context'
 export type { GitHubSource } from './contribute'
 export { editFileUrl, forkUrl, parseGitHubSource } from './contribute'
 export type { WorldFonts } from './font'
@@ -42,7 +42,9 @@ export {
 } from './time'
 export type {
   AvatarView,
+  PlayerMotion,
   Vec3,
+  Walker,
   WorldComponentProps,
   WorldContextValue,
   WorldFog,

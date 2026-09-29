@@ -1,6 +1,6 @@
 ---
 title: "Person"
-summary: "A proportioned, clothed, articulated figure generated from a seed: style templates (anime by default, realistic as the alternate), role presets, gender/age/build silhouettes, hair, outfits, hats and accessories, swappable cosmetic skins (named presets or custom bundles), poses, idle breathing, and a head that turns to watch you. Place one at a spawn point, or use it as the Player's third-person body."
+summary: "A proportioned, clothed, articulated figure generated from a seed: style templates (anime by default, realistic as the alternate), role presets, gender/age/build silhouettes, hair, outfits, hats and accessories, swappable cosmetic skins (named presets or custom bundles), poses, idle breathing, and a head that turns to watch you. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. Place one at a spawn point, or use it as the Player's third-person body."
 category: component
 component: person
 order: 100
@@ -59,6 +59,21 @@ export interface PersonProps extends WorldComponentProps {
   accessories?: PersonAccessory[]
   /** Static joint set. `wave` also animates the raised forearm. */
   pose?: PersonPose
+  /** Walk these waypoints, relative to `position` and turning with `rotation`, in units.
+   *  Height follows the ground; a waypoint's y lifts the figure above it. */
+  patrol?: Vec3[]
+  /** Wander a seeded loop of five points within this radius of `position`, in units. `patrol`
+   *  wins when both are set. */
+  wander?: number
+  /** Walking speed, in units per second. Defaults by age: child 1.0, adult 1.3, elder 0.8. */
+  speed?: number
+  /** Seconds held at each waypoint. Walking always stands; the authored `pose` plays here. */
+  pause?: number
+  /** `loop` walks from the last waypoint back to the first; `pingpong` retraces the route. */
+  loop?: RouteLoop
+  /** Walk-cycle speed, in units per second, for a figure something else moves (a cart, a
+   *  script). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed. */
+  gait?: number
   /** Breathing, weight shift, and blinking. */
   idle?: boolean
   /** Turn the head toward the player's avatar (or the camera, when no `Player` is mounted)

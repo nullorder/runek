@@ -37,6 +37,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--fix` writes them into the file; `--strict` exits non-zero for CI.
 - `Terrain` accepts `rotation`, like every other component.
 - Guide: "Placing things on uneven ground".
+- `Person` walks. `patrol` takes waypoints relative to its `position`
+  (they turn with `rotation`); `wander` takes a radius and walks a
+  seeded loop inside it. `speed` (by age: 1.3 m/s for an adult),
+  `pause` at each waypoint, and `loop` (`"loop"` or `"pingpong"`) shape
+  the route. Where a figure is on its route depends only on the clock
+  and the seed, so everyone viewing the world sees it in the same place.
+  It follows the ground under it, eases in and out of each stop, turns
+  into its corners, and swings its arms and legs in a walk cycle keyed
+  to the distance walked, so feet don't slide. The authored `pose` plays
+  at each pause (a merchant walks to the stall, then works). Walkers
+  step aside for the player and for each other (passing on the right
+  when head-on), and wait when a wall blocks both sides. A walking
+  figure's collider is kinematic; a standing one costs what it did.
+- `Person` `gait`: the walk-cycle speed for a figure something else
+  moves. As a `Player`'s body it now walks in step with the avatar
+  instead of sliding.
+- `useWorld().walkers` (the figures walking right now, for components
+  that want to steer around them) and `PlayerMotionContext` (the
+  enclosing `Player`'s live speed).
 
 ### Changed
 

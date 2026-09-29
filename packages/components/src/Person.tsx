@@ -1,15 +1,17 @@
 import { useFrame } from '@react-three/fiber'
-import { CapsuleCollider, RigidBody } from '@react-three/rapier'
+import { CapsuleCollider, type RapierRigidBody, RigidBody } from '@react-three/rapier'
 import {
+  PlayerMotionContext,
   pick,
   type Rng,
   range,
   rng,
+  sub,
   useWorld,
   type Vec3,
   type WorldComponentProps,
 } from '@runek/core'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Color,
   DoubleSide,
@@ -19,6 +21,13 @@ import {
   Vector2,
   Vector3,
 } from 'three'
+import {
+  type GaitState,
+  PhysicsRouteDriver,
+  RouteDriver,
+  type WalkRoute,
+} from './person/RouteDriver'
+import { buildRoute, type RouteLoop, wanderPoints } from './person/route'
 import { Sign } from './Sign'
 
 /** Preset bundles: outfit, hat, and accessories for a role. */
@@ -199,6 +208,21 @@ export interface PersonProps extends WorldComponentProps {
   accessories?: PersonAccessory[]
   /** Static joint set. `wave` also animates the raised forearm. */
   pose?: PersonPose
+  /** Walk these waypoints, relative to `position` and turning with `rotation`, in units.
+   *  Height follows the ground; a waypoint's y lifts the figure above it. */
+  patrol?: Vec3[]
+  /** Wander a seeded loop of five points within this radius of `position`, in units. `patrol`
+   *  wins when both are set. */
+  wander?: number
+  /** Walking speed, in units per second. Defaults by age: child 1.0, adult 1.3, elder 0.8. */
+  speed?: number
+  /** Seconds held at each waypoint. Walking always stands; the authored `pose` plays here. */
+  pause?: number
+  /** `loop` walks from the last waypoint back to the first; `pingpong` retraces the route. */
+  loop?: RouteLoop
+  /** Walk-cycle speed, in units per second, for a figure something else moves (a cart, a
+   *  script). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed. */
+  gait?: number
   /** Breathing, weight shift, and blinking. */
   idle?: boolean
   /** Turn the head toward the player's avatar (or the camera, when no `Player` is mounted)
@@ -390,6 +414,10 @@ const BANGS: Array<[number, number, number, number]> = [
   [0.31, 0.24, 0.23, -0.22],
 ]
 
+const WALK_SPEED: Record<PersonAge, number> = { child: 1, adult: 1.3, elder: 0.8 }
+/** Walking speed (m/s) at which the walk cycle reaches full swing. */
+const CRUISE = 1.3
+
 const LOD_FAR = 18
 const LOD_NEAR = 15
 const MAX_YAW = 1.2
@@ -464,9 +492,11 @@ interface Figure {
  * silhouette reads as a person rather than a toy; the body is a nested joint rig that breathes,
  * shifts its weight, blinks, and turns its head toward you.
  *
- * `position` is the spawn point. The figure is static (movement and dialogue are a later pass)
- * and stands on one capsule collider. Pass `physics={false}` for a bare visual, which is how it
- * becomes `Player`'s third-person body:
+ * `position` is the spawn point. Give it a `patrol` (waypoints) or a `wander` radius and it
+ * walks: where it is on the route is a function of the clock and the seed, so every viewer sees
+ * it in the same place, and it steps around the player and other walkers in its way. It stands
+ * on one capsule collider, kinematic while it walks. Pass `physics={false}` for a bare visual,
+ * which is how it becomes `Player`'s third-person body (walking in step with the avatar):
  * `<Player><Person physics={false} height={1.3} position={[0, -0.65, 0]} /></Player>`.
  *
  * Detail is parametric: past ~18 units the rig swaps to a cheap silhouette. A market square of
@@ -494,6 +524,12 @@ export function Person({
   hat,
   accessories,
   pose = 'stand',
+  patrol,
+  wander,
+  speed,
+  pause = 1.5,
+  loop = 'loop',
+  gait,
   idle = true,
   lookAt = true,
   lookRadius = 9,
@@ -503,6 +539,7 @@ export function Person({
   detail = 'auto',
 }: PersonProps) {
   const { unit, palette, ground, player } = useWorld()
+  const avatarMotion = useContext(PlayerMotionContext)
   // A placed figure stands on the world's ground baseline; a bare visual is positioned by
   // whatever parent owns it (a `Player` capsule, a vehicle), so it starts at its own origin.
   const at: Vec3 = position ?? (physics ? [0, ground, 0] : [0, 0, 0])
@@ -621,6 +658,20 @@ export function Person({
     palette,
   ])
 
+  // The route is node-local geometry like any other: waypoints scale by `unit` and turn with the
+  // node. Wander points come from their own seed stream so they don't reshuffle the figure.
+  const patrolKey = patrol && JSON.stringify(patrol)
+  const route = useMemo<WalkRoute | null>(() => {
+    const points = patrol ?? (wander ? wanderPoints(wander, sub(seed, 1)) : undefined)
+    if (!points || points.length < 2) return null
+    const built = buildRoute(
+      points.map(([x, y, z]) => [x * unit, y * unit, z * unit]),
+      { speed: (speed ?? WALK_SPEED[age]) * unit, pause, loop },
+    )
+    if (!built.period) return null
+    return { ...built, phase: rng(sub(seed, 2))() * built.period }
+  }, [patrolKey, patrol, wander, seed, speed, age, pause, loop, unit])
+
   const root = useRef<Group>(null)
   const hips = useRef<Group>(null)
   const chest = useRef<Group>(null)
@@ -628,9 +679,21 @@ export function Person({
   const shoulderL = useRef<Group>(null)
   const shoulderR = useRef<Group>(null)
   const elbowR = useRef<Group>(null)
+  const thighL = useRef<Group>(null)
+  const thighR = useRef<Group>(null)
+  const kneeL = useRef<Group>(null)
+  const kneeR = useRef<Group>(null)
   const eyes = useRef<Group>(null)
   const nameTag = useRef<Group>(null)
+  const nodeFrame = useRef<Group>(null)
+  const walker = useRef<Group>(null)
+  const facing = useRef<Group>(null)
+  const body = useRef<RapierRigidBody>(null)
   const scratch = useMemo(() => new Vector3(), [])
+  const walk = useRef<GaitState>({ speed: 0, distance: 0 })
+  // Eased blend weights: `stride` is how far into the walk cycle the limbs are (0 standing, 1
+  // full swing); `posed` how far into the authored pose (walking always stands).
+  const blend = useRef({ stride: 0, posed: 1 })
 
   const [far, setFar] = useState(detail === 'low')
   const low = detail === 'low' || (detail === 'auto' && far)
@@ -661,25 +724,56 @@ export function Person({
       else if (far && d < LOD_NEAR) setFar(false)
     }
 
-    const breath = idle ? Math.sin(t * 1.6 + f.phase) : 0
-    const sway = idle ? Math.sin(t * 0.42 + f.phase) : 0
+    // Walking speed comes from the route, else an explicit `gait`, else the carrying `Player`.
+    // Off-route, distance is integrated so the stride phase still tracks the feet.
+    const w = walk.current
+    if (!route) {
+      w.speed = gait ?? avatarMotion?.current.speed ?? 0
+      w.distance += w.speed * dt
+    }
+    const b = blend.current
+    const moving = w.speed > 0.05 * unit
+    b.stride += (Math.min(w.speed / (CRUISE * unit), 1) - b.stride) * (1 - Math.exp(-10 * dt))
+    b.posed += ((moving ? 0 : 1) - b.posed) * (1 - Math.exp(-8 * dt))
+    const s = b.stride
+    const q = b.posed
+    const waving = p.wave && q > 0.5
+    // Stride phase from distance walked: one full cycle (two steps) per 0.8 body heights.
+    const phase = (w.distance / (0.8 * f.H)) * Math.PI * 2
+    const swing = low ? 0 : Math.sin(phase) * s * Math.min(0.3 + 0.2 * (w.speed / unit), 0.7)
+    const bob = s * 0.012 * f.H * (Math.abs(Math.cos(phase)) - 0.6)
 
-    if (root.current) root.current.position.y = p.drop + breath * 0.004 * f.H
+    const breath = idle ? Math.sin(t * 1.6 + f.phase) : 0
+    const sway = idle ? Math.sin(t * 0.42 + f.phase) * (1 - s) : 0
+
+    if (root.current) root.current.position.y = p.drop * q + breath * 0.004 * f.H + bob
     if (hips.current) hips.current.rotation.z = sway * 0.022
     if (chest.current) {
-      chest.current.rotation.x = p.spineX
+      chest.current.rotation.x = f.stoop + (p.spineX - f.stoop) * q + s * 0.05
+      chest.current.rotation.y = swing * 0.18
       chest.current.rotation.z = -sway * 0.012
       chest.current.scale.set(1, 1 + breath * 0.012, 1 + breath * 0.022)
     }
+    // Opposite arm to leg: the left arm swings back as the left leg reaches forward.
     if (shoulderL.current) {
-      shoulderL.current.rotation.x = p.armX - sway * 0.06
-      shoulderL.current.rotation.z = -p.armZ
+      shoulderL.current.rotation.x = p.armX * q - sway * 0.06 + swing * 0.7
+      shoulderL.current.rotation.z = -(0.09 + (p.armZ - 0.09) * q)
     }
     if (shoulderR.current) {
-      shoulderR.current.rotation.x = p.wave ? -0.2 : p.armX + sway * 0.06
-      shoulderR.current.rotation.z = p.wave ? 2.35 : p.armZ
+      shoulderR.current.rotation.x = waving ? -0.2 : p.armX * q + sway * 0.06 - swing * 0.7
+      shoulderR.current.rotation.z = waving ? 2.35 : 0.09 + (p.armZ - 0.09) * q
     }
-    if (p.wave && elbowR.current) elbowR.current.rotation.z = -0.35 + Math.sin(t * 6) * 0.4
+    if (elbowR.current) {
+      elbowR.current.rotation.z = waving ? -0.35 + Math.sin(t * 6) * 0.4 : 0
+    }
+    // Legs: the thigh swings (negative X is forward), and the knee flexes while that leg
+    // travels forward, which is what lifts the foot clear of the ground.
+    const knee = (side: number) =>
+      low ? 0 : s * (0.12 + 0.6 * Math.max(0, Math.cos(phase + side)))
+    if (thighL.current) thighL.current.rotation.x = p.thighX * q - swing
+    if (thighR.current) thighR.current.rotation.x = p.thighX * q + swing
+    if (kneeL.current) kneeL.current.rotation.x = p.shinX * q + knee(0)
+    if (kneeR.current) kneeR.current.rotation.x = p.shinX * q + knee(Math.PI)
 
     if (eyes.current && !low) {
       const blink = (t + f.blinkPhase) % f.blinkEvery
@@ -892,11 +986,15 @@ export function Person({
   )
 
   const leg = (side: -1 | 1) => (
-    <group position={[side * f.legX, f.hipY, 0]} rotation={[p.thighX, 0, 0]}>
+    <group
+      ref={side < 0 ? thighL : thighR}
+      position={[side * f.legX, f.hipY, 0]}
+      rotation={[p.thighX, 0, 0]}
+    >
       <mesh geometry={geo.thigh} scale={trousers ? [1.14, 1, 1.14] : [1, 1, 1]} castShadow>
         {trousers ? bottomMat : skinMat}
       </mesh>
-      <group position={[0, -f.thigh, 0]} rotation={[p.shinX, 0, 0]}>
+      <group ref={side < 0 ? kneeL : kneeR} position={[0, -f.thigh, 0]} rotation={[p.shinX, 0, 0]}>
         <mesh scale={trousers ? [1.14, 1, 1.14] : [1, 1, 1]}>
           <sphereGeometry args={[f.legR * 0.78, sph, sph / 2]} />
           {trousers ? bottomMat : skinMat}
@@ -1271,26 +1369,65 @@ export function Person({
     </group>
   )
 
+  // One capsule spanning the standing (or seated) body: an obstacle you bump into, not a
+  // collider per limb (CONTRACT §5). A walking figure keeps the standing one throughout.
+  const seated = p.sit && !route
+  const bottom = seated ? f.H * 0.06 : 0
+  const top = f.H + (seated ? p.drop : 0)
+  const radius = Math.min(Math.max(f.hipW, f.shoulderW * 0.62) * 0.55, (top - bottom) / 2)
+  const half = Math.max((top - bottom) / 2 - radius, 0.01 * f.H)
+  const driven = route && {
+    route,
+    frame: nodeFrame,
+    facing,
+    gait: walk,
+    radius,
+    waist: f.hipY,
+    unit,
+  }
+
   if (!physics) {
     return (
-      <group position={at} rotation={rotation}>
-        {figure}
+      <group ref={nodeFrame} position={at} rotation={rotation}>
+        <group ref={walker}>
+          <group ref={facing}>{figure}</group>
+        </group>
+        {driven && (
+          <RouteDriver
+            {...driven}
+            move={(to) => walker.current?.position.copy(nodeFrame.current?.worldToLocal(to) ?? to)}
+          />
+        )}
       </group>
     )
   }
 
-  // One capsule spanning the standing (or seated) body: an obstacle you bump into, not a
-  // collider per limb (CONTRACT §5).
-  const bottom = p.sit ? f.H * 0.06 : 0
-  const top = f.H + p.drop
-  const radius = Math.min(Math.max(f.hipW, f.shoulderW * 0.62) * 0.55, (top - bottom) / 2)
-  const half = Math.max((top - bottom) / 2 - radius, 0.01 * f.H)
-
+  // A walking figure's body is kinematic, moved by its route; the node frame it walks in is a
+  // bare sibling, since the body itself leaves the spawn point. A standing one stays fixed.
+  // `excludeEcctrlRay` keeps the avatar from treating a walker as a moving platform to ride.
   return (
-    <RigidBody type="fixed" colliders={false} position={at} rotation={rotation}>
-      {collider && <CapsuleCollider args={[half, radius]} position={[0, (top + bottom) / 2, 0]} />}
-      {figure}
-    </RigidBody>
+    <>
+      {driven && (
+        <>
+          <group ref={nodeFrame} position={at} rotation={rotation} />
+          <PhysicsRouteDriver {...driven} body={body} />
+        </>
+      )}
+      <RigidBody
+        key={driven ? 'walk' : 'stand'}
+        ref={body}
+        type={driven ? 'kinematicPosition' : 'fixed'}
+        userData={driven ? { excludeEcctrlRay: true } : undefined}
+        colliders={false}
+        position={at}
+        rotation={rotation}
+      >
+        {collider && (
+          <CapsuleCollider args={[half, radius]} position={[0, (top + bottom) / 2, 0]} />
+        )}
+        <group ref={facing}>{figure}</group>
+      </RigidBody>
+    </>
   )
 }
 

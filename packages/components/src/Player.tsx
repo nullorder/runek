@@ -1,7 +1,7 @@
 import { useKeyboardControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useRapier } from '@react-three/rapier'
-import { type AvatarView, useWorld, type Vec3 } from '@runek/core'
+import { type AvatarView, PlayerMotionContext, useWorld, type Vec3 } from '@runek/core'
 import Ecctrl, { type CustomEcctrlRigidBody } from 'ecctrl'
 import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react'
 import type { Object3D } from 'three'
@@ -71,6 +71,21 @@ function CameraKeyLook() {
   return null
 }
 
+/** Publish the avatar's horizontal speed, so the body it carries walks in step. */
+function MotionProbe({
+  body,
+  motion,
+}: {
+  body: RefObject<CustomEcctrlRigidBody | null>
+  motion: { current: { speed: number } }
+}) {
+  useFrame(() => {
+    const v = body.current?.group?.linvel()
+    motion.current.speed = v ? Math.hypot(v.x, v.z) : 0
+  })
+  return null
+}
+
 // How long the avatar waits for ground to appear beneath it before it falls anyway (spawning
 // over open water, say), in seconds.
 const GROUND_WAIT = 0.5
@@ -127,6 +142,7 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
   const eyes = useRef<Object3D>(null)
   const body = useRef<CustomEcctrlRigidBody>(null)
   const [grounded, setGrounded] = useState(false)
+  const motion = useRef({ speed: 0 })
 
   // Publish the avatar so the world can react to the player rather than the camera. Only clear
   // the slot if it's still ours, so a remount elsewhere isn't wiped by this unmount.
@@ -157,15 +173,18 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
       camLerpMult={firstPerson ? 1000 : 25}
     >
       <group visible={!firstPerson}>
-        {children ?? (
-          <mesh castShadow>
-            <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />
-            <meshStandardMaterial color="#4a90d9" />
-          </mesh>
-        )}
+        <PlayerMotionContext.Provider value={motion}>
+          {children ?? (
+            <mesh castShadow>
+              <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />
+              <meshStandardMaterial color="#4a90d9" />
+            </mesh>
+          )}
+        </PlayerMotionContext.Provider>
       </group>
       <object3D ref={eyes} position={[0, EYE_HEIGHT, 0]} />
       <CameraKeyLook />
+      {!firstPerson && <MotionProbe body={body} motion={motion} />}
       {!grounded && <GroundGuard body={body} onGrounded={() => setGrounded(true)} />}
     </Ecctrl>
   )
