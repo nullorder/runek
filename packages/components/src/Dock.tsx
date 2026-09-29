@@ -1,6 +1,7 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { rng, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo } from 'react'
+import { dockSurface } from './surfaces/dock'
 
 export interface DockProps extends WorldComponentProps {
   /** How far the jetty reaches out from the shore (local +Z), in units. */
@@ -103,3 +104,5 @@ export function Dock({
     </RigidBody>
   )
 }
+
+Dock.surface = dockSurface

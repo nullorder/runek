@@ -12,6 +12,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `useWorld().player`: a ref to the mounted `Player`'s avatar (at eye
   height), or `null` when there's no `Player`. Components can react to
   where the player stands instead of where the camera is.
+- The ground is queryable: `groundAt(x, z)` returns the highest walkable
+  top at a point, computed from the same functions that build the
+  meshes (no raycasts, no physics). `createGroundIndex(world, registry)`
+  indexes a world once; `useGround()` gives the query inside a world;
+  `checkWorld` reports problems. All of it also ships from the React-free
+  `@runek/core/data` entry, for Node scripts and tests.
+- Anchored nodes: a world node's `anchor` (`"ground"` or `"surface"`)
+  makes its `position[1]` an offset above the ground at its (x, z), so
+  props stay on uneven terrain. The file keeps the offset, so moving or
+  reseeding the terrain re-seats everything anchored to it. Works for
+  any node, including groups, composites, and `Player`.
+- Surfaces: `Terrain` and `Shore` (terrain), `Dock`, `Floor`, and `Slab`
+  (decks), and `Lake` (water) publish their tops as `Component.surface`,
+  with the math in a plain `surfaces/*.ts` module that `runek add`
+  copies alongside the component. People, trees, furniture, and
+  buildings (including the `house` and `room` composites) are marked
+  `groundSitting`.
+- Editor: **Drop to ground** / **Drop to surface** for the selection, an
+  **Anchor** switch that keeps the node in place, and anchored nodes
+  slide along the ground when dragged.
+- `runek check-world <file>`: flags buried and floating nodes and open
+  water standing above its shore, with a suggested Y for each.
+  `--fix` writes them into the file; `--strict` exits non-zero for CI.
+- `Terrain` accepts `rotation`, like every other component.
+- Guide: "Placing things on uneven ground".
 
 ### Changed
 
@@ -21,6 +46,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   measured from the avatar. Without a `Player` (e.g. an orbit view) it
   still watches the camera. A `Person` used as the `Player`'s own body
   no longer tries to track anything.
+- `Player` holds still until there's ground under it (or half a second
+  passes) before gravity takes over, so a spawn can't drop through a
+  collider that hasn't arrived yet.
+
+### Fixed
+
+- A `Player` spawned over displaced `Terrain` could fall through it:
+  the trimesh collider was derived one render after the mesh. `Terrain`
+  now builds it in the same render.
 
 ## [0.13.0](https://github.com/nullorder/runek/compare/v0.12.0...v0.13.0) - 2026-09-18
 

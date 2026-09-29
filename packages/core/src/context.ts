@@ -1,5 +1,6 @@
 import { createContext } from 'react'
 import { DEFAULT_FONTS } from './font'
+import type { GroundIndex } from './ground'
 import { DEFAULT_CONTROLS } from './keyboard'
 import { DEFAULT_PALETTE } from './palette'
 import { DEFAULT_WORLD_TIME } from './time'
@@ -14,3 +15,6 @@ export const WorldContext = createContext<WorldContextValue>({
   time: DEFAULT_WORLD_TIME,
   controls: DEFAULT_CONTROLS,
 })
+
+/** The world's ground index, provided by `WorldRenderer`/`WorldEditor`. */
+export const GroundContext = createContext<GroundIndex | null>(null)

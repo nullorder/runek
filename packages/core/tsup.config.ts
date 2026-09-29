@@ -5,7 +5,7 @@ import { defineConfig } from 'tsup'
 // npm consumers at this `dist`. Peer deps (react, three, @react-three/*, leva)
 // are external by default.
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: ['src/index.ts', 'src/data.ts'],
   format: ['esm'],
   dts: true,
   clean: true,

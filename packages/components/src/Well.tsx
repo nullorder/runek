@@ -75,3 +75,5 @@ export function Well({
     </RigidBody>
   )
 }
+
+Well.groundSitting = true

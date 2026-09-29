@@ -58,3 +58,5 @@ export function Pillar({
     </RigidBody>
   )
 }
+
+Pillar.groundSitting = true

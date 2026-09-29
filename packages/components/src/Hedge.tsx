@@ -74,3 +74,5 @@ export function Hedge({
     </RigidBody>
   )
 }
+
+Hedge.groundSitting = true

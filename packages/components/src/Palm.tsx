@@ -173,3 +173,5 @@ export function Palm({
     </RigidBody>
   )
 }
+
+Palm.groundSitting = true

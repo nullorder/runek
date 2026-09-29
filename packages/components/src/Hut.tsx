@@ -183,3 +183,5 @@ export function Hut({
     </RigidBody>
   )
 }
+
+Hut.groundSitting = true

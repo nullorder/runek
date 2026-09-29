@@ -1,5 +1,6 @@
 import { RigidBody } from '@react-three/rapier'
 import { useWorld, type Vec3 } from '@runek/core'
+import { shoreSurface } from './surfaces/shore'
 
 export interface ShoreProps {
   position?: Vec3
@@ -33,3 +34,5 @@ export function Shore({
     </RigidBody>
   )
 }
+
+Shore.surface = shoreSurface

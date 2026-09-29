@@ -79,3 +79,5 @@ export function Plant({
     </RigidBody>
   )
 }
+
+Plant.groundSitting = true

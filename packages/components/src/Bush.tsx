@@ -67,3 +67,5 @@ export function Bush({
     </group>
   )
 }
+
+Bush.groundSitting = true

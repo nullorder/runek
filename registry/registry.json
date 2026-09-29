@@ -47,11 +47,15 @@
       "title": "Terrain",
       "type": "registry:component",
       "category": "terrain",
-      "description": "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff.",
+      "description": "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff. Its surface is queryable (`useGround`, anchors, `runek check-world`).",
       "files": [
         {
           "path": "packages/components/src/Terrain.tsx",
           "target": "Terrain.tsx"
+        },
+        {
+          "path": "packages/components/src/surfaces/terrain.ts",
+          "target": "surfaces/terrain.ts"
         }
       ]
     },
@@ -117,6 +121,10 @@
         {
           "path": "packages/components/src/Floor.tsx",
           "target": "Floor.tsx"
+        },
+        {
+          "path": "packages/components/src/surfaces/floor.ts",
+          "target": "surfaces/floor.ts"
         }
       ]
     },
@@ -143,6 +151,10 @@
         {
           "path": "packages/components/src/Slab.tsx",
           "target": "Slab.tsx"
+        },
+        {
+          "path": "packages/components/src/surfaces/slab.ts",
+          "target": "surfaces/slab.ts"
         }
       ]
     },
@@ -390,6 +402,10 @@
         {
           "path": "packages/components/src/Lake.tsx",
           "target": "Lake.tsx"
+        },
+        {
+          "path": "packages/components/src/surfaces/lake.ts",
+          "target": "surfaces/lake.ts"
         }
       ]
     },
@@ -429,6 +445,10 @@
         {
           "path": "packages/components/src/Shore.tsx",
           "target": "Shore.tsx"
+        },
+        {
+          "path": "packages/components/src/surfaces/shore.ts",
+          "target": "surfaces/shore.ts"
         }
       ]
     },
@@ -637,6 +657,10 @@
         {
           "path": "packages/components/src/Dock.tsx",
           "target": "Dock.tsx"
+        },
+        {
+          "path": "packages/components/src/surfaces/dock.ts",
+          "target": "surfaces/dock.ts"
         }
       ]
     },

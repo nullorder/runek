@@ -78,3 +78,5 @@ export function Lamp({
     </RigidBody>
   )
 }
+
+Lamp.groundSitting = true

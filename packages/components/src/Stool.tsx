@@ -52,3 +52,5 @@ export function Stool({
     </RigidBody>
   )
 }
+
+Stool.groundSitting = true

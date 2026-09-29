@@ -2,6 +2,7 @@ import { RigidBody } from '@react-three/rapier'
 import { useWorld, type WorldComponentProps } from '@runek/core'
 import { useEffect, useMemo } from 'react'
 import { ExtrudeGeometry, Shape } from 'three'
+import { slabSurface } from './surfaces/slab'
 
 export type SlabShape = 'pill' | 'disc'
 
@@ -75,3 +76,5 @@ export function Slab({
     </RigidBody>
   )
 }
+
+Slab.surface = slabSurface

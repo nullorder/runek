@@ -54,3 +54,5 @@ export function Counter({
     </RigidBody>
   )
 }
+
+Counter.groundSitting = true

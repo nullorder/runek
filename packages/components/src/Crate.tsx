@@ -80,3 +80,5 @@ export function Crate({
     </RigidBody>
   )
 }
+
+Crate.groundSitting = true

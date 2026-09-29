@@ -10,6 +10,7 @@
 npx @runek/cli init                          # write runek.config.json + the install dir
 npx @runek/cli add player terrain bookshelf  # pull source + deps into your project
 npx @runek/cli list                          # browse the catalog
+npx @runek/cli check-world public/world.json # find buried and floating nodes
 ```
 
 `add` resolves registry dependencies recursively (every component pulls `core`), rewrites the `@runek/core` import to your local copy, and installs the npm packages the components need via your detected package manager.
@@ -42,6 +43,9 @@ Same `seed` → same world, every time.
 --dir <path>            Install directory (default: src/runek)
 --overwrite             Overwrite files that already exist
 --no-install            Print the dependency install command instead of running it
+--strict                (check-world) exit non-zero when anything is found
+--fix                   (check-world) write the suggested Y values into the file
+--tolerance <units>     (check-world) allowed gap before flagging (default 0.08)
 ```
 
 ## Links

@@ -61,3 +61,5 @@ export function Bed({
     </RigidBody>
   )
 }
+
+Bed.groundSitting = true

@@ -49,3 +49,5 @@ export function Barrel({
     </RigidBody>
   )
 }
+
+Barrel.groundSitting = true

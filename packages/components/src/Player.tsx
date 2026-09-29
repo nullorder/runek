@@ -1,8 +1,9 @@
 import { useKeyboardControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
+import { useRapier } from '@react-three/rapier'
 import { type AvatarView, useWorld, type Vec3 } from '@runek/core'
-import Ecctrl from 'ecctrl'
-import { type ReactNode, useEffect, useRef } from 'react'
+import Ecctrl, { type CustomEcctrlRigidBody } from 'ecctrl'
+import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react'
 import type { Object3D } from 'three'
 
 export type PlayerView = AvatarView
@@ -70,6 +71,38 @@ function CameraKeyLook() {
   return null
 }
 
+// How long the avatar waits for ground to appear beneath it before it falls anyway (spawning
+// over open water, say), in seconds.
+const GROUND_WAIT = 0.5
+
+/** Hold the avatar kinematic until a ray straight down hits a collider, so it can't drop
+ *  through ground whose collider arrives a commit or two after the avatar's body. */
+function GroundGuard({
+  body,
+  onGrounded,
+}: {
+  body: RefObject<CustomEcctrlRigidBody | null>
+  onGrounded: () => void
+}) {
+  const { world, rapier } = useRapier()
+  const waited = useRef(0)
+  const done = useRef(false)
+
+  useFrame((_, dt) => {
+    const rb = body.current?.group
+    if (done.current || !rb) return
+    waited.current += dt
+    const at = rb.translation()
+    const ray = new rapier.Ray(at, { x: 0, y: -1, z: 0 })
+    const hit = world.castRay(ray, 1000, true, undefined, undefined, undefined, rb)
+    if (hit || waited.current > GROUND_WAIT) {
+      done.current = true
+      onGrounded()
+    }
+  })
+  return null
+}
+
 export interface PlayerProps {
   position?: Vec3
   /** Camera view. Unset defers to the world default (`<World avatar>`); falls back
@@ -92,6 +125,8 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
   const { avatar, player } = useWorld()
   const firstPerson = (view ?? avatar ?? 'first') === 'first'
   const eyes = useRef<Object3D>(null)
+  const body = useRef<CustomEcctrlRigidBody>(null)
+  const [grounded, setGrounded] = useState(false)
 
   // Publish the avatar so the world can react to the player rather than the camera. Only clear
   // the slot if it's still ours, so a remount elsewhere isn't wiped by this unmount.
@@ -106,6 +141,8 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
 
   return (
     <Ecctrl
+      ref={body}
+      type={grounded ? 'dynamic' : 'kinematicPosition'}
       position={position}
       mode="CameraBasedMovement"
       camInitDir={{ x: 0, y: yaw }}
@@ -129,6 +166,7 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
       </group>
       <object3D ref={eyes} position={[0, EYE_HEIGHT, 0]} />
       <CameraKeyLook />
+      {!grounded && <GroundGuard body={body} onGrounded={() => setGrounded(true)} />}
     </Ecctrl>
   )
 }

@@ -15,7 +15,8 @@
     }
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@runek/core": "workspace:*"
@@ -36,6 +37,7 @@
     "@types/three": "catalog:",
     "ecctrl": "catalog:",
     "react": "catalog:",
-    "three": "catalog:"
+    "three": "catalog:",
+    "vitest": "catalog:"
   }
 }

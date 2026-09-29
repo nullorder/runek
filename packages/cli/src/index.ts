@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
+import { applyFixes, describeIssue, loadCoreData, loadGroundRegistry } from './check.ts'
 import {
   type Config,
   collectDependencies,
@@ -31,6 +32,9 @@ type Options = {
   'no-install'?: boolean
   overwrite?: boolean
   force?: boolean
+  strict?: boolean
+  fix?: boolean
+  tolerance?: string
 }
 
 const CONFIG_HINT = cyan('runek.config.json')
@@ -41,6 +45,7 @@ ${bold('Usage')}
   runek init [options]              Create ${CONFIG_HINT} and the component directory
   runek add <name...> [options]     Add components (and their dependencies)
   runek list [options]              List everything in the registry
+  runek check-world <file> [opts]   Find buried and floating nodes in a world file
 
 ${bold('Options')}
   --registry <url|path>   Registry base (default: ${DEFAULT_CONFIG.registry})
@@ -48,12 +53,16 @@ ${bold('Options')}
   --overwrite             Overwrite files that already exist
   --no-install            Print the dependency install command instead of running it
   --force                 (init) overwrite an existing config
+  --strict                (check-world) exit non-zero when anything is found
+  --fix                   (check-world) write the suggested Y values into the file
+  --tolerance <units>     (check-world) allowed gap before flagging (default 0.08)
   -h, --help              Show this help
 
 ${bold('Examples')}
   runek init
   runek add player terrain bookshelf
   runek list --registry ./registry
+  runek check-world public/world.json --strict
 `
 
 async function main(): Promise<void> {
@@ -65,6 +74,9 @@ async function main(): Promise<void> {
       'no-install': { type: 'boolean' },
       overwrite: { type: 'boolean' },
       force: { type: 'boolean' },
+      strict: { type: 'boolean' },
+      fix: { type: 'boolean' },
+      tolerance: { type: 'string' },
       help: { type: 'boolean', short: 'h' },
     },
   })
@@ -85,6 +97,8 @@ async function main(): Promise<void> {
     case 'list':
     case 'ls':
       return list(opts)
+    case 'check-world':
+      return checkWorld(names[0], opts)
     default:
       throw new Error(`unknown command "${command}" — run "runek --help"`)
   }
@@ -164,6 +178,46 @@ async function list(opts: Options): Promise<void> {
       console.log(`  ${cyan(item.name.padEnd(12))} ${dim(item.description ?? '')}`)
     }
   }
+}
+
+async function checkWorld(file: string | undefined, opts: Options): Promise<void> {
+  if (!file) throw new Error('specify a world file, e.g. "runek check-world public/world.json"')
+  const cwd = process.cwd()
+  const config = readConfig(cwd)
+  const dir = resolve(cwd, opts.dir ?? config.dir)
+  const path = resolve(cwd, file)
+  const tolerance = opts.tolerance === undefined ? undefined : Number(opts.tolerance)
+  if (tolerance !== undefined && !(tolerance >= 0)) throw new Error('--tolerance must be a number')
+
+  const core = await loadCoreData([dir, cwd, dirname(path)])
+  const registry = await loadGroundRegistry(dir)
+  const world = core.parseWorld(readFileSync(path, 'utf8'))
+  const issues = core.checkWorld(world, registry, { tolerance })
+
+  const surfaces = Object.entries(registry)
+    .filter(([, entry]) => 'surface' in entry)
+    .map(([type]) => type)
+  console.log(dim(`surfaces from ${opts.dir ?? config.dir}: ${surfaces.join(', ') || 'none'}`))
+
+  if (issues.length === 0) {
+    console.log(`${green('✓')} nothing buried or floating in ${file}`)
+    return
+  }
+  for (const issue of issues) {
+    const mark = issue.kind === 'floating' ? yellow('floating') : red(issue.kind)
+    console.log(`  ${mark} ${describeIssue(issue)}`)
+  }
+
+  if (opts.fix) {
+    const fixed = applyFixes(world, issues)
+    writeFileSync(path, core.serializeWorld(world))
+    console.log(`\n${green('✓')} fixed ${fixed} node(s) in ${file}`)
+    return
+  }
+  console.log(
+    `\n${bold(`${issues.length} issue(s).`)} ${dim('--fix writes the suggested Y values')}`,
+  )
+  if (opts.strict) process.exitCode = 1
 }
 
 main().catch((err: unknown) => {

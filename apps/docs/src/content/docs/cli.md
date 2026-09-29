@@ -1,6 +1,6 @@
 ---
 title: CLI reference
-summary: "runek init / add / list — pull editable component source into your project."
+summary: "runek init / add / list / check-world — pull editable component source into your project and check your worlds."
 category: reference
 order: 30
 ---
@@ -39,15 +39,33 @@ npx @runek/cli list [options]
 
 Prints the catalog, grouped by category.
 
+## check-world
+
+```bash
+npx @runek/cli check-world <world.json> [options]
+```
+
+Finds nodes that are **buried** (below the terrain) or **floating** (above the highest surface), and open water that stands above its shore. It reads the ground from your own component source (the `surfaces/*.ts` modules that ship with `terrain`, `dock`, `floor`, `slab`, `shore`, and `lake`) and the ground math from your installed `@runek/core`, so it checks exactly what your app renders. Only components marked `groundSitting` are checked, and anchored nodes pass by construction.
+
+```bash
+npx @runek/cli check-world public/world.json
+#   buried Tent [70] at (-28, 0.42, 110) is 1.8 below the ground (2.22); set position[1] to 2.216, or anchor it
+```
+
+`--fix` writes each suggested Y into the file; `--strict` exits non-zero when anything is found, so an app can run it in CI. Loading `.ts` surfaces needs Node 22.18 or newer. See [Placing things on uneven ground](/docs/placing-things-on-uneven-ground).
+
 ## Options
 
 | Option | Commands | Description |
 |---|---|---|
 | `--registry <url\|path>` | all | Registry base. Defaults to the configured one (`https://runek.nullorder.org/r`). A local path works for development. |
-| `--dir <path>` | init, add | Install directory (default `src/runek`). |
+| `--dir <path>` | init, add, check-world | Install directory (default `src/runek`). |
 | `--overwrite` | add | Replace files that already exist (otherwise they're skipped). |
 | `--no-install` | add | Print the dependency install command instead of running it. |
 | `--force` | init | Overwrite an existing `runek.config.json`. |
+| `--strict` | check-world | Exit non-zero when an issue is found. |
+| `--fix` | check-world | Write the suggested Y values into the world file. |
+| `--tolerance <units>` | check-world | Allowed gap before a node is flagged (default `0.08`). |
 | `-h, --help` | — | Show help. |
 
 ## runek.config.json

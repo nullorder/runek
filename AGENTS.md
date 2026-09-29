@@ -12,7 +12,7 @@ Guidelines for AI agents (Claude Code and others) working in this repository.
 packages/
   core/         @runek/core        — <World>, useWorld, seeded rng, contract types
   components/   @runek/components   — the procedural components (depends on core)
-  cli/          runek              — the `runek` CLI: init / add / list (source registry)
+  cli/          runek              — the `runek` CLI: init / add / list / check-world (source registry)
 apps/
   docs/         the docs site (Astro + R3F): pre-rendered flat Markdown pages + a walkable 3D library world; also serves the registry at /r
 registry/       the served source registry: registry.json (index) + generated components/*.json

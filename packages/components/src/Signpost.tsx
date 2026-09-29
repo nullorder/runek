@@ -75,3 +75,5 @@ export function Signpost({
     </RigidBody>
   )
 }
+
+Signpost.groundSitting = true

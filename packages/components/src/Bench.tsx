@@ -87,3 +87,5 @@ export function Bench({
     </RigidBody>
   )
 }
+
+Bench.groundSitting = true
