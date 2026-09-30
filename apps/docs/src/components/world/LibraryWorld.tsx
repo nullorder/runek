@@ -327,8 +327,9 @@ export default function LibraryWorld({
         <Lamp position={[6.2, 0, 6.2]} />
         <Rug position={[0, 0.01, 0.4]} size={[7, 3.4]} seed={5} />
 
-        {/* Two visitors: the librarian keeps the shelf wall, a reader waits by the rug.
-            Both watch you as you cross the room. */}
+        {/* The librarian keeps the shelf wall and a reader waits by the rug, both watching you
+            cross the room. A guard walks the shelves, and two browsers wander the rug on loops
+            that cross, stepping around each other and around you. */}
         <Person
           position={[-3.4, 0, 4.6]}
           rotation={[0, -0.5, 0]}
@@ -337,6 +338,19 @@ export default function LibraryWorld({
           label="Librarian"
         />
         <Person position={[3.1, 0, 2.4]} rotation={[0, 2.5, 0]} seed={41} kind="traveler" />
+        <Person
+          position={[-4.2, 0, 3.5]}
+          seed={23}
+          kind="guard"
+          patrol={[
+            [0, 0, 0],
+            [8.4, 0, 0],
+          ]}
+          loop="pingpong"
+          pause={2.5}
+        />
+        <Person position={[-1.6, 0, -0.4]} seed={58} wander={2.2} pose="wave" />
+        <Person position={[1.6, 0, 1]} seed={77} kind="merchant" wander={2.2} speed={1.1} />
 
         {/* The avatar's own body, shown when a world (or a visitor) switches to third person. */}
         <Player position={[0, 2, -3.5]} yaw={0}>

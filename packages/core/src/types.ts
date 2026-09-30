@@ -27,6 +27,22 @@ export interface WorldFog {
   far: number
 }
 
+/** A figure walking a route, published so other walkers can step around it. Its world X and Z
+ *  are written in place every frame (the route's base position, before any detour). */
+export interface Walker {
+  x: number
+  z: number
+  /** Body radius, in world units. */
+  radius: number
+}
+
+/** What `Player` publishes to its children (its third-person body): live motion, written in
+ *  place every frame. */
+export interface PlayerMotion {
+  /** Horizontal speed, in world units per second. */
+  speed: number
+}
+
 export interface WorldContextValue {
   /** Meters per unit. Components scale their geometry by this. */
   unit: number
@@ -54,4 +70,7 @@ export interface WorldContextValue {
    *  player *is*, which in third person is not where the camera is. Absent under a
    *  hand-rolled provider, where components fall back to the camera. */
   player?: RefObject<Object3D | null>
+  /** Every figure currently walking a route. Mutable, not state: add yourself on mount, remove
+   *  on unmount, and read it inside `useFrame`. Absent under a hand-rolled provider. */
+  walkers?: Set<Walker>
 }
