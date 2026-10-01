@@ -72,6 +72,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `textarea`, `select`, or `contenteditable`), so typing "wasd" into a
   form beside the canvas doesn't walk the avatar. Keys held when the
   window loses focus are released instead of staying stuck down.
+- `@runek/cli` declares Node 24 or newer (`engines.node` was `>=20`),
+  matching the version the repo develops and tests on.
 - `Person` turns its head toward the player's avatar, not the camera.
   In third person the camera trails behind, so figures used to look
   past you; now they meet your avatar's eyes, and `lookRadius` is

@@ -43,7 +43,7 @@ just cli ...    # run the runek CLI from source, e.g. `just cli add bookshelf --
 just clean      # remove build output + node_modules
 ```
 
-Node ≥ 20, pnpm. The repo pins **Node 24** via `.nvmrc` (`nvm use` / `fnm use`; CI reads it through `node-version-file`). **Before handing off a change, run `just check`** — lint, typecheck, and build must all pass.
+Node ≥ 24, pnpm. The repo pins **Node 24** via `.nvmrc` (`nvm use` / `fnm use`; CI reads it through `node-version-file`). **Before handing off a change, run `just check`** — lint, typecheck, and build must all pass.
 
 ## Versions & dependencies
 

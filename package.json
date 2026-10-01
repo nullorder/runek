@@ -7,7 +7,7 @@
   "type": "module",
   "packageManager": "pnpm@10.15.1",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "build": "pnpm --filter @runek/docs build",
