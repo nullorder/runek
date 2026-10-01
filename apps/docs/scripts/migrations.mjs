@@ -124,4 +124,41 @@ import { registry } from './runek/registry'
       notes: ['The caps default to the palette `wall` slot; override with `endColor`.'],
     },
   ],
+
+  person: [
+    {
+      from: '0.13.0',
+      to: '0.14.0',
+      summary:
+        'The figure is rebuilt as one sculpted, skinned body with clothes as layers, and the default `style` is now `stylized`. No prop was removed: every flat prop still works, and the new part objects (`body`, `face`, `hair`, `clothes`) are optional.',
+      before: {
+        lang: 'tsx',
+        code: `<Person
+  seed={4}
+  outfit="shirt"
+  topColor="#e8e2d2"
+  skinTone="#c98d63"
+  hairColor="#2b1d14"
+/>`,
+      },
+      after: {
+        lang: 'tsx',
+        code: `<Person
+  seed={4}
+  body={{ tone: '#c98d63' }}
+  hair={{ style: 'short', color: '#2b1d14' }}
+  clothes={[
+    { type: 'shirt', sleeves: 'short', color: '#e8e2d2' },
+    { type: 'trousers' },
+    { type: 'shoes' },
+  ]}
+/>`,
+      },
+      notes: [
+        'Nothing to change to keep a world rendering: the flat props still resolve. The part objects are the long form when you want to set each piece yourself. Pass `style="anime"` for the closest match to the old default look.',
+        'Any trait set as a flat prop no longer shifts the seeded rolls of the others, so a few figures with explicit colors may roll a different hairstyle than before.',
+        '`clothes` lists layers inner to outer; a top listed before the trousers is tucked in. `clothes={[]}` is the bare base body.',
+      ],
+    },
+  ],
 }
