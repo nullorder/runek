@@ -25,6 +25,7 @@ export {
   GROUND_TOLERANCE,
   groundAt,
 } from './ground'
+export { isEditableTarget } from './input'
 export type { WorldControls } from './keyboard'
 export { controlsToMap, DEFAULT_CONTROLS, keyboardMap, resolveControls } from './keyboard'
 export type { WorldPalette } from './palette'
@@ -57,8 +58,6 @@ export type { WorldAboutProps } from './WorldAbout'
 export { WorldAbout } from './WorldAbout'
 export type { WorldContributeProps } from './WorldContribute'
 export { WorldContribute } from './WorldContribute'
-export type { WorldEditorProps } from './WorldEditor'
-export { WorldEditor } from './WorldEditor'
 export type { WorldNodesProps } from './WorldNodes'
 export { nodePath, WorldNodes } from './WorldNodes'
 export type { WorldRendererProps } from './WorldRenderer'

@@ -94,6 +94,14 @@ Two node types resolve without a component behind them:
 
 `serializeWorld(data)` returns pretty JSON. The runtime editor (`<WorldEditor>`) edits a `WorldData` live and exports it with the same call, so a world round-trips: render, edit, serialize, commit.
 
+The editor has its own entry point, so an app that only renders worlds doesn't ship its props panel. It needs `leva` installed alongside `@runek/core`:
+
+```tsx
+import { WorldEditor } from '@runek/core/editor'
+
+<WorldEditor data={world} registry={registry} onChange={setWorld} />
+```
+
 ## Identity & contribution
 
 A world is a creative work, so its identity travels *in the file* under `meta` (the way `package.json` carries a package's name, author, and `repository`):
