@@ -56,9 +56,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `useWorld().walkers` (the figures walking right now, for components
   that want to steer around them) and `PlayerMotionContext` (the
   enclosing `Player`'s live speed).
+- `World` `input`: set `false` to ignore the keyboard (e.g. while a
+  modal is open). Keys held at that moment are released.
+- `World` `paused`: stops the frame loop and physics, so a world that
+  isn't on screen costs nothing. Animations resume where they stopped.
+- `isEditableTarget(target)`: whether a key event belongs to a text
+  field rather than the world.
 
 ### Changed
 
+- **Breaking:** `WorldEditor` moved to its own entry point. Import it
+  from `@runek/core/editor` instead of `@runek/core`. `leva` is now an
+  optional peer dependency, needed only by apps that use the editor.
+- The world no longer reads keys typed into a text field (`input`,
+  `textarea`, `select`, or `contenteditable`), so typing "wasd" into a
+  form beside the canvas doesn't walk the avatar. Keys held when the
+  window loses focus are released instead of staying stuck down.
+- `@runek/cli` declares Node 24 or newer (`engines.node` was `>=20`),
+  matching the version the repo develops and tests on.
 - `Person` turns its head toward the player's avatar, not the camera.
   In third person the camera trails behind, so figures used to look
   past you; now they meet your avatar's eyes, and `lookRadius` is

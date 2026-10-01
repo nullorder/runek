@@ -4,6 +4,7 @@ import { type ComponentRef, type CSSProperties, useEffect, useRef, useState } fr
 import type { Object3D } from 'three'
 import { GroundContext } from './context'
 import { ANCHOR_KINDS, type GroundIndex, type NodeAnchor } from './ground'
+import { isEditableTarget } from './input'
 import type { Vec3 } from './types'
 import { World, type WorldProps } from './World'
 import { WorldAbout } from './WorldAbout'
@@ -69,11 +70,6 @@ const stripIds = (node: WorldNode): WorldNode => ({
   id: undefined,
   ...(node.children ? { children: node.children.map(stripIds) } : {}),
 })
-
-const isTyping = (target: EventTarget | null) => {
-  const el = target as HTMLElement | null
-  return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
-}
 
 /**
  * Edit a world data-first: orbit camera, click-select, gizmo move/rotate, leva props,
@@ -221,7 +217,7 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (isTyping(event.target)) return
+      if (isEditableTarget(event.target)) return
       if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
         event.preventDefault()
         undo()

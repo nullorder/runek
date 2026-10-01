@@ -35,6 +35,8 @@ import { Player } from './runek/Player'
 | `palette` | `Partial<WorldPalette>` | built-in | Override color slots; every component re-themes at once. |
 | `controls` | `Record<string, string[]>` | built-in | Remap input bindings (action → key codes); serializable. |
 | `fog` | `{ color, near, far }` | off | Linear distance fog; pair the color with the sky's horizon. |
+| `input` | `boolean` | `true` | Read the keyboard. Set `false` to ignore it, e.g. while a modal is open. |
+| `paused` | `boolean` | `false` | Stop rendering and physics until set back to `false`. |
 | `debug` | `boolean` | `false` | Draw Rapier collider wireframes. |
 
 ## Controls
@@ -55,6 +57,20 @@ add your own action names — they become bindings any component can read with
 drei's `useKeyboardControls`. The resolved map is available to components at
 `useWorld().controls`. For a completely custom drei map there's still the
 low-level `keyboardMap` prop, which wins verbatim when given.
+
+## Sharing the page
+
+A world often sits beside ordinary UI: a chat box, a settings form, a modal. Keys typed into a text field (`input`, `textarea`, `select`, or anything `contenteditable`) are left to the page, so typing "wasd" into a form never walks the avatar. To ignore the keyboard entirely, pass `input={false}`. Keys held at that moment are released, and so are keys held when the window loses focus. Mouse look listens on the canvas only, so anything drawn over the canvas already takes the pointer.
+
+When the world isn't on screen (a background tab of your app, a hidden panel), `paused` stops the frame loop and the physics steps so the world costs nothing:
+
+```tsx
+<World paused={!visible} input={!modalOpen}>
+  {/* … */}
+</World>
+```
+
+On resume, animations carry on from where they stopped, and anything driven by the wall clock (a walking `Person`) is already where it should be. `WorldRenderer` and `WorldEditor` take both props too.
 
 ## The palette
 
