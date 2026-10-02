@@ -22,7 +22,7 @@ just install       # install workspace deps (pnpm)
 just docs          # run the docs site (gallery + 3D library — the dev harness)
 ```
 
-This repo uses [`just`](https://just.systems) as the task runner — run `just` to list every recipe. Node ≥ 20 and pnpm are required.
+This repo uses [`just`](https://just.systems) as the task runner — run `just` to list every recipe. Node ≥ 24 and pnpm are required.
 
 ## Repository layout
 

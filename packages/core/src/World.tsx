@@ -1,10 +1,11 @@
 import { KeyboardControls, type KeyboardControlsEntry } from '@react-three/drei'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { type ReactNode, useMemo, useRef } from 'react'
 import type { Object3D } from 'three'
 import { WorldContext } from './context'
 import { DEFAULT_FONTS, type WorldFonts } from './font'
+import { useKeySource } from './input'
 import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { resolveWorldTime } from './time'
@@ -23,6 +24,14 @@ export interface WorldProps {
   /** Low-level escape hatch: a complete drei keyboard map, passed verbatim.
    *  Wins over `controls` when given. Prefer `controls`, which serializes. */
   keyboardMap?: KeyboardControlsEntry[]
+  /** Read the keyboard. Keys aimed at a text field or other editable element are always
+   *  left to the page; set false to ignore the keyboard entirely (e.g. while a modal is
+   *  open). Pointer look listens on the canvas only, so it already yields to overlays. */
+  input?: boolean
+  /** Stop the frame loop and physics: no rendering, no steps, no input. Animation clocks
+   *  carry on from where they stopped, and anything driven by the wall clock (walking
+   *  `Person`s) is simply where it should be on resume. */
+  paused?: boolean
   /** Render the default light rig. Set false to supply your own (e.g. <LightRig>). */
   lights?: boolean
   /** Override color slots; unset slots keep their defaults. Components read these via `useWorld()`. */
@@ -56,6 +65,8 @@ export function World({
   ground = 0,
   controls,
   keyboardMap,
+  input = true,
+  paused = false,
   lights = true,
   palette,
   fonts,
@@ -83,6 +94,8 @@ export function World({
     [keyboardMap, resolvedControls],
   )
 
+  const keySource = useKeySource(input && !paused)
+
   const player = useRef<Object3D | null>(null)
   const walkers = useMemo(() => new Set<Walker>(), [])
 
@@ -103,14 +116,17 @@ export function World({
   )
 
   return (
-    <KeyboardControls map={inputMap}>
+    // drei types `domElement` as an element but only listens on it, so any EventTarget works.
+    <KeyboardControls map={inputMap} domElement={keySource as HTMLElement}>
       <Canvas
+        frameloop={paused ? 'never' : 'always'}
         shadows
         camera={{ position: [6, 4, 6], fov: 60 }}
         gl={{ preserveDrawingBuffer }}
         onPointerMissed={onPointerMissed}
       >
         <WorldContext.Provider value={context}>
+          <KeepClock />
           {fog && <fog attach="fog" args={[fog.color, fog.near * unit, fog.far * unit]} />}
           {lights && (
             <>
@@ -129,11 +145,26 @@ export function World({
               />
             </>
           )}
-          <Physics gravity={gravity} debug={debug}>
+          <Physics gravity={gravity} paused={paused} debug={debug}>
             {children}
           </Physics>
         </WorldContext.Provider>
       </Canvas>
     </KeyboardControls>
   )
+}
+
+/**
+ * R3F zeroes the clock whenever the frame loop restarts, which would snap every
+ * clock-driven animation back to its start on resume. The clock only ever runs backwards
+ * at such a restart, so put it back to where it stopped. Runs before other frame callbacks.
+ */
+function KeepClock() {
+  const last = useRef(0)
+  useFrame(({ clock, frameloop }) => {
+    if (frameloop === 'never') return
+    if (clock.elapsedTime < last.current) clock.elapsedTime = last.current
+    last.current = clock.elapsedTime
+  }, -1)
+  return null
 }

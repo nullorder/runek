@@ -32,6 +32,10 @@
     "./data": {
       "types": "./src/data.ts",
       "default": "./src/data.ts"
+    },
+    "./editor": {
+      "types": "./src/editor.ts",
+      "default": "./src/editor.ts"
     }
   },
   "publishConfig": {
@@ -46,6 +50,10 @@
       "./data": {
         "types": "./dist/data.d.ts",
         "default": "./dist/data.js"
+      },
+      "./editor": {
+        "types": "./dist/editor.d.ts",
+        "default": "./dist/editor.js"
       }
     }
   },
@@ -61,6 +69,11 @@
     "leva": "catalog:",
     "react": "catalog:",
     "three": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "leva": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@react-three/drei": "catalog:",
