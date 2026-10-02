@@ -21,7 +21,7 @@
       "title": "Portal",
       "type": "registry:component",
       "category": "systems",
-      "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through \u2014 for world-to-world travel, level transitions, and teleports.",
+      "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports.",
       "files": [
         {
           "path": "packages/components/src/Portal.tsx",
@@ -34,7 +34,7 @@
       "title": "Compass",
       "type": "registry:component",
       "category": "systems",
-      "description": "A screen-fixed HUD compass: a glassy dial in a corner of the canvas whose rose card swings with the camera heading, with a fixed lubber line and an optional wind + bearing readout \u2014 works with any traversal that drives the camera (on foot or at a vehicle's chase-cam).",
+      "description": "A screen-fixed HUD compass: a glassy dial in a corner of the canvas whose rose card swings with the camera heading, with a fixed lubber line and an optional wind + bearing readout — works with any traversal that drives the camera (on foot or at a vehicle's chase-cam).",
       "files": [
         {
           "path": "packages/components/src/Compass.tsx",
@@ -133,7 +133,7 @@
       "title": "CurvedWall",
       "type": "registry:component",
       "category": "structures",
-      "description": "An arc of wall around the origin \u2014 solid concrete or a floor-to-ceiling glass curtain wall with mullions. Compose several arcs to leave door gaps; chords carry cuboid colliders.",
+      "description": "An arc of wall around the origin — solid concrete or a floor-to-ceiling glass curtain wall with mullions. Compose several arcs to leave door gaps; chords carry cuboid colliders.",
       "files": [
         {
           "path": "packages/components/src/CurvedWall.tsx",
@@ -163,7 +163,7 @@
       "title": "Level",
       "type": "registry:component",
       "category": "structures",
-      "description": "A stackable wall ring plus optional slab: per-side openings, sides that can be omitted, and a stairwell hole \u2014 the unit a building is composed from.",
+      "description": "A stackable wall ring plus optional slab: per-side openings, sides that can be omitted, and a stairwell hole — the unit a building is composed from.",
       "files": [
         {
           "path": "packages/components/src/Level.tsx",
@@ -384,7 +384,7 @@
       "title": "Book",
       "type": "registry:component",
       "category": "interiors",
-      "description": "A single procedural book \u2014 standing, lying, or open \u2014 with a seeded cover and optional click interaction; the standalone sibling of Bookshelf's instanced spines.",
+      "description": "A single procedural book — standing, lying, or open — with a seeded cover and optional click interaction; the standalone sibling of Bookshelf's instanced spines.",
       "files": [
         {
           "path": "packages/components/src/Book.tsx",
@@ -851,19 +851,15 @@
       "title": "Person",
       "type": "registry:component",
       "category": "character",
-      "description": "A proportioned, clothed, articulated figure generated from a seed: style templates (anime by default, realistic as the alternate), role presets, gender/age/build silhouettes, hair, outfits, hats and accessories, swappable cosmetic skins (named presets or custom bundles), poses, idle breathing, and a head that turns to watch you. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. Place one at a spawn point, or use it as the Player's third-person body.",
+      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body.",
       "files": [
         {
           "path": "packages/components/src/Person.tsx",
           "target": "Person.tsx"
         },
         {
-          "path": "packages/components/src/person/route.ts",
-          "target": "person/route.ts"
-        },
-        {
-          "path": "packages/components/src/person/RouteDriver.tsx",
-          "target": "person/RouteDriver.tsx"
+          "path": "packages/components/src/person",
+          "target": "person"
         }
       ]
     }

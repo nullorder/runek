@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Person` is configurable part by part, all as plain JSON: `body`
+  (`build`, `tone`, `height`), `face` (eye color and size, brow color
+  and weight, `nose` shape, lip color and fullness, `blush`), `hair`
+  as `{ style, color }`, and `clothes`, an ordered list of garment
+  layers (`tshirt`, `shirt`, `sweater`, `vest`, `tunic`, `coat`,
+  `dress`, `robe`, `apron`, `trousers`, `jeans`, `shorts`, `skirt`,
+  `shoes`, `boots`, `belt`, `scarf`, `cape`), each with its own
+  `color` and, for tops, `sleeves` and `neck`. Layers go inner to
+  outer and the order decides the fit: a shirt listed before the
+  jeans is tucked in. `clothes={[]}` is the bare base body. The flat
+  props (`outfit`, `topColor`, `skinTone`, `hairColor`, ...) still
+  work as shorthands. New `swept` hairstyle and `preppy` skin.
 - `useWorld().player`: a ref to the mounted `Player`'s avatar (at eye
   height), or `null` when there's no `Player`. Components can react to
   where the player stands instead of where the camera is.
@@ -74,6 +86,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   window loses focus are released instead of staying stuck down.
 - `@runek/cli` declares Node 24 or newer (`engines.node` was `>=20`),
   matching the version the repo develops and tests on.
+- `Person` has a new look: one continuous sculpted body (no seams at
+  the joints) with a sculpted face, eyelids that blink, eyes that
+  follow you, and hands with fingers, skinned to an 18-bone skeleton
+  so it bends as one. Clothes, hair, and hats are layers fitted to the
+  body, so any garment fits any build, age, or style. The default
+  `style` is now `stylized` (an animated-film look); `realistic` and
+  `anime` remain. Meshes build in the background a few milliseconds at
+  a time, coarse first; full detail builds only within ~10 units of
+  the camera, and identical figures share one build.
 - `Person` turns its head toward the player's avatar, not the camera.
   In third person the camera trails behind, so figures used to look
   past you; now they meet your avatar's eyes, and `lookRadius` is
@@ -86,6 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Setting one `Person` trait (a skin tone, a build) no longer
+  reshuffles the seeded rolls of the others.
 - A `Player` spawned over displaced `Terrain` could fall through it:
   the trimesh collider was derived one render after the mesh. `Terrain`
   now builds it in the same render.
