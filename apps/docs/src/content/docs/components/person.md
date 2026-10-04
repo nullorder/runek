@@ -1,6 +1,6 @@
 ---
 title: "Person"
-summary: "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body."
+summary: "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body."
 category: component
 component: person
 order: 100
@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add person
 ```
 
-Pulls `sign`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
+Pulls `interactable`, `sign`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -85,6 +85,17 @@ export interface PersonProps extends WorldComponentProps {
   pause?: number
   /** `loop` walks from the last waypoint back to the first; `pingpong` retraces the route. */
   loop?: RouteLoop
+  /** A one-way trip through these waypoints, relative to `position` like `patrol`, setting off
+   *  at `departAt`. Before then the figure waits at the first point facing its `rotation`; after
+   *  the last it stays there, facing the way it came, in its `pose`. Wins over `patrol` and
+   *  `wander`. Give a new trip a new `position` (the old one's end) and `departAt`. */
+  route?: Vec3[]
+  /** When the `route` trip sets off, in epoch milliseconds (`Date.now()`). Plain data, so every
+   *  viewer sees the figure at the same point of its trip. Unset, the trip is long over. */
+  departAt?: number
+  /** Called once per trip (`route` + `departAt`) when the figure has arrived, on the first
+   *  frame it has, so a trip that ended while the world was paused or unmounted still reports. */
+  onArrive?: () => void
   /** Walk-cycle speed, in units per second, for a figure something else moves (a cart, a
    *  script). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed. */
   gait?: number
@@ -97,6 +108,14 @@ export interface PersonProps extends WorldComponentProps {
   lookRadius?: number
   /** Floating name above the head. */
   label?: string
+  /** What the player can do with this figure (`Talk`, `Info`). When the avatar comes within
+   *  `actionRadius` a prompt shows them over the head, with the key each world `controls`
+   *  action is bound to; pressing one calls `onAction` with its `id`. Only the nearest figure
+   *  (or other `Interactable`) in range shows a prompt and takes the key. */
+  actions?: InteractionAction[]
+  /** How close the avatar must come for `actions`, in units. */
+  actionRadius?: number
+  onAction?: (id: string) => void
   /** Capsule collider, so the figure is something you bump into. */
   collider?: boolean
   /** Render as a bare visual with no `RigidBody`: for a parent that owns the physics

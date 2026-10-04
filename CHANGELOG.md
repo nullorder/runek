@@ -74,6 +74,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   isn't on screen costs nothing. Animations resume where they stopped.
 - `isEditableTarget(target)`: whether a key event belongs to a text
   field rather than the world.
+- `Person` takes trips: `route` is a one-way walk through waypoints
+  (relative to `position`, like `patrol`) that sets off at `departAt`
+  (epoch ms), waits at its first point before then, and stays at its
+  last point after, in its `pose`. Where it is depends only on the
+  clock, so every viewer agrees and a reopened page needs no replay.
+  `onArrive` fires once per trip, even when the arrival happened while
+  the world was paused or unmounted. `tripAt()` gives where a trip had
+  got to, for starting the next one from there.
+- `Person` `actions`, `actionRadius`, and `onAction`: walk near a
+  figure and a prompt over its head shows what you can do (`T Talk`,
+  `I Info`) with the keys the world's `controls` bind; press one and
+  `onAction` gets its id. Only the nearest figure in range shows a
+  prompt and takes the key, and keys yield to text fields.
+- `Interactable`: wrap anything in it to offer the player the same
+  prompt and actions (sit on a sofa, use a desk).
+- `useInteraction(anchor, { actions, radius, onAction })` in core, the
+  hook behind both, for components that draw their own prompt;
+  `keyLabel(code)` turns `KeyT` into `T` for display.
+- `useWorld().keyboard`: the key events the world reads (none aimed at
+  text fields, none while `input` is off or the world is paused).
+- `Sign` `outline`: a crisp edge in a color, so text reads against any
+  background.
+- `Desk`: a work desk on slim legs, a drawer pedestal, or side panels,
+  with a modesty panel at the back. Base and drawer count are seeded.
+- `Monitor`: a desk monitor on a foot, plate, or legs. Switched on,
+  its screen glows in its `screen` color with a few seeded windows of
+  text on it; `on={false}` is dark glass.
+- `Sofa`: one to four seats, with square, rolled, or slim arms, split
+  or bench cushions in soft shades of the fabric, pegs or a plinth,
+  and throw pillows, all seeded and each pinnable.
+- Guide: "Embedding a world in an app" (content security policy,
+  desktop webviews, lazy loading, input, pausing, and figures driven by
+  app state).
 
 ### Changed
 

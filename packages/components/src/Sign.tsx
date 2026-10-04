@@ -27,6 +27,8 @@ export interface SignProps {
   anchorY?: 'top' | 'middle' | 'bottom'
   /** Soft colored halo around the glyphs, for a glow without bloom. */
   glow?: boolean
+  /** A crisp edge in this color, so the text reads against any background. Wins over `glow`. */
+  outline?: string
 }
 
 /**
@@ -49,6 +51,7 @@ export function Sign({
   anchorX = 'center',
   anchorY = 'middle',
   glow = false,
+  outline,
 }: SignProps) {
   const { unit, fonts, palette } = useWorld()
   const face = font ?? fonts[variant]
@@ -65,10 +68,10 @@ export function Sign({
       letterSpacing={letterSpacing}
       anchorX={anchorX}
       anchorY={anchorY}
-      outlineWidth={glow ? 0.02 * unit : 0}
-      outlineColor={ink}
-      outlineBlur={glow ? '45%' : 0}
-      outlineOpacity={glow ? 0.5 : 1}
+      outlineWidth={outline ? '9%' : glow ? 0.02 * unit : 0}
+      outlineColor={outline ?? ink}
+      outlineBlur={outline || !glow ? 0 : '45%'}
+      outlineOpacity={outline || !glow ? 1 : 0.5}
     >
       {children}
     </Text>

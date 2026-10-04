@@ -769,6 +769,45 @@
       ]
     },
     {
+      "name": "desk",
+      "title": "Desk",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A work desk: a top over slim legs, a drawer pedestal, or side panels, with a modesty panel at the back. Base and drawers seeded, each pinnable. One cuboid collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Desk.tsx",
+          "target": "Desk.tsx"
+        }
+      ]
+    },
+    {
+      "name": "monitor",
+      "title": "Monitor",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry.",
+      "files": [
+        {
+          "path": "packages/components/src/Monitor.tsx",
+          "target": "Monitor.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sofa",
+      "title": "Sofa",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A sofa seating one to four: upholstered frame, seat and back cushions in soft shades of the fabric, square, rolled, or slim arms, pegs or a plinth, and throw pillows. Seeded, each choice pinnable.",
+      "files": [
+        {
+          "path": "packages/components/src/Sofa.tsx",
+          "target": "Sofa.tsx"
+        }
+      ]
+    },
+    {
       "name": "crate",
       "title": "Crate",
       "type": "registry:component",
@@ -847,11 +886,24 @@
       ]
     },
     {
+      "name": "interactable",
+      "title": "Interactable",
+      "type": "registry:component",
+      "category": "systems",
+      "description": "Wrap anything to make it something the player can act on: walk within range and a prompt shows its actions with the keys the world binds to them; press one and onAction gets its id. Only the nearest in range takes the key, and keys yield to text fields.",
+      "files": [
+        {
+          "path": "packages/components/src/Interactable.tsx",
+          "target": "Interactable.tsx"
+        }
+      ]
+    },
+    {
       "name": "person",
       "title": "Person",
       "type": "registry:component",
       "category": "character",
-      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body.",
+      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body.",
       "files": [
         {
           "path": "packages/components/src/Person.tsx",

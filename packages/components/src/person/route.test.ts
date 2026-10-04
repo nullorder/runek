@@ -1,6 +1,6 @@
 import type { Vec3 } from '@runek/core'
 import { describe, expect, it } from 'vitest'
-import { buildRoute, wanderPoints } from './route'
+import { buildRoute, tripAt, wanderPoints } from './route'
 
 const SQUARE: Vec3[] = [
   [0, 0, 0],
@@ -96,6 +96,70 @@ describe('buildRoute', () => {
   it('counts distance walked, for a walk cycle that tracks the feet', () => {
     const route = buildRoute(SQUARE, { speed: 2, pause: 0, loop: 'loop', accel: 0 })
     expect(route.sample(3).distance).toBeCloseTo(6)
+  })
+})
+
+describe('buildRoute once (a trip)', () => {
+  const TRIP: Vec3[] = [
+    [0, 0, 0],
+    [4, 0, 0],
+    [4, 0, 4],
+  ]
+
+  it('sets off at once and pauses only at the waypoints between', () => {
+    const route = buildRoute(TRIP, { speed: 2, pause: 1, loop: 'once', accel: 0.5 })
+    expect(route.once).toBe(true)
+    expect(route.period).toBeCloseTo(2.5 + 1 + 2.5)
+    expect(route.sample(0.1).x).toBeGreaterThan(0)
+  })
+
+  it('waits at the first point, facing the node, before it sets off', () => {
+    const route = buildRoute(TRIP, { speed: 2, pause: 1, loop: 'once' })
+    expect(route.sample(-30)).toMatchObject({ x: 0, z: 0, speed: 0, heading: 0, distance: 0 })
+  })
+
+  it('holds the last point after arriving, facing the way it came', () => {
+    const route = buildRoute(TRIP, { speed: 2, pause: 1, loop: 'once' })
+    const end = route.sample(route.period + 1000)
+    expect(end).toMatchObject({ x: 4, z: 4, speed: 0, distance: 8 })
+    expect(end.heading).toBeCloseTo(0)
+    expect(route.sample(route.period - 1e-6).z).toBeCloseTo(4)
+  })
+
+  it('does not close the loop back to the first point', () => {
+    const route = buildRoute(TRIP, { speed: 2, pause: 0, loop: 'once' })
+    for (let t = 0; t <= route.period + 1; t += 0.05) {
+      expect(route.sample(t).z).toBeGreaterThanOrEqual(-1e-9)
+      expect(route.sample(t).x).toBeGreaterThanOrEqual(-1e-9)
+    }
+    const heading = buildRoute(
+      [
+        [0, 0, 0],
+        [-3, 0, 0],
+      ],
+      { speed: 2, pause: 0, loop: 'once' },
+    ).sample(100).heading
+    expect(heading).toBeCloseTo(-Math.PI / 2)
+  })
+
+  it('stands still for a single point', () => {
+    const route = buildRoute([[1, 0, 2]], { speed: 2, pause: 0, loop: 'once' })
+    expect(route.period).toBe(0)
+    expect(route.sample(5)).toMatchObject({ x: 1, z: 2, speed: 0 })
+  })
+})
+
+describe('tripAt', () => {
+  it('samples a trip at an epoch time', () => {
+    const points: Vec3[] = [
+      [0, 0, 0],
+      [10, 0, 0],
+    ]
+    expect(tripAt(points, 5000, 1000)).toEqual([0, 0, 0])
+    expect(tripAt(points, 5000, 5000 + 60_000)).toEqual([10, 0, 0])
+    const mid = tripAt(points, 5000, 5000 + 4000, { speed: 2 })
+    expect(mid[0]).toBeGreaterThan(6)
+    expect(mid[0]).toBeLessThan(8)
   })
 })
 

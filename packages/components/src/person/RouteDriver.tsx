@@ -5,7 +5,8 @@ import { type RefObject, useEffect, useMemo, useRef } from 'react'
 import { type Object3D, Vector3 } from 'three'
 import type { Route } from './route'
 
-/** A route plus this figure's seeded offset into it, so figures sharing a route don't march in step. */
+/** A route plus the seconds added to the wall clock to sample it: a seeded offset into a cycle,
+ *  so figures sharing a route don't march in step, or minus the departure time for a trip. */
 export interface WalkRoute extends Route {
   phase: number
 }
@@ -33,6 +34,8 @@ export interface RouteDriverProps {
   waist: number
   unit: number
   blocked?: SideCheck
+  /** Called once when a trip is over, on the first frame it is (even if that was long ago). */
+  onArrive?: () => void
 }
 
 // How far ahead a walker looks for someone in its way, and the gap it keeps (in meters).
@@ -67,11 +70,19 @@ export function RouteDriver({
   waist,
   unit,
   blocked,
+  onArrive,
 }: RouteDriverProps) {
   const { player, walkers } = useWorld()
   const groundAt = useGround()
   const self = useMemo<Walker>(() => ({ x: 0, z: 0, radius }), [radius])
-  const state = useRef({ lag: 0, offset: 0, target: 0, checked: 0, started: false })
+  const state = useRef({
+    lag: 0,
+    offset: 0,
+    target: 0,
+    checked: 0,
+    started: false,
+    arrived: null as Route | null,
+  })
   const last = useMemo(() => new Vector3(), [])
   const v = useMemo(
     () => ({
@@ -97,7 +108,8 @@ export function RouteDriver({
     if (!node) return
     const dt = Math.min(delta, 0.1)
     const s = state.current
-    const p = route.sample(Date.now() / 1000 + route.phase - s.lag)
+    const t = Date.now() / 1000 + route.phase - s.lag
+    const p = route.sample(t)
 
     node.updateWorldMatrix(true, false)
     v.spawn.setFromMatrixPosition(node.matrixWorld)
@@ -198,6 +210,11 @@ export function RouteDriver({
     s.started = true
     gait.current.speed = hold ? 0 : p.speed
     gait.current.distance = p.distance
+
+    if (route.once && t >= route.period && s.arrived !== route) {
+      s.arrived = route
+      onArrive?.()
+    }
   })
 
   return null

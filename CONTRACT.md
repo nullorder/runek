@@ -21,7 +21,7 @@ The keywords **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are
 - A component **MUST** be a **pure, deterministic function of its props**: the same props (including `seed`) **MUST** produce the same output on every machine and every render.
 - All randomness **MUST** come from the seeded RNG (`rng(seed)` and the helpers from `@runek/core`). Components **MUST NOT** use `Math.random()`, `Date`, or any other ambient nondeterminism to generate geometry.
 - When composing child components, child seeds **MUST** be derived stably (e.g. `sub(seed, n)`), not shared verbatim.
-- Motion that is part of the world (a figure walking its route) **SHOULD** be a pure function of its props and the wall clock (`Date.now()`), not state integrated frame by frame, so every viewer sees it in the same place. Reactions to the viewer's own avatar (stepping aside, waiting) are the one per-viewer part, and **SHOULD** ride on top as an offset or a delay. See `Person`.
+- Motion that is part of the world (a figure walking its route) **SHOULD** be a pure function of its props and the wall clock (`Date.now()`), not state integrated frame by frame, so every viewer sees it in the same place. A one-off motion that starts on an event (a trip) **SHOULD** carry its start as data (an epoch-ms prop such as `departAt`), not start when the component mounts. Reactions to the viewer's own avatar (stepping aside, waiting) are the one per-viewer part, and **SHOULD** ride on top as an offset or a delay. See `Person`.
 
 ## 3. Geometry
 
@@ -43,7 +43,7 @@ The keywords **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are
 ## 6. Units & orientation
 
 - A component **MUST** read `unit` from `useWorld()` and scale its dimensions by it. **1 unit = 1 meter**, **Y is up**, rotations are in **radians**.
-- Point-list props (a `Person`'s `patrol` waypoints) **SHOULD** be node-local: relative to `position` and turned by `rotation`, like the component's own geometry, so moving or rotating the node in an editor carries them along.
+- Point-list props (a `Person`'s `patrol` or `route` waypoints) **SHOULD** be node-local: relative to `position` and turned by `rotation`, like the component's own geometry, so moving or rotating the node in an editor carries them along.
 
 ## 7. Palette & performance
 

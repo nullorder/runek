@@ -41,3 +41,18 @@ export function controlsToMap(controls: WorldControls): KeyboardControlsEntry[] 
 
 /** The default bindings in drei entry form. */
 export const keyboardMap: KeyboardControlsEntry[] = controlsToMap(DEFAULT_CONTROLS)
+
+const ARROWS: Record<string, string> = {
+  ArrowUp: '↑',
+  ArrowDown: '↓',
+  ArrowLeft: '←',
+  ArrowRight: '→',
+}
+
+/** A `KeyboardEvent.code` as a key cap reads: `KeyT` → `T`, `Digit1` → `1`, `ArrowUp` → `↑`,
+ *  `ShiftLeft` → `Shift`. */
+export function keyLabel(code: string): string {
+  if (ARROWS[code]) return ARROWS[code]
+  const m = /^(?:Key|Digit|Numpad)(.+)$/.exec(code) ?? /^(.+?)(?:Left|Right)$/.exec(code)
+  return m ? m[1] : code
+}

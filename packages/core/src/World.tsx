@@ -9,7 +9,7 @@ import { useKeySource } from './input'
 import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { resolveWorldTime } from './time'
-import type { AvatarView, Vec3, Walker, WorldFog } from './types'
+import type { AvatarView, Interactor, Vec3, Walker, WorldFog } from './types'
 
 export interface WorldProps {
   unit?: number
@@ -98,6 +98,7 @@ export function World({
 
   const player = useRef<Object3D | null>(null)
   const walkers = useMemo(() => new Set<Walker>(), [])
+  const interactions = useMemo(() => new Set<Interactor>(), [])
 
   const context = useMemo(
     () => ({
@@ -111,8 +112,23 @@ export function World({
       controls: resolvedControls,
       player,
       walkers,
+      interactions,
+      keyboard: keySource,
     }),
-    [unit, gravity, ground, palette, fonts, time, timezone, avatar, resolvedControls, walkers],
+    [
+      unit,
+      gravity,
+      ground,
+      palette,
+      fonts,
+      time,
+      timezone,
+      avatar,
+      resolvedControls,
+      walkers,
+      interactions,
+      keySource,
+    ],
   )
 
   return (

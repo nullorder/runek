@@ -19,6 +19,7 @@ import { Crate } from './Crate'
 import { CurvedWall } from './CurvedWall'
 import houseComposite from './composites/house.json'
 import roomComposite from './composites/room.json'
+import { Desk } from './Desk'
 import { Dock } from './Dock'
 import { Door } from './Door'
 import { Fence } from './Fence'
@@ -29,10 +30,12 @@ import { Fountain } from './Fountain'
 import { Grass } from './Grass'
 import { Hedge } from './Hedge'
 import { Hut } from './Hut'
+import { Interactable } from './Interactable'
 import { Lake } from './Lake'
 import { Lamp } from './Lamp'
 import { Level } from './Level'
 import { LightRig } from './LightRig'
+import { Monitor } from './Monitor'
 import { Ocean } from './Ocean'
 import { Palm } from './Palm'
 import { Path } from './Path'
@@ -53,6 +56,7 @@ import { Sign } from './Sign'
 import { Signpost } from './Signpost'
 import { Sky } from './Sky'
 import { Slab } from './Slab'
+import { Sofa } from './Sofa'
 import { Staircase } from './Staircase'
 import { Stool } from './Stool'
 import { Table } from './Table'
@@ -84,6 +88,7 @@ export const registry: ComponentRegistry = {
   Counter,
   Crate,
   CurvedWall,
+  Desk,
   Dock,
   Door,
   Fence,
@@ -97,10 +102,12 @@ export const registry: ComponentRegistry = {
   // (JSON imports infer wide types — number[] vs the bounds tuple — hence the two-step cast.)
   House: houseComposite as unknown as CompositeDef,
   Hut,
+  Interactable,
   Lake,
   Lamp,
   Level,
   LightRig,
+  Monitor,
   Ocean,
   Palm,
   Path,
@@ -122,6 +129,7 @@ export const registry: ComponentRegistry = {
   Signpost,
   Sky,
   Slab,
+  Sofa,
   Staircase,
   Stool,
   Table,

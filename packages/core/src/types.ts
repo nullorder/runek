@@ -36,6 +36,12 @@ export interface Walker {
   radius: number
 }
 
+/** Something offering the player actions (`useInteraction`): its distance to the avatar, or
+ *  `Infinity` out of range. Written in place every frame. */
+export interface Interactor {
+  distance: number
+}
+
 /** What `Player` publishes to its children (its third-person body): live motion, written in
  *  place every frame. */
 export interface PlayerMotion {
@@ -73,4 +79,11 @@ export interface WorldContextValue {
   /** Every figure currently walking a route. Mutable, not state: add yourself on mount, remove
    *  on unmount, and read it inside `useFrame`. Absent under a hand-rolled provider. */
   walkers?: Set<Walker>
+  /** Everything currently offering the player actions; the nearest in range is focused. Mutable,
+   *  like `walkers`. Absent under a hand-rolled provider. */
+  interactions?: Set<Interactor>
+  /** The world's keyboard: window key events the world reads, so none aimed at a text field and
+   *  none while `input` is off or the world is paused. Listen for `keydown` / `keyup`. Absent
+   *  under a hand-rolled provider. */
+  keyboard?: EventTarget
 }

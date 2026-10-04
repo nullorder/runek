@@ -1,15 +1,18 @@
 import { useFrame } from '@react-three/fiber'
 import { CapsuleCollider, type RapierRigidBody, RigidBody } from '@react-three/rapier'
 import {
+  type InteractionAction,
   PlayerMotionContext,
   rng,
   sub,
+  useInteraction,
   useWorld,
   type Vec3,
   type WorldComponentProps,
 } from '@runek/core'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { type Group, type Object3D, Vector3 } from 'three'
+import { InteractionPrompt } from './Interactable'
 import type { BuiltFigure, Lod } from './person/build'
 import {
   type GaitState,
@@ -43,6 +46,7 @@ import type {
 } from './person/types'
 import { Sign } from './Sign'
 
+export { tripAt } from './person/route'
 export { PERSON_SKINS, type PersonSkinName } from './person/spec'
 export type {
   PersonAccessory,
@@ -126,6 +130,17 @@ export interface PersonProps extends WorldComponentProps {
   pause?: number
   /** `loop` walks from the last waypoint back to the first; `pingpong` retraces the route. */
   loop?: RouteLoop
+  /** A one-way trip through these waypoints, relative to `position` like `patrol`, setting off
+   *  at `departAt`. Before then the figure waits at the first point facing its `rotation`; after
+   *  the last it stays there, facing the way it came, in its `pose`. Wins over `patrol` and
+   *  `wander`. Give a new trip a new `position` (the old one's end) and `departAt`. */
+  route?: Vec3[]
+  /** When the `route` trip sets off, in epoch milliseconds (`Date.now()`). Plain data, so every
+   *  viewer sees the figure at the same point of its trip. Unset, the trip is long over. */
+  departAt?: number
+  /** Called once per trip (`route` + `departAt`) when the figure has arrived, on the first
+   *  frame it has, so a trip that ended while the world was paused or unmounted still reports. */
+  onArrive?: () => void
   /** Walk-cycle speed, in units per second, for a figure something else moves (a cart, a
    *  script). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed. */
   gait?: number
@@ -138,6 +153,14 @@ export interface PersonProps extends WorldComponentProps {
   lookRadius?: number
   /** Floating name above the head. */
   label?: string
+  /** What the player can do with this figure (`Talk`, `Info`). When the avatar comes within
+   *  `actionRadius` a prompt shows them over the head, with the key each world `controls`
+   *  action is bound to; pressing one calls `onAction` with its `id`. Only the nearest figure
+   *  (or other `Interactable`) in range shows a prompt and takes the key. */
+  actions?: InteractionAction[]
+  /** How close the avatar must come for `actions`, in units. */
+  actionRadius?: number
+  onAction?: (id: string) => void
   /** Capsule collider, so the figure is something you bump into. */
   collider?: boolean
   /** Render as a bare visual with no `RigidBody`: for a parent that owns the physics
@@ -157,6 +180,8 @@ const LOD_OUT = 13
 const MAX_YAW = 1.2
 const MAX_PITCH = 0.4
 const EYE_REACH = 0.35
+
+const NO_ACTIONS: InteractionAction[] = []
 
 const isInside = (o: Object3D, ancestor: Object3D) => {
   for (let p = o.parent; p; p = p.parent) if (p === ancestor) return true
@@ -213,7 +238,9 @@ function useBuild(
  *
  * `position` is the spawn point. Give it a `patrol` (waypoints) or a `wander` radius and it
  * walks: where it is on the route is a function of the clock and the seed, so every viewer sees
- * it in the same place, and it steps around the player and other walkers in its way. It stands
+ * it in the same place, and it steps around the player and other walkers in its way. A `route`
+ * with a `departAt` time is a one-way trip instead (to a desk, to bed), with `onArrive` when it
+ * ends. It stands
  * on one capsule collider, kinematic while it walks. Pass `physics={false}` for a bare visual,
  * which is how it becomes `Player`'s third-person body (walking in step with the avatar):
  * `<Player><Person physics={false} height={1.3} position={[0, -0.65, 0]} /></Player>`.
@@ -251,11 +278,17 @@ export function Person({
   speed,
   pause = 1.5,
   loop = 'loop',
+  route: trip,
+  departAt = 0,
+  onArrive,
   gait,
   idle = true,
   lookAt = true,
   lookRadius = 9,
   label,
+  actions,
+  actionRadius = 2,
+  onAction,
   collider = true,
   physics = true,
   detail = 'auto',
@@ -327,18 +360,24 @@ export function Person({
   const marks = shape.marks
 
   // The route is node-local geometry like any other: waypoints scale by `unit` and turn with the
-  // node. Wander points come from their own seed stream so they don't reshuffle the figure.
+  // node. Wander points come from their own seed stream so they don't reshuffle the figure. A
+  // trip's clock starts at `departAt`; a cycle's at a seeded point, so walkers don't march in step.
   const patrolKey = patrol && JSON.stringify(patrol)
+  const tripKey = trip && JSON.stringify(trip)
   const route = useMemo<WalkRoute | null>(() => {
-    const points = patrol ?? (wander ? wanderPoints(wander, sub(seed, 1)) : undefined)
-    if (!points || points.length < 2) return null
+    const points = trip ?? patrol ?? (wander ? wanderPoints(wander, sub(seed, 1)) : undefined)
+    if (!points || (!trip && points.length < 2)) return null
     const built = buildRoute(
       points.map(([x, y, z]) => [x * unit, y * unit, z * unit]),
-      { speed: (speed ?? WALK_SPEED[age]) * unit, pause, loop },
+      { speed: (speed ?? WALK_SPEED[age]) * unit, pause, loop: trip ? 'once' : loop },
     )
+    if (trip) return { ...built, phase: -departAt / 1000 }
     if (!built.period) return null
     return { ...built, phase: rng(sub(seed, 2))() * built.period }
-  }, [patrolKey, wander, seed, speed, age, pause, loop, unit])
+  }, [tripKey, departAt, patrolKey, wander, seed, speed, age, pause, loop, unit])
+  const arrive = useRef(onArrive)
+  arrive.current = onArrive
+  const handleArrive = useMemo(() => () => arrive.current?.(), [])
 
   // ---- level of detail -------------------------------------------------------------------------
   const distance = useRef(Number.POSITIVE_INFINITY)
@@ -379,6 +418,11 @@ export function Person({
   }, [parts, detailed, shown])
 
   const root = useRef<Group>(null)
+  const focused = useInteraction(root, {
+    actions: actions ?? NO_ACTIONS,
+    radius: actionRadius,
+    onAction,
+  })
   const nameTag = useRef<Group>(null)
   const nodeFrame = useRef<Group>(null)
   const walker = useRef<Group>(null)
@@ -522,6 +566,12 @@ export function Person({
           </Sign>
         </group>
       )}
+      {focused && actions && (
+        <InteractionPrompt
+          actions={actions}
+          position={[0, H + marks.headH * 0.55 + (label ? 0.26 : 0.08) * unit, 0]}
+        />
+      )}
     </group>
   )
 
@@ -540,6 +590,7 @@ export function Person({
     radius,
     waist: marks.waistY,
     unit,
+    onArrive: handleArrive,
   }
 
   if (!physics) {

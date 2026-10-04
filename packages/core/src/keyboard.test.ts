@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { controlsToMap, DEFAULT_CONTROLS, resolveControls } from './keyboard'
+import { controlsToMap, DEFAULT_CONTROLS, keyLabel, resolveControls } from './keyboard'
 import { parseWorld, serializeWorld, type WorldData } from './world-data'
+
+describe('keyLabel', () => {
+  it('reads a key code the way its key cap does', () => {
+    expect(keyLabel('KeyT')).toBe('T')
+    expect(keyLabel('Digit1')).toBe('1')
+    expect(keyLabel('ArrowUp')).toBe('↑')
+    expect(keyLabel('ShiftLeft')).toBe('Shift')
+    expect(keyLabel('Space')).toBe('Space')
+  })
+})
 
 describe('resolveControls', () => {
   it('merges a partial remap over the defaults', () => {
