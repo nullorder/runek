@@ -1,6 +1,6 @@
 ---
 title: "Counter"
-summary: "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider."
+summary: "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider. With hob, a kitchen stove: a glass cooktop and an oven door."
 category: component
 component: counter
 order: 100
@@ -36,6 +36,9 @@ export interface CounterProps extends WorldComponentProps {
   color?: string
   /** Worktop color; defaults to the palette's `woodDark`. */
   topColor?: string
+  /** A kitchen stove at the +X end: a glass hob with four burners on the worktop and an oven
+   *  door in the front below it. */
+  hob?: boolean
 }
 ```
 

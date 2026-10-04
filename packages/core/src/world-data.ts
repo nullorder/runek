@@ -211,8 +211,8 @@ export function parseWorld(json: string): WorldData {
   if (data.timezone !== undefined && typeof data.timezone !== 'string') {
     throw new Error('World "timezone" must be a string')
   }
-  if (data.avatar !== undefined && data.avatar !== 'first' && data.avatar !== 'third') {
-    throw new Error('World "avatar" must be "first" or "third"')
+  if (data.avatar !== undefined && !['first', 'third', 'overhead'].includes(data.avatar)) {
+    throw new Error('World "avatar" must be "first", "third", or "overhead"')
   }
   if (data.ground !== undefined && typeof data.ground !== 'number') {
     throw new Error('World "ground" must be a number')

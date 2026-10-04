@@ -77,6 +77,16 @@ A world in a tab nobody is looking at should cost nothing. `paused` stops the fr
 
 Anything driven by the wall clock is simply where it should be on resume. A `Person` on a route was never stepping along it; its position is a function of the time, so pausing for an hour and resuming puts it exactly where an hour of walking would have.
 
+## A view of the whole place
+
+An app showing many figures at once usually wants to open on all of them. `view="overhead"` puts the camera high above the avatar at a fixed tilt; it follows as the avatar walks, scroll zooms, and WASD walks relative to the screen. Give the world a `view` control and the player can switch between overhead, third person, and first person:
+
+```tsx
+<World avatar="overhead" controls={{ view: ['KeyV'] }}>
+  <Player />
+</World>
+```
+
 ## Figures driven by app state
 
 When people in the world stand for something live in your app (agents, players, orders), give each one a trip whenever its state moves it. A trip is a `route` with a start time:

@@ -7,9 +7,10 @@ import type { WorldTime } from './time'
 
 export type Vec3 = [number, number, number]
 
-/** How the player camera frames the avatar. A world default `Player` reads when
- *  its own `view` is unset; an explicit component `view` still wins. */
-export type AvatarView = 'first' | 'third'
+/** How the player camera frames the avatar: through its eyes, from behind it, or from high
+ *  above (a map-like view that still follows it). A world default `Player` reads when its own
+ *  `view` is unset; an explicit component `view` still wins. */
+export type AvatarView = 'first' | 'third' | 'overhead'
 
 /** The contract every Runek component implements. */
 export interface WorldComponentProps {

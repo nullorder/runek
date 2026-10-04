@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add person
 ```
 
-Pulls `interactable`, `sign`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
+Pulls `interactable`, `sign`, `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -71,7 +71,11 @@ export interface PersonProps extends WorldComponentProps {
   shoeColor?: string
   hat?: PersonHat
   accessories?: PersonAccessory[]
-  /** Static joint set. `wave` also animates the raised forearm. */
+  /** What the figure is doing when it isn't walking. `sit` and `type` need a seat under them
+   *  (`type` is seated at a desk, fingers tapping); `work` leans over a counter; `play` works
+   *  controls at waist height; `drink` holds a mug and sips from it now and then; `lie` lies on its
+   *  back centered on `position`, head toward local -Z, so it takes a `Bed`'s position and
+   *  rotation at mattress height. */
   pose?: PersonPose
   /** Walk these waypoints, relative to `position` and turning with `rotation`, in units.
    *  Height follows the ground; a waypoint's y lifts the figure above it. */
@@ -108,6 +112,12 @@ export interface PersonProps extends WorldComponentProps {
   lookRadius?: number
   /** Floating name above the head. */
   label?: string
+  /** A short line in a speech bubble over the head (what the figure is saying or doing right
+   *  now). Long lines wrap and are cut after a few. */
+  bubble?: string
+  /** A small animated sign over the head: `sleep` (rising z's), `alert` (a bouncing !), `think`
+   *  (pulsing dots), `happy` (a heart), `coffee` (a steaming cup). */
+  emote?: PersonEmote
   /** What the player can do with this figure (`Talk`, `Info`). When the avatar comes within
    *  `actionRadius` a prompt shows them over the head, with the key each world `controls`
    *  action is bound to; pressing one calls `onAction` with its `id`. Only the nearest figure

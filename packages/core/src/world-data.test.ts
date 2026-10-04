@@ -79,6 +79,11 @@ describe('world-data', () => {
     expect(text.indexOf('"type"')).toBeLessThan(text.indexOf('"props"'))
   })
 
+  it('accepts every avatar view, overhead included', () => {
+    for (const view of ['first', 'third', 'overhead'])
+      expect(parseWorld(`{"version":1,"avatar":"${view}","nodes":[]}`).avatar).toBe(view)
+  })
+
   it('rejects an unknown avatar value', () => {
     expect(() => parseWorld('{"version":1,"avatar":"bird","nodes":[]}')).toThrow()
   })

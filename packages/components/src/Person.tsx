@@ -11,8 +11,19 @@ import {
   type WorldComponentProps,
 } from '@runek/core'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { type Group, type Object3D, Vector3 } from 'three'
+import {
+  CylinderGeometry,
+  type Group,
+  Mesh,
+  MeshPhysicalMaterial,
+  type Object3D,
+  Quaternion,
+  Group as ThreeGroup,
+  TorusGeometry,
+  Vector3,
+} from 'three'
 import { InteractionPrompt } from './Interactable'
+import { Emote, SpeechBubble } from './person/Bubble'
 import type { BuiltFigure, Lod } from './person/build'
 import {
   type GaitState,
@@ -31,6 +42,7 @@ import type {
   PersonBodySpec,
   PersonBuild,
   PersonDetail,
+  PersonEmote,
   PersonFaceSpec,
   PersonFacialHair,
   PersonGarment,
@@ -54,6 +66,7 @@ export type {
   PersonBodySpec,
   PersonBuild,
   PersonDetail,
+  PersonEmote,
   PersonFaceSpec,
   PersonFacialHair,
   PersonGarment,
@@ -116,7 +129,11 @@ export interface PersonProps extends WorldComponentProps {
   shoeColor?: string
   hat?: PersonHat
   accessories?: PersonAccessory[]
-  /** Static joint set. `wave` also animates the raised forearm. */
+  /** What the figure is doing when it isn't walking. `sit` and `type` need a seat under them
+   *  (`type` is seated at a desk, fingers tapping); `work` leans over a counter; `play` works
+   *  controls at waist height; `drink` holds a mug and sips from it now and then; `lie` lies on its
+   *  back centered on `position`, head toward local -Z, so it takes a `Bed`'s position and
+   *  rotation at mattress height. */
   pose?: PersonPose
   /** Walk these waypoints, relative to `position` and turning with `rotation`, in units.
    *  Height follows the ground; a waypoint's y lifts the figure above it. */
@@ -153,6 +170,12 @@ export interface PersonProps extends WorldComponentProps {
   lookRadius?: number
   /** Floating name above the head. */
   label?: string
+  /** A short line in a speech bubble over the head (what the figure is saying or doing right
+   *  now). Long lines wrap and are cut after a few. */
+  bubble?: string
+  /** A small animated sign over the head: `sleep` (rising z's), `alert` (a bouncing !), `think`
+   *  (pulsing dots), `happy` (a heart), `coffee` (a steaming cup). */
+  emote?: PersonEmote
   /** What the player can do with this figure (`Talk`, `Info`). When the avatar comes within
    *  `actionRadius` a prompt shows them over the head, with the key each world `controls`
    *  action is bound to; pressing one calls `onAction` with its `id`. Only the nearest figure
@@ -177,6 +200,9 @@ const CRUISE = 1.3
 /** Full detail builds inside LOD_IN units of the camera and drops past LOD_OUT. */
 const LOD_IN = 10
 const LOD_OUT = 13
+/** Seconds between sips for `drink`, and how long a sip takes. */
+const SIP_EVERY = 7
+const SIP = 1.8
 const MAX_YAW = 1.2
 const MAX_PITCH = 0.4
 const EYE_REACH = 0.35
@@ -286,6 +312,8 @@ export function Person({
   lookAt = true,
   lookRadius = 9,
   label,
+  bubble,
+  emote,
   actions,
   actionRadius = 2,
   onAction,
@@ -436,19 +464,78 @@ export function Person({
 
   const H = spec.height
   const p = useMemo(() => {
-    const sit = pose === 'sit'
+    const sit = pose === 'sit' || pose === 'type'
+    const lean: Partial<Record<PersonPose, number>> = {
+      work: 0.42,
+      lean: -0.14,
+      type: 0.14,
+      play: 0.1,
+      sit: 0.06,
+    }
+    const armX: Partial<Record<PersonPose, number>> = {
+      work: -0.7,
+      type: -0.5,
+      play: -0.45,
+      sit: -0.25,
+      drink: -0.12,
+    }
+    const elbow: Partial<Record<PersonPose, number>> = {
+      work: -0.6,
+      type: -1.15,
+      play: -1.25,
+      sit: -0.5,
+      drink: -0.35,
+      lie: -0.08,
+    }
     return {
       sit,
+      lie: pose === 'lie',
       drop: sit ? -(marks.hipY - marks.thigh * 0.92) : 0,
-      spineX: motion.stoop + (pose === 'work' ? 0.42 : pose === 'lean' ? -0.14 : sit ? 0.06 : 0),
-      armX: pose === 'work' ? -0.7 : sit ? -0.25 : 0,
-      armZ: pose === 'lean' ? 0.1 : 0.02,
-      elbow: pose === 'work' ? -0.6 : sit ? -0.5 : -0.18,
+      spineX: motion.stoop * (pose === 'lie' ? 0 : 1) + (lean[pose] ?? 0),
+      armX: armX[pose] ?? 0,
+      armZ: pose === 'lean' ? 0.1 : pose === 'lie' ? 0.16 : 0.02,
+      elbow: elbow[pose] ?? -0.18,
       thighX: sit ? -Math.PI / 2 : 0,
       shinX: sit ? Math.PI / 2.1 : 0,
       wave: pose === 'wave',
+      drink: pose === 'drink',
+      /** Finger tapping (keys, buttons): how fast. */
+      tap: pose === 'type' ? 17 : pose === 'play' ? 9 : 0,
     }
   }, [pose, marks, motion.stoop])
+
+  // A mug for `drink`, held in the right hand and kept upright whatever the wrist does.
+  const mug = useMemo(() => {
+    const k = H / 1.7
+    const body = new CylinderGeometry(0.036 * k, 0.032 * k, 0.09 * k, 14)
+    const handle = new TorusGeometry(0.022 * k, 0.006 * k, 6, 12, Math.PI)
+    const mat = new MeshPhysicalMaterial({ color: '#efe9df', roughness: 0.35, clearcoat: 0.4 })
+    const g = new ThreeGroup()
+    const cup = new Mesh(body, mat)
+    const ear = new Mesh(handle, mat)
+    ear.rotation.z = -Math.PI / 2
+    ear.position.set(0, 0, -0.036 * k)
+    ear.rotation.y = Math.PI / 2
+    cup.castShadow = true
+    g.add(cup, ear)
+    g.position.set(0.012 * k, -0.075 * k, 0.03 * k)
+    const dispose = () => {
+      body.dispose()
+      handle.dispose()
+      mat.dispose()
+    }
+    return { group: g, dispose }
+  }, [H])
+  useEffect(() => {
+    if (!p.drink) return
+    const hand = rig.bones['hand.R']
+    hand.add(mug.group)
+    return () => {
+      hand.remove(mug.group)
+    }
+  }, [p.drink, rig, mug])
+  useEffect(() => mug.dispose, [mug])
+  const quat = useMemo(() => ({ a: new Quaternion(), b: new Quaternion() }), [])
 
   useFrame((state, dt) => {
     const t = state.clock.elapsedTime
@@ -478,6 +565,14 @@ export function Person({
     const s = bl.stride
     const q = bl.posed
     const waving = p.wave && q > 0.5
+    // Lying down turns the whole figure onto its back, centered on the origin, back on the
+    // surface, head toward -Z.
+    const lie = p.lie ? q : 0
+    rig.group.rotation.x = -(Math.PI / 2) * lie
+    rig.group.position.set(0, 0.075 * H * lie, (H / 2) * lie)
+    const tap = (side: number) => (p.tap ? Math.sin(t * p.tap + side) * 0.035 * q : 0)
+    const cyc = (t + motion.phase * 3) % SIP_EVERY
+    const sip = p.drink && cyc < SIP ? Math.sin((cyc / SIP) * Math.PI) * q : 0
     // Stride phase from distance walked: one full cycle (two steps) per 0.8 body heights.
     const phase = (w.distance / (0.8 * H)) * Math.PI * 2
     const swing = Math.sin(phase) * s * Math.min(0.3 + 0.2 * (w.speed / unit), 0.7)
@@ -492,14 +587,26 @@ export function Person({
     b.chest.rotation.set(lean * 0.55 + breath * 0.012, swing * 0.18, -sway * 0.012)
     // Opposite arm to leg: an arm swings back as its leg reaches forward.
     b['upperArm.L'].rotation.set(p.armX * q - sway * 0.06 + swing * 0.7, 0, p.armZ - ARM_SPREAD)
-    b['foreArm.L'].rotation.set(p.elbow * q - 0.18 * (1 - q) - s * 0.25, 0, 0)
-    if (waving) {
+    b['foreArm.L'].rotation.set(p.elbow * q - 0.18 * (1 - q) - s * 0.25 + tap(0), 0, 0)
+    if (p.drink && q > 0.05) {
+      // Mug at the chest, lifted to the lips for a sip.
+      b['upperArm.R'].rotation.set((-0.35 - 0.3 * sip) * q, 0, ARM_SPREAD + (0.4 + 0.12 * sip) * q)
+      b['foreArm.R'].rotation.set((-1.75 - 0.6 * sip) * q - 0.18 * (1 - q), 0, 0)
+    } else if (waving) {
       // Upper arm out just above level, forearm raised and rocking at the elbow.
       b['upperArm.R'].rotation.set(-0.25, 0, ARM_SPREAD - 1.75)
       b['foreArm.R'].rotation.set(0, 0, -1.15 - Math.sin(t * 6) * 0.35)
     } else {
       b['upperArm.R'].rotation.set(p.armX * q + sway * 0.06 - swing * 0.7, 0, ARM_SPREAD - p.armZ)
-      b['foreArm.R'].rotation.set(p.elbow * q - 0.18 * (1 - q) - s * 0.25, 0, 0)
+      b['foreArm.R'].rotation.set(p.elbow * q - 0.18 * (1 - q) - s * 0.25 + tap(2.1), 0, 0)
+    }
+    if (p.drink) {
+      // Undo the wrist's turn so the mug stays upright, tipping only as it reaches the lips.
+      rig.group.updateMatrixWorld()
+      rig.group.getWorldQuaternion(quat.a).invert()
+      b['hand.R'].getWorldQuaternion(quat.b)
+      mug.group.quaternion.copy(quat.a.multiply(quat.b)).invert()
+      mug.group.rotateX(0.5 * sip)
     }
     // Legs: the thigh swings (negative X is forward), and the knee flexes while that leg travels
     // forward, which is what lifts the foot clear of the ground.
@@ -531,7 +638,7 @@ export function Person({
     let tracking = false
     const avatar = player?.current
     const self = avatar?.parent != null && isInside(h, avatar.parent)
-    if (lookAt && h.parent && !self) {
+    if (lookAt && h.parent && !self && !p.lie) {
       if (avatar) avatar.getWorldPosition(scratch)
       else scratch.copy(state.camera.position)
       h.parent.worldToLocal(scratch).sub(h.position)
@@ -544,7 +651,7 @@ export function Person({
       }
     }
     h.rotation.y += (yaw - h.rotation.y) * k
-    h.rotation.x += (pitch - h.rotation.x) * k
+    h.rotation.x += (pitch - 0.25 * sip - h.rotation.x) * k
     const eyeYaw = tracking ? clamp(wanted - h.rotation.y, -EYE_REACH, EYE_REACH) : 0
     for (const e of parts.eyes) e.rotation.y += (eyeYaw - e.rotation.y) * Math.min(1, k * 3)
 
@@ -556,20 +663,36 @@ export function Person({
     }
   })
 
+  // Where floating things go: over the head, which for a lying figure is near the surface at -Z.
+  const overhead: Vec3 = p.lie ? [0, 0.32 * H, -0.42 * H] : [0, H + marks.headH * 0.55 + p.drop, 0]
+  // Stacked over the head, bottom to top: name, bubble, emote, action prompt.
+  const [bubbleH, setBubbleH] = useState(0)
+  const above = (y: number): Vec3 => [overhead[0], overhead[1] + y, overhead[2]]
+  const bubbleY = (label ? 0.2 : 0.05) * unit
+  const emoteY = bubbleY + (bubble ? bubbleH + 0.05 * unit : 0.08 * unit)
+  const promptY = emoteY + (emote ? 0.3 * unit : 0) + (bubble || emote ? 0.04 * unit : 0)
   const figure = (
     <group ref={root}>
       <primitive object={rig.group} />
       {label && (
-        <group ref={nameTag} position={[0, H + marks.headH * 0.55, 0]}>
+        <group ref={nameTag} position={overhead}>
           <Sign variant="body" size={0.13} color={palette.accent}>
             {label}
           </Sign>
         </group>
       )}
+      {bubble && (
+        <SpeechBubble
+          text={bubble}
+          position={above(bubbleY)}
+          onHeight={(h) => setBubbleH((prev) => (Math.abs(prev - h) > 0.002 ? h : prev))}
+        />
+      )}
+      {emote && <Emote kind={emote} position={above(emoteY)} />}
       {focused && actions && (
         <InteractionPrompt
           actions={actions}
-          position={[0, H + marks.headH * 0.55 + (label ? 0.26 : 0.08) * unit, 0]}
+          position={above(bubble || emote ? promptY : (label ? 0.26 : 0.08) * unit)}
         />
       )}
     </group>
@@ -629,9 +752,16 @@ export function Person({
         position={at}
         rotation={rotation}
       >
-        {collider && (
-          <CapsuleCollider args={[half, radius]} position={[0, (top + bottom) / 2, 0]} />
-        )}
+        {collider &&
+          (p.lie && !route ? (
+            <CapsuleCollider
+              args={[Math.max(H / 2 - radius, 0.01 * H), radius]}
+              rotation={[Math.PI / 2, 0, 0]}
+              position={[0, radius, 0]}
+            />
+          ) : (
+            <CapsuleCollider args={[half, radius]} position={[0, (top + bottom) / 2, 0]} />
+          ))}
         <group ref={facing}>{figure}</group>
       </RigidBody>
     </>

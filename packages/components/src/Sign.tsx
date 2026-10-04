@@ -29,6 +29,9 @@ export interface SignProps {
   glow?: boolean
   /** A crisp edge in this color, so the text reads against any background. Wins over `glow`. */
   outline?: string
+  /** Called with the laid-out text's width and height, in world units, whenever it changes:
+   *  for fitting a backdrop behind it. */
+  onBounds?: (width: number, height: number) => void
 }
 
 /**
@@ -52,6 +55,7 @@ export function Sign({
   anchorY = 'middle',
   glow = false,
   outline,
+  onBounds,
 }: SignProps) {
   const { unit, fonts, palette } = useWorld()
   const face = font ?? fonts[variant]
@@ -72,6 +76,14 @@ export function Sign({
       outlineColor={outline ?? ink}
       outlineBlur={outline || !glow ? 0 : '45%'}
       outlineOpacity={outline || !glow ? 1 : 0.5}
+      onSync={
+        onBounds
+          ? (text: { textRenderInfo?: { blockBounds: number[] } }) => {
+              const b = text.textRenderInfo?.blockBounds
+              if (b) onBounds(b[2] - b[0], b[3] - b[1])
+            }
+          : undefined
+      }
     >
       {children}
     </Text>

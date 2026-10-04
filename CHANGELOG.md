@@ -107,6 +107,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Guide: "Embedding a world in an app" (content security policy,
   desktop webviews, lazy loading, input, pausing, and figures driven by
   app state).
+- `Person` poses `type` (seated, fingers on the keys), `play` (hands
+  on controls), `drink` (a mug held at the chest, sipped now and then),
+  and `lie` (on its back, centered on `position`, head toward -Z, so it
+  takes a `Bed`'s position and rotation at mattress height).
+- `Person` `bubble`: a short line in a speech bubble over the head.
+  `emote`: a small animated sign instead (`sleep` rising z's, `alert`
+  a bouncing !, `think` pulsing dots, `happy` a heart, `coffee` a
+  steaming cup), drawn from shapes and the world font.
+- Office and casual clothes: `hoodie` and `blazer` garment layers,
+  `outfit` shorthands `tshirt`, `sweater`, `hoodie`, and `blazer`, a
+  `chef` hat, and the `office`, `casual`, `hoodie`, and `chef` skins.
+- `Player` `view="overhead"` (and `avatar: "overhead"` in a world):
+  the camera high above at a fixed tilt, following the avatar, with
+  scroll to zoom and WASD walking relative to the screen. A `view`
+  control in the world's `controls` cycles first, third, and overhead
+  at runtime, keeping the avatar where it stands.
+- `OfficeChair`, `Tv` (on a stand, a console, or a wall, with a seeded
+  picture), `Whiteboard` (seeded marker diagrams and optional `text`),
+  `Fridge`, `CoffeeMachine` (espresso or drip, with steam),
+  `ArcadeCabinet` (a seeded pixel game on its screen), and `PoolTable`
+  (balls racked or mid-game).
+- `Table` `base="pedestal"` and `ends="round"`, for a conference table;
+  `Counter` `hob` for a kitchen stove (a glass cooktop and an oven).
+- `Sign` `onBounds`: the laid-out text's size, for fitting a backdrop.
 
 ### Changed
 
@@ -134,6 +158,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   measured from the avatar. Without a `Player` (e.g. an orbit view) it
   still watches the camera. A `Person` used as the `Player`'s own body
   no longer tries to track anything.
+- `Player`'s capsule no longer tips over: its rotation is locked and
+  only the visible body turns to face the way it walks. At low frame
+  rates the old balancing could topple the avatar. The avatar also
+  starts facing the way the camera looks.
+- A seated `Person`'s name, bubble, and prompt sit over its head at
+  seat height instead of floating at standing height.
 - `Player` holds still until there's ground under it (or half a second
   passes) before gravity takes over, so a spawn can't drop through a
   collider that hasn't arrived yet.

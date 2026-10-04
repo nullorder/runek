@@ -241,7 +241,7 @@
       "title": "Table",
       "type": "registry:component",
       "category": "interiors",
-      "description": "Table with a top and four legs.",
+      "description": "Table with a top on four legs, or on pedestals with rounded ends for a conference table.",
       "files": [
         {
           "path": "packages/components/src/Table.tsx",
@@ -280,7 +280,7 @@
       "title": "Counter",
       "type": "registry:component",
       "category": "interiors",
-      "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider.",
+      "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider. With hob, a kitchen stove: a glass cooktop and an oven door.",
       "files": [
         {
           "path": "packages/components/src/Counter.tsx",
@@ -804,6 +804,97 @@
         {
           "path": "packages/components/src/Sofa.tsx",
           "target": "Sofa.tsx"
+        }
+      ]
+    },
+    {
+      "name": "officechair",
+      "title": "OfficeChair",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A swivel office chair: five-star base on casters, gas column, padded seat, low or high back, optional arms. Seats a Person in sit or type pose.",
+      "files": [
+        {
+          "path": "packages/components/src/OfficeChair.tsx",
+          "target": "OfficeChair.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tv",
+      "title": "Tv",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes.",
+      "files": [
+        {
+          "path": "packages/components/src/Tv.tsx",
+          "target": "Tv.tsx"
+        }
+      ]
+    },
+    {
+      "name": "whiteboard",
+      "title": "Whiteboard",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A whiteboard on a rolling stand or a wall, with seeded marker diagrams (boxes, arrows, lines of writing) and optional text across the top.",
+      "files": [
+        {
+          "path": "packages/components/src/Whiteboard.tsx",
+          "target": "Whiteboard.tsx"
+        }
+      ]
+    },
+    {
+      "name": "fridge",
+      "title": "Fridge",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A kitchen fridge with a top or bottom freezer or one tall door, bar handles, and a seeded enamel or steel finish.",
+      "files": [
+        {
+          "path": "packages/components/src/Fridge.tsx",
+          "target": "Fridge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "coffeemachine",
+      "title": "CoffeeMachine",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A countertop coffee machine, espresso or drip, with a cup or carafe and a few puffs of steam. Sits on a Counter.",
+      "files": [
+        {
+          "path": "packages/components/src/CoffeeMachine.tsx",
+          "target": "CoffeeMachine.tsx"
+        }
+      ]
+    },
+    {
+      "name": "arcadecabinet",
+      "title": "ArcadeCabinet",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a seeded pixel game.",
+      "files": [
+        {
+          "path": "packages/components/src/ArcadeCabinet.tsx",
+          "target": "ArcadeCabinet.tsx"
+        }
+      ]
+    },
+    {
+      "name": "pooltable",
+      "title": "PoolTable",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A pool table with rails, cushions, six pockets, and sixteen instanced balls, racked or scattered mid-game.",
+      "files": [
+        {
+          "path": "packages/components/src/PoolTable.tsx",
+          "target": "PoolTable.tsx"
         }
       ]
     },
