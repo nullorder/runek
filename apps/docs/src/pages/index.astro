@@ -96,7 +96,7 @@ const manifest = `{
         </p>
         <div class="cta">
           <a class="btn primary" href="/library">Enter the library →</a>
-          <a class="btn ghost" href="/gallery">Browse artifacts</a>
+          <a class="btn ghost" href="/workshop">Open the workshop</a>
         </div>
         <button type="button" class="install" data-copy="npx @runek/cli add bookshelf" title="Copy command">
           npx @runek/cli add bookshelf
@@ -221,13 +221,6 @@ const manifest = `{
         {categories.map((category) => <li>{category}</li>)}
       </ul>
       <a class="btn primary" href="/gallery">Browse the gallery →</a>
-    </section>
-
-    <!-- ::: closing band ::: -->
-    <section class="band">
-      <h2>walk the library</h2>
-      <p>The docs are themselves a Runek world — built from the artifacts they document.</p>
-      <a class="btn primary" href="/library">Enter →</a>
     </section>
   </main>
 </BaseLayout>
@@ -677,8 +670,7 @@ const manifest = `{
     align-items: center;
   }
   .manifest h2,
-  .index h2,
-  .band h2 {
+  .index h2 {
     font-family: var(--display);
     font-weight: 400;
     color: var(--green);
@@ -727,24 +719,6 @@ const manifest = `{
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--blue);
-  }
-
-  /* ── closing band ───────────────────────────────────── */
-  .band {
-    border-top: 1px solid var(--border);
-    background:
-      radial-gradient(ellipse 60% 80% at 50% 110%, rgba(42, 167, 255, 0.1), transparent 70%),
-      var(--bg-soft);
-    text-align: center;
-    padding: 4.5rem 1.5rem 5rem;
-  }
-  .band h2 {
-    font-size: clamp(1.8rem, 5vw, 2.8rem);
-    letter-spacing: 0.04em;
-  }
-  .band p {
-    color: var(--muted);
-    margin: 0 0 1.6rem;
   }
 
   /* ── responsive + motion ────────────────────────────── */
@@ -810,9 +784,6 @@ const manifest = `{
     }
     .spec {
       padding: 1.2rem 1.1rem 1.3rem;
-    }
-    .band {
-      padding: 3.2rem 1.1rem 3.6rem;
     }
   }
   @media (prefers-reduced-motion: reduce) {

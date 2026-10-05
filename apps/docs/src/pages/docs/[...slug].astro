@@ -24,6 +24,9 @@ const isComponent = entry.data.category === 'component' && Boolean(entry.data.co
     isComponent && (
       <div class="doc-preview" data-pagefind-ignore>
         <ComponentPreview client:visible title={entry.data.title} />
+        <a class="doc-preview__lab" href={`/workshop#m=lab&c=${entry.data.title}`}>
+          Tune every prop in the workshop →
+        </a>
       </div>
     )
   }

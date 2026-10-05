@@ -1,0 +1,27 @@
+---
+import Workshop from '../workshop/Workshop.tsx'
+import '../styles/global.css'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="The Runek workshop: build a world from procedural components in your browser, tune every prop, edit it as JSON or live TSX, and share it as a link."
+    />
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/Pixelspace-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Runek · the workshop</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0d12; }
+      body { background-image: none; }
+    </style>
+  </head>
+  <body>
+    <Workshop client:only="react" />
+    <noscript>The Runek workshop is a 3D workbench and needs JavaScript and WebGL. The <a href="/docs">docs</a> work without either.</noscript>
+  </body>
+</html>
