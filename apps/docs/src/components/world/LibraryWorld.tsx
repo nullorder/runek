@@ -10,6 +10,7 @@ import {
   Monitor,
   Person,
   Player,
+  Portal,
   Rug,
   Sign,
   Sky,
@@ -85,6 +86,9 @@ const RUNE_SCALE = 0.095
 const RUNE_STROKE = 0.13
 const RUNE_DEPTH = 0.1
 const RUNE_GREEN = '#3df58a'
+
+/** Where the east wall opens onto the Workshop. */
+const WORKSHOP_DOOR_Z = 4.6
 
 function RuneStroke({ a, b }: { a: readonly [number, number]; b: readonly [number, number] }) {
   const ax = a[0] * RUNE_SCALE
@@ -228,7 +232,13 @@ export default function LibraryWorld({
         <Floor size={[14, 14]} color={LIBRARY_PALETTE.wall} />
         <Wall position={[0, 0, -6.9]} width={14} height={4.5} />
         <Wall position={[0, 0, 6.9]} width={14} height={4.5} />
-        <Wall position={[6.9, 0, 0]} rotation={[0, Math.PI / 2, 0]} width={14} height={4.5} />
+        <Wall
+          position={[6.9, 0, 0]}
+          rotation={[0, Math.PI / 2, 0]}
+          width={14}
+          height={4.5}
+          openings={[{ offset: -WORKSHOP_DOOR_Z, width: 2, height: 3 }]}
+        />
         <Wall
           position={[-6.9, 0, 0]}
           rotation={[0, Math.PI / 2, 0]}
@@ -261,6 +271,29 @@ export default function LibraryWorld({
         >
           Component Gallery
         </Sign>
+
+        {/* The door to the Workshop: a step outside and a portal. */}
+        <Sign
+          position={[6.78, 3.35, WORKSHOP_DOOR_Z]}
+          rotation={[0, -Math.PI / 2, 0]}
+          size={0.14}
+          letterSpacing={0.02}
+          color="#e3cd96"
+        >
+          Workshop
+        </Sign>
+        <Floor
+          position={[8.2, 0, WORKSHOP_DOOR_Z]}
+          size={[2.6, 2.6]}
+          color={LIBRARY_PALETTE.wall}
+        />
+        <Portal
+          position={[7.5, 0, WORKSHOP_DOOR_Z]}
+          rotation={[0, -Math.PI / 2, 0]}
+          radius={1.1}
+          to="/workshop"
+          color={RUNE_GREEN}
+        />
 
         {/* The gallery wing beyond the doorway: every component on display,
             each with its integration guide. Selecting a guide opens the same
@@ -388,6 +421,7 @@ export default function LibraryWorld({
         <span>
           <b>click</b> a book
         </span>
+        <a href="/workshop">Workshop →</a>
         <a href="/docs">2D docs →</a>
       </div>
 

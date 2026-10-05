@@ -602,6 +602,17 @@ pre.astro-code code {
   color: var(--green);
   text-decoration: none;
 }
+.card-lab {
+  float: right;
+  margin-top: 0.15rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.card-lab:hover {
+  color: var(--green);
+  text-decoration: none;
+}
 .card-meta p {
   margin: 0.3rem 0 0;
   color: var(--muted);
@@ -722,6 +733,24 @@ pre.astro-code code {
 .doc-preview .preview {
   height: 100%;
   border-bottom: none;
+}
+.doc-preview {
+  position: relative;
+}
+.doc-preview__lab {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.6rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--green-line);
+  border-radius: 7px;
+  background: color-mix(in oklab, var(--bg) 75%, transparent);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+.doc-preview__lab:hover {
+  text-decoration: none;
+  background: var(--green-soft);
 }
 @media (max-width: 640px) {
   .doc-preview {

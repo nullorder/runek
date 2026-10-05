@@ -4,3 +4,6 @@ dist/
 
 # Registry copied in from /registry at build (served at /r)
 public/r/
+
+# Prop schema generated from the component sources (scripts/build-prop-schema.mjs)
+src/workshop/schema/props.json

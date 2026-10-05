@@ -1,18 +1,32 @@
 {
   "name": "@runek/docs",
   "version": "0.13.0",
-  "description": "Runek documentation site — flat docs + a walkable 3D library world (Astro + R3F).",
+  "description": "Runek documentation site \u2014 flat docs + a walkable 3D library world (Astro + R3F).",
   "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/sync-registry.mjs && astro dev",
-    "build": "node scripts/sync-registry.mjs && astro build && pagefind --site dist && rm -f dist/pagefind/pagefind-ui.js dist/pagefind/pagefind-ui.css dist/pagefind/pagefind-modular-ui.js dist/pagefind/pagefind-modular-ui.css",
+    "dev": "node scripts/sync-registry.mjs && node scripts/build-prop-schema.mjs && astro dev",
+    "build": "node scripts/sync-registry.mjs && node scripts/build-prop-schema.mjs && astro build && pagefind --site dist && rm -f dist/pagefind/pagefind-ui.js dist/pagefind/pagefind-ui.css dist/pagefind/pagefind-modular-ui.js dist/pagefind/pagefind-modular-ui.css",
     "preview": "astro preview",
-    "typecheck": "astro check",
-    "sync-registry": "node scripts/sync-registry.mjs"
+    "typecheck": "node scripts/build-prop-schema.mjs && astro check",
+    "sync-registry": "node scripts/sync-registry.mjs",
+    "test": "node scripts/build-prop-schema.mjs && vitest run",
+    "prop-schema": "node scripts/build-prop-schema.mjs"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "catalog:",
+    "@codemirror/commands": "catalog:",
+    "@codemirror/lang-javascript": "catalog:",
+    "@codemirror/lang-json": "catalog:",
+    "@codemirror/language": "catalog:",
+    "@codemirror/lint": "catalog:",
+    "@codemirror/search": "catalog:",
+    "@codemirror/state": "catalog:",
+    "@codemirror/view": "catalog:",
+    "@lezer/common": "catalog:",
+    "@lezer/highlight": "catalog:",
+    "@lezer/json": "catalog:",
     "@react-three/drei": "catalog:",
     "@react-three/fiber": "catalog:",
     "@react-three/rapier": "catalog:",
@@ -23,7 +37,9 @@
     "marked": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "three": "catalog:"
+    "sucrase": "catalog:",
+    "three": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@astrojs/check": "catalog:",
@@ -34,6 +50,7 @@
     "@types/three": "catalog:",
     "astro": "catalog:",
     "pagefind": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

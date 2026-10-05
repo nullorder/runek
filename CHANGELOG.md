@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The workshop: an in-browser workbench at `/workshop` on the docs
+  site, and a door from the library to it. Your world renders live in a room, with
+  the tools floating over it. An inspector generated from each
+  component's TypeScript edits every prop (sliders, palette-aware
+  colors, enums, vectors, nested lists like `clothes` or `openings`).
+  `world.json` edits two ways, with completion and checks. A live
+  `App.tsx` runs in a sandboxed iframe and keeps its `world.json`
+  import in sync. A component lab has bounds, scale, wireframe,
+  normals, colliders, stats, a seed grid, an A/B compare and a
+  determinism check. There are templates, snippets, play mode, a ⌘K
+  palette, undo, autosave, share links that carry the world in the
+  URL, and exports (world.json, App.tsx, PNG, the prop schema).
+  Gallery cards and component docs open their component in the lab.
 - `Person` is configurable part by part, all as plain JSON: `body`
   (`build`, `tone`, `height`), `face` (eye color and size, brow color
   and weight, `nose` shape, lip color and fullness, `blush`), `hair`
