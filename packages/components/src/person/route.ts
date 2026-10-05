@@ -11,7 +11,9 @@ export interface RouteOptions {
   speed: number
   /** Seconds held at each waypoint before setting off again. */
   pause: number
-  loop: RouteLoop
+  /** How the route repeats, or `once` for a single trip that sets off at `t = 0` and holds the
+   *  last point from `t = period` on. */
+  loop: RouteLoop | 'once'
   /** Seconds to reach full speed from a standstill (and to stop again). */
   accel?: number
 }
@@ -29,9 +31,13 @@ export interface RouteSample {
 }
 
 export interface Route {
-  /** Seconds for one full cycle, pauses included. Zero for a route that never moves. */
+  /** Seconds for one full cycle, pauses included; for a trip, the arrival time. Zero for a route
+   *  that never moves. */
   period: number
-  /** Where the figure is at `t` seconds (any real number; the route repeats every `period`). */
+  /** A single trip rather than a repeating cycle. */
+  once: boolean
+  /** Where the figure is at `t` seconds (any real number; a cycle repeats every `period`, a trip
+   *  waits at its first point before 0 and holds its last after `period`). */
   sample: (t: number) => RouteSample
 }
 
@@ -40,7 +46,8 @@ interface Leg {
   to: Vec3
   length: number
   heading: number
-  /** Seconds spent moving (the pause before it is separate). */
+  /** Seconds held at the leg's start, then seconds spent moving. */
+  wait: number
   move: number
   /** Ramp time at each end: the full `accel`, or half the move for a leg too short to cruise. */
   ramp: number
@@ -53,18 +60,22 @@ const DEFAULT_ACCEL = 0.4
 
 /**
  * Build a route through node-local waypoints. The legs join them in order (closing back to the
- * first for `loop`, retracing for `pingpong`); each leg pauses, then eases up to `speed`,
- * cruises, and eases to a stop. Fewer than two distinct points stand still at the first.
+ * first for `loop`, retracing for `pingpong`, stopping at the last for `once`); each leg pauses,
+ * then eases up to `speed`, cruises, and eases to a stop. A trip sets off without the first
+ * pause. Fewer than two distinct points stand still at the first.
  */
 export function buildRoute(points: Vec3[], options: RouteOptions): Route {
   const { speed, pause, loop, accel = DEFAULT_ACCEL } = options
+  const once = loop === 'once'
   const order = loop === 'pingpong' ? [...points, ...points.slice(1, -1).reverse()] : points
+  const count = once ? order.length - 1 : order.length
   const legs: Leg[] = []
   let clock = 0
   let walked = 0
-  for (let i = 0; i < order.length && order.length > 1; i++) {
+  for (let i = 0; i < count && order.length > 1; i++) {
     const from = order[i]
     const to = order[(i + 1) % order.length]
+    const wait = once && i === 0 ? 0 : pause
     const length = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2])
     const ramp = speed > 0 ? Math.min(accel, length / speed) : 0
     const move = speed > 0 && length > 0 ? length / speed + ramp : 0
@@ -73,12 +84,13 @@ export function buildRoute(points: Vec3[], options: RouteOptions): Route {
       to,
       length,
       heading: Math.atan2(to[0] - from[0], to[2] - from[2]),
+      wait,
       move,
       ramp,
       start: clock,
       before: walked,
     })
-    clock += pause + move
+    clock += wait + move
     walked += length
   }
 
@@ -92,12 +104,13 @@ export function buildRoute(points: Vec3[], options: RouteOptions): Route {
       speed: 0,
       distance: 0,
     }
-    return { period: 0, sample: () => still }
+    return { period: 0, once, sample: () => still }
   }
 
-  // The heading a figure arrives at each leg's start with: the last leg before it that moves.
+  // The heading a figure arrives at each leg's start with: the last leg before it that moves. A
+  // trip hasn't arrived anywhere before it sets off, so it faces the node's own way.
   const arrival = legs.map((_, i) => {
-    for (let k = 1; k <= legs.length; k++) {
+    for (let k = 1; k <= (once ? i : legs.length); k++) {
       const prev = legs[(i - k + legs.length) % legs.length]
       if (prev.length > 0) return prev.heading
     }
@@ -105,12 +118,22 @@ export function buildRoute(points: Vec3[], options: RouteOptions): Route {
   })
 
   const period = clock
+  const last = order[order.length - 1]
+  const end: RouteSample = {
+    x: last[0],
+    y: last[1],
+    z: last[2],
+    heading: legs.findLast((leg) => leg.length > 0)?.heading ?? 0,
+    speed: 0,
+    distance: walked,
+  }
   const sample = (t: number): RouteSample => {
-    const at = ((t % period) + period) % period
+    if (once && t >= period) return end
+    const at = once ? t : ((t % period) + period) % period
     let i = legs.length - 1
     while (i > 0 && legs[i].start > at) i--
     const leg = legs[i]
-    const tau = at - leg.start - pause
+    const tau = at - leg.start - leg.wait
     if (tau <= 0 || leg.move === 0) {
       return {
         x: leg.from[0],
@@ -146,7 +169,22 @@ export function buildRoute(points: Vec3[], options: RouteOptions): Route {
       distance: leg.before + s,
     }
   }
-  return { period, sample }
+  return { period, once, sample }
+}
+
+/**
+ * Where a `route` trip has got to at `now` (epoch ms), in the node's local frame and ignoring
+ * detours: for an app starting a new trip from wherever the last one had reached. `speed` and
+ * `pause` are the figure's own (an adult walks 1.3 m/s; the default pause is 1.5 s).
+ */
+export function tripAt(
+  points: Vec3[],
+  departAt: number,
+  now: number,
+  { speed = 1.3, pause = 1.5 }: { speed?: number; pause?: number } = {},
+): Vec3 {
+  const p = buildRoute(points, { speed, pause, loop: 'once' }).sample((now - departAt) / 1000)
+  return [p.x, p.y, p.z]
 }
 
 /**

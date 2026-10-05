@@ -50,6 +50,11 @@ export interface SignProps {
   anchorY?: 'top' | 'middle' | 'bottom'
   /** Soft colored halo around the glyphs, for a glow without bloom. */
   glow?: boolean
+  /** A crisp edge in this color, so the text reads against any background. Wins over `glow`. */
+  outline?: string
+  /** Called with the laid-out text's width and height, in world units, whenever it changes:
+   *  for fitting a backdrop behind it. */
+  onBounds?: (width: number, height: number) => void
 }
 ```
 

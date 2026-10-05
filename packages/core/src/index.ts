@@ -26,8 +26,16 @@ export {
   groundAt,
 } from './ground'
 export { isEditableTarget } from './input'
+export type { InteractionAction, InteractionOptions } from './interaction'
+export { isNearest, useInteraction } from './interaction'
 export type { WorldControls } from './keyboard'
-export { controlsToMap, DEFAULT_CONTROLS, keyboardMap, resolveControls } from './keyboard'
+export {
+  controlsToMap,
+  DEFAULT_CONTROLS,
+  keyboardMap,
+  keyLabel,
+  resolveControls,
+} from './keyboard'
 export type { WorldPalette } from './palette'
 export { DEFAULT_PALETTE } from './palette'
 export type { Rng } from './rng'
@@ -43,6 +51,7 @@ export {
 } from './time'
 export type {
   AvatarView,
+  Interactor,
   PlayerMotion,
   Vec3,
   Walker,

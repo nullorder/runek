@@ -652,9 +652,11 @@ export function shapeFigure(spec: FigureSpec): Shape {
             ? 0.3
             : l.type === 'coat'
               ? 0.16
-              : l.type === 'apron'
-                ? 0.06
-                : 0.12
+              : l.type === 'blazer'
+                ? 0.1
+                : l.type === 'apron'
+                  ? 0.06
+                  : 0.12
       const drop = long ? skirt(hipY + 0.03 * u, hem, off, flare) : null
       const loose = l.tucked ? 0 : 0.006
       const vBottom = shoulderY - 0.095 * u
@@ -671,7 +673,13 @@ export function shapeFigure(spec: FigureSpec): Shape {
         if (drop) d = smin(d, drop(x, yy, z) + folds(x, yy, z, 0.006), 0.03 * u)
         // neckline
         d = smax(d, -(len(x, (z + 0.01 * u) * 1.15) - (neckR + 0.014 * u + off)), 0.008 * u)
-        if (l.neck === 'v' && z > 0) d = smax(d, yy - (vBottom + Math.abs(x) * 2.2), 0.004 * u)
+        // A blazer's collar sits over a V opening: the lapels.
+        if ((l.neck === 'v' || l.type === 'blazer') && z > 0)
+          d = smax(
+            d,
+            yy - (vBottom - (l.type === 'blazer' ? 0.05 * u : 0) + Math.abs(x) * 2.2),
+            0.004 * u,
+          )
         d = smax(d, yy - neckTop, 0.006 * u)
         if (l.type === 'apron')
           d = Math.max(d, Math.abs(x) - 0.105 * u * W, 0.02 * u - z, yy - (shoulderY - 0.06 * u))
@@ -680,8 +688,19 @@ export function shapeFigure(spec: FigureSpec): Shape {
       const y0 = (long ? hem : Math.min(hem, inArmMin(l))) - 0.02 * u
       // A fold-down collar: a band that flares as it drops, open at the front in a V so its two
       // points lie on the chest. Thin, so it meshes as its own finer part.
-      const collar: Field | null =
-        l.neck === 'collar'
+      // A hoodie's hood, down: a thick soft roll lying round the back of the neck, open at the
+      // front where the drawstrings would hang.
+      const hood: Field | null =
+        l.type === 'hoodie'
+          ? (x, yy, z) => {
+              const r = neckR + 0.03 * u + off
+              const ring = len(len(x, (z + 0.02 * u) * 1.1) - r, (yy - (neckTop - 0.012 * u)) * 1.3)
+              return Math.max(ring - 0.024 * u, z - 0.03 * u + Math.abs(x) * 0.35)
+            }
+          : null
+      const collar: Field | null = hood
+        ? hood
+        : l.neck === 'collar'
           ? (x, yy, z) => {
               const drop = clamp01((neckTop + 0.006 * u - yy) / (0.03 * u))
               const r = neckR + 0.016 * u + off + drop * 0.02 * u
@@ -940,7 +959,7 @@ export function shapeFigure(spec: FigureSpec): Shape {
       material: spec.hat === 'straw' ? 'knit' : 'cloth',
       field: hat,
       min: [-0.27 * hu, eyeY - 0.2 * hu, -0.27 * hu],
-      max: [0.27 * hu, eyeY + 0.26 * hu, 0.27 * hu],
+      max: [0.27 * hu, eyeY + (spec.hat === 'chef' ? 0.32 : 0.26) * hu, 0.27 * hu],
       near: 0.0045,
       far: 0.014,
       weightBy:
@@ -1332,6 +1351,16 @@ function hatField(spec: FigureSpec, E: HeadPoint, hu: number): Field | null {
     return (x, y, z) => {
       const shell = Math.max(crown(x, y, z), (0.068 - ly(y)) * hu)
       return Math.min(shell, Math.max(visor(x, y, z), -(z / hu - 0.06) * hu))
+    }
+  }
+  if (h === 'chef') {
+    // A band round the head, a straight tube above it, and a soft puff on top.
+    const puff = ellipsoid(E(0, 0.21, -0.02), [0.118 * hu, 0.072 * hu, 0.118 * hu])
+    const cz = E(0, 0, -0.016)[2]
+    return (x, y, z) => {
+      const band = Math.max(crown(x, y, z) - 0.004 * hu, (0.06 - ly(y)) * hu)
+      const tube = Math.max(len(x / hu, (z - cz) / hu) - 0.1, 0.06 - ly(y), ly(y) - 0.2) * hu
+      return smin(Math.min(band, tube), puff(x, y, z), 0.025 * hu)
     }
   }
   if (h === 'bandana') {

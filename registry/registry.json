@@ -241,7 +241,7 @@
       "title": "Table",
       "type": "registry:component",
       "category": "interiors",
-      "description": "Table with a top and four legs.",
+      "description": "Table with a top on four legs, or on pedestals with rounded ends for a conference table.",
       "files": [
         {
           "path": "packages/components/src/Table.tsx",
@@ -280,7 +280,7 @@
       "title": "Counter",
       "type": "registry:component",
       "category": "interiors",
-      "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider.",
+      "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider. With hob, a kitchen stove: a glass cooktop and an oven door.",
       "files": [
         {
           "path": "packages/components/src/Counter.tsx",
@@ -769,6 +769,136 @@
       ]
     },
     {
+      "name": "desk",
+      "title": "Desk",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A work desk: a top over slim legs, a drawer pedestal, or side panels, with a modesty panel at the back. Base and drawers seeded, each pinnable. One cuboid collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Desk.tsx",
+          "target": "Desk.tsx"
+        }
+      ]
+    },
+    {
+      "name": "monitor",
+      "title": "Monitor",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry.",
+      "files": [
+        {
+          "path": "packages/components/src/Monitor.tsx",
+          "target": "Monitor.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sofa",
+      "title": "Sofa",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A sofa seating one to four: upholstered frame, seat and back cushions in soft shades of the fabric, square, rolled, or slim arms, pegs or a plinth, and throw pillows. Seeded, each choice pinnable.",
+      "files": [
+        {
+          "path": "packages/components/src/Sofa.tsx",
+          "target": "Sofa.tsx"
+        }
+      ]
+    },
+    {
+      "name": "officechair",
+      "title": "OfficeChair",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A swivel office chair: five-star base on casters, gas column, padded seat, low or high back, optional arms. Seats a Person in sit or type pose.",
+      "files": [
+        {
+          "path": "packages/components/src/OfficeChair.tsx",
+          "target": "OfficeChair.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tv",
+      "title": "Tv",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes.",
+      "files": [
+        {
+          "path": "packages/components/src/Tv.tsx",
+          "target": "Tv.tsx"
+        }
+      ]
+    },
+    {
+      "name": "whiteboard",
+      "title": "Whiteboard",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A whiteboard on a rolling stand or a wall, with seeded marker diagrams (boxes, arrows, lines of writing) and optional text across the top.",
+      "files": [
+        {
+          "path": "packages/components/src/Whiteboard.tsx",
+          "target": "Whiteboard.tsx"
+        }
+      ]
+    },
+    {
+      "name": "fridge",
+      "title": "Fridge",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A kitchen fridge with a top or bottom freezer or one tall door, bar handles, and a seeded enamel or steel finish.",
+      "files": [
+        {
+          "path": "packages/components/src/Fridge.tsx",
+          "target": "Fridge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "coffeemachine",
+      "title": "CoffeeMachine",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A countertop coffee machine, espresso or drip, with a cup or carafe and a few puffs of steam. Sits on a Counter.",
+      "files": [
+        {
+          "path": "packages/components/src/CoffeeMachine.tsx",
+          "target": "CoffeeMachine.tsx"
+        }
+      ]
+    },
+    {
+      "name": "arcadecabinet",
+      "title": "ArcadeCabinet",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a seeded pixel game.",
+      "files": [
+        {
+          "path": "packages/components/src/ArcadeCabinet.tsx",
+          "target": "ArcadeCabinet.tsx"
+        }
+      ]
+    },
+    {
+      "name": "pooltable",
+      "title": "PoolTable",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A pool table with rails, cushions, six pockets, and sixteen instanced balls, racked or scattered mid-game.",
+      "files": [
+        {
+          "path": "packages/components/src/PoolTable.tsx",
+          "target": "PoolTable.tsx"
+        }
+      ]
+    },
+    {
       "name": "crate",
       "title": "Crate",
       "type": "registry:component",
@@ -847,11 +977,24 @@
       ]
     },
     {
+      "name": "interactable",
+      "title": "Interactable",
+      "type": "registry:component",
+      "category": "systems",
+      "description": "Wrap anything to make it something the player can act on: walk within range and a prompt shows its actions with the keys the world binds to them; press one and onAction gets its id. Only the nearest in range takes the key, and keys yield to text fields.",
+      "files": [
+        {
+          "path": "packages/components/src/Interactable.tsx",
+          "target": "Interactable.tsx"
+        }
+      ]
+    },
+    {
       "name": "person",
       "title": "Person",
       "type": "registry:component",
       "category": "character",
-      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body.",
+      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body.",
       "files": [
         {
           "path": "packages/components/src/Person.tsx",

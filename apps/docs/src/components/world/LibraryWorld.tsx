@@ -1,15 +1,19 @@
 import {
   type BookSpec,
   Bookshelf,
+  Chair,
   Clock,
+  Desk,
   Floor,
   Lamp,
   LightRig,
+  Monitor,
   Person,
   Player,
   Rug,
   Sign,
   Sky,
+  Sofa,
   Wall,
 } from '@runek/components'
 import { World, type WorldPalette } from '@runek/core'
@@ -326,6 +330,22 @@ export default function LibraryWorld({
         <Lamp position={[-6.2, 0, 6.2]} />
         <Lamp position={[6.2, 0, 6.2]} />
         <Rug position={[0, 0.01, 0.4]} size={[7, 3.4]} seed={5} />
+
+        {/* Behind the spawn: the front desk against the RUNEK wall, facing the room, and a
+            reading sofa in the corner by the gallery doorway, with someone settled into it. */}
+        <Desk position={[5.9, 0, -3.6]} rotation={[0, -Math.PI / 2, 0]} seed={4} base="pedestal" />
+        <Monitor position={[6.05, 0.75, -3.6]} rotation={[0, -Math.PI / 2, 0]} seed={9} />
+        <Chair position={[5.15, 0, -3.6]} rotation={[0, Math.PI / 2, 0]} />
+        <Sofa position={[-6.2, 0, -4.5]} rotation={[0, Math.PI / 2, 0]} seed={3} arms="square" />
+        <Person
+          position={[-6.05, 0, -3.88]}
+          rotation={[0, Math.PI / 2, 0]}
+          seed={88}
+          outfit="shirt"
+          topColor="#4d6b7a"
+          accessories={['glasses']}
+          pose="sit"
+        />
 
         {/* The librarian keeps the shelf wall and a reader waits by the rug, both watching you
             cross the room. A guard walks the shelves, and two browsers wander the rug on loops

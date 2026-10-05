@@ -111,6 +111,45 @@ export const PERSON_SKINS = {
     hat: 'cap',
     accessories: ['belt'],
   },
+  /** Pale shirt under a charcoal blazer, dark trousers, polished shoes: a desk job. */
+  office: {
+    clothes: [
+      { type: 'shirt', sleeves: 'long', neck: 'collar', color: '#e9edf1' },
+      { type: 'trousers', color: '#2f3238' },
+      { type: 'blazer', color: '#3d4350' },
+      { type: 'belt', color: '#2a2220' },
+      { type: 'shoes', color: '#1f1b19' },
+    ],
+    hat: 'none',
+  },
+  /** A plain tee, jeans, and sneakers. */
+  casual: {
+    clothes: [
+      { type: 'tshirt', color: '#d9d4c8' },
+      { type: 'jeans', color: '#4a5d78' },
+      { type: 'shoes', color: '#e8e6e0' },
+    ],
+    hat: 'none',
+  },
+  /** A soft hoodie over jeans and sneakers. */
+  hoodie: {
+    clothes: [
+      { type: 'jeans', color: '#3c4658' },
+      { type: 'hoodie', color: '#6c7a5c' },
+      { type: 'shoes', color: '#e3e0d8' },
+    ],
+    hat: 'none',
+  },
+  /** Kitchen whites: a chef's jacket, checked-dark trousers, an apron, and the tall hat. */
+  chef: {
+    clothes: [
+      { type: 'trousers', color: '#34363b' },
+      { type: 'shirt', sleeves: 'long', neck: 'crew', length: 0.4, color: '#f3f1ec' },
+      { type: 'apron', color: '#efece4' },
+      { type: 'shoes', color: '#26231f' },
+    ],
+    hat: 'chef',
+  },
   /** White short-sleeved shirt under a green sweater vest, slim jeans, brown shoes. */
   preppy: {
     clothes: [
@@ -296,6 +335,28 @@ const OUTFITS: Record<PersonOutfit, Array<PersonGarment & { slot: Slot }>> = {
     { type: 'vest', slot: 'top' },
     { type: 'shoes', slot: 'shoe' },
   ],
+  tshirt: [
+    { type: 'tshirt', slot: 'top' },
+    { type: 'jeans', slot: 'bottom' },
+    { type: 'shoes', slot: 'shoe' },
+  ],
+  sweater: [
+    { type: 'shirt', sleeves: 'long', neck: 'collar', slot: 'light' },
+    { type: 'trousers', slot: 'bottom' },
+    { type: 'sweater', slot: 'top' },
+    { type: 'shoes', slot: 'shoe' },
+  ],
+  hoodie: [
+    { type: 'jeans', slot: 'bottom' },
+    { type: 'hoodie', slot: 'top' },
+    { type: 'shoes', slot: 'shoe' },
+  ],
+  blazer: [
+    { type: 'shirt', sleeves: 'long', neck: 'collar', slot: 'light' },
+    { type: 'trousers', slot: 'bottom' },
+    { type: 'blazer', slot: 'top' },
+    { type: 'shoes', slot: 'shoe' },
+  ],
 }
 
 export type GarmentRegion = 'top' | 'bottom' | 'feet' | 'extra'
@@ -305,6 +366,8 @@ export const GARMENT_REGION: Record<PersonGarmentType, GarmentRegion> = {
   tshirt: 'top',
   shirt: 'top',
   sweater: 'top',
+  hoodie: 'top',
+  blazer: 'top',
   vest: 'top',
   tunic: 'top',
   coat: 'top',
@@ -326,6 +389,8 @@ export const GARMENT_MATERIAL: Record<PersonGarmentType, MaterialKind> = {
   tshirt: 'cloth',
   shirt: 'cloth',
   sweater: 'knit',
+  hoodie: 'knit',
+  blazer: 'cloth',
   vest: 'knit',
   tunic: 'cloth',
   coat: 'cloth',
@@ -351,6 +416,8 @@ const GARMENT_DEFAULTS: Record<
   tshirt: { sleeves: 'short', neck: 'crew', length: 0.3 },
   shirt: { sleeves: 'long', neck: 'collar', length: 0.3 },
   sweater: { sleeves: 'long', neck: 'crew', length: 0.3 },
+  hoodie: { sleeves: 'long', neck: 'crew', length: 0.36 },
+  blazer: { sleeves: 'long', neck: 'collar', length: 0.42 },
   vest: { sleeves: 'none', neck: 'v', length: 0.15 },
   tunic: { sleeves: 'long', neck: 'crew', length: 0.6 },
   coat: { sleeves: 'long', neck: 'collar', length: 0.85 },
@@ -593,7 +660,9 @@ export function resolveFigure(
           ? palette.fabric
           : hat === 'hood'
             ? (outerTop?.color ?? palette.fabric)
-            : palette.accent
+            : hat === 'chef'
+              ? '#f4f2ec'
+              : palette.accent
 
   return {
     spec: {
@@ -695,9 +764,12 @@ function resolveLayers(
     x.region === 'extra' ||
     y.region === 'extra'
   layers.forEach((l, i) => {
-    if (l.region === 'top' && !['dress', 'robe', 'coat', 'apron'].includes(l.type))
+    if (l.region === 'top' && !['dress', 'robe', 'coat', 'blazer', 'apron'].includes(l.type))
       l.tucked = layers.slice(i + 1).some((o) => o.region === 'bottom' && o.type !== 'skirt')
-    let off = base[l.region] + (l.material === 'knit' ? 0.003 : 0) + (l.type === 'coat' ? 0.008 : 0)
+    let off =
+      base[l.region] +
+      (l.material === 'knit' ? 0.003 : 0) +
+      (l.type === 'coat' || l.type === 'blazer' ? 0.008 : 0)
     for (let j = 0; j < i; j++)
       if (overlaps(l, layers[j])) off = Math.max(off, layers[j].offset + slack(layers[j]))
     l.offset = off

@@ -3,8 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useRapier } from '@react-three/rapier'
 import { type AvatarView, PlayerMotionContext, useWorld, type Vec3 } from '@runek/core'
 import Ecctrl, { type CustomEcctrlRigidBody } from 'ecctrl'
-import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react'
-import type { Object3D } from 'three'
+import { type ReactNode, type RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import type { Object3D, Scene } from 'three'
 
 export type PlayerView = AvatarView
 
@@ -23,30 +23,35 @@ const LOOK_SPEED = 1.2 // pitch, radians/second
 const CAM_LOW = -1.3
 const CAM_UP = 1.5
 
-function CameraKeyLook() {
+/**
+ * ecctrl's camera pivot: a bare Object3D added to the scene whose single child is the (childless)
+ * follow-cam, offset back along -z by the camera distance (or -0.01 in first person). Sign and
+ * shape identify it in every view without tying anything to one of them.
+ */
+function findPivot(scene: Scene): Object3D | null {
+  return (
+    scene.children.find(
+      (o) =>
+        o.type === 'Object3D' &&
+        o.children.length === 1 &&
+        o.children[0].type === 'Object3D' &&
+        o.children[0].children.length === 0 &&
+        o.children[0].position.x === 0 &&
+        o.children[0].position.z < -0.001,
+    ) ?? null
+  )
+}
+
+function CameraKeyLook({ pitchable }: { pitchable: boolean }) {
   const scene = useThree((s) => s.scene)
   const [, getKeys] = useKeyboardControls()
   const pivot = useRef<Object3D | null>(null)
 
   useFrame((_, dt) => {
-    // ecctrl's camera pivot is a bare Object3D added to the scene whose single child is the
-    // (childless) follow-cam, offset back along z by the camera distance. Match on that shape
-    // and cache; until it mounts (or if the match ever misses) mouse-drag still turns, so a
-    // miss just no-ops rather than breaking.
+    // Cached once found; until it mounts (or if the match ever misses) mouse-drag still turns, so
+    // a miss just no-ops rather than breaking.
     if (!pivot.current) {
-      pivot.current =
-        scene.children.find(
-          (o) =>
-            o.type === 'Object3D' &&
-            o.children.length === 1 &&
-            o.children[0].type === 'Object3D' &&
-            o.children[0].children.length === 0 &&
-            // The follow-cam sits offset back along -z (the third-person camera
-            // distance, or -0.01 in first person). Sign + shape identify ecctrl's
-            // pivot in both views without tying keyboard look to one of them.
-            o.children[0].position.x === 0 &&
-            o.children[0].position.z < -0.001,
-        ) ?? null
+      pivot.current = findPivot(scene)
       if (!pivot.current) return
     }
     const step = Math.min(dt, 0.05)
@@ -58,7 +63,7 @@ function CameraKeyLook() {
 
     // Pitch. ArrowUp lowers the follow-cam to look up; ArrowDown raises it to look down. Repeat
     // ecctrl's mouse-pitch math on the follow-cam so the camera orbits the same vertical arc.
-    const pitch = (keys.lookDown ? 1 : 0) - (keys.lookUp ? 1 : 0)
+    const pitch = pitchable ? (keys.lookDown ? 1 : 0) - (keys.lookUp ? 1 : 0) : 0
     if (pitch) {
       const cam = pivot.current.children[0]
       const vy = Math.min(Math.max(cam.rotation.x + pitch * LOOK_SPEED * step, CAM_LOW), CAM_UP)
@@ -120,8 +125,11 @@ function GroundGuard({
 
 export interface PlayerProps {
   position?: Vec3
-  /** Camera view. Unset defers to the world default (`<World avatar>`); falls back
-   *  to first-person. An explicit value here always wins. */
+  /** Camera view: `first` (through the avatar's eyes), `third` (behind it), or `overhead` (high
+   *  above at a fixed tilt, following it; scroll zooms, WASD walks relative to the screen). Unset
+   *  defers to the world default (`<World avatar>`); falls back to first-person. An explicit value
+   *  here always wins. A world `view` control (e.g. `controls: { view: ['KeyV'] }`) cycles the
+   *  three at runtime. */
   view?: PlayerView
   /** Initial camera yaw in radians (0 faces +z). */
   yaw?: number
@@ -131,18 +139,112 @@ export interface PlayerProps {
   children?: ReactNode
 }
 
+/** How ecctrl frames each view. `pitch` tilts the camera down (radians); a `locked` pitch can't
+ *  be changed by dragging or the look keys. */
+const CAMERA: Record<
+  PlayerView,
+  {
+    distance: number
+    zoom: [number, number]
+    pitch: number
+    locked: boolean
+    collision: boolean
+    turnVel: number
+    turnSpeed: number
+    follow: number
+    lerp: number
+  }
+> = {
+  first: {
+    distance: -0.01,
+    zoom: [-0.01, -0.01],
+    pitch: 0,
+    locked: false,
+    collision: true,
+    turnVel: 1,
+    turnSpeed: 100,
+    follow: 1000,
+    lerp: 1000,
+  },
+  third: {
+    distance: -5,
+    zoom: [-1.5, -8],
+    pitch: 0,
+    locked: false,
+    collision: true,
+    turnVel: 0.2,
+    turnSpeed: 15,
+    follow: 11,
+    lerp: 25,
+  },
+  // Walls would pull the camera in toward the avatar, so overhead flies over them.
+  overhead: {
+    distance: -14,
+    zoom: [-6, -30],
+    pitch: 1,
+    locked: true,
+    collision: false,
+    turnVel: 0.2,
+    turnSpeed: 15,
+    follow: 8,
+    lerp: 20,
+  },
+}
+const VIEWS: PlayerView[] = ['first', 'third', 'overhead']
+
 const CAPSULE_RADIUS = 0.3
 const CAPSULE_HALF_HEIGHT = 0.35
 // Where the avatar's eyes sit on the capsule: what others look at when they look at the player.
 const EYE_HEIGHT = 0.5
 
 export function Player({ position = [0, 3, 0], view, yaw = 0, children }: PlayerProps) {
-  const { avatar, player } = useWorld()
-  const firstPerson = (view ?? avatar ?? 'first') === 'first'
+  const { avatar, player, keyboard, controls } = useWorld()
+  const scene = useThree((s) => s.scene)
+  const wanted = view ?? avatar ?? 'first'
+  const [current, setCurrent] = useState<PlayerView>(wanted)
+  useEffect(() => setCurrent(wanted), [wanted])
+  const firstPerson = current === 'first'
+  const cam = CAMERA[current]
   const eyes = useRef<Object3D>(null)
   const body = useRef<CustomEcctrlRigidBody>(null)
   const [grounded, setGrounded] = useState(false)
   const motion = useRef({ speed: 0 })
+
+  // ecctrl reads its camera setup once, at mount, so a new view remounts it: from where the
+  // avatar stands now, facing the way the camera faced. The old camera pivot is taken out of the
+  // scene so nothing finds it again.
+  const [mount, setMount] = useState({ view: current, at: position, yaw })
+  useLayoutEffect(() => {
+    if (mount.view === current) return
+    const pivot = findPivot(scene)
+    const t = body.current?.group?.translation()
+    pivot?.removeFromParent()
+    setMount({
+      view: current,
+      at: t ? [t.x, t.y, t.z] : mount.at,
+      yaw: pivot?.rotation.y ?? mount.yaw,
+    })
+  }, [current, scene, mount])
+
+  useEffect(() => {
+    const keys = controls.view
+    if (!keyboard || !keys?.length) return
+    // One step per press: the page's key repeat arrives as more keydowns.
+    const held = new Set<string>()
+    const onDown = (event: Event) => {
+      const { code } = event as KeyboardEvent
+      if (!keys.includes(code) || held.has(code)) return
+      held.add(code)
+      setCurrent((v) => VIEWS[(VIEWS.indexOf(v) + 1) % VIEWS.length])
+    }
+    const onUp = (event: Event) => held.delete((event as KeyboardEvent).code)
+    keyboard.addEventListener('keydown', onDown)
+    keyboard.addEventListener('keyup', onUp)
+    return () => {
+      keyboard.removeEventListener('keydown', onDown)
+      keyboard.removeEventListener('keyup', onUp)
+    }
+  }, [keyboard, controls])
 
   // Publish the avatar so the world can react to the player rather than the camera. Only clear
   // the slot if it's still ours, so a remount elsewhere isn't wiped by this unmount.
@@ -153,24 +255,33 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
     return () => {
       if (player.current === anchor) player.current = null
     }
-  }, [player])
+    // A view change remounts ecctrl, and with it the anchor.
+  }, [player, mount.view])
 
   return (
     <Ecctrl
+      key={mount.view}
       ref={body}
       type={grounded ? 'dynamic' : 'kinematicPosition'}
-      position={position}
+      position={mount.at}
       mode="CameraBasedMovement"
-      camInitDir={{ x: 0, y: yaw }}
+      camInitDir={{ x: cam.pitch, y: mount.yaw }}
+      characterInitDir={mount.yaw}
+      // A locked capsule can't tip over; ecctrl turns only the visible model to face the way it
+      // walks. Its balancing torque, applied once per rendered frame, could topple the avatar
+      // when frames came slowly.
+      autoBalance={false}
+      {...(cam.locked ? { camUpLimit: cam.pitch, camLowLimit: cam.pitch } : {})}
+      camCollision={cam.collision}
       capsuleRadius={CAPSULE_RADIUS}
       capsuleHalfHeight={CAPSULE_HALF_HEIGHT}
-      camInitDis={firstPerson ? -0.01 : -5}
-      camMinDis={firstPerson ? -0.01 : -1.5}
-      camMaxDis={firstPerson ? -0.01 : -8}
-      turnVelMultiplier={firstPerson ? 1 : 0.2}
-      turnSpeed={firstPerson ? 100 : 15}
-      camFollowMult={firstPerson ? 1000 : 11}
-      camLerpMult={firstPerson ? 1000 : 25}
+      camInitDis={cam.distance}
+      camMinDis={cam.zoom[0]}
+      camMaxDis={cam.zoom[1]}
+      turnVelMultiplier={cam.turnVel}
+      turnSpeed={cam.turnSpeed}
+      camFollowMult={cam.follow}
+      camLerpMult={cam.lerp}
     >
       <group visible={!firstPerson}>
         <PlayerMotionContext.Provider value={motion}>
@@ -183,7 +294,7 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
         </PlayerMotionContext.Provider>
       </group>
       <object3D ref={eyes} position={[0, EYE_HEIGHT, 0]} />
-      <CameraKeyLook />
+      <CameraKeyLook pitchable={!cam.locked} />
       {!firstPerson && <MotionProbe body={body} motion={motion} />}
       {!grounded && <GroundGuard body={body} onGrounded={() => setGrounded(true)} />}
     </Ecctrl>

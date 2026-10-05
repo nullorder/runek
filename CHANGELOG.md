@@ -74,6 +74,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   isn't on screen costs nothing. Animations resume where they stopped.
 - `isEditableTarget(target)`: whether a key event belongs to a text
   field rather than the world.
+- `Person` takes trips: `route` is a one-way walk through waypoints
+  (relative to `position`, like `patrol`) that sets off at `departAt`
+  (epoch ms), waits at its first point before then, and stays at its
+  last point after, in its `pose`. Where it is depends only on the
+  clock, so every viewer agrees and a reopened page needs no replay.
+  `onArrive` fires once per trip, even when the arrival happened while
+  the world was paused or unmounted. `tripAt()` gives where a trip had
+  got to, for starting the next one from there.
+- `Person` `actions`, `actionRadius`, and `onAction`: walk near a
+  figure and a prompt over its head shows what you can do (`T Talk`,
+  `I Info`) with the keys the world's `controls` bind; press one and
+  `onAction` gets its id. Only the nearest figure in range shows a
+  prompt and takes the key, and keys yield to text fields.
+- `Interactable`: wrap anything in it to offer the player the same
+  prompt and actions (sit on a sofa, use a desk).
+- `useInteraction(anchor, { actions, radius, onAction })` in core, the
+  hook behind both, for components that draw their own prompt;
+  `keyLabel(code)` turns `KeyT` into `T` for display.
+- `useWorld().keyboard`: the key events the world reads (none aimed at
+  text fields, none while `input` is off or the world is paused).
+- `Sign` `outline`: a crisp edge in a color, so text reads against any
+  background.
+- `Desk`: a work desk on slim legs, a drawer pedestal, or side panels,
+  with a modesty panel at the back. Base and drawer count are seeded.
+- `Monitor`: a desk monitor on a foot, plate, or legs. Switched on,
+  its screen glows in its `screen` color with a few seeded windows of
+  text on it; `on={false}` is dark glass.
+- `Sofa`: one to four seats, with square, rolled, or slim arms, split
+  or bench cushions in soft shades of the fabric, pegs or a plinth,
+  and throw pillows, all seeded and each pinnable.
+- Guide: "Embedding a world in an app" (content security policy,
+  desktop webviews, lazy loading, input, pausing, and figures driven by
+  app state).
+- `Person` poses `type` (seated, fingers on the keys), `play` (hands
+  on controls), `drink` (a mug held at the chest, sipped now and then),
+  and `lie` (on its back, centered on `position`, head toward -Z, so it
+  takes a `Bed`'s position and rotation at mattress height).
+- `Person` `bubble`: a short line in a speech bubble over the head.
+  `emote`: a small animated sign instead (`sleep` rising z's, `alert`
+  a bouncing !, `think` pulsing dots, `happy` a heart, `coffee` a
+  steaming cup), drawn from shapes and the world font.
+- Office and casual clothes: `hoodie` and `blazer` garment layers,
+  `outfit` shorthands `tshirt`, `sweater`, `hoodie`, and `blazer`, a
+  `chef` hat, and the `office`, `casual`, `hoodie`, and `chef` skins.
+- `Player` `view="overhead"` (and `avatar: "overhead"` in a world):
+  the camera high above at a fixed tilt, following the avatar, with
+  scroll to zoom and WASD walking relative to the screen. A `view`
+  control in the world's `controls` cycles first, third, and overhead
+  at runtime, keeping the avatar where it stands.
+- `OfficeChair`, `Tv` (on a stand, a console, or a wall, with a seeded
+  picture), `Whiteboard` (seeded marker diagrams and optional `text`),
+  `Fridge`, `CoffeeMachine` (espresso or drip, with steam),
+  `ArcadeCabinet` (a seeded pixel game on its screen), and `PoolTable`
+  (balls racked or mid-game).
+- `Table` `base="pedestal"` and `ends="round"`, for a conference table;
+  `Counter` `hob` for a kitchen stove (a glass cooktop and an oven).
+- `Sign` `onBounds`: the laid-out text's size, for fitting a backdrop.
 
 ### Changed
 
@@ -101,6 +158,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   measured from the avatar. Without a `Player` (e.g. an orbit view) it
   still watches the camera. A `Person` used as the `Player`'s own body
   no longer tries to track anything.
+- `Player`'s capsule no longer tips over: its rotation is locked and
+  only the visible body turns to face the way it walks. At low frame
+  rates the old balancing could topple the avatar. The avatar also
+  starts facing the way the camera looks.
+- A seated `Person`'s name, bubble, and prompt sit over its head at
+  seat height instead of floating at standing height.
 - `Player` holds still until there's ground under it (or half a second
   passes) before gravity takes over, so a spawn can't drop through a
   collider that hasn't arrived yet.

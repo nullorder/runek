@@ -27,8 +27,11 @@ import { Player } from './runek/Player'
 ```ts
 export interface PlayerProps {
   position?: Vec3
-  /** Camera view. Unset defers to the world default (`<World avatar>`); falls back
-   *  to first-person. An explicit value here always wins. */
+  /** Camera view: `first` (through the avatar's eyes), `third` (behind it), or `overhead` (high
+   *  above at a fixed tilt, following it; scroll zooms, WASD walks relative to the screen). Unset
+   *  defers to the world default (`<World avatar>`); falls back to first-person. An explicit value
+   *  here always wins. A world `view` control (e.g. `controls: { view: ['KeyV'] }`) cycles the
+   *  three at runtime. */
   view?: PlayerView
   /** Initial camera yaw in radians (0 faces +z). */
   yaw?: number

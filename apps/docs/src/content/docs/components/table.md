@@ -1,6 +1,6 @@
 ---
 title: "Table"
-summary: "Table with a top and four legs."
+summary: "Table with a top on four legs, or on pedestals with rounded ends for a conference table."
 category: component
 component: table
 order: 100
@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add table
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -32,6 +32,11 @@ export interface TableProps {
   depth?: number
   height?: number
   thickness?: number
+  /** Four `legs` at the corners, or `pedestal` columns on crossed feet (one, or two for a table
+   *  longer than 2 units): a conference table. */
+  base?: 'legs' | 'pedestal'
+  /** `round` makes the short ends semicircles: a racetrack top, as conference tables have. */
+  ends?: 'square' | 'round'
   /** Defaults to the world palette's `wood` slot. */
   color?: string
 }
