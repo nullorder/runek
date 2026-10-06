@@ -22,22 +22,23 @@ import { Rug } from './runek/Rug'
 <Rug position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Rug", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface RugProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** `[width, depth]` in units. */
-  size?: [number, number]
-  /** Defaults to the world palette's `fabric` slot. */
-  baseColor?: string
-  /** Defaults to the world palette's `accent` slot. */
-  borderColor?: string
-  accentColor?: string
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `size` | `[number, number]` | `[3, 2]` | `[width, depth]` in units. |
+| `baseColor` | `color` | palette `fabric` | Defaults to the world palette's `fabric` slot. |
+| `borderColor` | `color` | palette `accent` | Defaults to the world palette's `accent` slot. |
+| `accentColor` | `color` | `"#9c5252"` |  |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

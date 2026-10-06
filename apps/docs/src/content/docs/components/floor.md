@@ -22,21 +22,32 @@ import { Floor } from './runek/Floor'
 <Floor position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Floor", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface FloorProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** `[width, depth]` in units. The top surface sits at the component origin. */
-  size?: [number, number]
-  thickness?: number
-  /** A hole in the slab (stairwell); the slab splits into strips around it. */
-  opening?: FloorOpening
-  /** Defaults to the world palette's `floor` slot. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` |  | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `size` | `[number, number]` | `[8, 8]` | `[width, depth]` in units. The top surface sits at the component origin. |
+| `thickness` | `number` | `0.2` | Thickness, in units. |
+| `opening` | `FloorOpening` |  | A hole in the slab (stairwell); the slab splits into strips around it. |
+| `color` | `color` | palette `floor` | Defaults to the world palette's `floor` slot. |
+
+### `FloorOpening`
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `x` | `number` |  | Hole center offset from the slab center along X, in units. |
+| `z` | `number` |  | Hole center offset from the slab center along Z, in units. |
+| `width` | `number` | **required** |  |
+| `depth` | `number` | **required** |  |
 
 ## Registry manifest
 

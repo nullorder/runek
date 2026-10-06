@@ -22,22 +22,25 @@ import { Lamp } from './runek/Lamp'
 <Lamp position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Lamp", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface LampProps {
-  position?: Vec3
-  rotation?: Vec3
-  height?: number
-  /** Base + pole color. Defaults to the world palette's `metal` slot. */
-  color?: string
-  shadeColor?: string
-  lightColor?: string
-  intensity?: number
-  /** Candle-like intensity flicker, 0–1; 0 holds the light steady. */
-  flicker?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `height` | `number` | `1.6` | Height, in units. |
+| `color` | `color` | palette `metal` | Base + pole color. Defaults to the world palette's `metal` slot. |
+| `shadeColor` | `color` | `"#e9d8a6"` |  |
+| `lightColor` | `color` | `"#ffe8c2"` |  |
+| `intensity` | `number` | `18` |  |
+| `flicker` | `number` | `0.08` | Candle-like intensity flicker, 0–1; 0 holds the light steady. |
 
 ## Registry manifest
 

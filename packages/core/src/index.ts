@@ -38,6 +38,14 @@ export {
 } from './keyboard'
 export type { WorldPalette } from './palette'
 export { DEFAULT_PALETTE } from './palette'
+export type {
+  ComponentSchema,
+  ObjectDef,
+  PropSchema,
+  PropType,
+  SchemaMap,
+} from './prop-schema'
+export { describeType, matches } from './prop-schema'
 export type { Rng } from './rng'
 export { int, pick, range, rng, sub } from './rng'
 export type { SunState, WorldTime } from './time'
@@ -61,6 +69,8 @@ export type {
 } from './types'
 export { useGround } from './useGround'
 export { useWorld } from './useWorld'
+export type { JsonPath, ValidationIssue } from './validate'
+export { suggest, validateWorld } from './validate'
 export type { WorldProps } from './World'
 export { World } from './World'
 export type { WorldAboutProps } from './WorldAbout'

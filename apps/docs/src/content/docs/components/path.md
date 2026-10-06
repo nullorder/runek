@@ -22,30 +22,26 @@ import { Path } from './runek/Path'
 <Path position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Path", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface PathProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Length along local Z, in units. */
-  length?: number
-  width?: number
-  /** Lateral meander amplitude, in units. */
-  meander?: number
-  /** Total height climbed from the near end (local −Z) to the far end (+Z), in units. For a
-   *  trail that gains height as it winds; the ribbon rises linearly along its length. */
-  rise?: number
-  /** Explicit elevation profile, in units: evenly spaced samples from the near end (local −Z)
-   *  to the far end (+Z), linearly interpolated along the ribbon. Overrides `rise`. Author it
-   *  from the terrain the trail crosses so the ribbon hugs the ground it climbs. */
-  heights?: number[]
-  /** Defaults to the world palette's `ground` slot. */
-  color?: string
-  segments?: number
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `length` | `number` | `12` | Length along local Z, in units. |
+| `width` | `number` | `1.4` | Width, in units. |
+| `meander` | `number` | `1.2` | Lateral meander amplitude, in units. |
+| `rise` | `number` | `0` | Total height climbed from the near end (local −Z) to the far end (+Z), in units. For a trail that gains height as it winds; the ribbon rises linearly along its length. |
+| `heights` | `number[]` |  | Explicit elevation profile, in units: evenly spaced samples from the near end (local −Z) to the far end (+Z), linearly interpolated along the ribbon. Overrides `rise`. Author it from the terrain the trail crosses so the ribbon hugs the ground it climbs. |
+| `color` | `color` | palette `ground` | Defaults to the world palette's `ground` slot. |
+| `segments` | `number` | `48` |  |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

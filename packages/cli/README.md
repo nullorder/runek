@@ -10,15 +10,21 @@
 npx @runek/cli init                          # write runek.config.json + the install dir
 npx @runek/cli add player terrain bookshelf  # pull source + deps into your project
 npx @runek/cli list                          # browse the catalog
+npx @runek/cli info bookshelf                # props, defaults, deps, and examples for one component
+npx @runek/cli validate public/world.json    # check types, props, and values in a world file
 npx @runek/cli check-world public/world.json # find buried and floating nodes
+npx @runek/cli preview public/world.json     # a workshop link that opens the world in the browser
+npx @runek/cli skill                         # install the Runek skill for coding agents
 ```
 
-`add` resolves registry dependencies recursively (every component pulls `core`), rewrites the `@runek/core` import to your local copy, and installs the npm packages the components need via your detected package manager.
+`add` resolves registry dependencies recursively (`house` pulls its walls, floor, roof, door, and window), writes the source verbatim (components import the published `@runek/core`), and installs the npm packages the components need via your detected package manager.
+
+`list`, `info`, `validate`, and `check-world` take `--json` for scripts and agents.
 
 Then compose a world:
 
 ```tsx
-import { World } from './runek/core'
+import { World } from '@runek/core'
 import { Bookshelf } from './runek/Bookshelf'
 import { Player } from './runek/Player'
 import { Terrain } from './runek/Terrain'
@@ -43,10 +49,16 @@ Same `seed` → same world, every time.
 --dir <path>            Install directory (default: src/runek)
 --overwrite             Overwrite files that already exist
 --no-install            Print the dependency install command instead of running it
---strict                (check-world) exit non-zero when anything is found
+--strict                (validate, check-world) exit non-zero on warnings / anything found
 --fix                   (check-world) write the suggested Y values into the file
 --tolerance <units>     (check-world) allowed gap before flagging (default 0.08)
+--json                  (list, info, validate, check-world) machine-readable output
+--out <path>            (skill) where to write the skill (default: .claude/skills/runek/SKILL.md)
+--open                  (preview) open the link in your browser
+-v, --version           Print the CLI version
 ```
+
+Full reference: [runek.nullorder.org/docs/cli](https://runek.nullorder.org/docs/cli).
 
 ## Links
 

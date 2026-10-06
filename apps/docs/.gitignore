@@ -2,8 +2,7 @@
 dist/
 .astro/
 
-# Registry copied in from /registry at build (served at /r)
+# Copied in from /registry at build (served at /r and /registry)
 public/r/
-
-# Prop schema generated from the component sources (scripts/build-prop-schema.mjs)
+public/registry/
 src/workshop/schema/props.json

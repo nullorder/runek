@@ -1,10 +1,9 @@
-import { DEFAULT_PALETTE } from '@runek/core'
-import { describeType, matches } from '../schema/controls'
-import type { SchemaMap } from '../schema/types'
+import { DEFAULT_PALETTE } from './palette.ts'
+import { describeType, matches, type SchemaMap } from './prop-schema.ts'
 
 export type JsonPath = (string | number)[]
 
-export interface Issue {
+export interface ValidationIssue {
   path: JsonPath
   message: string
   severity: 'error' | 'warning'
@@ -13,6 +12,7 @@ export interface Issue {
 }
 
 const WORLD_KEYS = [
+  '$schema',
   'version',
   'meta',
   'unit',
@@ -29,7 +29,7 @@ const WORLD_KEYS = [
 ]
 const NODE_KEYS = ['type', 'id', 'anchor', 'props', 'children']
 
-export function distance(a: string, b: string): number {
+function distance(a: string, b: string): number {
   const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)])
   for (let j = 1; j <= b.length; j++) dp[0][j] = j
   for (let i = 1; i <= a.length; i++) {
@@ -68,8 +68,12 @@ const isObj = (v: unknown): v is Record<string, unknown> =>
 
 /** Check parsed world JSON against the component schemas. Structural problems are errors (the
  *  world can't load); prop problems are warnings (it still renders, just maybe not as meant). */
-export function validateWorld(data: unknown, schema: SchemaMap, custom: string[] = []): Issue[] {
-  const issues: Issue[] = []
+export function validateWorld(
+  data: unknown,
+  schema: SchemaMap,
+  custom: string[] = [],
+): ValidationIssue[] {
+  const issues: ValidationIssue[] = []
   const types = [...Object.keys(schema), 'Group', ...custom]
   if (!isObj(data))
     return [

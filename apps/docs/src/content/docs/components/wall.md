@@ -22,22 +22,33 @@ import { Wall } from './runek/Wall'
 <Wall position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Wall", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface WallProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Length along the wall's local X axis, in units. */
-  width?: number
-  height?: number
-  thickness?: number
-  /** Defaults to the world palette's `wall` slot. */
-  color?: string
-  /** Holes cut into the wall (doors, windows). Must not overlap horizontally. */
-  openings?: WallOpening[]
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `width` | `number` | `4` | Length along the wall's local X axis, in units. |
+| `height` | `number` | `3` | Height, in units. |
+| `thickness` | `number` | `0.2` | Thickness, in units. |
+| `color` | `color` | palette `wall` | Defaults to the world palette's `wall` slot. |
+| `openings` | `WallOpening[]` |  | Holes cut into the wall (doors, windows). Must not overlap horizontally. |
+
+### `WallOpening`
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `offset` | `number` |  | Horizontal center offset from the wall center, in units. |
+| `width` | `number` | **required** |  |
+| `height` | `number` | **required** |  |
+| `sill` | `number` |  | Height of the opening's base above the wall base, in units. |
 
 ## Migrate
 

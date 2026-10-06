@@ -8,6 +8,8 @@ export type RoofStyle = 'flat' | 'gable'
 export interface RoofProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /** `[width, depth]` in units. The roof rests with its base at the component origin. */
   size?: [number, number]
   style?: RoofStyle

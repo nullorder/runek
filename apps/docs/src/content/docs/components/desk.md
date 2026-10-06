@@ -19,29 +19,29 @@ Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`.
 ```tsx
 import { Desk } from './runek/Desk'
 
-<Desk position={[0, 0, 0]} />
+<Desk position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Desk", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface DeskProps extends WorldComponentProps {
-  /** Width along local X, in units. */
-  width?: number
-  /** Depth along local Z, in units. The front, where you sit, faces +Z. */
-  depth?: number
-  /** Height of the work surface, in units. */
-  height?: number
-  /** Seeded when unset. */
-  base?: DeskBase
-  /** Drawers in the pedestal, 0 to 4. Seeded when unset; only a `pedestal` desk has them. */
-  drawers?: number
-  /** Top color; defaults to the palette's `wood`. */
-  color?: string
-  /** Legs, pedestal, and panels; defaults to the palette's `metal` for legs, else `woodDark`. */
-  baseColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `width` | `number` | `1.4` | Width along local X, in units. |
+| `depth` | `number` | `0.7` | Depth along local Z, in units. The front, where you sit, faces +Z. |
+| `height` | `number` | `0.75` | Height of the work surface, in units. |
+| `base` | `"legs" \| "pedestal" \| "panels"` |  | Seeded when unset. |
+| `drawers` | `number` |  | Drawers in the pedestal, 0 to 4. Seeded when unset; only a `pedestal` desk has them. |
+| `color` | `color` |  | Top color; defaults to the palette's `wood`. |
+| `baseColor` | `color` |  | Legs, pedestal, and panels; defaults to the palette's `metal` for legs, else `woodDark`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

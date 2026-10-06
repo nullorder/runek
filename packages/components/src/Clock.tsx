@@ -6,6 +6,8 @@ import type { Group } from 'three'
 export interface ClockProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /** Face radius in units. */
   radius?: number
   /**

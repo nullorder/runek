@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Color } from 'three'
 
 export interface LightRigProps {
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   sunPosition?: Vec3
   sunColor?: string
   sunIntensity?: number

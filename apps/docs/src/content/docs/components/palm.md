@@ -19,29 +19,29 @@ Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 ```tsx
 import { Palm } from './runek/Palm'
 
-<Palm position={[0, 0, 0]} />
+<Palm position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Palm", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface PalmProps extends WorldComponentProps {
-  /** Trunk height, in units. */
-  height?: number
-  /** Sideways lean of the crown, as a fraction of height. */
-  lean?: number
-  /** Frond count. */
-  fronds?: number
-  /** Frond length, in units. */
-  frondLength?: number
-  /** Defaults to the world palette's `bark` slot. */
-  trunkColor?: string
-  /** Defaults to the world palette's `foliage` slot. */
-  frondColor?: string
-  /** Grow a coconut cluster under the crown. */
-  coconuts?: boolean
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `height` | `number` | `6` | Trunk height, in units. |
+| `lean` | `number` | `0.18` | Sideways lean of the crown, as a fraction of height. |
+| `fronds` | `number` | `11` | Frond count. |
+| `frondLength` | `number` | `2.2` | Frond length, in units. |
+| `trunkColor` | `color` | palette `bark` | Defaults to the world palette's `bark` slot. |
+| `frondColor` | `color` | palette `foliage` | Defaults to the world palette's `foliage` slot. |
+| `coconuts` | `boolean` | `true` | Grow a coconut cluster under the crown. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

@@ -1,8 +1,18 @@
+import { useFrame } from '@react-three/fiber'
 import { RigidBody } from '@react-three/rapier'
 import { Book, Floor, Lake, Lamp, Rocks, Rug, registry, Sign, Trees, Wall } from '@runek/components'
 import { isCompositeDef, WorldNodes } from '@runek/core'
-import { type ComponentType, useMemo } from 'react'
-import { DEFAULT_CAMERA, PREVIEW } from '../../lib/preview'
+import { type ComponentType, useMemo, useRef, useState } from 'react'
+import {
+  Box3,
+  type BufferGeometry,
+  type Group,
+  type InstancedMesh,
+  Matrix4,
+  type Object3D,
+  Vector3,
+} from 'three'
+import { PREVIEW } from '../../lib/preview'
 import type { DocMeta } from './LibraryWorld'
 
 /**
@@ -15,41 +25,21 @@ import type { DocMeta } from './LibraryWorld'
  */
 
 /** System components with nothing to put on a pedestal. */
-const EXCLUDE = new Set(['Player', 'LightRig', 'Compass', 'Sky'])
+const EXCLUDE = new Set(['Player', 'LightRig', 'Compass', 'Sky', 'Interactable'])
 
-/**
- * Per-exhibit overrides layered over the gallery-preview config: `props` merge
- * over `PREVIEW[name].props`, `scale` replaces the camera-derived miniature
- * scale, `lift` raises center-origin components (in scaled units) so they
- * don't sink into the pedestal.
- */
-const TUNE: Record<string, { props?: Record<string, unknown>; scale?: number; lift?: number }> = {
+/** Per-exhibit props layered over the gallery-preview config. */
+const TUNE: Record<string, Record<string, unknown>> = {
   // Ocean defaults to a 400-unit patch that follows the camera — pin a small pond.
-  Ocean: { props: { size: [7, 7], follow: false }, scale: 0.18 },
-  // The preview terrain is 30 units across; shrink it to the pedestal.
-  Terrain: { scale: 0.05 },
+  Ocean: { size: [7, 7], follow: false },
   // Bare visual — a dynamic body would roll off the pedestal.
-  Sailboat: { props: { physics: false }, scale: 0.25 },
+  Sailboat: { physics: false },
   // A live portal navigates on contact; in the gallery it's display-only.
-  Portal: { props: { onEnter: () => {} } },
-  // Center-origin components: lift so they sit above the pedestal top.
-  Clock: { lift: 0.55 },
-  Sign: { lift: 0.5 },
-  Window: { lift: 0.55 },
-  // Components with no tuned preview camera get the default miniature scale,
-  // which overflows the pedestal for the large ones — scale ≈ 1.5 / max extent.
-  Dock: { scale: 0.15 },
-  Floor: { scale: 0.19 },
-  Road: { scale: 0.12 },
-  Cliff: { scale: 0.12 },
-  Counter: { scale: 0.45 },
-  Hut: { scale: 0.22 },
-  Tent: { scale: 0.4 },
-  Signpost: { scale: 0.4 },
-  Lake: { scale: 0.075 },
-  Shore: { scale: 0.06 },
-  Fence: { scale: 0.25 },
+  Portal: { onEnter: () => {} },
 }
+
+/** The space a miniature may fill on its pedestal, in units: footprint and height. */
+const FIT_SPAN = 1.3
+const FIT_HEIGHT = 1.3
 
 /** Tunnel geometry, in units. It begins at the library's right wall (x = -7)
  * and runs along -x; interior width 5 (z ∈ [-2.5, 2.5]), matching the door. */
@@ -64,10 +54,10 @@ const NORTH_Z = WIDTH / 2 + 0.1 // window wall center
 type Exhibit = {
   name: string
   props: Record<string, unknown>
-  scale: number
-  lift: number
   doc?: DocMeta
 }
+
+type Fit = { scale: number; offset: [number, number, number] }
 
 /** One miniature: a component renders directly; a composite expands via the renderer. */
 function Mini({ name, props }: { name: string; props: Record<string, unknown> }) {
@@ -84,12 +74,90 @@ function Mini({ name, props }: { name: string; props: Record<string, unknown> })
   return <Component seed={7} {...props} />
 }
 
-/** Miniature scale from the 2D gallery's tuned camera distance: a preview
- * camera frames its subject, so distance is a good proxy for component size. */
-function miniScale(name: string): number {
-  const cam = PREVIEW[name]?.camera ?? DEFAULT_CAMERA
-  const dist = Math.hypot(...cam)
-  return Math.min(1, 2.3 / dist)
+/** Scale a measured box down to the pedestal, centered on it and resting on its top. */
+function fitBox(box: Box3): Fit {
+  if (box.isEmpty()) return { scale: 1, offset: [0, 0, 0] }
+  const size = box.max.clone().sub(box.min)
+  const scale = Math.min(
+    1,
+    FIT_SPAN / Math.max(size.x, size.z, 1e-3),
+    FIT_HEIGHT / Math.max(size.y, 1e-3),
+  )
+  // A hair of lift keeps flat exhibits (water, rugs) from z-fighting the pedestal top.
+  return {
+    scale,
+    offset: [
+      (-(box.min.x + box.max.x) / 2) * scale,
+      -box.min.y * scale + 0.01,
+      (-(box.min.z + box.max.z) / 2) * scale,
+    ],
+  }
+}
+
+/** Bounds of everything under `root`, in its local space. Uses each geometry's own bounding
+ *  box, which instanced text glyphs and scattered instances report correctly. */
+function measure(root: Object3D): Box3 {
+  root.updateWorldMatrix(true, true)
+  const toLocal = new Matrix4().copy(root.matrixWorld).invert()
+  const box = new Box3()
+  const part = new Box3()
+  root.traverse((o) => {
+    const instanced = o as InstancedMesh
+    const geometry = (o as { geometry?: BufferGeometry }).geometry
+    if (instanced.isInstancedMesh) {
+      instanced.computeBoundingBox()
+      part.copy(instanced.boundingBox as Box3)
+    } else if (geometry) {
+      geometry.computeBoundingBox()
+      // Text glyphs keep no bounds until their first layout.
+      if (!geometry.boundingBox) return
+      part.copy(geometry.boundingBox)
+    } else return
+    if (!part.isEmpty()) box.union(part.applyMatrix4(o.matrixWorld).applyMatrix4(toLocal))
+  })
+  return box
+}
+
+/** Frames a measurement must hold before it counts (text and instances fill in late); moving
+ *  exhibits (birds, steam) settle within a small tolerance or at the frame cap. */
+const SETTLE_FRAMES = 20
+const MAX_FRAMES = 90
+
+function settled(a: Box3 | null, b: Box3): boolean {
+  if (!a || a.isEmpty() !== b.isEmpty()) return false
+  if (b.isEmpty()) return true
+  const tolerance = 0.02 * b.getSize(new Vector3()).length()
+  return a.min.distanceTo(b.min) <= tolerance && a.max.distanceTo(b.max) <= tolerance
+}
+
+/**
+ * Sizes any component to its pedestal: a hidden first mount is measured once its bounds
+ * settle, then the miniature remounts scaled and centered, so its colliders match too.
+ */
+function FittedMini({ name, props }: { name: string; props: Record<string, unknown> }) {
+  const [fit, setFit] = useState<Fit | null>(null)
+  const probe = useRef<Group>(null)
+  const frames = useRef(0)
+  const steady = useRef(0)
+  const last = useRef<Box3 | null>(null)
+  useFrame(() => {
+    if (fit || !probe.current) return
+    const box = measure(probe.current)
+    steady.current = settled(last.current, box) ? steady.current + 1 : 0
+    last.current = box
+    if (steady.current >= SETTLE_FRAMES || ++frames.current >= MAX_FRAMES) setFit(fitBox(box))
+  })
+  if (!fit)
+    return (
+      <group ref={probe} visible={false}>
+        <Mini name={name} props={props} />
+      </group>
+    )
+  return (
+    <group position={fit.offset} scale={fit.scale}>
+      <Mini name={name} props={props} />
+    </group>
+  )
 }
 
 function GuideBook({ doc, onSelect }: { doc: DocMeta; onSelect: (doc: DocMeta) => void }) {
@@ -127,7 +195,7 @@ function ExhibitStand({
   position: [number, number, number]
   onSelect: (doc: DocMeta) => void
 }) {
-  const { name, props, scale, lift } = exhibit
+  const { name, props } = exhibit
   return (
     // Backed against the south wall, facing the window (+z).
     <group position={position}>
@@ -140,8 +208,8 @@ function ExhibitStand({
       </RigidBody>
 
       {/* the miniature, live and procedural like everything else */}
-      <group position={[0, 0.86 + lift * scale, 0]} scale={scale}>
-        <Mini name={name} props={props} />
+      <group position={[0, 0.86, 0]}>
+        <FittedMini name={name} props={props} />
       </group>
 
       {/* nameplate just proud of the wall face behind the pedestal */}
@@ -170,16 +238,11 @@ export default function GalleryWing({
     const bySlug = new Map(componentDocs.map((d) => [d.component ?? '', d]))
     return Object.keys(registry)
       .filter((name) => !EXCLUDE.has(name))
-      .map((name) => {
-        const tune = TUNE[name]
-        return {
-          name,
-          props: { ...PREVIEW[name]?.props, ...tune?.props },
-          scale: tune?.scale ?? miniScale(name),
-          lift: tune?.lift ?? 0,
-          doc: bySlug.get(name.toLowerCase()),
-        }
-      })
+      .map((name) => ({
+        name,
+        props: { ...PREVIEW[name]?.props, ...TUNE[name] },
+        doc: bySlug.get(name.toLowerCase()),
+      }))
   }, [componentDocs])
 
   // One straight run: exhibit i stands at FIRST_X - i·SPACING; the tunnel ends

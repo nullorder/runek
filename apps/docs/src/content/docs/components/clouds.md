@@ -22,24 +22,24 @@ import { Clouds } from './runek/Clouds'
 <Clouds position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Clouds", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface CloudsProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Number of clouds. */
-  count?: number
-  /** Spread `[width, depth]`, in units. */
-  area?: [number, number]
-  /** Height above the origin, in units. */
-  height?: number
-  /** Drift speed along +X, in units/sec (0 holds still). */
-  drift?: number
-  color?: string
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `count` | `number` | `8` | Number of clouds. |
+| `area` | `[number, number]` | `[80, 80]` | Spread `[width, depth]`, in units. |
+| `height` | `number` | `24` | Height above the origin, in units. |
+| `drift` | `number` | `0.6` | Drift speed along +X, in units/sec (0 holds still). |
+| `color` | `color` | `"#eef2f7"` |  |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

@@ -15,6 +15,8 @@ export interface FloorOpening {
 export interface FloorProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /** `[width, depth]` in units. The top surface sits at the component origin. */
   size?: [number, number]
   thickness?: number

@@ -353,8 +353,33 @@ h1,
 .explore-3d a {
   color: var(--blue);
 }
+.explore-3d .as-markdown {
+  color: var(--muted);
+}
 
 /* Registry link card — the served index (CLI ref) and per-component manifests */
+.doc-source {
+  margin: 1.3rem 0;
+  padding: 0.75rem 1.1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.doc-source summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.doc-source summary span,
+.doc-source__path {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.85em;
+  font-weight: 400;
+}
+.doc-source pre {
+  max-height: 32rem;
+  overflow: auto;
+}
 .manifest-card {
   display: block;
   margin: 1.3rem 0;
@@ -817,6 +842,9 @@ pre.astro-code code {
   font-family: var(--mono);
   font-size: 0.74rem;
   opacity: 0.7;
+}
+.site-footer .foot-fine a {
+  color: inherit;
 }
 
 /* In-world (library) HUD */

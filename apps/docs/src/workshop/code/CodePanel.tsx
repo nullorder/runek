@@ -2,7 +2,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { syntaxTree } from '@codemirror/language'
 import { type Diagnostic, setDiagnostics } from '@codemirror/lint'
 import { EditorView } from '@codemirror/view'
-import { assignNodeIds, parseWorld, type WorldData } from '@runek/core/data'
+import { assignNodeIds, parseWorld, validateWorld, type WorldData } from '@runek/core/data'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { copyText, worldText } from '../actions'
 import { Panel } from '../panels/Panel'
@@ -28,7 +28,6 @@ import {
   registryNames,
 } from './generate'
 import { nodePathOf, pathAt, rangeOf } from './json-tree'
-import { validateWorld } from './validate'
 import { setNodeRange, worldJsonExtensions } from './world-json'
 
 type Tab = 'json' | 'app' | 'install'

@@ -4,6 +4,8 @@ import { useWorld, type Vec3 } from '@runek/core'
 export interface BedProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   width?: number
   length?: number
   /** Frame color; defaults to the world palette's `wood` slot. */

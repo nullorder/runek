@@ -1,10 +1,9 @@
-import type { JsonValue } from '@runek/core/data'
+import { type JsonValue, matches } from '@runek/core/data'
 import { useEffect, useId, useRef, useState } from 'react'
 import {
   controlKind,
   emptyValue,
   labelFor,
-  matches,
   type NumberRange,
   numberRange,
   variantOf,

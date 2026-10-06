@@ -22,41 +22,31 @@ import { Sign } from './runek/Sign'
 <Sign position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Sign", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface SignProps {
-  /** The text to render. */
-  children: ReactNode
-  position?: Vec3
-  rotation?: Vec3
-  /**
-   * Which world font role to render in (`display` for titles/signage, `body`
-   * for labels). The world declares the actual face via `<World fonts>`; an
-   * undeclared role falls back to the font bundled in `@runek/core`. (Named
-   * `variant`, not `role`, so it doesn't trip JSX a11y linters.)
-   */
-  variant?: keyof WorldFonts
-  /** Explicit font URL, overriding the world role. */
-  font?: string
-  /** Cap height in units. */
-  size?: number
-  /** Text color. Defaults to the world palette's `accent` slot. */
-  color?: string
-  /** Wrap width in units; omit to keep the text on one line. */
-  maxWidth?: number
-  letterSpacing?: number
-  anchorX?: 'left' | 'center' | 'right'
-  anchorY?: 'top' | 'middle' | 'bottom'
-  /** Soft colored halo around the glyphs, for a glow without bloom. */
-  glow?: boolean
-  /** A crisp edge in this color, so the text reads against any background. Wins over `glow`. */
-  outline?: string
-  /** Called with the laid-out text's width and height, in world units, whenever it changes:
-   *  for fitting a backdrop behind it. */
-  onBounds?: (width: number, height: number) => void
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `string` | **required** | The text to render. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `variant` | `"display" \| "body"` | `"display"` | Which world font role to render in (`display` for titles/signage, `body` for labels). The world declares the actual face via `<World fonts>`; an undeclared role falls back to the font bundled in `@runek/core`. (Named `variant`, not `role`, so it doesn't trip JSX a11y linters.) |
+| `font` | `string` |  | Explicit font URL, overriding the world role. |
+| `size` | `number` | `0.3` | Cap height in units. |
+| `color` | `color` | palette `accent` | Text color. Defaults to the world palette's `accent` slot. |
+| `maxWidth` | `number` |  | Wrap width in units; omit to keep the text on one line. |
+| `letterSpacing` | `number` | `0` |  |
+| `anchorX` | `"left" \| "center" \| "right"` | `"center"` |  |
+| `anchorY` | `"top" \| "bottom" \| "middle"` | `"middle"` |  |
+| `glow` | `boolean` | `false` | Soft colored halo around the glyphs, for a glow without bloom. |
+| `outline` | `color` |  | A crisp edge in this color, so the text reads against any background. Wins over `glow`. |
+| `onBounds` | `function` (code only) |  | Called with the laid-out text's width and height, in world units, whenever it changes: for fitting a backdrop behind it. |
 
 ## Registry manifest
 

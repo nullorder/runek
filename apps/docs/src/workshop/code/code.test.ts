@@ -1,8 +1,8 @@
 import { parser } from '@lezer/json'
+import { suggest, validateWorld } from '@runek/core/data'
 import { describe, expect, it } from 'vitest'
 import { SCHEMA } from '../schema'
 import { containerAt, nodePathOf, pathAt, propertyAt, rangeOf } from './json-tree'
-import { suggest, validateWorld } from './validate'
 
 const text = `{
   "version": 1,

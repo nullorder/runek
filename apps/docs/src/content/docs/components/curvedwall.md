@@ -22,28 +22,28 @@ import { CurvedWall } from './runek/CurvedWall'
 <CurvedWall position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "CurvedWall", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface CurvedWallProps extends WorldComponentProps {
-  /** Arc centerline radius, in units. The component origin is the circle's center. */
-  radius?: number
-  /** Sweep angle in radians, centered on the local +Z axis. */
-  arc?: number
-  height?: number
-  thickness?: number
-  /** `glass` renders a transparent curtain wall with mullions; `solid` a plain wall. */
-  style?: CurvedWallStyle
-  /** Chord segments; defaults from `radius × arc`, more segments reading as smoother. */
-  segments?: number
-  /** Solid wall color; defaults to the world palette's `wall` slot. */
-  color?: string
-  /** Glass tint (glass style). */
-  glassColor?: string
-  /** Mullion and rail color (glass style); defaults to the palette's `metal` slot. */
-  frameColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `radius` | `number` | `6` | Arc centerline radius, in units. The component origin is the circle's center. |
+| `arc` | `number` | `1.5707963267948966` | Sweep angle in radians, centered on the local +Z axis. |
+| `height` | `number` | `3` | Height, in units. |
+| `thickness` | `number` | `0.15` | Thickness, in units. |
+| `style` | `"solid" \| "glass"` | `"solid"` | `glass` renders a transparent curtain wall with mullions; `solid` a plain wall. |
+| `segments` | `number` |  | Chord segments; defaults from `radius × arc`, more segments reading as smoother. |
+| `color` | `color` | palette `wall` | Solid wall color; defaults to the world palette's `wall` slot. |
+| `glassColor` | `color` | `"#b7d8e8"` | Glass tint (glass style). |
+| `frameColor` | `color` | palette `metal` | Mullion and rail color (glass style); defaults to the palette's `metal` slot. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 

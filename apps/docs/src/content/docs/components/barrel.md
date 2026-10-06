@@ -22,20 +22,23 @@ import { Barrel } from './runek/Barrel'
 <Barrel position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Barrel", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface BarrelProps {
-  position?: Vec3
-  rotation?: Vec3
-  radius?: number
-  height?: number
-  /** Stave color; defaults to the world palette's `wood` slot. */
-  color?: string
-  /** Hoop color; defaults to the world palette's `metal` slot. */
-  hoopColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `radius` | `number` | `0.35` | Radius, in units. |
+| `height` | `number` | `0.9` | Height, in units. |
+| `color` | `color` | palette `wood` | Stave color; defaults to the world palette's `wood` slot. |
+| `hoopColor` | `color` | palette `metal` | Hoop color; defaults to the world palette's `metal` slot. |
 
 ## Registry manifest
 

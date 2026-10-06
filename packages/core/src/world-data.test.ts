@@ -23,6 +23,13 @@ describe('world-data', () => {
     expect(parseWorld(serializeWorld(sample))).toEqual(sample)
   })
 
+  it('keeps $schema first', () => {
+    const $schema = 'https://runek.nullorder.org/r/world.schema.json'
+    const text = serializeWorld({ ...sample, $schema })
+    expect(Object.keys(JSON.parse(text))[0]).toBe('$schema')
+    expect(parseWorld(text).$schema).toBe($schema)
+  })
+
   it('round-trips meta and node ids with no loss', () => {
     const withMeta: WorldData = {
       version: 1,

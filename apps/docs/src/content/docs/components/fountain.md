@@ -22,19 +22,22 @@ import { Fountain } from './runek/Fountain'
 <Fountain position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Fountain", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface FountainProps {
-  position?: Vec3
-  rotation?: Vec3
-  radius?: number
-  /** Stone color; defaults to the world palette's `stone` slot. */
-  color?: string
-  /** Water color; defaults to the world palette's `waterShallow` slot. */
-  waterColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `radius` | `number` | `1.6` | Radius, in units. |
+| `color` | `color` | palette `stone` | Stone color; defaults to the world palette's `stone` slot. |
+| `waterColor` | `color` | palette `waterShallow` | Water color; defaults to the world palette's `waterShallow` slot. |
 
 ## Registry manifest
 

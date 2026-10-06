@@ -7,7 +7,13 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!registry/components", "!**/*.astro"]
+    "includes": [
+      "**",
+      "!registry/components",
+      "!registry/props.json",
+      "!registry/world.schema.json",
+      "!**/*.astro"
+    ]
   },
   "formatter": {
     "enabled": true,

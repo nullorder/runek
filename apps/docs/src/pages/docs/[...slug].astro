@@ -1,7 +1,9 @@
 ---
+import { Code } from 'astro:components'
 import { getCollection, render } from 'astro:content'
 import ComponentPreview from '../../components/gallery/ComponentPreview.tsx'
 import DocLayout from '../../layouts/DocLayout.astro'
+import { getManifest } from '../../lib/registry'
 
 export async function getStaticPaths() {
   const docs = await getCollection('docs')
@@ -12,6 +14,7 @@ const { entry } = Astro.props
 const { Content } = await render(entry)
 // Component docs carry a live, slowly rotating preview of the real component.
 const isComponent = entry.data.category === 'component' && Boolean(entry.data.component)
+const files = isComponent ? getManifest(entry.data.component as string).files : []
 ---
 
 <DocLayout
@@ -31,4 +34,19 @@ const isComponent = entry.data.category === 'component' && Boolean(entry.data.co
     )
   }
   <Content />
+  {
+    files.length > 0 && (
+      <details class="doc-source" data-pagefind-ignore>
+        <summary>
+          Source <span>({files.length === 1 ? files[0].path : `${files.length} files`})</span>
+        </summary>
+        {files.map((file) => (
+          <section>
+            {files.length > 1 && <p class="doc-source__path">{file.path}</p>}
+            <Code code={file.content} lang={file.path.endsWith('.json') ? 'json' : 'tsx'} theme="night-owl" />
+          </section>
+        ))}
+      </details>
+    )
+  }
 </DocLayout>

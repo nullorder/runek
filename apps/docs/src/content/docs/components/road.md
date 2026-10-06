@@ -22,20 +22,23 @@ import { Road } from './runek/Road'
 <Road position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Road", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface RoadProps extends WorldComponentProps {
-  /** Length along local Z, in units. */
-  length?: number
-  /** Width along local X, in units. */
-  width?: number
-  /** Deck color; defaults to the palette's `stone`. */
-  color?: string
-  /** Kerb color; defaults to the palette's `woodDark`. */
-  kerbColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `length` | `number` | `12` | Length along local Z, in units. |
+| `width` | `number` | `3` | Width along local X, in units. |
+| `color` | `color` |  | Deck color; defaults to the palette's `stone`. |
+| `kerbColor` | `color` |  | Kerb color; defaults to the palette's `woodDark`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 

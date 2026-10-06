@@ -22,27 +22,27 @@ import { Roof } from './runek/Roof'
 <Roof position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Roof", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface RoofProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** `[width, depth]` in units. The roof rests with its base at the component origin. */
-  size?: [number, number]
-  style?: RoofStyle
-  /** Ridge height for a gable roof, in units. */
-  peak?: number
-  thickness?: number
-  overhang?: number
-  /** Cap the triangular gable ends so the attic isn't open to the outside. */
-  ends?: boolean
-  /** Defaults to the world palette's `roof` slot. */
-  color?: string
-  /** Gable end caps; defaults to the world palette's `wall` slot. */
-  endColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `size` | `[number, number]` | `[8, 8]` | `[width, depth]` in units. The roof rests with its base at the component origin. |
+| `style` | `"flat" \| "gable"` | `"gable"` |  |
+| `peak` | `number` | `1.6` | Ridge height for a gable roof, in units. |
+| `thickness` | `number` | `0.18` | Thickness, in units. |
+| `overhang` | `number` | `0.3` |  |
+| `ends` | `boolean` | `true` | Cap the triangular gable ends so the attic isn't open to the outside. |
+| `color` | `color` | palette `roof` | Defaults to the world palette's `roof` slot. |
+| `endColor` | `color` | palette `wall` | Gable end caps; defaults to the world palette's `wall` slot. |
 
 ## Migrate
 

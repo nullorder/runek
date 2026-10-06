@@ -22,19 +22,22 @@ import { Shore } from './runek/Shore'
 <Shore position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Shore", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface ShoreProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** `[width, depth]` in units. The sandy top sits at the component origin. */
-  size?: [number, number]
-  thickness?: number
-  /** Defaults to the world palette's `sand` slot. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `size` | `[number, number]` | `[24, 24]` | `[width, depth]` in units. The sandy top sits at the component origin. |
+| `thickness` | `number` | `0.3` | Thickness, in units. |
+| `color` | `color` | palette `sand` | Defaults to the world palette's `sand` slot. |
 
 ## Registry manifest
 

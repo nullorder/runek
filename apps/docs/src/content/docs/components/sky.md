@@ -22,19 +22,21 @@ import { Sky } from './runek/Sky'
 <Sky position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Sky", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface SkyProps {
-  /** Direction of the sun; also where the bright spot appears. Set this to pin the
-   *  sky to a fixed sun and bypass the world's day/night cycle. */
-  sunPosition?: Vec3
-  turbidity?: number
-  rayleigh?: number
-  /** Background when the sun is below the horizon. */
-  nightColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `sunPosition` | `[x, y, z]` |  | Direction of the sun; also where the bright spot appears. Set this to pin the sky to a fixed sun and bypass the world's day/night cycle. |
+| `turbidity` | `number` | `8` |  |
+| `rayleigh` | `number` | `1.4` |  |
+| `nightColor` | `color` | `"#04060e"` | Background when the sun is below the horizon. |
 
 ## Registry manifest
 

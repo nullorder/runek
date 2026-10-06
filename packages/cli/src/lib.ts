@@ -25,6 +25,38 @@ export type IndexItem = {
   description?: string
 }
 
+/** The prop schema shape (mirrors `@runek/core/data`; the CLI stays dependency-free). */
+export type PropType =
+  | { type: 'number' | 'boolean' | 'color' | 'vec3' | 'function' | 'node' }
+  | { type: 'string'; suggestions?: string[]; multiline?: boolean }
+  | { type: 'enum'; options: (string | number)[] }
+  | { type: 'tuple'; items: PropType[] }
+  | { type: 'array'; items: PropType }
+  | { type: 'object'; ref: string }
+  | { type: 'union'; variants: PropType[] }
+  | { type: 'unknown'; text?: string }
+
+export type PropSchema = PropType & {
+  doc?: string
+  optional?: boolean
+  default?: unknown
+  computed?: string
+  palette?: string
+}
+
+export type ComponentSchema = {
+  kind: 'component' | 'composite'
+  seeded?: boolean
+  name?: string
+  category?: string
+  description?: string
+  doc?: string
+  props: Record<string, PropSchema>
+  defs?: Record<string, { props: Record<string, PropSchema> }>
+}
+
+export type SchemaMap = Record<string, ComponentSchema>
+
 export type RegistryIndex = { name: string; homepage?: string; items: IndexItem[] }
 
 export type Config = {
@@ -37,6 +69,11 @@ export const CONFIG_FILE = 'runek.config.json'
 export const DEFAULT_CONFIG: Config = {
   registry: 'https://runek.nullorder.org/r',
   dir: 'src/runek',
+}
+
+/** The CLI's own version; `package.json` sits one level up from both `src/` and `dist/`. */
+export function cliVersion(): string {
+  return JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version
 }
 
 // --- config ----------------------------------------------------------------
@@ -62,16 +99,20 @@ function isHttp(base: string): boolean {
   return /^https?:\/\//.test(base)
 }
 
-async function readJson<T>(base: string, ...segments: string[]): Promise<T> {
+async function readText(base: string, ...segments: string[]): Promise<string> {
   if (isHttp(base)) {
     const url = [base.replace(/\/+$/, ''), ...segments].join('/')
     const res = await fetch(url)
     if (!res.ok) throw new Error(`registry request failed (${res.status}) for ${url}`)
-    return (await res.json()) as T
+    return await res.text()
   }
   const path = join(isAbsolute(base) ? base : resolve(base), ...segments)
   if (!existsSync(path)) throw new Error(`registry file not found: ${path}`)
-  return JSON.parse(readFileSync(path, 'utf8')) as T
+  return readFileSync(path, 'utf8')
+}
+
+async function readJson<T>(base: string, ...segments: string[]): Promise<T> {
+  return JSON.parse(await readText(base, ...segments)) as T
 }
 
 export function fetchIndex(base: string): Promise<RegistryIndex> {
@@ -80,6 +121,16 @@ export function fetchIndex(base: string): Promise<RegistryIndex> {
 
 export function fetchManifest(base: string, name: string): Promise<Manifest> {
   return readJson<Manifest>(base, 'components', `${name}.json`)
+}
+
+/** Every component's props as data (`registry/props.json`), keyed by world-data type. */
+export function fetchPropSchema(base: string): Promise<SchemaMap> {
+  return readJson<SchemaMap>(base, 'props.json')
+}
+
+/** The agent skill the registry serves (`agents/SKILL.md`). */
+export function fetchSkill(base: string): Promise<string> {
+  return readText(base, 'agents', 'SKILL.md')
 }
 
 /**

@@ -22,21 +22,32 @@ import { Interactable } from './runek/Interactable'
 <Interactable position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Interactable", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface InteractableProps extends WorldComponentProps {
-  /** What the player can do here. Each names a world `controls` action for its key, so declare
-   *  it in the world (`controls: { use: ['KeyE'] }`). */
-  actions?: InteractionAction[]
-  /** How close the avatar must come for the prompt to show, in units. */
-  radius?: number
-  /** Height of the prompt above the origin, in units. */
-  promptHeight?: number
-  onAction?: (id: string) => void
-  children?: ReactNode
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `actions` | `InteractionAction[]` | `[]` | What the player can do here. Each names a world `controls` action for its key, so declare it in the world (`controls: { use: ['KeyE'] }`). |
+| `radius` | `number` | `2` | How close the avatar must come for the prompt to show, in units. |
+| `promptHeight` | `number` | `1.4` | Height of the prompt above the origin, in units. |
+| `onAction` | `function` (code only) |  |  |
+| `children` | `node` (code only) |  |  |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+
+### `InteractionAction`
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `id` | `string` | **required** | Passed back to `onAction`. |
+| `label` | `string` | **required** | Shown in the prompt, e.g. `Talk`. |
+| `control` | `string` | **required** | The world `controls` action that triggers it (declare `talk: ['KeyT']` in the world's `controls`). The prompt shows the key bound to it, so a remap relabels it. |
 
 ## Registry manifest
 

@@ -6,6 +6,8 @@ import { ExtrudeGeometry, Shape } from 'three'
 export interface TableProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   width?: number
   depth?: number
   height?: number

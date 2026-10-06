@@ -4,6 +4,8 @@ import { useWorld, type Vec3 } from '@runek/core'
 export interface StaircaseProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   steps?: number
   /** Total rise, in units. Ascends along +y and +z from the origin. */
   totalHeight?: number

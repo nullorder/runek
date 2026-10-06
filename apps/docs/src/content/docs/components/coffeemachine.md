@@ -19,21 +19,25 @@ Pulls `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0
 ```tsx
 import { CoffeeMachine } from './runek/CoffeeMachine'
 
-<CoffeeMachine position={[0, 0, 0]} />
+<CoffeeMachine position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "CoffeeMachine", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface CoffeeMachineProps extends WorldComponentProps {
-  /** Seeded when unset. */
-  kind?: CoffeeMachineKind
-  /** Body color. Seeded from a few appliance finishes when unset. */
-  color?: string
-  /** A few puffs of steam rising from the cup or carafe. */
-  steam?: boolean
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `kind` | `"espresso" \| "drip"` |  | Seeded when unset. |
+| `color` | `color` |  | Body color. Seeded from a few appliance finishes when unset. |
+| `steam` | `boolean` | `true` | A few puffs of steam rising from the cup or carafe. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

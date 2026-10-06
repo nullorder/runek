@@ -22,18 +22,22 @@ import { Stool } from './runek/Stool'
 <Stool position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Stool", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface StoolProps extends WorldComponentProps {
-  /** Seat height above the ground, in units. */
-  height?: number
-  /** Seat radius, in units. */
-  radius?: number
-  /** Color; defaults to the palette's `wood`. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `height` | `number` | `0.95` | Seat height above the ground, in units. |
+| `radius` | `number` | `0.24` | Seat radius, in units. |
+| `color` | `color` |  | Color; defaults to the palette's `wood`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 

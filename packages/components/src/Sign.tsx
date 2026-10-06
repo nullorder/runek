@@ -7,6 +7,8 @@ export interface SignProps {
   children: ReactNode
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /**
    * Which world font role to render in (`display` for titles/signage, `body`
    * for labels). The world declares the actual face via `<World fonts>`; an

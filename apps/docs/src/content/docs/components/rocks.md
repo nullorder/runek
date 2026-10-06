@@ -22,21 +22,23 @@ import { Rocks } from './runek/Rocks'
 <Rocks position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Rocks", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface RocksProps {
-  position?: Vec3
-  rotation?: Vec3
-  count?: number
-  /** Cluster radius, in units. */
-  spread?: number
-  /** Mean rock radius, in units. */
-  size?: number
-  hue?: number
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `count` | `number` | `6` |  |
+| `spread` | `number` | `3` | Cluster radius, in units. |
+| `size` | `number` | `0.6` | Mean rock radius, in units. |
+| `hue` | `number` | `30` |  |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

@@ -22,20 +22,22 @@ import { Plant } from './runek/Plant'
 <Plant position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Plant", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface PlantProps {
-  position?: Vec3
-  rotation?: Vec3
-  height?: number
-  /** Planter color; defaults to the world palette's `wood` slot. */
-  potColor?: string
-  /** Foliage color; defaults to the world palette's `foliage` slot. */
-  foliageColor?: string
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `height` | `number` | `0.7` | Height, in units. |
+| `potColor` | `color` | palette `wood` | Planter color; defaults to the world palette's `wood` slot. |
+| `foliageColor` | `color` | palette `foliage` | Foliage color; defaults to the world palette's `foliage` slot. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

@@ -5,6 +5,8 @@ import { useMemo } from 'react'
 export interface ArchProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /** Clear opening width, in units. */
   width?: number
   /** Height to the springline (top of the piers), in units. */

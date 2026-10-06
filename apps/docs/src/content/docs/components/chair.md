@@ -22,20 +22,24 @@ import { Chair } from './runek/Chair'
 <Chair position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Chair", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface ChairProps {
-  position?: Vec3
-  rotation?: Vec3
-  width?: number
-  depth?: number
-  seatHeight?: number
-  backHeight?: number
-  /** Defaults to the world palette's `wood` slot. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `width` | `number` | `0.45` | Width, in units. |
+| `depth` | `number` | `0.45` | Depth, in units. |
+| `seatHeight` | `number` | `0.45` |  |
+| `backHeight` | `number` | `0.5` |  |
+| `color` | `color` | palette `wood` | Defaults to the world palette's `wood` slot. |
 
 ## Registry manifest
 
