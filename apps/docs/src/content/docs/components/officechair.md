@@ -19,25 +19,27 @@ Pulls `@react-three/drei@^10.7.7`, `@react-three/rapier@^2.2.0`, `@runek/core@^0
 ```tsx
 import { OfficeChair } from './runek/OfficeChair'
 
-<OfficeChair position={[0, 0, 0]} />
+<OfficeChair position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "OfficeChair", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface OfficeChairProps extends WorldComponentProps {
-  /** Top of the seat cushion, in units. */
-  seatHeight?: number
-  /** Seeded when unset. */
-  back?: OfficeChairBack
-  /** Armrests. Seeded when unset. */
-  arms?: boolean
-  /** Seat and back; defaults to the palette's `fabric`. */
-  color?: string
-  /** Base, column, and arms; defaults to the palette's `metal`. */
-  frameColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `seatHeight` | `number` | `0.47` | Top of the seat cushion, in units. |
+| `back` | `"low" \| "high"` |  | Seeded when unset. |
+| `arms` | `boolean` |  | Armrests. Seeded when unset. |
+| `color` | `color` |  | Seat and back; defaults to the palette's `fabric`. |
+| `frameColor` | `color` |  | Base, column, and arms; defaults to the palette's `metal`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

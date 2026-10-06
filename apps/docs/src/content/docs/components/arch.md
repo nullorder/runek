@@ -22,25 +22,25 @@ import { Arch } from './runek/Arch'
 <Arch position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Arch", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface ArchProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Clear opening width, in units. */
-  width?: number
-  /** Height to the springline (top of the piers), in units. */
-  height?: number
-  depth?: number
-  /** Pier thickness, in units. */
-  thickness?: number
-  /** Voussoir blocks forming the semicircular arch. */
-  blocks?: number
-  /** Defaults to the world palette's `stone` slot. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `width` | `number` | `2.4` | Clear opening width, in units. |
+| `height` | `number` | `2.6` | Height to the springline (top of the piers), in units. |
+| `depth` | `number` | `0.6` | Depth, in units. |
+| `thickness` | `number` | `0.4` | Pier thickness, in units. |
+| `blocks` | `number` | `9` | Voussoir blocks forming the semicircular arch. |
+| `color` | `color` | palette `stone` | Defaults to the world palette's `stone` slot. |
 
 ## Registry manifest
 

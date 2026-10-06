@@ -125,6 +125,8 @@ function GroundGuard({
 
 export interface PlayerProps {
   position?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /** Camera view: `first` (through the avatar's eyes), `third` (behind it), or `overhead` (high
    *  above at a fixed tilt, following it; scroll zooms, WASD walks relative to the screen). Unset
    *  defers to the world default (`<World avatar>`); falls back to first-person. An explicit value

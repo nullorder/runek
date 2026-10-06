@@ -22,28 +22,27 @@ import { Ocean } from './runek/Ocean'
 <Ocean position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Ocean", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface OceanProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Plane size `[width, depth]`, in units. With `follow` on (the default) this patch tracks
-   *  the camera, so keep it large enough to reach past the world fog. */
-  size?: [number, number]
-  /** Defaults to the world palette's `waterDeep` slot. */
-  colorDeep?: string
-  /** Defaults to the world palette's `waterShallow` slot. */
-  colorShallow?: string
-  /** Direction the sun glint comes from; pair with your Sky's `sunPosition`. */
-  sunPosition?: Vec3
-  waveHeight?: number
-  waveSpeed?: number
-  segments?: number
-  /** Track the camera horizontally for an endless sea (default true). Set false to pin it. */
-  follow?: boolean
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` |  | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `size` | `[number, number]` | `[400, 400]` | Plane size `[width, depth]`, in units. With `follow` on (the default) this patch tracks the camera, so keep it large enough to reach past the world fog. |
+| `colorDeep` | `color` | palette `waterDeep` | Defaults to the world palette's `waterDeep` slot. |
+| `colorShallow` | `color` | palette `waterShallow` | Defaults to the world palette's `waterShallow` slot. |
+| `sunPosition` | `[x, y, z]` | `[80, 30, 40]` | Direction the sun glint comes from; pair with your Sky's `sunPosition`. |
+| `waveHeight` | `number` | `0.4` |  |
+| `waveSpeed` | `number` | `0.6` |  |
+| `segments` | `number` | `160` |  |
+| `follow` | `boolean` | `true` | Track the camera horizontally for an endless sea (default true). Set false to pin it. |
 
 ## Registry manifest
 

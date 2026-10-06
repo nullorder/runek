@@ -22,21 +22,24 @@ import { Bench } from './runek/Bench'
 <Bench position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Bench", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface BenchProps {
-  position?: Vec3
-  rotation?: Vec3
-  length?: number
-  depth?: number
-  seatHeight?: number
-  /** Include a backrest. */
-  back?: boolean
-  /** Defaults to the world palette's `wood` slot. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `length` | `number` | `1.6` | Length, in units. |
+| `depth` | `number` | `0.5` | Depth, in units. |
+| `seatHeight` | `number` | `0.45` |  |
+| `back` | `boolean` | `true` | Include a backrest. |
+| `color` | `color` | palette `wood` | Defaults to the world palette's `wood` slot. |
 
 ## Registry manifest
 

@@ -19,27 +19,28 @@ Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 ```tsx
 import { Monitor } from './runek/Monitor'
 
-<Monitor position={[0, 0, 0]} />
+<Monitor position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Monitor", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface MonitorProps extends WorldComponentProps {
-  /** Screen width, in units. */
-  width?: number
-  /** Width over height. */
-  aspect?: number
-  /** Seeded when unset. */
-  stand?: MonitorStand
-  /** The screen's glow when on. Seeded from a few calm tints when unset. */
-  screen?: string
-  /** Lit, showing a few seeded windows; off, a dark glass. */
-  on?: boolean
-  /** Bezel and stand; defaults to the palette's `metal`. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `width` | `number` | `0.6` | Screen width, in units. |
+| `aspect` | `number` | `1.7777777777777777` | Width over height. |
+| `stand` | `"legs" \| "foot" \| "plate"` |  | Seeded when unset. |
+| `screen` | `color` |  | The screen's glow when on. Seeded from a few calm tints when unset. |
+| `on` | `boolean` | `true` | Lit, showing a few seeded windows; off, a dark glass. |
+| `color` | `color` |  | Bezel and stand; defaults to the palette's `metal`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

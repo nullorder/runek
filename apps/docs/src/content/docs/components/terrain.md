@@ -22,36 +22,28 @@ import { Terrain } from './runek/Terrain'
 <Terrain position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Terrain", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface TerrainProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Ground extent `[width, depth]`, in units. */
-  size?: [number, number]
-  thickness?: number
-  /** Defaults to the world palette's `ground` slot. */
-  color?: string
-  /** Vertical relief amplitude, in units. 0 keeps the ground flat. */
-  relief?: number
-  /** Grid subdivisions for displaced ground. */
-  resolution?: number
-  /** Noise frequency. */
-  frequency?: number
-  /** Radius from center kept flat (for a build pad), in units. */
-  flatRadius?: number
-  /** Radial island falloff (0 = off). When set, the ground domes up toward the center and
-   *  sinks below the world ground at its rim, so the mesh reads as a landmass surrounded by
-   *  water. The value is the fraction of the half-extent that stays land before the coast
-   *  (e.g. 0.8 = land out to 80% of the radius, then a shoreline into the sea). */
-  falloff?: number
-  /** Register a collider (default true). Set false for distant/backdrop terrain the player
-   *  never walks, to skip a large trimesh collider. */
-  collider?: boolean
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `size` | `[number, number]` | `[40, 40]` | Ground extent `[width, depth]`, in units. |
+| `thickness` | `number` | `0.4` | Thickness, in units. |
+| `color` | `color` | palette `ground` | Defaults to the world palette's `ground` slot. |
+| `relief` | `number` | `0` | Vertical relief amplitude, in units. 0 keeps the ground flat. |
+| `resolution` | `number` | `64` | Grid subdivisions for displaced ground. |
+| `frequency` | `number` | `0.04` | Noise frequency. |
+| `flatRadius` | `number` | `0` | Radius from center kept flat (for a build pad), in units. |
+| `falloff` | `number` | `0` | Radial island falloff (0 = off). When set, the ground domes up toward the center and sinks below the world ground at its rim, so the mesh reads as a landmass surrounded by water. The value is the fraction of the half-extent that stays land before the coast (e.g. 0.8 = land out to 80% of the radius, then a shoreline into the sea). |
+| `collider` | `boolean` | `true` | Register a collider (default true). Set false for distant/backdrop terrain the player never walks, to skip a large trimesh collider. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

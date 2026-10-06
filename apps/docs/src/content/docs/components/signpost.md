@@ -22,28 +22,25 @@ import { Signpost } from './runek/Signpost'
 <Signpost position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Signpost", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface SignpostProps extends WorldComponentProps {
-  /**
-   * The name shown on the board. A plain string, **not** `children`: a world renderer overrides a
-   * node's `children` prop with its nested nodes, so text authored in JSON must be a named prop to
-   * survive. Empty by default — `<Signpost />` is a blank board.
-   */
-  name?: string
-  /** Post height, in units. */
-  height?: number
-  /** Board width, in units. */
-  width?: number
-  /** Post + board wood color; defaults to the palette's `wood`. */
-  color?: string
-  /** Name color; defaults to the palette's `sand` (legible on the wood). */
-  textColor?: string
-  /** Name cap height, in units. */
-  size?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `name` | `string` | `""` | The name shown on the board. A plain string, **not** `children`: a world renderer overrides a node's `children` prop with its nested nodes, so text authored in JSON must be a named prop to survive. Empty by default — `<Signpost />` is a blank board. |
+| `height` | `number` | `2.6` | Post height, in units. |
+| `width` | `number` | `3.4` | Board width, in units. |
+| `color` | `color` |  | Post + board wood color; defaults to the palette's `wood`. |
+| `textColor` | `color` |  | Name color; defaults to the palette's `sand` (legible on the wood). |
+| `size` | `number` | `0.5` | Name cap height, in units. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 

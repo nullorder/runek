@@ -22,26 +22,26 @@ import { Flag } from './runek/Flag'
 <Flag position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Flag", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface FlagProps extends WorldComponentProps {
-  /** Pole height, in units. */
-  poleHeight?: number
-  /** Flag width away from the pole (the fly), in units. */
-  fly?: number
-  /** Flag height (the drop), in units. */
-  drop?: number
-  /** Ripple speed. */
-  waveSpeed?: number
-  /** Ripple depth as a fraction of the fly. */
-  waveAmplitude?: number
-  /** Cloth color; defaults to the world palette's `fabric`. */
-  color?: string
-  /** Pole color; defaults to the palette's `wood`. */
-  poleColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `poleHeight` | `number` | `6` | Pole height, in units. |
+| `fly` | `number` | `2.4` | Flag width away from the pole (the fly), in units. |
+| `drop` | `number` | `1.5` | Flag height (the drop), in units. |
+| `waveSpeed` | `number` | `3` | Ripple speed. |
+| `waveAmplitude` | `number` | `0.22` | Ripple depth as a fraction of the fly. |
+| `color` | `color` |  | Cloth color; defaults to the world palette's `fabric`. |
+| `poleColor` | `color` |  | Pole color; defaults to the palette's `wood`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 

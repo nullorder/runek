@@ -23,6 +23,16 @@ export {
   groundAt,
 } from './ground.ts'
 export type {
+  ComponentSchema,
+  ObjectDef,
+  PropSchema,
+  PropType,
+  SchemaMap,
+} from './prop-schema.ts'
+export { describeType, matches } from './prop-schema.ts'
+export type { JsonPath, ValidationIssue } from './validate.ts'
+export { suggest, validateWorld } from './validate.ts'
+export type {
   ComponentRegistry,
   CompositeDef,
   JsonValue,

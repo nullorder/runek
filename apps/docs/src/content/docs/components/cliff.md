@@ -19,27 +19,28 @@ Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 ```tsx
 import { Cliff } from './runek/Cliff'
 
-<Cliff position={[0, 0, 0]} />
+<Cliff position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Cliff", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface CliffProps extends WorldComponentProps {
-  /** Base radius at the waterline, in units. */
-  radius?: number
-  /** Plateau (top) radius, in units. */
-  topRadius?: number
-  /** Height from the base to the plateau, in units. */
-  height?: number
-  /** Radial facets — fewer reads as blockier rock. */
-  segments?: number
-  /** Surface jitter, as a fraction of a facet. */
-  rough?: number
-  /** Rock color; defaults to the palette's `stone`. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `radius` | `number` | `10` | Base radius at the waterline, in units. |
+| `topRadius` | `number` | `6` | Plateau (top) radius, in units. |
+| `height` | `number` | `12` | Height from the base to the plateau, in units. |
+| `segments` | `number` | `8` | Radial facets — fewer reads as blockier rock. |
+| `rough` | `number` | `0.35` | Surface jitter, as a fraction of a facet. |
+| `color` | `color` |  | Rock color; defaults to the palette's `stone`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

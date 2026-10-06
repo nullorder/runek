@@ -22,25 +22,21 @@ import { Player } from './runek/Player'
 <Player position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Player", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface PlayerProps {
-  position?: Vec3
-  /** Camera view: `first` (through the avatar's eyes), `third` (behind it), or `overhead` (high
-   *  above at a fixed tilt, following it; scroll zooms, WASD walks relative to the screen). Unset
-   *  defers to the world default (`<World avatar>`); falls back to first-person. An explicit value
-   *  here always wins. A world `view` control (e.g. `controls: { view: ['KeyV'] }`) cycles the
-   *  three at runtime. */
-  view?: PlayerView
-  /** Initial camera yaw in radians (0 faces +z). */
-  yaw?: number
-  /** Custom avatar visual, replacing the default capsule. Size it to the capsule
-   *  envelope (~1.3 units tall, centered at the character origin); it is hidden in
-   *  first-person view. In world JSON, nest it as a child node of the Player. */
-  children?: ReactNode
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 3, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `view` | `"first" \| "third" \| "overhead"` |  | Camera view: `first` (through the avatar's eyes), `third` (behind it), or `overhead` (high above at a fixed tilt, following it; scroll zooms, WASD walks relative to the screen). Unset defers to the world default (`<World avatar>`); falls back to first-person. An explicit value here always wins. A world `view` control (e.g. `controls: { view: ['KeyV'] }`) cycles the three at runtime. |
+| `yaw` | `number` | `0` | Initial camera yaw in radians (0 faces +z). |
+| `children` | `node` (code only) |  | Custom avatar visual, replacing the default capsule. Size it to the capsule envelope (~1.3 units tall, centered at the character origin); it is hidden in first-person view. In world JSON, nest it as a child node of the Player. |
 
 ## Registry manifest
 

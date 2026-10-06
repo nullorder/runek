@@ -10,7 +10,7 @@ Runek is a source registry of procedural 3D components for [React Three Fiber](h
 
 Think **"shadcn for 3D worlds."**
 
-**[Docs](https://runek.nullorder.org/docs) · [Gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library) · [Registry index](https://runek.nullorder.org/r/registry.json)**
+**[Docs](https://runek.nullorder.org/docs) · [Gallery](https://runek.nullorder.org/gallery) · [Walk the library](https://runek.nullorder.org/library) · [Registry index](https://runek.nullorder.org/r/registry.json) · [llms.txt](https://runek.nullorder.org/llms.txt)**
 
 > **Status:** `v0.8.0` (in repo; npm publish of `@runek/core` + `@runek/cli` at 0.8.0 pending) — adds **world settings & rules** on top of distribution GA: a world picks a reproducible time-of-day or a live timezone (driving day/night in `Sky` and `LightRig`) and a default avatar view. The 23-component catalog (palette-aware, instanced, day/night-aware), a runtime editor (move/rotate, add/duplicate/delete, undo), and worlds-as-data with world-level palette, fog, time, and avatar. The docs site + component registry are live at [runek.nullorder.org](https://runek.nullorder.org); the prior GA (`@runek/core` + `@runek/cli` 0.6.0) is on npm. Full release history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -61,16 +61,27 @@ export function FirstWorld() {
 
 Same `seed` → same world, every time.
 
+## For coding agents
+
+Runek is built to be driven by agents as well as people:
+
+- **[llms.txt](https://runek.nullorder.org/llms.txt)** indexes the docs and every component; [llms-full.txt](https://runek.nullorder.org/llms-full.txt) is the whole docs set in one file, and any docs page is available as Markdown at `/docs/<slug>.md`.
+- **[props.json](https://runek.nullorder.org/r/props.json)** lists every component's props with types, defaults, and docs, and **[world.schema.json](https://runek.nullorder.org/r/world.schema.json)** is a JSON Schema for world files (add it as `"$schema"` for completion and checks in your editor).
+- **The CLI closes the loop:** `runek info <name>` shows a component's props, `runek validate world.json` catches unknown components, misspelled props, and wrong value types (with suggestions), `runek check-world --fix` fixes buried or floating nodes, and `runek preview world.json` prints a workshop link to see the result. `list`, `validate`, and `check-world` take `--json`.
+- **`npx @runek/cli skill`** installs a Runek agent skill into your project (`.claude/skills/runek/SKILL.md`).
+
+See [Runek for agents](https://runek.nullorder.org/docs/for-agents).
+
 ## Repository layout
 
 ```
 packages/
   core/         @runek/core        — <World>, useWorld, seeded rng, contract types
   components/   @runek/components   — the procedural components
-  cli/          @runek/cli          — the CLI (init / add / list / check-world); bin: runek
+  cli/          @runek/cli          — the CLI (init / add / list / info / validate / check-world / preview / skill); bin: runek
 apps/
   docs/         the docs site (flat docs + a walkable 3D library); serves the registry at /r
-registry/       registry.json (index) + generated components/*.json
+registry/       registry.json (index) + generated components/*.json, props.json, world.schema.json
 ```
 
 ## Development

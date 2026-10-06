@@ -12,6 +12,8 @@ The keywords **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are
 
 - A component **MUST** be a React function component with a **named export** in **PascalCase** (e.g. `Bookshelf`), and **MUST** export a typed props interface named `<Name>Props`.
 - It **MUST** accept the base props `position`, `rotation`, and `seed` (`WorldComponentProps` from `@runek/core`). It **MAY** add its own props.
+- A component with nothing to vary **MUST** still accept `seed`, and **SHOULD** document it as having no seeded variation; the generated prop schema marks it `seeded: false`, so tools skip seed controls for it.
+- Props **SHOULD** carry a one-line JSDoc: it becomes the description in the prop schema (`props.json`), the docs, the workshop inspector, and `runek info`.
 - Every prop **SHOULD** be **JSON-serializable** (numbers, strings, booleans, arrays, plain objects). Function/ref props break [worlds-as-data](https://runek.nullorder.org/docs/worlds-as-data) and **SHOULD NOT** be required.
 - Each prop **MUST** have a sensible default, so `<Name />` renders something.
 - A component **MAY** be interactive. If so, the *data* of the interaction (what is clickable, where a click leads) **MUST** stay JSON-serializable — e.g. a `books` array, a per-item `href` — and any event callback (e.g. `onBookSelect`) **MUST** be **optional**, so the component still renders and round-trips from data without it. See `Bookshelf`.

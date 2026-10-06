@@ -19,27 +19,28 @@ Pulls `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0
 ```tsx
 import { Windmill } from './runek/Windmill'
 
-<Windmill position={[0, 0, 0]} />
+<Windmill position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Windmill", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface WindmillProps extends WorldComponentProps {
-  /** Tower height, in units. */
-  height?: number
-  /** Tower base radius, in units. */
-  radius?: number
-  /** Sail (blade) length, in units. */
-  sailLength?: number
-  /** Sail rotation speed, in radians per second. */
-  sailSpeed?: number
-  /** Tower color (defaults to the world palette's `wall`). */
-  color?: string
-  /** Cap, door, and sail-frame color (defaults to the world palette's `wood`). */
-  trimColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `height` | `number` | `7` | Tower height, in units. |
+| `radius` | `number` | `2` | Tower base radius, in units. |
+| `sailLength` | `number` | `4.5` | Sail (blade) length, in units. |
+| `sailSpeed` | `number` | `0.4` | Sail rotation speed, in radians per second. |
+| `color` | `color` |  | Tower color (defaults to the world palette's `wall`). |
+| `trimColor` | `color` |  | Cap, door, and sail-frame color (defaults to the world palette's `wood`). |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

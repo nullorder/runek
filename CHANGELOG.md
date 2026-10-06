@@ -9,6 +9,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Agent-friendly docs: `/llms.txt` indexes every guide and
+  component, `/llms-full.txt` is the whole docs set in one file, every
+  docs page is also served as Markdown at `/docs/<slug>.md`, and a new
+  "Runek for agents" guide walks through discover, install, compose,
+  validate, and preview. Component pages now list every prop with its
+  type, default, and description.
+- A machine-readable catalog: `/r/props.json` (every component's
+  props, types, defaults, and docs, generated from the TypeScript by
+  `just registry`) and `/r/world.schema.json`, a JSON Schema for world
+  files. Add `"$schema": "https://runek.nullorder.org/r/world.schema.json"`
+  to a world for completion and checks in your editor. The `$schema`
+  URLs that `registry.json` and `runek.config.json` already point at
+  (`/registry/schema.json`, `/registry/config-schema.json`) now resolve.
+- `runek validate <world.json>`: checks a world against the catalog
+  (unknown components, misspelled props, wrong value types, bad
+  anchors, duplicate ids) with did-you-mean suggestions. Components you
+  wrote yourself are recognized from your install directory.
+- `runek info <name>`: a component's props (type, default, docs),
+  dependencies, and a world-node and JSX example.
+- `runek preview <world.json>`: prints a workshop link that opens the
+  world in the browser.
+- `runek skill`: installs a Runek agent skill into your project
+  (`.claude/skills/runek/SKILL.md` by default).
+- `--json` output for `runek list`, `runek check-world`, and
+  `runek validate`.
+- `validateWorld`, `suggest`, `matches`, `describeType`, and the prop
+  schema types (`SchemaMap`, `ComponentSchema`, `PropSchema`) are
+  exported from `@runek/core` and `@runek/core/data`, so the same world
+  checks run in the workshop, the CLI, and your own tooling.
+- A world file may carry a `$schema` key; `serializeWorld` keeps it.
+- Every component now accepts `seed`, as the contract requires. The 25
+  that had none (`Bench`, `Chair`, `Table`, `Wall`, `Door`, `Window`,
+  `Roof`, `Floor`, `Staircase`, `Arch`, `Pillar`, `Barrel`, `Bed`,
+  `Shelf`, `Clock`, `Lamp`, `Sign`, `Well`, `Fountain`, `Lake`, `Shore`,
+  `Ocean`, `Sky`, `LightRig`, `Player`) accept it with no seeded
+  variation, so nothing renders differently. The prop schema marks
+  each component `seeded` or not, and the workshop only offers seed
+  controls where a seed changes something.
+- Component pages show the component's source in a collapsible panel.
 - The workshop: an in-browser workbench at `/workshop` on the docs
   site, and a door from the library to it. Your world renders live in a room, with
   the tools floating over it. An inspector generated from each
@@ -183,6 +222,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The library's gallery fits every exhibit to its pedestal: each
+  miniature is measured once, then scaled and centered, so large
+  pieces (`CurvedWall`, `Cliff`, `Clouds`, `Pool`, `Roof`, `Palm`,
+  `Flag`, ...) no longer overhang the corridor or stand in front of
+  their pedestal, `Ocean` shows again, and the empty `Interactable`
+  exhibit is gone.
+- `CurvedWall` previews (gallery cards and its docs page) show a
+  smaller arc centered on the frame instead of a wall standing in
+  front of the camera.
 - Setting one `Person` trait (a skin tone, a build) no longer
   reshuffles the seeded rolls of the others.
 - A `Player` spawned over displaced `Terrain` could fall through it:

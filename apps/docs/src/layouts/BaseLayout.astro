@@ -25,6 +25,8 @@ const nav = [
     {description && <meta name="description" content={description} />}
     <link rel="icon" href="/logo.svg" type="image/svg+xml" />
     <link rel="preload" href="/fonts/Pixelspace-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+    <slot name="head" />
     <title>{title}</title>
   </head>
   <body>
@@ -74,7 +76,9 @@ const nav = [
             </svg>
           </a>
         </div>
-        <p class="foot-fine">MIT © nullorder · worlds, one rune at a time</p>
+        <p class="foot-fine">
+          MIT © nullorder · worlds, one rune at a time · <a href="/llms.txt">llms.txt</a>
+        </p>
       </div>
     </footer>
 

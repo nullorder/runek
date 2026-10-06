@@ -4,6 +4,8 @@ import { currentHours, sunState, useWorld, type Vec3 } from '@runek/core'
 import { useState } from 'react'
 
 export interface SkyProps {
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /** Direction of the sun; also where the bright spot appears. Set this to pin the
    *  sky to a fixed sun and bypass the world's day/night cycle. */
   sunPosition?: Vec3

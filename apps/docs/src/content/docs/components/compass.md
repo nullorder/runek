@@ -22,27 +22,25 @@ import { Compass } from './runek/Compass'
 <Compass position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Compass", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface CompassProps extends WorldComponentProps {
-  /** Screen corner the dial sits in. */
-  corner?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
-  /** Dial diameter, in CSS px (shrinks ~22% on narrow viewports). */
-  size?: number
-  /** Inset from the corner edges, in CSS px `[x, y]`. */
-  inset?: [number, number]
-  /** Show the wind + bearing readout pill under the dial. */
-  readout?: boolean
-  /**
-   * World yaw (radians) the dial reads as north, using the same convention as `Player`/`Helm`
-   * yaw: 0 faces +Z, so the default makes +Z north (and -X east).
-   */
-  north?: number
-  /** North needle + north letter color. Compass-north red; no palette slot fits. */
-  accentColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `corner` | `"top-left" \| "top-right" \| "bottom-left" \| "bottom-right"` | `"bottom-left"` | Screen corner the dial sits in. |
+| `size` | `number` | `108` | Dial diameter, in CSS px (shrinks ~22% on narrow viewports). |
+| `inset` | `[number, number]` | `[16, 16]` | Inset from the corner edges, in CSS px `[x, y]`. |
+| `readout` | `boolean` | `true` | Show the wind + bearing readout pill under the dial. |
+| `north` | `number` | `0` | World yaw (radians) the dial reads as north, using the same convention as `Player`/`Helm` yaw: 0 faces +Z, so the default makes +Z north (and -X east). |
+| `accentColor` | `color` | `"#c0392b"` | North needle + north letter color. Compass-north red; no palette slot fits. |
+| `position` | `[x, y, z]` |  | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` |  | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 

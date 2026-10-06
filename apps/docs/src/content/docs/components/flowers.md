@@ -22,21 +22,23 @@ import { Flowers } from './runek/Flowers'
 <Flowers position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Flowers", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface FlowersProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Patch extent `[width, depth]`, in units. */
-  area?: [number, number]
-  count?: number
-  height?: number
-  /** Stem color; defaults to the world palette's `foliage` slot. */
-  stemColor?: string
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `area` | `[number, number]` | `[6, 6]` | Patch extent `[width, depth]`, in units. |
+| `count` | `number` | `60` |  |
+| `height` | `number` | `0.4` | Height, in units. |
+| `stemColor` | `color` | palette `foliage` | Stem color; defaults to the world palette's `foliage` slot. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

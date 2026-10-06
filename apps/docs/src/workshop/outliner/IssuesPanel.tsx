@@ -1,7 +1,7 @@
+import { validateWorld } from '@runek/core/data'
 import { useEffect, useMemo } from 'react'
 import { fixIssue, worldIssues } from '../actions'
 import { valueAt } from '../code/json-tree'
-import { validateWorld } from '../code/validate'
 import { Panel } from '../panels/Panel'
 import { SCHEMA } from '../schema'
 import { requestCamera, select, useWorkshop } from '../state/store'

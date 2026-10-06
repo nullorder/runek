@@ -22,21 +22,25 @@ import { Window } from './runek/Window'
 <Window position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Window", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface WindowProps {
-  position?: Vec3
-  rotation?: Vec3
-  width?: number
-  height?: number
-  /** Frame bar thickness, in units. */
-  frame?: number
-  depth?: number
-  color?: string
-  glassColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `width` | `number` | `1.2` | Width, in units. |
+| `height` | `number` | `1.2` | Height, in units. |
+| `frame` | `number` | `0.08` | Frame bar thickness, in units. |
+| `depth` | `number` | `0.1` | Depth, in units. |
+| `color` | `color` | `"#e8e2d6"` |  |
+| `glassColor` | `color` | `"#acd4e6"` |  |
 
 ## Registry manifest
 

@@ -50,7 +50,7 @@ export function codeOnlyProps(type: string): string[] {
     .map(([name]) => name)
 }
 
-export const hasSeed = (type: string) => !!SCHEMA[type]?.props.seed
+export const hasSeed = (type: string) => !!SCHEMA[type]?.seeded
 
 /** Catalog grouping by registry category, in display order. */
 export function catalogGroups(names = PLACEABLE) {

@@ -22,32 +22,29 @@ import { Tent } from './runek/Tent'
 <Tent position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Tent", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface TentProps extends WorldComponentProps {
-  /** Width across the tent (local X), in units. */
-  width?: number
-  /** Depth front-to-back (local Z); the entrance faces +Z. */
-  depth?: number
-  /** Ridge height, in units. */
-  height?: number
-  /** Fabric color; defaults to the palette's `fabric`. */
-  color?: string
-  /** Alternate stripe color; defaults to the palette's `wall`. */
-  stripeColor?: string
-  /** Pole color; defaults to the palette's `woodDark`. */
-  poleColor?: string
-  /** Billow depth as a fraction of the width. */
-  wind?: number
-  /** Wind ripple speed. */
-  windSpeed?: number
-  /** Static inward drape of the fabric between ridge and ground, as a fraction of the width. */
-  sag?: number
-  /** Solid walls (the two sides + the back) you can't walk through; the front stays open. */
-  collider?: boolean
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `width` | `number` | `3` | Width across the tent (local X), in units. |
+| `depth` | `number` | `3.6` | Depth front-to-back (local Z); the entrance faces +Z. |
+| `height` | `number` | `2.2` | Ridge height, in units. |
+| `color` | `color` |  | Fabric color; defaults to the palette's `fabric`. |
+| `stripeColor` | `color` |  | Alternate stripe color; defaults to the palette's `wall`. |
+| `poleColor` | `color` |  | Pole color; defaults to the palette's `woodDark`. |
+| `wind` | `number` | `0.05` | Billow depth as a fraction of the width. |
+| `windSpeed` | `number` | `2.5` | Wind ripple speed. |
+| `sag` | `number` | `0.03` | Static inward drape of the fabric between ridge and ground, as a fraction of the width. |
+| `collider` | `boolean` | `true` | Solid walls (the two sides + the back) you can't walk through; the front stays open. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 

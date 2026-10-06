@@ -22,21 +22,25 @@ import { LightRig } from './runek/LightRig'
 <LightRig position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "LightRig", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface LightRigProps {
-  sunPosition?: Vec3
-  sunColor?: string
-  sunIntensity?: number
-  ambient?: number
-  skyColor?: string
-  groundColor?: string
-  shadows?: boolean
-  /** Half-extent of the shadow camera frustum, in units. */
-  shadowRange?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `sunPosition` | `[x, y, z]` |  |  |
+| `sunColor` | `color` |  |  |
+| `sunIntensity` | `number` |  |  |
+| `ambient` | `number` |  |  |
+| `skyColor` | `color` | `"#bcd4ff"` |  |
+| `groundColor` | `color` | `"#4a4030"` |  |
+| `shadows` | `boolean` | `true` |  |
+| `shadowRange` | `number` | `30` | Half-extent of the shadow camera frustum, in units. |
 
 ## Registry manifest
 

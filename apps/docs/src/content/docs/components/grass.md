@@ -22,23 +22,24 @@ import { Grass } from './runek/Grass'
 <Grass position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Grass", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface GrassProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Patch extent `[width, depth]`, in units. */
-  area?: [number, number]
-  count?: number
-  height?: number
-  /** Defaults to the world palette's `foliage` slot. */
-  color?: string
-  /** Wind sway strength; 0 disables the animation. */
-  sway?: number
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `area` | `[number, number]` | `[10, 10]` | Patch extent `[width, depth]`, in units. |
+| `count` | `number` | `600` |  |
+| `height` | `number` | `0.35` | Height, in units. |
+| `color` | `color` | palette `foliage` | Defaults to the world palette's `foliage` slot. |
+| `sway` | `number` | `1` | Wind sway strength; 0 disables the animation. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

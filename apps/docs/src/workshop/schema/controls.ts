@@ -1,4 +1,4 @@
-import type { JsonValue } from '@runek/core'
+import { type JsonValue, matches } from '@runek/core/data'
 import { RANGES } from './ranges'
 import type { PropSchema, PropType } from './types'
 
@@ -161,54 +161,4 @@ export function variantOf(
   value: JsonValue | undefined,
 ) {
   return type.variants.findIndex((variant) => matches(variant, value))
-}
-
-export function matches(type: PropType, value: JsonValue | undefined): boolean {
-  if (value === undefined) return false
-  switch (type.type) {
-    case 'number':
-      return typeof value === 'number'
-    case 'string':
-      return typeof value === 'string'
-    case 'color':
-      return typeof value === 'string'
-    case 'boolean':
-      return typeof value === 'boolean'
-    case 'enum':
-      return type.options.includes(value as string | number)
-    case 'vec3':
-      return Array.isArray(value) && value.length === 3 && value.every((v) => typeof v === 'number')
-    case 'tuple':
-      return Array.isArray(value) && value.length === type.items.length
-    case 'array':
-      return Array.isArray(value)
-    case 'object':
-      return typeof value === 'object' && value !== null && !Array.isArray(value)
-    case 'union':
-      return type.variants.some((v) => matches(v, value))
-    default:
-      return true
-  }
-}
-
-/** A short human name for a type, for errors and completion details. */
-export function describeType(type: PropType): string {
-  switch (type.type) {
-    case 'enum':
-      return type.options.map((o) => JSON.stringify(o)).join(' | ')
-    case 'vec3':
-      return '[x, y, z]'
-    case 'tuple':
-      return `[${type.items.map(describeType).join(', ')}]`
-    case 'array':
-      return `${describeType(type.items)}[]`
-    case 'object':
-      return type.ref.split('.').at(-1) ?? 'object'
-    case 'union':
-      return type.variants.map(describeType).join(' | ')
-    case 'color':
-      return 'color'
-    default:
-      return type.type
-  }
 }

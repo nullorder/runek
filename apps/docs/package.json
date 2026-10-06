@@ -6,13 +6,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/sync-registry.mjs && node scripts/build-prop-schema.mjs && astro dev",
-    "build": "node scripts/sync-registry.mjs && node scripts/build-prop-schema.mjs && astro build && pagefind --site dist && rm -f dist/pagefind/pagefind-ui.js dist/pagefind/pagefind-ui.css dist/pagefind/pagefind-modular-ui.js dist/pagefind/pagefind-modular-ui.css",
+    "dev": "node ../../scripts/build-prop-schema.mjs && node scripts/sync-registry.mjs && astro dev",
+    "build": "node ../../scripts/build-prop-schema.mjs && node scripts/sync-registry.mjs && astro build && pagefind --site dist && rm -f dist/pagefind/pagefind-ui.js dist/pagefind/pagefind-ui.css dist/pagefind/pagefind-modular-ui.js dist/pagefind/pagefind-modular-ui.css",
     "preview": "astro preview",
-    "typecheck": "node scripts/build-prop-schema.mjs && astro check",
+    "typecheck": "node ../../scripts/build-prop-schema.mjs && node scripts/sync-registry.mjs && astro check",
     "sync-registry": "node scripts/sync-registry.mjs",
-    "test": "node scripts/build-prop-schema.mjs && vitest run",
-    "prop-schema": "node scripts/build-prop-schema.mjs"
+    "test": "node ../../scripts/build-prop-schema.mjs && node scripts/sync-registry.mjs && vitest run",
+    "prop-schema": "node ../../scripts/build-prop-schema.mjs"
   },
   "dependencies": {
     "@codemirror/autocomplete": "catalog:",

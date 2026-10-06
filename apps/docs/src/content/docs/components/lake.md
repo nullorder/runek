@@ -22,25 +22,26 @@ import { Lake } from './runek/Lake'
 <Lake position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Lake", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface LakeProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Water surface `[width, depth]`, in units. */
-  size?: [number, number]
-  /** Defaults to the world palette's `waterDeep` slot. */
-  colorDeep?: string
-  /** Defaults to the world palette's `waterShallow` slot. */
-  colorShallow?: string
-  /** Direction the sun glint comes from; pair with your Sky's `sunPosition`. */
-  sunPosition?: Vec3
-  waveHeight?: number
-  waveSpeed?: number
-  segments?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` |  | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `size` | `[number, number]` | `[20, 20]` | Water surface `[width, depth]`, in units. |
+| `colorDeep` | `color` | palette `waterDeep` | Defaults to the world palette's `waterDeep` slot. |
+| `colorShallow` | `color` | palette `waterShallow` | Defaults to the world palette's `waterShallow` slot. |
+| `sunPosition` | `[x, y, z]` | `[80, 30, 40]` | Direction the sun glint comes from; pair with your Sky's `sunPosition`. |
+| `waveHeight` | `number` | `0.12` |  |
+| `waveSpeed` | `number` | `1` |  |
+| `segments` | `number` | `64` |  |
 
 ## Registry manifest
 

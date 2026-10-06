@@ -4,6 +4,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { describeType } from '../../../packages/core/src/prop-schema.ts'
 import { MIGRATIONS } from './migrations.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../../..')
@@ -11,6 +12,7 @@ const registryDir = join(root, 'registry')
 const outDir = join(root, 'apps/docs/src/content/docs/components')
 
 const index = JSON.parse(readFileSync(join(registryDir, 'registry.json'), 'utf8'))
+const schema = JSON.parse(readFileSync(join(registryDir, 'props.json'), 'utf8'))
 const components = index.items.filter(
   (i) => i.type === 'registry:component' || i.type === 'registry:composite',
 )
@@ -31,14 +33,17 @@ for (const item of components) {
     console.log(`  docs/components/${item.name}.md (composite)`)
     continue
   }
-  // Match with or without an `extends` clause between the name and the brace.
-  const propsMatch = source.match(/export interface \w*Props[^{]*\{[\s\S]*?\n\}/)
-  const hasSeed = /\bseed\b/.test(propsMatch?.[0] ?? '')
+  const component = schema[item.title]
+  const hasSeed = Boolean(component?.seeded)
   const deps = [...manifest.registryDependencies, ...manifest.dependencies]
 
   const usage = hasSeed
     ? `<${item.title} position={[0, 0, 0]} seed={1} />`
     : `<${item.title} position={[0, 0, 0]} />`
+  const node = inline({
+    type: item.title,
+    props: hasSeed ? { position: [0, 0, 0], seed: 1 } : { position: [0, 0, 0] },
+  })
 
   const body = `---
 title: ${JSON.stringify(item.title)}
@@ -61,7 +66,13 @@ import { ${item.title} } from './runek/${item.title}'
 
 ${usage}
 \`\`\`
-${propsMatch ? `\n## Props\n\n\`\`\`ts\n${propsMatch[0]}\n\`\`\`\n` : ''}${migrateSection(item)}
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+\`\`\`json
+${node}
+\`\`\`
+${component ? propsSection(component) : ''}${migrateSection(item)}
 ## Registry manifest
 
 <a class="manifest-card" href="${REGISTRY}/components/${item.name}.json">
@@ -78,6 +89,42 @@ Browse the whole catalog in the **[gallery →](/gallery)**.
 }
 
 console.log(`\nWrote ${components.length} component docs.`)
+
+/** One-line JSON with readable spacing: `{ "a": [0, 0, 0] }`. */
+function inline(value) {
+  return JSON.stringify(value, null, 1)
+    .replace(/\n\s*/g, ' ')
+    .replace(/\[ /g, '[')
+    .replace(/ \]/g, ']')
+}
+
+function cell(text) {
+  return text.replace(/\s*\n\s*/g, ' ').replaceAll('|', '\\|')
+}
+
+function defaultOf(prop) {
+  if (prop.default !== undefined) return `\`${cell(inline(prop.default))}\``
+  if (prop.computed) return `\`${cell(prop.computed)}\``
+  if (prop.palette) return `palette \`${prop.palette}\``
+  return prop.optional ? '' : '**required**'
+}
+
+function propsTable(props) {
+  const rows = Object.entries(props).map(([name, prop]) => {
+    const codeOnly = prop.type === 'function' || prop.type === 'node'
+    const type = `\`${cell(describeType(prop))}\`${codeOnly ? ' (code only)' : ''}`
+    return `| \`${name}\` | ${type} | ${defaultOf(prop)} | ${cell(prop.doc ?? '')} |`
+  })
+  return ['| Prop | Type | Default | Description |', '|---|---|---|---|', ...rows].join('\n')
+}
+
+/** Props from the generated prop schema (registry/props.json), nested specs included. */
+function propsSection(component) {
+  const defs = Object.entries(component.defs ?? {}).map(
+    ([ref, def]) => `\n### \`${ref}\`\n\n${propsTable(def.props)}\n`,
+  )
+  return `\n## Props\n\n${propsTable(component.props)}\n${defs.join('')}`
+}
 
 /** The "Migrate" section for items whose API changed across a version: a
  *  side-by-side before/after panel per entry (data in migrations.mjs). Raw HTML

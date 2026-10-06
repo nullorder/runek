@@ -1,5 +1,5 @@
 import type { SyntaxNode, Tree } from '@lezer/common'
-import type { JsonPath } from './validate'
+import type { JsonPath } from '@runek/core/data'
 
 type Text = { sliceString: (from: number, to: number) => string }
 

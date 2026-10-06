@@ -19,25 +19,27 @@ Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 ```tsx
 import { ArcadeCabinet } from './runek/ArcadeCabinet'
 
-<ArcadeCabinet position={[0, 0, 0]} />
+<ArcadeCabinet position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "ArcadeCabinet", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface ArcadeCabinetProps extends WorldComponentProps {
-  /** Cabinet width, in units. */
-  width?: number
-  /** Body color. Seeded when unset. */
-  color?: string
-  /** Side-art stripe and marquee glow. Seeded when unset. */
-  accent?: string
-  /** Lit screen showing a seeded game; off, dark glass. */
-  on?: boolean
-  /** Control sets on the panel (one or two players). Seeded when unset. */
-  players?: 1 | 2
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `width` | `number` | `0.66` | Cabinet width, in units. |
+| `color` | `color` |  | Body color. Seeded when unset. |
+| `accent` | `color` |  | Side-art stripe and marquee glow. Seeded when unset. |
+| `on` | `boolean` | `true` | Lit screen showing a seeded game; off, dark glass. |
+| `players` | `1 \| 2` |  | Control sets on the panel (one or two players). Seeded when unset. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

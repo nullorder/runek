@@ -1,5 +1,5 @@
+import { validateWorld } from '@runek/core/data'
 import { describe, expect, it } from 'vitest'
-import { validateWorld } from '../code/validate'
 import { SCHEMA } from '../schema'
 import { SNIPPETS } from '../snippets'
 import { TEMPLATES } from '.'

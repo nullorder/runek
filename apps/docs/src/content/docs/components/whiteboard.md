@@ -19,26 +19,28 @@ Pulls `sign`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184
 ```tsx
 import { Whiteboard } from './runek/Whiteboard'
 
-<Whiteboard position={[0, 0, 0]} />
+<Whiteboard position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Whiteboard", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface WhiteboardProps extends WorldComponentProps {
-  /** Board width, in units. */
-  width?: number
-  /** Board height, in units. */
-  height?: number
-  mount?: WhiteboardMount
-  /** Written across the top of the board in marker. */
-  text?: string
-  /** Seeded marker diagrams (boxes, arrows, lines). Set false for a clean board. */
-  doodles?: boolean
-  /** Frame and stand; defaults to the palette's `metal`. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `width` | `number` | `1.6` | Board width, in units. |
+| `height` | `number` | `1` | Board height, in units. |
+| `mount` | `"stand" \| "wall"` | `"stand"` |  |
+| `text` | `string` |  | Written across the top of the board in marker. |
+| `doodles` | `boolean` | `true` | Seeded marker diagrams (boxes, arrows, lines). Set false for a clean board. |
+| `color` | `color` |  | Frame and stand; defaults to the palette's `metal`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

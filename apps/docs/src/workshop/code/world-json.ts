@@ -5,12 +5,11 @@ import { type Diagnostic, linter } from '@codemirror/lint'
 import { type Extension, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, type DecorationSet, EditorView } from '@codemirror/view'
 import { DEFAULT_PALETTE } from '@runek/core'
+import { describeType, type JsonPath, validateWorld } from '@runek/core/data'
 import { COMPONENT_NAMES, SCHEMA } from '../schema'
-import { describeType } from '../schema/controls'
 import type { PropSchema } from '../schema/types'
 import { SNIPPETS } from '../snippets'
 import { containerAt, nodePathOf, propertyAt, rangeOf } from './json-tree'
-import { type JsonPath, validateWorld } from './validate'
 
 type KeyInfo = [string, string, string]
 

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://runek.nullorder.org/registry/schema.json",
+  "title": "Runek registry index",
+  "description": "The hand-maintained index of a Runek source registry. `just registry` expands each item into a self-contained manifest at components/<name>.json.",
+  "type": "object",
+  "required": ["name", "items"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string" },
+    "homepage": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "files"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "What `runek add <name>` takes."
+          },
+          "title": {
+            "type": "string",
+            "description": "The component's export and world-data `type` (PascalCase)."
+          },
+          "type": { "enum": ["registry:component", "registry:composite", "registry:lib"] },
+          "category": {
+            "type": "string",
+            "examples": [
+              "character",
+              "environment",
+              "interiors",
+              "structures",
+              "systems",
+              "terrain",
+              "vegetation",
+              "water"
+            ]
+          },
+          "description": { "type": "string" },
+          "files": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["path", "target"],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Source path from the repo root (a file or a directory)."
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Where it lands inside the install directory."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

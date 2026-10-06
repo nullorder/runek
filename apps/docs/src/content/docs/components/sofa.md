@@ -19,35 +19,32 @@ Pulls `@react-three/drei@^10.7.7`, `@react-three/rapier@^2.2.0`, `@runek/core@^0
 ```tsx
 import { Sofa } from './runek/Sofa'
 
-<Sofa position={[0, 0, 0]} />
+<Sofa position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Sofa", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface SofaProps extends WorldComponentProps {
-  /** Seats across, 1 to 4. */
-  seats?: number
-  /** Depth along local Z, in units. Seats face +Z. */
-  depth?: number
-  /** Top of the seat cushions, in units. */
-  seatHeight?: number
-  /** Seeded when unset. */
-  arms?: SofaArms
-  /** Seeded when unset. */
-  cushions?: SofaCushions
-  /** Seeded when unset. */
-  legs?: SofaLegs
-  /** Throw pillows, 0 to 2. Seeded when unset. */
-  pillows?: number
-  /** Upholstery; defaults to the palette's `fabric`. */
-  color?: string
-  /** Throw pillows; defaults to the palette's `accent`. */
-  pillowColor?: string
-  /** Legs; defaults to the palette's `woodDark`. */
-  legColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `seats` | `number` | `3` | Seats across, 1 to 4. |
+| `depth` | `number` | `0.9` | Depth along local Z, in units. Seats face +Z. |
+| `seatHeight` | `number` | `0.44` | Top of the seat cushions, in units. |
+| `arms` | `"slim" \| "none" \| "square" \| "rolled"` |  | Seeded when unset. |
+| `cushions` | `"split" \| "bench"` |  | Seeded when unset. |
+| `legs` | `"pegs" \| "plinth"` |  | Seeded when unset. |
+| `pillows` | `number` |  | Throw pillows, 0 to 2. Seeded when unset. |
+| `color` | `color` |  | Upholstery; defaults to the palette's `fabric`. |
+| `pillowColor` | `color` |  | Throw pillows; defaults to the palette's `accent`. |
+| `legColor` | `color` |  | Legs; defaults to the palette's `woodDark`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

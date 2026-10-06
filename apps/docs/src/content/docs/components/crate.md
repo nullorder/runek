@@ -22,19 +22,21 @@ import { Crate } from './runek/Crate'
 <Crate position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Crate", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface CrateProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Edge length, in units. */
-  size?: number
-  /** Plank color; defaults to the world palette's `wood` slot. */
-  color?: string
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `size` | `number` | `0.8` | Edge length, in units. |
+| `color` | `color` | palette `wood` | Plank color; defaults to the world palette's `wood` slot. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

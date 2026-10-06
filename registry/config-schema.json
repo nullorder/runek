@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://runek.nullorder.org/registry/config-schema.json",
+  "title": "runek.config.json",
+  "description": "Project config for the runek CLI, written by `runek init`.",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "registry": {
+      "type": "string",
+      "description": "Registry base: a URL or a local path.",
+      "default": "https://runek.nullorder.org/r"
+    },
+    "dir": {
+      "type": "string",
+      "description": "Install directory for component source.",
+      "default": "src/runek"
+    }
+  },
+  "additionalProperties": false
+}

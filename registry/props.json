@@ -1,0 +1,6052 @@
+{
+  "ArcadeCabinet": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "An upright arcade cabinet: side panels cut to the classic profile, a lit marquee, a joystick\nand buttons on the control panel, and a glowing screen running a seeded pixel game (a row of\ninvaders over a ship, drawn as instanced squares). One cuboid collider.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Cabinet width, in units.",
+        "optional": true,
+        "default": 0.66
+      },
+      "color": {
+        "type": "color",
+        "doc": "Body color. Seeded when unset.",
+        "optional": true
+      },
+      "accent": {
+        "type": "color",
+        "doc": "Side-art stripe and marquee glow. Seeded when unset.",
+        "optional": true
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Lit screen showing a seeded game; off, dark glass.",
+        "optional": true,
+        "default": true
+      },
+      "players": {
+        "type": "enum",
+        "options": [
+          1,
+          2
+        ],
+        "doc": "Control sets on the panel (one or two players). Seeded when unset.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "arcadecabinet",
+    "category": "interiors",
+    "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a seeded pixel game."
+  },
+  "Arch": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A freestanding gateway: two piers and a semicircular arch of voussoirs.\nComposes with `Wall` for an entrance. The piers carry the colliders; the\narch crown sits overhead.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Clear opening width, in units.",
+        "optional": true,
+        "default": 2.4
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height to the springline (top of the piers), in units.",
+        "optional": true,
+        "default": 2.6
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Pier thickness, in units.",
+        "optional": true,
+        "default": 0.4
+      },
+      "blocks": {
+        "type": "number",
+        "doc": "Voussoir blocks forming the semicircular arch.",
+        "optional": true,
+        "default": 9
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `stone` slot.",
+        "optional": true,
+        "palette": "stone"
+      }
+    },
+    "name": "arch",
+    "category": "structures",
+    "description": "Freestanding gateway: two piers and a semicircular arch of voussoirs. Composes with Wall."
+  },
+  "Barrel": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A staved barrel: two frustums bellied at the middle, banded by metal hoops.\nA convex-hull collider matches the bulge. Crate's round sibling.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Radius, in units.",
+        "optional": true,
+        "default": 0.35
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 0.9
+      },
+      "color": {
+        "type": "color",
+        "doc": "Stave color; defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "hoopColor": {
+        "type": "color",
+        "doc": "Hoop color; defaults to the world palette's `metal` slot.",
+        "optional": true,
+        "palette": "metal"
+      }
+    },
+    "name": "barrel",
+    "category": "interiors",
+    "description": "Staved barrel bellied at the middle, banded by metal hoops; convex-hull collider."
+  },
+  "Bed": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A bed: frame, mattress, pillows, and a headboard (at local -Z). Finishes a\nbedroom. Solid, so it owns one cuboid collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 1.4
+      },
+      "length": {
+        "type": "number",
+        "doc": "Length, in units.",
+        "optional": true,
+        "default": 2
+      },
+      "color": {
+        "type": "color",
+        "doc": "Frame color; defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "beddingColor": {
+        "type": "color",
+        "doc": "Bedding color; defaults to the world palette's `fabric` slot.",
+        "optional": true,
+        "palette": "fabric"
+      }
+    },
+    "name": "bed",
+    "category": "interiors",
+    "description": "Bed with a frame, mattress, pillows, and a headboard."
+  },
+  "Bench": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A slatted bench, with an optional backrest. Indoor or outdoor seating.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "length": {
+        "type": "number",
+        "doc": "Length, in units.",
+        "optional": true,
+        "default": 1.6
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.5
+      },
+      "seatHeight": {
+        "type": "number",
+        "optional": true,
+        "default": 0.45
+      },
+      "back": {
+        "type": "boolean",
+        "doc": "Include a backrest.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      }
+    },
+    "name": "bench",
+    "category": "interiors",
+    "description": "Slatted bench with an optional backrest; indoor or outdoor seating."
+  },
+  "Birds": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A loose flock circling overhead, each bird flapping on its own seeded orbit.\nMotion and life for the sky. Decorative (no collider).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "count": {
+        "type": "number",
+        "optional": true,
+        "default": 10
+      },
+      "area": {
+        "type": "number",
+        "doc": "Orbit spread, in units.",
+        "optional": true,
+        "default": 20
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 12
+      },
+      "speed": {
+        "type": "number",
+        "optional": true,
+        "default": 1
+      },
+      "color": {
+        "type": "color",
+        "optional": true,
+        "default": "#2a2a30"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "birds",
+    "category": "environment",
+    "description": "A loose flock circling overhead, each bird flapping on its own seeded orbit."
+  },
+  "Book": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A single procedural book — the standalone, placeable sibling of `Bookshelf`'s\ninstanced spines. Put it on a table, a pedestal, or a reading stand; give it\nan `href` or `onSelect` and it becomes a clickable artifact. Decorative: no\ncollider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "width": {
+        "type": "number",
+        "doc": "Cover width (spine to fore-edge), in units.",
+        "optional": true,
+        "default": 0.22
+      },
+      "height": {
+        "type": "number",
+        "doc": "Spine length, in units.",
+        "optional": true,
+        "default": 0.3
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Closed page-block thickness, in units.",
+        "optional": true,
+        "default": 0.05
+      },
+      "pose": {
+        "type": "enum",
+        "options": [
+          "standing",
+          "lying",
+          "open"
+        ],
+        "doc": "`lying` rests on its back cover (spine on the -x edge); `standing` stands\nupright on its bottom edge; `open` lies opened flat at the spine.",
+        "optional": true,
+        "default": "lying"
+      },
+      "color": {
+        "type": "color",
+        "doc": "Cover color. Defaults to a seeded cloth-bound color.",
+        "optional": true
+      },
+      "pageColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#efe7d2"
+      },
+      "title": {
+        "type": "string",
+        "doc": "Shown as a hover label when the book is interactive.",
+        "optional": true
+      },
+      "href": {
+        "type": "string",
+        "doc": "Navigated to on click when no `onSelect` is given.",
+        "optional": true
+      },
+      "onSelect": {
+        "type": "function",
+        "doc": "Called on click. Optional, so the book still renders from data.",
+        "optional": true
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "book",
+    "category": "interiors",
+    "description": "A single procedural book — standing, lying, or open — with a seeded cover and optional click interaction; the standalone sibling of Bookshelf's instanced spines."
+  },
+  "Bookshelf": {
+    "kind": "component",
+    "seeded": true,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "width": {
+        "type": "number",
+        "doc": "Outer dimensions in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 2
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.3
+      },
+      "shelves": {
+        "type": "number",
+        "doc": "Number of rows. Defaults to 3; set 1 or 2 for a shorter case.",
+        "optional": true,
+        "default": 3
+      },
+      "fill": {
+        "type": "number",
+        "doc": "Fraction of shelf space filled with procedural decoration, 0–1. Defaults to\n`0` (an empty shelf); set it for a decorative, non-interactive shelf. Ignored\nwhen `books` is set.",
+        "optional": true,
+        "default": 0
+      },
+      "color": {
+        "type": "color",
+        "doc": "Frame color. Defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "backColor": {
+        "type": "color",
+        "doc": "Back-panel color. Defaults to the world palette's `woodDark` slot.",
+        "optional": true,
+        "palette": "woodDark"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      },
+      "books": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "BookSpec"
+        },
+        "doc": "Explicit, addressable books. When provided, these replace the procedural\n`fill` and are the only books rendered. Pass `[]` for an empty shelf and\nappend to make books appear. A book is clickable when `onBookSelect` is set\nor it carries an `href`.",
+        "optional": true
+      },
+      "onBookSelect": {
+        "type": "function",
+        "doc": "Called with the clicked book. When omitted, a book's `href` is navigated to.",
+        "optional": true
+      },
+      "label": {
+        "type": "string",
+        "doc": "Section label rendered above the shelf, e.g. `\"Guides\"`. Drawn as a `Sign`\nin the world's `display` face.",
+        "optional": true
+      },
+      "labelColor": {
+        "type": "color",
+        "doc": "Label color. Defaults to the world palette's `accent` slot.",
+        "optional": true,
+        "palette": "accent"
+      },
+      "labelSize": {
+        "type": "number",
+        "doc": "Label cap height in units.",
+        "optional": true,
+        "default": 0.08
+      }
+    },
+    "defs": {
+      "BookSpec": {
+        "props": {
+          "id": {
+            "type": "string",
+            "doc": "Stable identity, passed back to `onBookSelect`."
+          },
+          "title": {
+            "type": "string",
+            "doc": "Shown as a hover label.",
+            "optional": true
+          },
+          "color": {
+            "type": "color",
+            "doc": "Spine color. Defaults to a seeded color.",
+            "optional": true
+          },
+          "href": {
+            "type": "string",
+            "doc": "Navigated to on click when no `onBookSelect` is given.",
+            "optional": true
+          },
+          "shelf": {
+            "type": "number",
+            "doc": "Row to place the book on, counted from the top (0 = top row). Clamped to\nthe shelf's row count. Books without a row auto-pack bottom-up around the\nplaced ones.",
+            "optional": true
+          }
+        }
+      }
+    },
+    "name": "bookshelf",
+    "category": "interiors",
+    "description": "Procedurally generated bookshelf with seeded books and one cuboid collider."
+  },
+  "Bridge": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A plank deck that spans a gap, optionally arched, with railings. The deck is\nthe gameplay surface, so colliders follow it as a few slabs, not one per plank.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "type": "number",
+        "doc": "Span along local X, in units.",
+        "optional": true,
+        "default": 6
+      },
+      "width": {
+        "type": "number",
+        "doc": "Walkway width along local Z, in units.",
+        "optional": true,
+        "default": 2
+      },
+      "arch": {
+        "type": "number",
+        "doc": "Arch rise at the center, in units (0 = flat).",
+        "optional": true,
+        "default": 0
+      },
+      "rails": {
+        "type": "boolean",
+        "doc": "Side railings.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Deck color; defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "bridge",
+    "category": "structures",
+    "description": "Plank deck spanning a gap, optionally arched, with railings and slab colliders that follow the deck."
+  },
+  "Bush": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A clustered shrub of overlapping foliage blobs: the mid-height density between\nGrass and Trees. Soft, so decorative (no collider).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Overall radius, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "blobs": {
+        "type": "number",
+        "doc": "Number of foliage blobs.",
+        "optional": true,
+        "default": 7
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `foliage` slot.",
+        "optional": true,
+        "palette": "foliage"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "bush",
+    "category": "vegetation",
+    "description": "Clustered foliage blobs, seeded; the mid-height density between Grass and Trees."
+  },
+  "Campfire": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A ring of stones, a tepee of logs, and an animated flame with a warm,\nflickering light: a night-time focal point that plays off the day/night system.\nDecorative (no collider).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Radius, in units.",
+        "optional": true,
+        "default": 0.5
+      },
+      "logColor": {
+        "type": "color",
+        "doc": "Log color; defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "flameColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#ff7a1a"
+      },
+      "intensity": {
+        "type": "number",
+        "optional": true,
+        "default": 14
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "campfire",
+    "category": "environment",
+    "description": "Stone ring, a tepee of logs, and an animated flame with a warm flickering light."
+  },
+  "Chair": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 0.45
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.45
+      },
+      "seatHeight": {
+        "type": "number",
+        "optional": true,
+        "default": 0.45
+      },
+      "backHeight": {
+        "type": "number",
+        "optional": true,
+        "default": 0.5
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      }
+    },
+    "name": "chair",
+    "category": "interiors",
+    "description": "Chair with seat, back, and legs."
+  },
+  "Cliff": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A rocky promontory: a low-poly truncated cone, vertex-jittered by `seed`, rising from the\nwaterline to a flattish plateau you can stand on. A convex-hull collider blocks the steep sides\nand carries the top. Sink the base below the water in placement so it reads as rising from the\nsea. (Convex — true overhangs aren't modelled.)",
+    "props": {
+      "radius": {
+        "type": "number",
+        "doc": "Base radius at the waterline, in units.",
+        "optional": true,
+        "default": 10
+      },
+      "topRadius": {
+        "type": "number",
+        "doc": "Plateau (top) radius, in units.",
+        "optional": true,
+        "default": 6
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height from the base to the plateau, in units.",
+        "optional": true,
+        "default": 12
+      },
+      "segments": {
+        "type": "number",
+        "doc": "Radial facets — fewer reads as blockier rock.",
+        "optional": true,
+        "default": 8
+      },
+      "rough": {
+        "type": "number",
+        "doc": "Surface jitter, as a fraction of a facet.",
+        "optional": true,
+        "default": 0.35
+      },
+      "color": {
+        "type": "color",
+        "doc": "Rock color; defaults to the palette's `stone`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "cliff",
+    "category": "terrain",
+    "description": "A rocky promontory: a low-poly, seed-jittered truncated cone with a flattish plateau and a convex-hull collider."
+  },
+  "Clock": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A procedural analog clock — face, rim, ticks, and three hands, all from code\n(no fonts or textures). The hands track the system clock, or a given `timezone`.\nDecorative: it registers no colliders (mount it against a wall that has one).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Face radius in units.",
+        "optional": true,
+        "default": 0.55
+      },
+      "timezone": {
+        "type": "string",
+        "doc": "IANA timezone, e.g. \"Asia/Kolkata\". Omit to inherit the world's `timezone`\n(`<World timezone>`), then the local system time; if neither resolves, the\nclock falls back to UTC.",
+        "optional": true
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "Rim/frame color. Defaults to the world palette's `metal` slot.",
+        "optional": true,
+        "palette": "metal"
+      },
+      "faceColor": {
+        "type": "color",
+        "doc": "Dial color.",
+        "optional": true,
+        "default": "#0d1117"
+      },
+      "handColor": {
+        "type": "color",
+        "doc": "Hour/minute hand and tick color.",
+        "optional": true,
+        "default": "#e8eef5"
+      },
+      "accentColor": {
+        "type": "color",
+        "doc": "Second hand + hub accent. Defaults to the world palette's `accent` slot.",
+        "optional": true,
+        "palette": "accent"
+      }
+    },
+    "name": "clock",
+    "category": "interiors",
+    "description": "Procedural analog wall clock; hands track the system clock or a given IANA timezone."
+  },
+  "Clouds": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "Drifting clouds built from clustered soft blobs (no textures). Layer above a\n`Sky` for depth and motion. Decorative (no collider).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "count": {
+        "type": "number",
+        "doc": "Number of clouds.",
+        "optional": true,
+        "default": 8
+      },
+      "area": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Spread `[width, depth]`, in units.",
+        "optional": true,
+        "default": [
+          80,
+          80
+        ]
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height above the origin, in units.",
+        "optional": true,
+        "default": 24
+      },
+      "drift": {
+        "type": "number",
+        "doc": "Drift speed along +X, in units/sec (0 holds still).",
+        "optional": true,
+        "default": 0.6
+      },
+      "color": {
+        "type": "color",
+        "optional": true,
+        "default": "#eef2f7"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "clouds",
+    "category": "environment",
+    "description": "Drifting clouds built from clustered soft blobs (no textures); layer above a Sky."
+  },
+  "CoffeeMachine": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A countertop coffee machine, its origin at its feet so it sits on a `Counter`: an espresso\nmachine (group head, cup on the drip tray, dials) or a drip brewer (water tank, carafe on a hot\nplate). `steam` sends a few puffs up from the coffee. One small cuboid collider; it stands on a\ncounter, not the ground.",
+    "props": {
+      "kind": {
+        "type": "enum",
+        "options": [
+          "espresso",
+          "drip"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Body color. Seeded from a few appliance finishes when unset.",
+        "optional": true
+      },
+      "steam": {
+        "type": "boolean",
+        "doc": "A few puffs of steam rising from the cup or carafe.",
+        "optional": true,
+        "default": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "coffeemachine",
+    "category": "interiors",
+    "description": "A countertop coffee machine, espresso or drip, with a cup or carafe and a few puffs of steam. Sits on a Counter."
+  },
+  "Compass": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A screen-fixed HUD compass: a glassy dial (translucent ring, classic split-half rose\nneedles, cardinal markers, a fixed lubber line at twelve o'clock) floating in a corner of\nthe canvas, with an optional wind + bearing readout pill. Like a ship's binnacle compass,\nthe rose card swings while the ring and lubber line stay fixed — whatever cardinal sits\nunder the pointer is the way you're facing.\n\nThe heading is read from the camera every frame, which covers any traversal scheme that\ndrives the camera (an ecctrl `Player` on foot, a chase-cam vehicle). The card rotates by\ndirect DOM mutation, so per-frame updates never re-render React. Rendered via drei `Html`\ninto the canvas wrapper — purely informational, it never intercepts pointer events.",
+    "props": {
+      "corner": {
+        "type": "enum",
+        "options": [
+          "top-left",
+          "top-right",
+          "bottom-left",
+          "bottom-right"
+        ],
+        "doc": "Screen corner the dial sits in.",
+        "optional": true,
+        "default": "bottom-left"
+      },
+      "size": {
+        "type": "number",
+        "doc": "Dial diameter, in CSS px (shrinks ~22% on narrow viewports).",
+        "optional": true,
+        "default": 108
+      },
+      "inset": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Inset from the corner edges, in CSS px `[x, y]`.",
+        "optional": true,
+        "default": [
+          16,
+          16
+        ]
+      },
+      "readout": {
+        "type": "boolean",
+        "doc": "Show the wind + bearing readout pill under the dial.",
+        "optional": true,
+        "default": true
+      },
+      "north": {
+        "type": "number",
+        "doc": "World yaw (radians) the dial reads as north, using the same convention as `Player`/`Helm`\nyaw: 0 faces +Z, so the default makes +Z north (and -X east).",
+        "optional": true,
+        "default": 0
+      },
+      "accentColor": {
+        "type": "color",
+        "doc": "North needle + north letter color. Compass-north red; no palette slot fits.",
+        "optional": true,
+        "default": "#c0392b"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "compass",
+    "category": "systems",
+    "description": "A screen-fixed HUD compass: a glassy dial in a corner of the canvas whose rose card swings with the camera heading, with a fixed lubber line and an optional wind + bearing readout — works with any traversal that drives the camera (on foot or at a vehicle's chase-cam)."
+  },
+  "Counter": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A service / bar counter (or, with `hob`, a kitchen stove run): a solid body under a worktop that overhangs the front (local +Z), where\nstools tuck in. One cuboid collider — you can't walk through it. Pair with `Stool` and a `Shelf`.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Length along local X, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "height": {
+        "type": "number",
+        "doc": "Counter height, in units.",
+        "optional": true,
+        "default": 1.1
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth along local Z, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "color": {
+        "type": "color",
+        "doc": "Body color; defaults to the palette's `wood`.",
+        "optional": true
+      },
+      "topColor": {
+        "type": "color",
+        "doc": "Worktop color; defaults to the palette's `woodDark`.",
+        "optional": true
+      },
+      "hob": {
+        "type": "boolean",
+        "doc": "A kitchen stove at the +X end: a glass hob with four burners on the worktop and an oven\ndoor in the front below it.",
+        "optional": true,
+        "default": false
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "counter",
+    "category": "interiors",
+    "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider. With hob, a kitchen stove: a glass cooktop and an oven door."
+  },
+  "Crate": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A slatted wooden crate: a paneled core inside a 12-edge plank frame, each plank\nseeded a slightly different shade. A clean cube with a cuboid collider, so it\nstacks. The world-building staple (see also Barrel).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "size": {
+        "type": "number",
+        "doc": "Edge length, in units.",
+        "optional": true,
+        "default": 0.8
+      },
+      "color": {
+        "type": "color",
+        "doc": "Plank color; defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "crate",
+    "category": "interiors",
+    "description": "Slatted wooden crate with seeded plank shades; stacks via a cuboid collider."
+  },
+  "CurvedWall": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "An arc of wall around the component origin — the curved-architecture counterpart of `Wall`.\n`solid` reads as concrete; `glass` as a floor-to-ceiling curtain wall with mullions at every\nchord joint. Leave door gaps by composing several arcs. Chords render instanced and each\ncarries a cuboid collider, so the wall blocks like the curve it draws.",
+    "props": {
+      "radius": {
+        "type": "number",
+        "doc": "Arc centerline radius, in units. The component origin is the circle's center.",
+        "optional": true,
+        "default": 6
+      },
+      "arc": {
+        "type": "number",
+        "doc": "Sweep angle in radians, centered on the local +Z axis.",
+        "optional": true,
+        "default": 1.5707963267948966
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.15
+      },
+      "style": {
+        "type": "enum",
+        "options": [
+          "solid",
+          "glass"
+        ],
+        "doc": "`glass` renders a transparent curtain wall with mullions; `solid` a plain wall.",
+        "optional": true,
+        "default": "solid"
+      },
+      "segments": {
+        "type": "number",
+        "doc": "Chord segments; defaults from `radius × arc`, more segments reading as smoother.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Solid wall color; defaults to the world palette's `wall` slot.",
+        "optional": true,
+        "palette": "wall"
+      },
+      "glassColor": {
+        "type": "color",
+        "doc": "Glass tint (glass style).",
+        "optional": true,
+        "default": "#b7d8e8"
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "Mullion and rail color (glass style); defaults to the palette's `metal` slot.",
+        "optional": true,
+        "palette": "metal"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "curvedwall",
+    "category": "structures",
+    "description": "An arc of wall around the origin — solid concrete or a floor-to-ceiling glass curtain wall with mullions. Compose several arcs to leave door gaps; chords carry cuboid colliders."
+  },
+  "Desk": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A work desk: a top over legs, a drawer pedestal, or side panels, with a modesty panel at the back\n(local -Z). The base and drawer count come from the seed unless you pin them. One cuboid\ncollider for the whole desk. Pair with a `Monitor` on top and a `Chair` at the front.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Width along local X, in units.",
+        "optional": true,
+        "default": 1.4
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth along local Z, in units. The front, where you sit, faces +Z.",
+        "optional": true,
+        "default": 0.7
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height of the work surface, in units.",
+        "optional": true,
+        "default": 0.75
+      },
+      "base": {
+        "type": "enum",
+        "options": [
+          "legs",
+          "pedestal",
+          "panels"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "drawers": {
+        "type": "number",
+        "doc": "Drawers in the pedestal, 0 to 4. Seeded when unset; only a `pedestal` desk has them.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Top color; defaults to the palette's `wood`.",
+        "optional": true
+      },
+      "baseColor": {
+        "type": "color",
+        "doc": "Legs, pedestal, and panels; defaults to the palette's `metal` for legs, else `woodDark`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "desk",
+    "category": "interiors",
+    "description": "A work desk: a top over slim legs, a drawer pedestal, or side panels, with a modesty panel at the back. Base and drawers seeded, each pinnable. One cuboid collider."
+  },
+  "Dock": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A plank jetty on pilings that reaches out over water. The deck is the gameplay surface\n(a few collider slabs, not one per plank, like `Bridge`); the pilings, side stringers, and\nthe two seaward mooring posts are decorative. The local origin sits at the deck surface on\nthe shore end, so `position` is where the jetty meets land and it runs out along local +Z.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "How far the jetty reaches out from the shore (local +Z), in units.",
+        "optional": true,
+        "default": 10
+      },
+      "width": {
+        "type": "number",
+        "doc": "Walkway width (local X), in units.",
+        "optional": true,
+        "default": 3
+      },
+      "depth": {
+        "type": "number",
+        "doc": "How deep the pilings sink below the deck surface, in units.",
+        "optional": true,
+        "default": 4
+      },
+      "color": {
+        "type": "color",
+        "doc": "Deck color; defaults to the world palette's `wood`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "dock",
+    "category": "structures",
+    "description": "A plank jetty on pilings reaching out over water; walkable deck colliders, side stringers, and seaward mooring posts."
+  },
+  "Door": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 0.9
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 2
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.05
+      },
+      "openAngle": {
+        "type": "number",
+        "doc": "Hinge angle in radians; 0 is closed.",
+        "optional": true,
+        "default": 0
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      }
+    },
+    "name": "door",
+    "category": "structures",
+    "description": "Door panel within a frame."
+  },
+  "Fence": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A run of posts and rails. One footprint collider, not one body per post.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "type": "number",
+        "doc": "Total length along local X, in units.",
+        "optional": true,
+        "default": 6
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 1.1
+      },
+      "postSpacing": {
+        "type": "number",
+        "doc": "Spacing between posts, in units.",
+        "optional": true,
+        "default": 1.5
+      },
+      "rails": {
+        "type": "number",
+        "doc": "Number of horizontal rails.",
+        "optional": true,
+        "default": 2
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "fence",
+    "category": "structures",
+    "description": "Posts and rails with seeded weathering; encloses yards and paths. One footprint collider."
+  },
+  "Flag": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A cloth flag on a pole. The cloth is a segmented plane rippled per-frame and pinned at the\nluff (pole side), so the wave grows toward the fly. The pole carries a thin collider; the\ncloth and finial are decorative.",
+    "props": {
+      "poleHeight": {
+        "type": "number",
+        "doc": "Pole height, in units.",
+        "optional": true,
+        "default": 6
+      },
+      "fly": {
+        "type": "number",
+        "doc": "Flag width away from the pole (the fly), in units.",
+        "optional": true,
+        "default": 2.4
+      },
+      "drop": {
+        "type": "number",
+        "doc": "Flag height (the drop), in units.",
+        "optional": true,
+        "default": 1.5
+      },
+      "waveSpeed": {
+        "type": "number",
+        "doc": "Ripple speed.",
+        "optional": true,
+        "default": 3
+      },
+      "waveAmplitude": {
+        "type": "number",
+        "doc": "Ripple depth as a fraction of the fly.",
+        "optional": true,
+        "default": 0.22
+      },
+      "color": {
+        "type": "color",
+        "doc": "Cloth color; defaults to the world palette's `fabric`.",
+        "optional": true
+      },
+      "poleColor": {
+        "type": "color",
+        "doc": "Pole color; defaults to the palette's `wood`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "flag",
+    "category": "structures",
+    "description": "A cloth flag on a pole; the cloth ripples per-frame, pinned at the luff. Thin pole collider."
+  },
+  "Floor": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "`[width, depth]` in units. The top surface sits at the component origin.",
+        "optional": true,
+        "default": [
+          8,
+          8
+        ]
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.2
+      },
+      "opening": {
+        "type": "object",
+        "ref": "FloorOpening",
+        "doc": "A hole in the slab (stairwell); the slab splits into strips around it.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `floor` slot.",
+        "optional": true,
+        "palette": "floor"
+      }
+    },
+    "defs": {
+      "FloorOpening": {
+        "props": {
+          "x": {
+            "type": "number",
+            "doc": "Hole center offset from the slab center along X, in units.",
+            "optional": true
+          },
+          "z": {
+            "type": "number",
+            "doc": "Hole center offset from the slab center along Z, in units.",
+            "optional": true
+          },
+          "width": {
+            "type": "number"
+          },
+          "depth": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "name": "floor",
+    "category": "structures",
+    "description": "Flat floor slab with a fixed collider; optional stairwell opening."
+  },
+  "Flowers": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "Instanced wildflowers scattered over a patch: a green stem plus a colored\nhead, seeded so the same seed plants the same meadow. Decorative (no collider).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "area": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Patch extent `[width, depth]`, in units.",
+        "optional": true,
+        "default": [
+          6,
+          6
+        ]
+      },
+      "count": {
+        "type": "number",
+        "optional": true,
+        "default": 60
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 0.4
+      },
+      "stemColor": {
+        "type": "color",
+        "doc": "Stem color; defaults to the world palette's `foliage` slot.",
+        "optional": true,
+        "palette": "foliage"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "flowers",
+    "category": "vegetation",
+    "description": "Instanced seeded wildflowers (stem + colored head) scattered over a patch."
+  },
+  "Fountain": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A two-tier stone fountain with gently rippling water (a light per-frame bob,\nno textures). A plaza centerpiece. The basin is solid, so it owns a collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Radius, in units.",
+        "optional": true,
+        "default": 1.6
+      },
+      "color": {
+        "type": "color",
+        "doc": "Stone color; defaults to the world palette's `stone` slot.",
+        "optional": true,
+        "palette": "stone"
+      },
+      "waterColor": {
+        "type": "color",
+        "doc": "Water color; defaults to the world palette's `waterShallow` slot.",
+        "optional": true,
+        "palette": "waterShallow"
+      }
+    },
+    "name": "fountain",
+    "category": "water",
+    "description": "Two-tier stone fountain with gently rippling water (a per-frame bob, no textures)."
+  },
+  "Fridge": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A kitchen fridge: a rounded cabinet with its door split for a freezer (top or bottom) or one\ntall door, long bar handles on the opening side, and a kick plate. Doors face local +Z. One\ncuboid collider.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 0.7
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 1.8
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.68
+      },
+      "layout": {
+        "type": "enum",
+        "options": [
+          "top",
+          "bottom",
+          "single"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Body color. Seeded between an enamel white and brushed steel when unset.",
+        "optional": true
+      },
+      "handleColor": {
+        "type": "color",
+        "doc": "Handles; defaults to the palette's `metal`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "fridge",
+    "category": "interiors",
+    "description": "A kitchen fridge with a top or bottom freezer or one tall door, bar handles, and a seeded enamel or steel finish."
+  },
+  "Grass": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "Decorative instanced blades with a vertex-shader wind sway — no collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "area": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Patch extent `[width, depth]`, in units.",
+        "optional": true,
+        "default": [
+          10,
+          10
+        ]
+      },
+      "count": {
+        "type": "number",
+        "optional": true,
+        "default": 600
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 0.35
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `foliage` slot.",
+        "optional": true,
+        "palette": "foliage"
+      },
+      "sway": {
+        "type": "number",
+        "doc": "Wind sway strength; 0 disables the animation.",
+        "optional": true,
+        "default": 1
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "grass",
+    "category": "environment",
+    "description": "Instanced grass blades (seeded scatter)."
+  },
+  "Hedge": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A trimmed green wall: a solid clipped box dressed with seeded surface tufts.\nIt blocks like a Wall, so it owns a cuboid collider. Fence's vegetation cousin.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "type": "number",
+        "doc": "Length along local X, in units.",
+        "optional": true,
+        "default": 4
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `foliage` slot.",
+        "optional": true,
+        "palette": "foliage"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "hedge",
+    "category": "vegetation",
+    "description": "A trimmed green wall with seeded surface tufts; blocks like a Wall."
+  },
+  "House": {
+    "kind": "composite",
+    "seeded": true,
+    "doc": "A two-level dwelling arranged from parts: wall rings with door and window openings, a staircase through the upper floor, a gable roof, and a plant by the door.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "optional": true
+      },
+      "seed": {
+        "type": "number",
+        "optional": true,
+        "doc": "Cascades to the seeded parts of the arrangement."
+      }
+    },
+    "name": "house",
+    "category": "structures",
+    "description": "Composite: a two-level dwelling arranged from parts (Levels, Door, Windows, Staircase, gable Roof, Plant). Unpack to customize."
+  },
+  "Hut": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A round hut: a cylindrical wall with a front doorway under a shaggy conical thatch roof. The\nwall is ringed by post ribs on a low stone base, the roof is seed-jittered with a ragged fringe,\nprotruding rafter tips, and a topknot finial, and a small framed window sits at the back. The\ndoorway faces local +Z. A single cylinder collider makes it a solid obstacle (the doorway is\nvisual — the hut is composed, not entered). For a square house with a gable roof, use `House`.",
+    "props": {
+      "radius": {
+        "type": "number",
+        "doc": "Wall radius, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "wallHeight": {
+        "type": "number",
+        "doc": "Wall height at the eaves, in units.",
+        "optional": true,
+        "default": 2.9
+      },
+      "roofHeight": {
+        "type": "number",
+        "doc": "Conical roof height above the eaves, in units.",
+        "optional": true,
+        "default": 1.5
+      },
+      "doorWidth": {
+        "type": "number",
+        "doc": "Doorway width at the front (local +Z), in units.",
+        "optional": true,
+        "default": 1.3
+      },
+      "wallColor": {
+        "type": "color",
+        "doc": "Wall color; defaults to the palette's `wall`.",
+        "optional": true
+      },
+      "roofColor": {
+        "type": "color",
+        "doc": "Roof color; defaults to the palette's `roof`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "hut",
+    "category": "structures",
+    "description": "A round hut: a post-ribbed wall on a stone base, a framed doorway and window, under a shaggy thatch cone; one cylinder collider."
+  },
+  "Interactable": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "Wrap anything to make it something the player can act on: walk within `radius` and a prompt\nappears over it (`E Use`), press the key and `onAction` gets the action's `id`. Of everything\nin range only the nearest shows its prompt and takes the key, and keys already yield to text\nfields on the page. The actions are plain JSON, so a world file can declare them; the callback\nis the host's. No geometry or colliders of its own.\n\n```tsx\n<World controls={{ use: ['KeyE'] }}>\n  <Interactable actions={[{ id: 'sit', label: 'Sit', control: 'use' }]} onAction={sitDown}>\n    <Chair />\n  </Interactable>\n</World>\n```",
+    "props": {
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "InteractionAction"
+        },
+        "doc": "What the player can do here. Each names a world `controls` action for its key, so declare\nit in the world (`controls: { use: ['KeyE'] }`).",
+        "optional": true,
+        "default": []
+      },
+      "radius": {
+        "type": "number",
+        "doc": "How close the avatar must come for the prompt to show, in units.",
+        "optional": true,
+        "default": 2
+      },
+      "promptHeight": {
+        "type": "number",
+        "doc": "Height of the prompt above the origin, in units.",
+        "optional": true,
+        "default": 1.4
+      },
+      "onAction": {
+        "type": "function",
+        "optional": true
+      },
+      "children": {
+        "type": "node",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "defs": {
+      "InteractionAction": {
+        "props": {
+          "id": {
+            "type": "string",
+            "doc": "Passed back to `onAction`."
+          },
+          "label": {
+            "type": "string",
+            "doc": "Shown in the prompt, e.g. `Talk`."
+          },
+          "control": {
+            "type": "string",
+            "doc": "The world `controls` action that triggers it (declare `talk: ['KeyT']` in the world's\n`controls`). The prompt shows the key bound to it, so a remap relabels it."
+          }
+        }
+      }
+    },
+    "name": "interactable",
+    "category": "systems",
+    "description": "Wrap anything to make it something the player can act on: walk within range and a prompt shows its actions with the keys the world binds to them; press one and onAction gets its id. Only the nearest in range takes the key, and keys yield to text fields."
+  },
+  "Lake": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "Procedural animated water (no textures), decorative (no collider). The local\norigin is the water surface: place it at or below the surrounding ground so it\nfills a depression rather than floating (CONTRACT §10).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Water surface `[width, depth]`, in units.",
+        "optional": true,
+        "default": [
+          20,
+          20
+        ]
+      },
+      "colorDeep": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `waterDeep` slot.",
+        "optional": true,
+        "palette": "waterDeep"
+      },
+      "colorShallow": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `waterShallow` slot.",
+        "optional": true,
+        "palette": "waterShallow"
+      },
+      "sunPosition": {
+        "type": "vec3",
+        "doc": "Direction the sun glint comes from; pair with your Sky's `sunPosition`.",
+        "optional": true,
+        "default": [
+          80,
+          30,
+          40
+        ]
+      },
+      "waveHeight": {
+        "type": "number",
+        "optional": true,
+        "default": 0.12
+      },
+      "waveSpeed": {
+        "type": "number",
+        "optional": true,
+        "default": 1
+      },
+      "segments": {
+        "type": "number",
+        "optional": true,
+        "default": 64
+      }
+    },
+    "name": "lake",
+    "category": "water",
+    "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level."
+  },
+  "Lamp": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 1.6
+      },
+      "color": {
+        "type": "color",
+        "doc": "Base + pole color. Defaults to the world palette's `metal` slot.",
+        "optional": true,
+        "palette": "metal"
+      },
+      "shadeColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#e9d8a6"
+      },
+      "lightColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#ffe8c2"
+      },
+      "intensity": {
+        "type": "number",
+        "optional": true,
+        "default": 18
+      },
+      "flicker": {
+        "type": "number",
+        "doc": "Candle-like intensity flicker, 0–1; 0 holds the light steady.",
+        "optional": true,
+        "default": 0.08
+      }
+    },
+    "name": "lamp",
+    "category": "interiors",
+    "description": "Lamp that emits a point light."
+  },
+  "Level": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "One ring of walls plus an optional slab — the stackable unit of a building.\nIts origin is the base of its walls, so level N sits at the summed height of\nthe levels below it. Composes `Wall` and `Floor`.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Interior footprint `[width, depth]`, in units.",
+        "optional": true,
+        "default": [
+          8,
+          8
+        ]
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.2
+      },
+      "walls": {
+        "type": "object",
+        "ref": "LevelWalls",
+        "doc": "Per-side wall configs; an omitted side renders a solid wall.",
+        "optional": true
+      },
+      "floor": {
+        "type": "union",
+        "variants": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "object",
+            "ref": "LevelFloorConfig"
+          }
+        ],
+        "doc": "The slab underfoot; `false` for none, or a config with a stairwell `opening`.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wall` slot.",
+        "optional": true,
+        "palette": "wall"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Reserved for procedural variation.",
+        "optional": true
+      }
+    },
+    "defs": {
+      "LevelWalls": {
+        "props": {
+          "front": {
+            "type": "object",
+            "ref": "LevelWallConfig",
+            "optional": true
+          },
+          "back": {
+            "type": "object",
+            "ref": "LevelWallConfig",
+            "optional": true
+          },
+          "left": {
+            "type": "object",
+            "ref": "LevelWallConfig",
+            "optional": true
+          },
+          "right": {
+            "type": "object",
+            "ref": "LevelWallConfig",
+            "optional": true
+          }
+        }
+      },
+      "LevelWallConfig": {
+        "props": {
+          "present": {
+            "type": "boolean",
+            "doc": "Set `false` to leave this side open (porch, lean-to).",
+            "optional": true
+          },
+          "openings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "ref": "WallOpening"
+            },
+            "optional": true
+          },
+          "color": {
+            "type": "color",
+            "doc": "Defaults to the level `color`, then the world palette's `wall` slot.",
+            "optional": true,
+            "palette": "wall"
+          }
+        }
+      },
+      "WallOpening": {
+        "props": {
+          "offset": {
+            "type": "number",
+            "doc": "Horizontal center offset from the wall center, in units.",
+            "optional": true
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "sill": {
+            "type": "number",
+            "doc": "Height of the opening's base above the wall base, in units.",
+            "optional": true
+          }
+        }
+      },
+      "LevelFloorConfig": {
+        "props": {
+          "opening": {
+            "type": "object",
+            "ref": "FloorOpening",
+            "optional": true
+          },
+          "thickness": {
+            "type": "number",
+            "optional": true
+          },
+          "color": {
+            "type": "color",
+            "doc": "Defaults to the world palette's `floor` slot.",
+            "optional": true,
+            "palette": "floor"
+          }
+        }
+      },
+      "FloorOpening": {
+        "props": {
+          "x": {
+            "type": "number",
+            "doc": "Hole center offset from the slab center along X, in units.",
+            "optional": true
+          },
+          "z": {
+            "type": "number",
+            "doc": "Hole center offset from the slab center along Z, in units.",
+            "optional": true
+          },
+          "width": {
+            "type": "number"
+          },
+          "depth": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "name": "level",
+    "category": "structures",
+    "description": "A stackable wall ring plus optional slab: per-side openings, sides that can be omitted, and a stairwell hole — the unit a building is composed from."
+  },
+  "LightRig": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A drop-in sun + sky/ground fill rig. Pair with `<World lights={false}>`. With no\nexplicit sun props it tracks the world's time-of-day: the sun's position, tint,\nand intensity follow `<World time>` / `timezone` (golden hour, blue hour, dim\nmoonlight). Any prop you set wins over the time-derived value.",
+    "props": {
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "sunPosition": {
+        "type": "vec3",
+        "optional": true
+      },
+      "sunColor": {
+        "type": "color",
+        "optional": true
+      },
+      "sunIntensity": {
+        "type": "number",
+        "optional": true
+      },
+      "ambient": {
+        "type": "number",
+        "optional": true
+      },
+      "skyColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#bcd4ff"
+      },
+      "groundColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#4a4030"
+      },
+      "shadows": {
+        "type": "boolean",
+        "optional": true,
+        "default": true
+      },
+      "shadowRange": {
+        "type": "number",
+        "doc": "Half-extent of the shadow camera frustum, in units.",
+        "optional": true,
+        "default": 30
+      }
+    },
+    "name": "lightrig",
+    "category": "systems",
+    "description": "Sun + hemisphere/ground fill with shadow configuration."
+  },
+  "Monitor": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A desk monitor: a thin screen in a bezel on a stand, its origin at the foot so it sits on a\n`Desk` top. Switched on, the screen glows in its `screen` color with a few seeded windows and\nlines of text on it, all geometry (no textures), so a busy office can light up desk by desk.\nOne small cuboid collider; not ground-standing.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Screen width, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "aspect": {
+        "type": "number",
+        "doc": "Width over height.",
+        "optional": true,
+        "default": 1.7777777777777777
+      },
+      "stand": {
+        "type": "enum",
+        "options": [
+          "legs",
+          "foot",
+          "plate"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "screen": {
+        "type": "color",
+        "doc": "The screen's glow when on. Seeded from a few calm tints when unset.",
+        "optional": true
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Lit, showing a few seeded windows; off, a dark glass.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Bezel and stand; defaults to the palette's `metal`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "monitor",
+    "category": "interiors",
+    "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry."
+  },
+  "Ocean": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "Procedural animated ocean (no textures), decorative (no collider). It follows the camera\nhorizontally so it reads as open sea to the horizon, with world-space swells that stay put\nas it moves and a fog blend that melts the far water into the sky. The surface sits at the\nworld ground baseline by default (CONTRACT §10); an explicit `position` height wins.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Plane size `[width, depth]`, in units. With `follow` on (the default) this patch tracks\nthe camera, so keep it large enough to reach past the world fog.",
+        "optional": true,
+        "default": [
+          400,
+          400
+        ]
+      },
+      "colorDeep": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `waterDeep` slot.",
+        "optional": true,
+        "palette": "waterDeep"
+      },
+      "colorShallow": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `waterShallow` slot.",
+        "optional": true,
+        "palette": "waterShallow"
+      },
+      "sunPosition": {
+        "type": "vec3",
+        "doc": "Direction the sun glint comes from; pair with your Sky's `sunPosition`.",
+        "optional": true,
+        "default": [
+          80,
+          30,
+          40
+        ]
+      },
+      "waveHeight": {
+        "type": "number",
+        "optional": true,
+        "default": 0.4
+      },
+      "waveSpeed": {
+        "type": "number",
+        "optional": true,
+        "default": 0.6
+      },
+      "segments": {
+        "type": "number",
+        "optional": true,
+        "default": 160
+      },
+      "follow": {
+        "type": "boolean",
+        "doc": "Track the camera horizontally for an endless sea (default true). Set false to pin it.",
+        "optional": true,
+        "default": true
+      }
+    },
+    "name": "ocean",
+    "category": "water",
+    "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground."
+  },
+  "OfficeChair": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A swivel office chair: a five-star base on casters, a gas column, a padded seat, and a back,\nwith or without arms. Seat faces local +Z, so `pose=\"sit\"` or `pose=\"type\"` on a `Person` at the\nsame position and rotation sits in it. One cuboid collider for the seat.",
+    "props": {
+      "seatHeight": {
+        "type": "number",
+        "doc": "Top of the seat cushion, in units.",
+        "optional": true,
+        "default": 0.47
+      },
+      "back": {
+        "type": "enum",
+        "options": [
+          "low",
+          "high"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "arms": {
+        "type": "boolean",
+        "doc": "Armrests. Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Seat and back; defaults to the palette's `fabric`.",
+        "optional": true
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "Base, column, and arms; defaults to the palette's `metal`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "officechair",
+    "category": "interiors",
+    "description": "A swivel office chair: five-star base on casters, gas column, padded seat, low or high back, optional arms. Seats a Person in sit or type pose."
+  },
+  "Palm": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A coconut palm: a leaning, gently bowed trunk topped with a crown of drooping fronds.\nTrunk rings and fronds are instanced; the seed drives lean direction, frond spread, and\ncoconut placement. One trunk cylinder collider.",
+    "props": {
+      "height": {
+        "type": "number",
+        "doc": "Trunk height, in units.",
+        "optional": true,
+        "default": 6
+      },
+      "lean": {
+        "type": "number",
+        "doc": "Sideways lean of the crown, as a fraction of height.",
+        "optional": true,
+        "default": 0.18
+      },
+      "fronds": {
+        "type": "number",
+        "doc": "Frond count.",
+        "optional": true,
+        "default": 11
+      },
+      "frondLength": {
+        "type": "number",
+        "doc": "Frond length, in units.",
+        "optional": true,
+        "default": 2.2
+      },
+      "trunkColor": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `bark` slot.",
+        "optional": true,
+        "palette": "bark"
+      },
+      "frondColor": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `foliage` slot.",
+        "optional": true,
+        "palette": "foliage"
+      },
+      "coconuts": {
+        "type": "boolean",
+        "doc": "Grow a coconut cluster under the crown.",
+        "optional": true,
+        "default": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "palm",
+    "category": "vegetation",
+    "description": "A coconut palm: leaning bowed trunk and a crown of drooping instanced fronds, deterministic from seed."
+  },
+  "Path": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A meandering ribbon trail laid flat in the XZ plane, draped just above the\nground. Decorative: you walk on the terrain beneath it, so it owns no collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "type": "number",
+        "doc": "Length along local Z, in units.",
+        "optional": true,
+        "default": 12
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 1.4
+      },
+      "meander": {
+        "type": "number",
+        "doc": "Lateral meander amplitude, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "rise": {
+        "type": "number",
+        "doc": "Total height climbed from the near end (local −Z) to the far end (+Z), in units. For a\ntrail that gains height as it winds; the ribbon rises linearly along its length.",
+        "optional": true,
+        "default": 0
+      },
+      "heights": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "doc": "Explicit elevation profile, in units: evenly spaced samples from the near end (local −Z)\nto the far end (+Z), linearly interpolated along the ribbon. Overrides `rise`. Author it\nfrom the terrain the trail crosses so the ribbon hugs the ground it climbs.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `ground` slot.",
+        "optional": true,
+        "palette": "ground"
+      },
+      "segments": {
+        "type": "number",
+        "optional": true,
+        "default": 48
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "path",
+    "category": "terrain",
+    "description": "A meandering ribbon trail from seeded waypoints; decorative, laid just over the ground."
+  },
+  "Person": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A procedural person: a sculpted, clothed, skinned figure generated from a seed.\n\nThe body is one continuous surface grown from a few dozen smooth primitives on an 18-bone\nskeleton (no seams at the joints), with a sculpted face, real eyelids, and eyeballs that\nfollow you. Clothes, hair, and hats are layers over it, each fitted to the body by offsetting\nits surface, so any garment fits any build, age, or style. Skin weights come from the same\nprimitives, so the whole figure bends as one.\n\nEvery trait resolves the same way: a part object (`body`, `face`, `hair`, `clothes`) wins, then\nthe flat shorthand prop, then the `skin` bundle, then the `kind` preset, then a seeded roll.\nSo `<Person seed={3} />` is a complete villager and each prop narrows it.\n\n`position` is the spawn point. Give it a `patrol` (waypoints) or a `wander` radius and it\nwalks: where it is on the route is a function of the clock and the seed, so every viewer sees\nit in the same place, and it steps around the player and other walkers in its way. A `route`\nwith a `departAt` time is a one-way trip instead (to a desk, to bed), with `onArrive` when it\nends. It stands\non one capsule collider, kinematic while it walks. Pass `physics={false}` for a bare visual,\nwhich is how it becomes `Player`'s third-person body (walking in step with the avatar):\n`<Player><Person physics={false} height={1.3} position={[0, -0.65, 0]} /></Player>`.\n\nMeshes build in the background a few milliseconds per frame, coarse first; the full-detail\nmesh only builds near the camera. Identical figures share one build.",
+    "props": {
+      "style": {
+        "type": "enum",
+        "options": [
+          "stylized",
+          "realistic",
+          "anime"
+        ],
+        "doc": "Proportion and face template: `stylized` (default) is an animated-film look with a big\nhead and eyes, small features, and slender limbs; `realistic` keeps canonical human\nproportions; `anime` pushes the eyes and legs further.",
+        "optional": true,
+        "default": "stylized"
+      },
+      "kind": {
+        "type": "enum",
+        "options": [
+          "villager",
+          "merchant",
+          "guard",
+          "sailor",
+          "farmer",
+          "noble",
+          "scholar",
+          "traveler"
+        ],
+        "doc": "Role preset: fills `outfit`, `hat`, and `accessories` unless you set them.",
+        "optional": true,
+        "default": "villager"
+      },
+      "gender": {
+        "type": "enum",
+        "options": [
+          "feminine",
+          "masculine",
+          "neutral"
+        ],
+        "doc": "Silhouette cues only; every trait it influences stays overridable. Seeded when unset.",
+        "optional": true
+      },
+      "age": {
+        "type": "enum",
+        "options": [
+          "child",
+          "adult",
+          "elder"
+        ],
+        "doc": "Head-to-body ratio, stature, and (for `elder`) a stooped spine.",
+        "optional": true,
+        "default": "adult"
+      },
+      "body": {
+        "type": "object",
+        "ref": "PersonBodySpec",
+        "doc": "The body: `build`, skin `tone`, and `height`. The flat props below are shorthands for\nthe same fields; when both are set, this object wins.",
+        "optional": true
+      },
+      "face": {
+        "type": "object",
+        "ref": "PersonFaceSpec",
+        "doc": "The face, part by part: eye color and size, brow color and weight, nose shape, lip\ncolor and fullness, blush.",
+        "optional": true
+      },
+      "clothes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "PersonGarment"
+        },
+        "doc": "Clothing layers, inner to outer, each with its own type, color, and options. The order\ndecides the fit: a shirt listed before the jeans is tucked in. Replaces `outfit`; `[]`\nis the bare base body (a smooth mannequin).",
+        "optional": true
+      },
+      "height": {
+        "type": "number",
+        "doc": "Standing height, in units. Every other measurement derives from it.",
+        "optional": true
+      },
+      "build": {
+        "type": "enum",
+        "options": [
+          "slim",
+          "average",
+          "stocky"
+        ],
+        "doc": "Limb thickness and torso depth. Seeded when unset.",
+        "optional": true
+      },
+      "skinTone": {
+        "type": "color",
+        "doc": "Skin color; seeded from a curated set of tones when unset.",
+        "optional": true
+      },
+      "skin": {
+        "type": "union",
+        "variants": [
+          {
+            "type": "enum",
+            "options": [
+              "sailor",
+              "hoodie",
+              "festival",
+              "chef",
+              "harvest",
+              "winter",
+              "voyage",
+              "ceremony",
+              "atelier",
+              "pirate",
+              "bartender",
+              "office",
+              "casual",
+              "preppy"
+            ]
+          },
+          {
+            "type": "object",
+            "ref": "PersonSkin"
+          }
+        ],
+        "doc": "Cosmetic loadout: a preset name from `PERSON_SKINS` (e.g. `\"winter\"`) or a custom\n`PersonSkin` bundle. Individual props win over it. Plain JSON either way, so an editor\nor an in-world UI can swap a figure's whole look by writing this one prop.",
+        "optional": true
+      },
+      "hair": {
+        "type": "union",
+        "variants": [
+          {
+            "type": "enum",
+            "options": [
+              "short",
+              "long",
+              "swept",
+              "bun",
+              "ponytail",
+              "braid",
+              "cropped",
+              "bald"
+            ]
+          },
+          {
+            "type": "object",
+            "ref": "PersonHairSpec"
+          }
+        ],
+        "doc": "A style name, or `{ style, color }`.",
+        "optional": true
+      },
+      "hairColor": {
+        "type": "color",
+        "optional": true
+      },
+      "facialHair": {
+        "type": "enum",
+        "options": [
+          "none",
+          "stubble",
+          "moustache",
+          "beard"
+        ],
+        "optional": true
+      },
+      "outfit": {
+        "type": "enum",
+        "options": [
+          "tshirt",
+          "shirt",
+          "sweater",
+          "hoodie",
+          "blazer",
+          "vest",
+          "tunic",
+          "coat",
+          "dress",
+          "robe",
+          "apron",
+          "uniform"
+        ],
+        "doc": "One-word outfit; expands to a `clothes` stack (e.g. `tunic`: trousers, tunic, shoes).",
+        "optional": true
+      },
+      "topColor": {
+        "type": "color",
+        "doc": "Outermost top's color; defaults to a seeded shade of a palette slot. A garment's own\n`color` wins over it.",
+        "optional": true
+      },
+      "bottomColor": {
+        "type": "color",
+        "doc": "Bottoms' color; defaults to a seeded shade of the palette's `woodDark`, `stone`, or `metal`.",
+        "optional": true
+      },
+      "shoeColor": {
+        "type": "color",
+        "doc": "Footwear color; defaults to the palette's `metal`.",
+        "optional": true
+      },
+      "hat": {
+        "type": "enum",
+        "options": [
+          "none",
+          "cap",
+          "straw",
+          "brim",
+          "bandana",
+          "hood",
+          "chef"
+        ],
+        "optional": true
+      },
+      "accessories": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "options": [
+            "belt",
+            "scarf",
+            "cape",
+            "bag",
+            "glasses",
+            "staff"
+          ]
+        },
+        "optional": true
+      },
+      "pose": {
+        "type": "enum",
+        "options": [
+          "stand",
+          "sit",
+          "lean",
+          "work",
+          "wave",
+          "type",
+          "play",
+          "drink",
+          "lie"
+        ],
+        "doc": "What the figure is doing when it isn't walking. `sit` and `type` need a seat under them\n(`type` is seated at a desk, fingers tapping); `work` leans over a counter; `play` works\ncontrols at waist height; `drink` holds a mug and sips from it now and then; `lie` lies on its\nback centered on `position`, head toward local -Z, so it takes a `Bed`'s position and\nrotation at mattress height.",
+        "optional": true,
+        "default": "stand"
+      },
+      "patrol": {
+        "type": "array",
+        "items": {
+          "type": "vec3"
+        },
+        "doc": "Walk these waypoints, relative to `position` and turning with `rotation`, in units.\nHeight follows the ground; a waypoint's y lifts the figure above it.",
+        "optional": true
+      },
+      "wander": {
+        "type": "number",
+        "doc": "Wander a seeded loop of five points within this radius of `position`, in units. `patrol`\nwins when both are set.",
+        "optional": true
+      },
+      "speed": {
+        "type": "number",
+        "doc": "Walking speed, in units per second. Defaults by age: child 1.0, adult 1.3, elder 0.8.",
+        "optional": true
+      },
+      "pause": {
+        "type": "number",
+        "doc": "Seconds held at each waypoint. Walking always stands; the authored `pose` plays here.",
+        "optional": true,
+        "default": 1.5
+      },
+      "loop": {
+        "type": "enum",
+        "options": [
+          "loop",
+          "pingpong"
+        ],
+        "doc": "`loop` walks from the last waypoint back to the first; `pingpong` retraces the route.",
+        "optional": true,
+        "default": "loop"
+      },
+      "route": {
+        "type": "array",
+        "items": {
+          "type": "vec3"
+        },
+        "doc": "A one-way trip through these waypoints, relative to `position` like `patrol`, setting off\nat `departAt`. Before then the figure waits at the first point facing its `rotation`; after\nthe last it stays there, facing the way it came, in its `pose`. Wins over `patrol` and\n`wander`. Give a new trip a new `position` (the old one's end) and `departAt`.",
+        "optional": true
+      },
+      "departAt": {
+        "type": "number",
+        "doc": "When the `route` trip sets off, in epoch milliseconds (`Date.now()`). Plain data, so every\nviewer sees the figure at the same point of its trip. Unset, the trip is long over.",
+        "optional": true,
+        "default": 0
+      },
+      "onArrive": {
+        "type": "function",
+        "doc": "Called once per trip (`route` + `departAt`) when the figure has arrived, on the first\nframe it has, so a trip that ended while the world was paused or unmounted still reports.",
+        "optional": true
+      },
+      "gait": {
+        "type": "number",
+        "doc": "Walk-cycle speed, in units per second, for a figure something else moves (a cart, a\nscript). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed.",
+        "optional": true
+      },
+      "idle": {
+        "type": "boolean",
+        "doc": "Breathing, weight shift, and blinking.",
+        "optional": true,
+        "default": true
+      },
+      "lookAt": {
+        "type": "boolean",
+        "doc": "Turn the head (and eyes) toward the player's avatar (or the camera, when no `Player` is\nmounted) when it comes within `lookRadius`.",
+        "optional": true,
+        "default": true
+      },
+      "lookRadius": {
+        "type": "number",
+        "doc": "How close the avatar must be for `lookAt` to engage, in units.",
+        "optional": true,
+        "default": 9
+      },
+      "label": {
+        "type": "string",
+        "doc": "Floating name above the head.",
+        "optional": true
+      },
+      "bubble": {
+        "type": "string",
+        "doc": "A short line in a speech bubble over the head (what the figure is saying or doing right\nnow). Long lines wrap and are cut after a few.",
+        "optional": true
+      },
+      "emote": {
+        "type": "enum",
+        "options": [
+          "sleep",
+          "alert",
+          "think",
+          "happy",
+          "coffee"
+        ],
+        "doc": "A small animated sign over the head: `sleep` (rising z's), `alert` (a bouncing !), `think`\n(pulsing dots), `happy` (a heart), `coffee` (a steaming cup).",
+        "optional": true
+      },
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "InteractionAction"
+        },
+        "doc": "What the player can do with this figure (`Talk`, `Info`). When the avatar comes within\n`actionRadius` a prompt shows them over the head, with the key each world `controls`\naction is bound to; pressing one calls `onAction` with its `id`. Only the nearest figure\n(or other `Interactable`) in range shows a prompt and takes the key.",
+        "optional": true
+      },
+      "actionRadius": {
+        "type": "number",
+        "doc": "How close the avatar must come for `actions`, in units.",
+        "optional": true,
+        "default": 2
+      },
+      "onAction": {
+        "type": "function",
+        "optional": true
+      },
+      "collider": {
+        "type": "boolean",
+        "doc": "Capsule collider, so the figure is something you bump into.",
+        "optional": true,
+        "default": true
+      },
+      "physics": {
+        "type": "boolean",
+        "doc": "Render as a bare visual with no `RigidBody`: for a parent that owns the physics\n(e.g. as `Player`'s third-person avatar). When false, `collider` is ignored.",
+        "optional": true,
+        "default": true
+      },
+      "detail": {
+        "type": "enum",
+        "options": [
+          "low",
+          "high",
+          "auto"
+        ],
+        "doc": "`auto` builds the full-detail mesh only within ~10 units of the camera; `high` always;\n`low` never.",
+        "optional": true,
+        "default": "auto"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "defs": {
+      "PersonBodySpec": {
+        "props": {
+          "build": {
+            "type": "enum",
+            "options": [
+              "slim",
+              "average",
+              "stocky"
+            ],
+            "doc": "Limb thickness and torso depth.",
+            "optional": true
+          },
+          "tone": {
+            "type": "color",
+            "doc": "Skin color.",
+            "optional": true
+          },
+          "height": {
+            "type": "number",
+            "doc": "Standing height, in units.",
+            "optional": true
+          }
+        }
+      },
+      "PersonFaceSpec": {
+        "props": {
+          "eyes": {
+            "type": "object",
+            "ref": "Person.eyes",
+            "optional": true
+          },
+          "brows": {
+            "type": "object",
+            "ref": "Person.brows",
+            "doc": "Brow color defaults to the hair color; `weight` thickens them.",
+            "optional": true
+          },
+          "nose": {
+            "type": "enum",
+            "options": [
+              "button",
+              "straight",
+              "broad"
+            ],
+            "optional": true
+          },
+          "lips": {
+            "type": "object",
+            "ref": "Person.lips",
+            "optional": true
+          },
+          "blush": {
+            "type": "number",
+            "doc": "Cheek flush, 0 (none) to 1.",
+            "optional": true
+          }
+        }
+      },
+      "Person.eyes": {
+        "props": {
+          "color": {
+            "type": "color",
+            "optional": true
+          },
+          "size": {
+            "type": "number",
+            "optional": true
+          }
+        }
+      },
+      "Person.brows": {
+        "props": {
+          "color": {
+            "type": "color",
+            "optional": true
+          },
+          "weight": {
+            "type": "number",
+            "optional": true
+          }
+        }
+      },
+      "Person.lips": {
+        "props": {
+          "color": {
+            "type": "color",
+            "optional": true
+          },
+          "fullness": {
+            "type": "number",
+            "optional": true
+          }
+        }
+      },
+      "PersonGarment": {
+        "props": {
+          "type": {
+            "type": "enum",
+            "options": [
+              "tshirt",
+              "shirt",
+              "sweater",
+              "hoodie",
+              "blazer",
+              "vest",
+              "tunic",
+              "coat",
+              "dress",
+              "robe",
+              "apron",
+              "trousers",
+              "jeans",
+              "shorts",
+              "skirt",
+              "shoes",
+              "boots",
+              "belt",
+              "scarf",
+              "cape"
+            ]
+          },
+          "color": {
+            "type": "color",
+            "optional": true
+          },
+          "sleeves": {
+            "type": "enum",
+            "options": [
+              "none",
+              "short",
+              "long"
+            ],
+            "doc": "Tops only.",
+            "optional": true
+          },
+          "neck": {
+            "type": "enum",
+            "options": [
+              "crew",
+              "v",
+              "collar"
+            ],
+            "doc": "Tops only.",
+            "optional": true
+          },
+          "length": {
+            "type": "number",
+            "doc": "0 to 1: how far it reaches (a top's hem, a leg's length, a skirt or boot's drop).",
+            "optional": true
+          }
+        }
+      },
+      "PersonSkin": {
+        "props": {
+          "outfit": {
+            "type": "enum",
+            "options": [
+              "tshirt",
+              "shirt",
+              "sweater",
+              "hoodie",
+              "blazer",
+              "vest",
+              "tunic",
+              "coat",
+              "dress",
+              "robe",
+              "apron",
+              "uniform"
+            ],
+            "optional": true
+          },
+          "clothes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "ref": "PersonGarment"
+            },
+            "doc": "Full layer stack; wins over `outfit`.",
+            "optional": true
+          },
+          "topColor": {
+            "type": "color",
+            "optional": true
+          },
+          "bottomColor": {
+            "type": "color",
+            "optional": true
+          },
+          "shoeColor": {
+            "type": "color",
+            "optional": true
+          },
+          "hat": {
+            "type": "enum",
+            "options": [
+              "none",
+              "cap",
+              "straw",
+              "brim",
+              "bandana",
+              "hood",
+              "chef"
+            ],
+            "optional": true
+          },
+          "hair": {
+            "type": "enum",
+            "options": [
+              "short",
+              "long",
+              "swept",
+              "bun",
+              "ponytail",
+              "braid",
+              "cropped",
+              "bald"
+            ],
+            "optional": true
+          },
+          "hairColor": {
+            "type": "color",
+            "optional": true
+          },
+          "accessories": {
+            "type": "array",
+            "items": {
+              "type": "enum",
+              "options": [
+                "belt",
+                "scarf",
+                "cape",
+                "bag",
+                "glasses",
+                "staff"
+              ]
+            },
+            "optional": true
+          }
+        }
+      },
+      "PersonHairSpec": {
+        "props": {
+          "style": {
+            "type": "enum",
+            "options": [
+              "short",
+              "long",
+              "swept",
+              "bun",
+              "ponytail",
+              "braid",
+              "cropped",
+              "bald"
+            ],
+            "optional": true
+          },
+          "color": {
+            "type": "color",
+            "optional": true
+          }
+        }
+      },
+      "InteractionAction": {
+        "props": {
+          "id": {
+            "type": "string",
+            "doc": "Passed back to `onAction`."
+          },
+          "label": {
+            "type": "string",
+            "doc": "Shown in the prompt, e.g. `Talk`."
+          },
+          "control": {
+            "type": "string",
+            "doc": "The world `controls` action that triggers it (declare `talk: ['KeyT']` in the world's\n`controls`). The prompt shows the key bound to it, so a remap relabels it."
+          }
+        }
+      }
+    },
+    "name": "person",
+    "category": "character",
+    "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body."
+  },
+  "Pillar": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A column: square plinth, tapered shaft, square capital. `flutes` facets the\nshaft (a fluted look) when set; 0 leaves it smooth. Builds porches, colonnades,\nand ruins.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Shaft radius at the base, in units.",
+        "optional": true,
+        "default": 0.28
+      },
+      "flutes": {
+        "type": "number",
+        "doc": "Vertical flutes around the shaft; 0 = smooth.",
+        "optional": true,
+        "default": 0
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `stone` slot.",
+        "optional": true,
+        "palette": "stone"
+      }
+    },
+    "name": "pillar",
+    "category": "structures",
+    "description": "Column with a plinth, a tapered (optionally fluted) shaft, and a capital."
+  },
+  "Plant": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A potted plant: a tapered planter, soil, and a seeded cluster of foliage. Indoor\nlife. The planter owns a small collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 0.7
+      },
+      "potColor": {
+        "type": "color",
+        "doc": "Planter color; defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "foliageColor": {
+        "type": "color",
+        "doc": "Foliage color; defaults to the world palette's `foliage` slot.",
+        "optional": true,
+        "palette": "foliage"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "plant",
+    "category": "interiors",
+    "description": "Potted plant: a tapered planter and a seeded cluster of foliage."
+  },
+  "Player": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          3,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "view": {
+        "type": "enum",
+        "options": [
+          "first",
+          "third",
+          "overhead"
+        ],
+        "doc": "Camera view: `first` (through the avatar's eyes), `third` (behind it), or `overhead` (high\nabove at a fixed tilt, following it; scroll zooms, WASD walks relative to the screen). Unset\ndefers to the world default (`<World avatar>`); falls back to first-person. An explicit value\nhere always wins. A world `view` control (e.g. `controls: { view: ['KeyV'] }`) cycles the\nthree at runtime.",
+        "optional": true
+      },
+      "yaw": {
+        "type": "number",
+        "doc": "Initial camera yaw in radians (0 faces +z).",
+        "optional": true,
+        "default": 0
+      },
+      "children": {
+        "type": "node",
+        "doc": "Custom avatar visual, replacing the default capsule. Size it to the capsule\nenvelope (~1.3 units tall, centered at the character origin); it is hidden in\nfirst-person view. In world JSON, nest it as a child node of the Player.",
+        "optional": true
+      }
+    },
+    "name": "player",
+    "category": "character",
+    "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings."
+  },
+  "Pool": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A built swimming pool, flush with the deck: a raised coping rim, a plastered basin you can\nwalk (and jump) into, and a still translucent water surface just below the lip. The rim's top\nledge sits at the component origin, so it drops into any `Slab`/`Floor` terrace at deck Y.\nFor natural water, use `Lake`; for open sea, `Ocean`.",
+    "props": {
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Water surface `[width, depth]`, in units.",
+        "optional": true,
+        "default": [
+          6,
+          3.5
+        ]
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Basin depth below the deck, in units.",
+        "optional": true,
+        "default": 1.6
+      },
+      "coping": {
+        "type": "number",
+        "doc": "Coping ledge width around the rim, in units.",
+        "optional": true,
+        "default": 0.35
+      },
+      "steps": {
+        "type": "boolean",
+        "doc": "Build exit steps into one corner of the basin.",
+        "optional": true,
+        "default": true
+      },
+      "copingColor": {
+        "type": "color",
+        "doc": "Coping color; defaults to the world palette's `wall` slot.",
+        "optional": true,
+        "palette": "wall"
+      },
+      "basinColor": {
+        "type": "color",
+        "doc": "Basin plaster color.",
+        "optional": true,
+        "default": "#bfe0e6"
+      },
+      "waterColor": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `waterShallow` slot.",
+        "optional": true,
+        "palette": "waterShallow"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "pool",
+    "category": "water",
+    "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner exit steps, and a translucent water surface."
+  },
+  "PoolTable": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A pool table: wooden rails over cushioned cloth, six pockets, and solid legs, with the balls\nracked in a triangle (the cue ball on the head spot) or scattered as if mid-game, all sixteen in\none instanced mesh. One cuboid collider for the table.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Outer length along local X, in units.",
+        "optional": true,
+        "default": 2.5
+      },
+      "width": {
+        "type": "number",
+        "doc": "Outer width along local Z, in units.",
+        "optional": true,
+        "default": 1.4
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height of the playing surface, in units.",
+        "optional": true,
+        "default": 0.8
+      },
+      "balls": {
+        "type": "enum",
+        "options": [
+          "none",
+          "racked",
+          "scattered"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "The cloth. Seeded from a few classic colors when unset.",
+        "optional": true
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "Rails and legs; defaults to the palette's `wood`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "pooltable",
+    "category": "interiors",
+    "description": "A pool table with rails, cushions, six pockets, and sixteen instanced balls, racked or scattered mid-game."
+  },
+  "Portal": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A travel gate: a glowing ring that fires a one-shot event when the avatar — or a vehicle —\npasses through it. The visual is procedural and asset-free; the trigger is a Rapier sensor.\nDrive transitions with the optional `onEnter` callback, or set `to` and let it navigate.\nUse it for world-to-world travel, level/hub transitions, or in-world teleports; for a single\ncontinuous space, move the camera instead.",
+    "props": {
+      "to": {
+        "type": "string",
+        "doc": "Where the portal leads — a URL or app route. Kept JSON-serializable so a world\nround-trips from data. With no `onEnter`, entering navigates here\n(`window.location.href = to`); with `onEnter`, this is just passed through to it.",
+        "optional": true
+      },
+      "onEnter": {
+        "type": "function",
+        "doc": "Called once when the avatar (or a vehicle) enters the gate, with `to`. Optional, so\nthe component still renders and round-trips from data without it (CONTRACT §1). Use it\nto drive an in-app transition instead of a full navigation — e.g. swap the mounted world.\nNote: a host rendered inside `<WorldRenderer>` lives in a separate React reconciler from\nthe page, so bridge this callback out through a module-level store, not React context.",
+        "optional": true
+      },
+      "label": {
+        "type": "string",
+        "doc": "Floating caption above the gate (e.g. the destination's name).",
+        "optional": true
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Ring radius, in units.",
+        "optional": true,
+        "default": 2.2
+      },
+      "color": {
+        "type": "color",
+        "doc": "Glow / ring color; defaults to the world palette's `accent` slot.",
+        "optional": true,
+        "palette": "accent"
+      },
+      "active": {
+        "type": "boolean",
+        "doc": "Arm the trigger. Set false for a decorative or not-yet-open gate. Default true.",
+        "optional": true,
+        "default": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "portal",
+    "category": "systems",
+    "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports."
+  },
+  "Road": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A paved street: a flat stone deck with low kerbs along both edges, laid in the XZ plane and\ndraped just above the ground. Straight along local Z. Decorative, like `Path` — it owns no\ncollider; you walk the terrain beneath it. For a meandering dirt trail, use `Path`.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Length along local Z, in units.",
+        "optional": true,
+        "default": 12
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width along local X, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "color": {
+        "type": "color",
+        "doc": "Deck color; defaults to the palette's `stone`.",
+        "optional": true
+      },
+      "kerbColor": {
+        "type": "color",
+        "doc": "Kerb color; defaults to the palette's `woodDark`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "road",
+    "category": "structures",
+    "description": "A paved street: a flat stone deck with low kerbs, draped on the ground like Path; decorative (no collider)."
+  },
+  "Rocks": {
+    "kind": "component",
+    "seeded": true,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "count": {
+        "type": "number",
+        "optional": true,
+        "default": 6
+      },
+      "spread": {
+        "type": "number",
+        "doc": "Cluster radius, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "size": {
+        "type": "number",
+        "doc": "Mean rock radius, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "hue": {
+        "type": "number",
+        "optional": true,
+        "default": 30
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "rocks",
+    "category": "environment",
+    "description": "Faceted rocks with convex-hull colliders (seeded scatter)."
+  },
+  "Roof": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "`[width, depth]` in units. The roof rests with its base at the component origin.",
+        "optional": true,
+        "default": [
+          8,
+          8
+        ]
+      },
+      "style": {
+        "type": "enum",
+        "options": [
+          "flat",
+          "gable"
+        ],
+        "optional": true,
+        "default": "gable"
+      },
+      "peak": {
+        "type": "number",
+        "doc": "Ridge height for a gable roof, in units.",
+        "optional": true,
+        "default": 1.6
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.18
+      },
+      "overhang": {
+        "type": "number",
+        "optional": true,
+        "default": 0.3
+      },
+      "ends": {
+        "type": "boolean",
+        "doc": "Cap the triangular gable ends so the attic isn't open to the outside.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `roof` slot.",
+        "optional": true,
+        "palette": "roof"
+      },
+      "endColor": {
+        "type": "color",
+        "doc": "Gable end caps; defaults to the world palette's `wall` slot.",
+        "optional": true,
+        "palette": "wall"
+      }
+    },
+    "name": "roof",
+    "category": "structures",
+    "description": "Flat or gable roof."
+  },
+  "Room": {
+    "kind": "composite",
+    "seeded": true,
+    "doc": "Four walls and a floor with a front doorway — one Level with an opening. Unpack it to add a ceiling, windows, or more openings.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "optional": true
+      },
+      "seed": {
+        "type": "number",
+        "optional": true,
+        "doc": "Cascades to the seeded parts of the arrangement."
+      }
+    },
+    "name": "room",
+    "category": "structures",
+    "description": "Composite: four walls and a floor with a doorway, arranged from one Level. Unpack to customize."
+  },
+  "Rug": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "Decorative — flat, no collider; walk over it.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "`[width, depth]` in units.",
+        "optional": true,
+        "default": [
+          3,
+          2
+        ]
+      },
+      "baseColor": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `fabric` slot.",
+        "optional": true,
+        "palette": "fabric"
+      },
+      "borderColor": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `accent` slot.",
+        "optional": true,
+        "palette": "accent"
+      },
+      "accentColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#9c5252"
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "rug",
+    "category": "interiors",
+    "description": "Procedural striped rug (seeded stripes, no textures)."
+  },
+  "Sailboat": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A small procedural sailboat: a station-built hull, a mast, a boom, and a swung-out mainsail.\nFloats at the local waterline and bobs gently on the swell. A static prop for now; the\nsteerable variant is app-side player logic, not a new component.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Hull length along local Z (bow at +Z), in units.",
+        "optional": true,
+        "default": 5.5
+      },
+      "beam": {
+        "type": "number",
+        "doc": "Hull maximum beam (width along X), in units.",
+        "optional": true,
+        "default": 2
+      },
+      "freeboard": {
+        "type": "number",
+        "doc": "Deck height above the waterline (local y=0), in units.",
+        "optional": true,
+        "default": 0.5
+      },
+      "draft": {
+        "type": "number",
+        "doc": "Keel depth below the waterline, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "mastHeight": {
+        "type": "number",
+        "doc": "Mast height above the deck, in units.",
+        "optional": true,
+        "default": 4.6
+      },
+      "boomLength": {
+        "type": "number",
+        "doc": "Boom length aft of the mast, in units.",
+        "optional": true,
+        "default": 3.2
+      },
+      "sail": {
+        "type": "boolean",
+        "doc": "Raise the mainsail.",
+        "optional": true,
+        "default": true
+      },
+      "bob": {
+        "type": "boolean",
+        "doc": "Gentle moored bobbing on the swell.",
+        "optional": true,
+        "default": true
+      },
+      "collider": {
+        "type": "boolean",
+        "doc": "Solid hull collider.",
+        "optional": true,
+        "default": true
+      },
+      "physics": {
+        "type": "boolean",
+        "doc": "Render the hull/rig as a bare visual, with no `RigidBody` or collider — for a parent\ncontroller (e.g. a steerable vehicle) that owns the physics body. When false, `position`\nand `rotation` place the visual directly and the `collider` prop is ignored. Default true.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Hull color; defaults to the world palette's `wood`.",
+        "optional": true
+      },
+      "trimColor": {
+        "type": "color",
+        "doc": "Deck, mast, and boom color; defaults to the palette's `woodDark`.",
+        "optional": true
+      },
+      "sailColor": {
+        "type": "color",
+        "doc": "Sail color.",
+        "optional": true,
+        "default": "#eee6d0"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "sailboat",
+    "category": "water",
+    "description": "A small procedural sailboat: a station-built low-poly hull, mast, boom, and mainsail, floating at the waterline with a gentle moored bob."
+  },
+  "Shelf": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "Open shelving unit — frame + planks, no contents (see Bookshelf for a filled variant).",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 1
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 1.8
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.3
+      },
+      "shelves": {
+        "type": "number",
+        "optional": true,
+        "default": 4
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      }
+    },
+    "name": "shelf",
+    "category": "interiors",
+    "description": "Wall shelf with planks."
+  },
+  "Shore": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "`[width, depth]` in units. The sandy top sits at the component origin.",
+        "optional": true,
+        "default": [
+          24,
+          24
+        ]
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.3
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `sand` slot.",
+        "optional": true,
+        "palette": "sand"
+      }
+    },
+    "name": "shore",
+    "category": "water",
+    "description": "Sloped beach/shore strip to meet a Lake."
+  },
+  "Sign": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "In-world text. The one component that renders glyphs, and so the single\ncarve-out to the no-assets rule (CONTRACT §4): it ships no font of its own,\ndrawing only from the world's declared `fonts` or the default bundled in\n`@runek/core`. Decorative: it registers no colliders (mount it on a surface\nthat has one, e.g. a Wall).",
+    "props": {
+      "children": {
+        "type": "string",
+        "doc": "The text to render.",
+        "multiline": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "variant": {
+        "type": "enum",
+        "options": [
+          "display",
+          "body"
+        ],
+        "doc": "Which world font role to render in (`display` for titles/signage, `body`\nfor labels). The world declares the actual face via `<World fonts>`; an\nundeclared role falls back to the font bundled in `@runek/core`. (Named\n`variant`, not `role`, so it doesn't trip JSX a11y linters.)",
+        "optional": true,
+        "default": "display"
+      },
+      "font": {
+        "type": "string",
+        "doc": "Explicit font URL, overriding the world role.",
+        "optional": true
+      },
+      "size": {
+        "type": "number",
+        "doc": "Cap height in units.",
+        "optional": true,
+        "default": 0.3
+      },
+      "color": {
+        "type": "color",
+        "doc": "Text color. Defaults to the world palette's `accent` slot.",
+        "optional": true,
+        "palette": "accent"
+      },
+      "maxWidth": {
+        "type": "number",
+        "doc": "Wrap width in units; omit to keep the text on one line.",
+        "optional": true
+      },
+      "letterSpacing": {
+        "type": "number",
+        "optional": true,
+        "default": 0
+      },
+      "anchorX": {
+        "type": "enum",
+        "options": [
+          "left",
+          "center",
+          "right"
+        ],
+        "optional": true,
+        "default": "center"
+      },
+      "anchorY": {
+        "type": "enum",
+        "options": [
+          "top",
+          "bottom",
+          "middle"
+        ],
+        "optional": true,
+        "default": "middle"
+      },
+      "glow": {
+        "type": "boolean",
+        "doc": "Soft colored halo around the glyphs, for a glow without bloom.",
+        "optional": true,
+        "default": false
+      },
+      "outline": {
+        "type": "color",
+        "doc": "A crisp edge in this color, so the text reads against any background. Wins over `glow`.",
+        "optional": true
+      },
+      "onBounds": {
+        "type": "function",
+        "doc": "Called with the laid-out text's width and height, in world units, whenever it changes:\nfor fitting a backdrop behind it.",
+        "optional": true
+      }
+    },
+    "name": "sign",
+    "category": "interiors",
+    "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core."
+  },
+  "Signpost": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A roadside signboard: a wooden post and a plank carrying a name in the world's display font.\nThe post sits **behind** the plank so it never crosses the text, and the board is single-sided\n(its front faces local +Z) — rotate it to face the reader. The post is the only collider.",
+    "props": {
+      "name": {
+        "type": "string",
+        "doc": "The name shown on the board. A plain string, **not** `children`: a world renderer overrides a\nnode's `children` prop with its nested nodes, so text authored in JSON must be a named prop to\nsurvive. Empty by default — `<Signpost />` is a blank board.",
+        "optional": true,
+        "default": ""
+      },
+      "height": {
+        "type": "number",
+        "doc": "Post height, in units.",
+        "optional": true,
+        "default": 2.6
+      },
+      "width": {
+        "type": "number",
+        "doc": "Board width, in units.",
+        "optional": true,
+        "default": 3.4
+      },
+      "color": {
+        "type": "color",
+        "doc": "Post + board wood color; defaults to the palette's `wood`.",
+        "optional": true
+      },
+      "textColor": {
+        "type": "color",
+        "doc": "Name color; defaults to the palette's `sand` (legible on the wood).",
+        "optional": true
+      },
+      "size": {
+        "type": "number",
+        "doc": "Name cap height, in units.",
+        "optional": true,
+        "default": 0.5
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "signpost",
+    "category": "structures",
+    "description": "A wooden post-and-plank signboard carrying a name in the world's display font; the post sits behind the board so the text reads clean."
+  },
+  "Sky": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "Procedural atmospheric sky (no textures). With no explicit `sunPosition` it\nfollows the world's time-of-day (`<World time>` / `timezone`): the sun arcs\noverhead by day, and at night the dome swaps to a dark sky with a procedural\nstarfield. Pass `sunPosition` to pin a fixed sun and opt out of the cycle.",
+    "props": {
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "sunPosition": {
+        "type": "vec3",
+        "doc": "Direction of the sun; also where the bright spot appears. Set this to pin the\nsky to a fixed sun and bypass the world's day/night cycle.",
+        "optional": true
+      },
+      "turbidity": {
+        "type": "number",
+        "optional": true,
+        "default": 8
+      },
+      "rayleigh": {
+        "type": "number",
+        "optional": true,
+        "default": 1.4
+      },
+      "nightColor": {
+        "type": "color",
+        "doc": "Background when the sun is below the horizon.",
+        "optional": true,
+        "default": "#04060e"
+      }
+    },
+    "name": "sky",
+    "category": "environment",
+    "description": "Procedural atmosphere (drei Sky)."
+  },
+  "Slab": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A rounded structural plate: an extruded pill or ellipse you can stack into curved-modernist\nfloor decks, cantilevered roofs, terraces, or a lawn disc. Convex by construction, so a single\nhull collider carries it. Flat-topped and walkable; the top surface sits at the origin like\n`Floor`, so decks and their furniture share a Y.",
+    "props": {
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Footprint `[width, depth]`, in units. The top surface sits at the component origin.",
+        "optional": true,
+        "default": [
+          8,
+          8
+        ]
+      },
+      "shape": {
+        "type": "enum",
+        "options": [
+          "pill",
+          "disc"
+        ],
+        "doc": "`pill` is a rounded rectangle, `disc` an ellipse.",
+        "optional": true,
+        "default": "pill"
+      },
+      "cornerRadius": {
+        "type": "number",
+        "doc": "Pill corner radius, in units; clamped to half the smaller extent (a full stadium).",
+        "optional": true
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.35
+      },
+      "curveSegments": {
+        "type": "number",
+        "doc": "Curve smoothness of the rounded edges.",
+        "optional": true,
+        "default": 24
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wall` slot.",
+        "optional": true,
+        "palette": "wall"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "slab",
+    "category": "structures",
+    "description": "A rounded structural plate (pill or ellipse) for curved-modernist decks, cantilevered roofs, terraces, or a lawn disc. Walkable, with a single convex-hull collider."
+  },
+  "Sofa": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A sofa: an upholstered frame, seat and back cushions, arms, and legs, seating one to four. Arm\nstyle, cushions, legs, and throw pillows come from the seed unless you pin them, and every\ncushion takes a slightly different shade of the fabric so it reads soft. Two cuboid colliders\n(the seat block and the back). Seats face local +Z, evenly spaced between the arms.",
+    "props": {
+      "seats": {
+        "type": "number",
+        "doc": "Seats across, 1 to 4.",
+        "optional": true,
+        "default": 3
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth along local Z, in units. Seats face +Z.",
+        "optional": true,
+        "default": 0.9
+      },
+      "seatHeight": {
+        "type": "number",
+        "doc": "Top of the seat cushions, in units.",
+        "optional": true,
+        "default": 0.44
+      },
+      "arms": {
+        "type": "enum",
+        "options": [
+          "slim",
+          "none",
+          "square",
+          "rolled"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "cushions": {
+        "type": "enum",
+        "options": [
+          "split",
+          "bench"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "legs": {
+        "type": "enum",
+        "options": [
+          "pegs",
+          "plinth"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "pillows": {
+        "type": "number",
+        "doc": "Throw pillows, 0 to 2. Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Upholstery; defaults to the palette's `fabric`.",
+        "optional": true
+      },
+      "pillowColor": {
+        "type": "color",
+        "doc": "Throw pillows; defaults to the palette's `accent`.",
+        "optional": true
+      },
+      "legColor": {
+        "type": "color",
+        "doc": "Legs; defaults to the palette's `woodDark`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "sofa",
+    "category": "interiors",
+    "description": "A sofa seating one to four: upholstered frame, seat and back cushions in soft shades of the fabric, square, rolled, or slim arms, pegs or a plinth, and throw pillows. Seeded, each choice pinnable."
+  },
+  "Staircase": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "steps": {
+        "type": "number",
+        "optional": true,
+        "default": 6
+      },
+      "totalHeight": {
+        "type": "number",
+        "doc": "Total rise, in units. Ascends along +y and +z from the origin.",
+        "optional": true,
+        "default": 1.5
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Total run (depth), in units.",
+        "optional": true,
+        "default": 2.4
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `stone` slot.",
+        "optional": true,
+        "palette": "stone"
+      }
+    },
+    "name": "staircase",
+    "category": "structures",
+    "description": "Stepped staircase with per-step colliders."
+  },
+  "Stool": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A round bar stool: a disc seat on three splayed legs. A thin cylinder collider.",
+    "props": {
+      "height": {
+        "type": "number",
+        "doc": "Seat height above the ground, in units.",
+        "optional": true,
+        "default": 0.95
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Seat radius, in units.",
+        "optional": true,
+        "default": 0.24
+      },
+      "color": {
+        "type": "color",
+        "doc": "Color; defaults to the palette's `wood`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "stool",
+    "category": "interiors",
+    "description": "A round bar stool: a disc seat on three splayed legs; a thin cylinder collider."
+  },
+  "Table": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A table: a top on four legs, or on pedestals with rounded ends for a meeting room\n(`<Table width={3.2} depth={1.2} base=\"pedestal\" ends=\"round\" />`). One cuboid collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.8
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 0.75
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.05
+      },
+      "base": {
+        "type": "enum",
+        "options": [
+          "legs",
+          "pedestal"
+        ],
+        "doc": "Four `legs` at the corners, or `pedestal` columns on crossed feet (one, or two for a table\nlonger than 2 units): a conference table.",
+        "optional": true,
+        "default": "legs"
+      },
+      "ends": {
+        "type": "enum",
+        "options": [
+          "square",
+          "round"
+        ],
+        "doc": "`round` makes the short ends semicircles: a racetrack top, as conference tables have.",
+        "optional": true,
+        "default": "square"
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      }
+    },
+    "name": "table",
+    "category": "interiors",
+    "description": "Table with a top on four legs, or on pedestals with rounded ends for a conference table."
+  },
+  "Tent": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "An A-frame ridge tent: two sloped striped-fabric sides and a closed back, open at the front (+Z)\nwhere two flaps are pinned back from the entrance. The fabric drapes inward between ridge and\nground and billows in the wind per-frame (pinned at the ridge and ground). The ridge pole pokes\nout past the fabric, stayed by guy ropes to stakes at the front corners and the back. The two\nsides and the back are solid (set `collider={false}` for a soft tent); the open front lets you\nwalk in. For a round dwelling with a conical roof, use `Hut`.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Width across the tent (local X), in units.",
+        "optional": true,
+        "default": 3
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth front-to-back (local Z); the entrance faces +Z.",
+        "optional": true,
+        "default": 3.6
+      },
+      "height": {
+        "type": "number",
+        "doc": "Ridge height, in units.",
+        "optional": true,
+        "default": 2.2
+      },
+      "color": {
+        "type": "color",
+        "doc": "Fabric color; defaults to the palette's `fabric`.",
+        "optional": true
+      },
+      "stripeColor": {
+        "type": "color",
+        "doc": "Alternate stripe color; defaults to the palette's `wall`.",
+        "optional": true
+      },
+      "poleColor": {
+        "type": "color",
+        "doc": "Pole color; defaults to the palette's `woodDark`.",
+        "optional": true
+      },
+      "wind": {
+        "type": "number",
+        "doc": "Billow depth as a fraction of the width.",
+        "optional": true,
+        "default": 0.05
+      },
+      "windSpeed": {
+        "type": "number",
+        "doc": "Wind ripple speed.",
+        "optional": true,
+        "default": 2.5
+      },
+      "sag": {
+        "type": "number",
+        "doc": "Static inward drape of the fabric between ridge and ground, as a fraction of the width.",
+        "optional": true,
+        "default": 0.03
+      },
+      "collider": {
+        "type": "boolean",
+        "doc": "Solid walls (the two sides + the back) you can't walk through; the front stays open.",
+        "optional": true,
+        "default": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "tent",
+    "category": "structures",
+    "description": "An A-frame ridge tent: striped wind-rippled fabric, entrance flaps pinned open, guy ropes and stakes; solid sides and back, open front."
+  },
+  "Terrain": {
+    "kind": "component",
+    "seeded": true,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Ground extent `[width, depth]`, in units.",
+        "optional": true,
+        "default": [
+          40,
+          40
+        ]
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.4
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `ground` slot.",
+        "optional": true,
+        "palette": "ground"
+      },
+      "relief": {
+        "type": "number",
+        "doc": "Vertical relief amplitude, in units. 0 keeps the ground flat.",
+        "optional": true,
+        "default": 0
+      },
+      "resolution": {
+        "type": "number",
+        "doc": "Grid subdivisions for displaced ground.",
+        "optional": true,
+        "default": 64
+      },
+      "frequency": {
+        "type": "number",
+        "doc": "Noise frequency.",
+        "optional": true,
+        "default": 0.04
+      },
+      "flatRadius": {
+        "type": "number",
+        "doc": "Radius from center kept flat (for a build pad), in units.",
+        "optional": true,
+        "default": 0
+      },
+      "falloff": {
+        "type": "number",
+        "doc": "Radial island falloff (0 = off). When set, the ground domes up toward the center and\nsinks below the world ground at its rim, so the mesh reads as a landmass surrounded by\nwater. The value is the fraction of the half-extent that stays land before the coast\n(e.g. 0.8 = land out to 80% of the radius, then a shoreline into the sea).",
+        "optional": true,
+        "default": 0
+      },
+      "collider": {
+        "type": "boolean",
+        "doc": "Register a collider (default true). Set false for distant/backdrop terrain the player\nnever walks, to skip a large trimesh collider.",
+        "optional": true,
+        "default": true
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "terrain",
+    "category": "terrain",
+    "description": "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff. Its surface is queryable (`useGround`, anchors, `runek check-world`)."
+  },
+  "Trees": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A single procedural tree grown from a bracketed L-system.\nBranches and leaves render as one instanced mesh each, so a forest stays cheap.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      },
+      "iterations": {
+        "type": "number",
+        "optional": true,
+        "default": 2
+      },
+      "segmentLength": {
+        "type": "number",
+        "doc": "Base branch length, in units.",
+        "optional": true,
+        "default": 0.7
+      },
+      "angle": {
+        "type": "number",
+        "doc": "Branching angle, in radians.",
+        "optional": true,
+        "default": 0.5
+      },
+      "trunkColor": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `bark` slot.",
+        "optional": true,
+        "palette": "bark"
+      },
+      "leafColor": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `foliage` slot.",
+        "optional": true,
+        "palette": "foliage"
+      }
+    },
+    "name": "trees",
+    "category": "vegetation",
+    "description": "L-system trees grown by a 3D turtle, deterministic from seed."
+  },
+  "Tv": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A flat-screen television on a stand, on a low media console, or on a wall. Switched on, its\nscreen glows with a seeded picture drawn from a few flat shapes (no textures), so a lounge has\nsomething to look at. One cuboid collider; standing mounts sit on the ground.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Screen width, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "mount": {
+        "type": "enum",
+        "options": [
+          "stand",
+          "console",
+          "wall"
+        ],
+        "doc": "`stand` and `console` are seeded when unset; `wall` must be asked for. On a wall the origin\nis the middle of the screen with its back against the wall (local -Z).",
+        "optional": true
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Showing a seeded picture (a sky, a sun, hills) in this tint, or dark glass when off.",
+        "optional": true,
+        "default": true
+      },
+      "screen": {
+        "type": "color",
+        "doc": "Picture tint. Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Bezel and stand; defaults to the palette's `metal`.",
+        "optional": true
+      },
+      "consoleColor": {
+        "type": "color",
+        "doc": "The console's wood; defaults to the palette's `woodDark`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "tv",
+    "category": "interiors",
+    "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes."
+  },
+  "Wall": {
+    "kind": "component",
+    "seeded": false,
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Length along the wall's local X axis, in units.",
+        "optional": true,
+        "default": 4
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Thickness, in units.",
+        "optional": true,
+        "default": 0.2
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wall` slot.",
+        "optional": true,
+        "palette": "wall"
+      },
+      "openings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "WallOpening"
+        },
+        "doc": "Holes cut into the wall (doors, windows). Must not overlap horizontally.",
+        "optional": true
+      }
+    },
+    "defs": {
+      "WallOpening": {
+        "props": {
+          "offset": {
+            "type": "number",
+            "doc": "Horizontal center offset from the wall center, in units.",
+            "optional": true
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "sill": {
+            "type": "number",
+            "doc": "Height of the opening's base above the wall base, in units.",
+            "optional": true
+          }
+        }
+      }
+    },
+    "name": "wall",
+    "category": "structures",
+    "description": "Wall segment with door/window openings and a fixed collider."
+  },
+  "Well": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A stone well: ring wall, a dark pool, two posts carrying a little pyramid roof,\nand a bucket on a rope. A village focal point.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Radius, in units.",
+        "optional": true,
+        "default": 0.7
+      },
+      "wallHeight": {
+        "type": "number",
+        "optional": true,
+        "default": 0.8
+      },
+      "color": {
+        "type": "color",
+        "doc": "Stone color; defaults to the world palette's `stone` slot.",
+        "optional": true,
+        "palette": "stone"
+      },
+      "roofColor": {
+        "type": "color",
+        "doc": "Roof + frame color; defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      }
+    },
+    "name": "well",
+    "category": "structures",
+    "description": "Stone well with a dark pool, posts, a little pyramid roof, and a bucket on a rope."
+  },
+  "Whiteboard": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A whiteboard on a rolling stand or a wall, with a seeded scrawl of diagrams on it (boxes joined\nby arrows, underlined lines of \"writing\"), all thin geometry, and optional `text` in the world's\nfont across the top. One cuboid collider.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Board width, in units.",
+        "optional": true,
+        "default": 1.6
+      },
+      "height": {
+        "type": "number",
+        "doc": "Board height, in units.",
+        "optional": true,
+        "default": 1
+      },
+      "mount": {
+        "type": "enum",
+        "options": [
+          "stand",
+          "wall"
+        ],
+        "optional": true,
+        "default": "stand"
+      },
+      "text": {
+        "type": "string",
+        "doc": "Written across the top of the board in marker.",
+        "optional": true
+      },
+      "doodles": {
+        "type": "boolean",
+        "doc": "Seeded marker diagrams (boxes, arrows, lines). Set false for a clean board.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Frame and stand; defaults to the palette's `metal`.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "whiteboard",
+    "category": "interiors",
+    "description": "A whiteboard on a rolling stand or a wall, with seeded marker diagrams (boxes, arrows, lines of writing) and optional text across the top."
+  },
+  "Windmill": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A tower windmill with four slowly turning sails. The tower carries a single cylinder\ncollider; the cap, axle, and sails are decorative. Seeded only for a small starting-phase\noffset so a row of windmills doesn't turn in lockstep.",
+    "props": {
+      "height": {
+        "type": "number",
+        "doc": "Tower height, in units.",
+        "optional": true,
+        "default": 7
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Tower base radius, in units.",
+        "optional": true,
+        "default": 2
+      },
+      "sailLength": {
+        "type": "number",
+        "doc": "Sail (blade) length, in units.",
+        "optional": true,
+        "default": 4.5
+      },
+      "sailSpeed": {
+        "type": "number",
+        "doc": "Sail rotation speed, in radians per second.",
+        "optional": true,
+        "default": 0.4
+      },
+      "color": {
+        "type": "color",
+        "doc": "Tower color (defaults to the world palette's `wall`).",
+        "optional": true
+      },
+      "trimColor": {
+        "type": "color",
+        "doc": "Cap, door, and sail-frame color (defaults to the world palette's `wood`).",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "windmill",
+    "category": "structures",
+    "description": "A tapered tower with a conical cap and four sails that turn each frame; tower collider, seeded blade phase."
+  },
+  "Window": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "Decorative — the surrounding wall opening owns the collision.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "frame": {
+        "type": "number",
+        "doc": "Frame bar thickness, in units.",
+        "optional": true,
+        "default": 0.08
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth, in units.",
+        "optional": true,
+        "default": 0.1
+      },
+      "color": {
+        "type": "color",
+        "optional": true,
+        "default": "#e8e2d6"
+      },
+      "glassColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#acd4e6"
+      }
+    },
+    "name": "window",
+    "category": "structures",
+    "description": "Window with frame and translucent pane."
+  }
+}

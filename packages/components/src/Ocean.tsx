@@ -6,6 +6,8 @@ import * as THREE from 'three'
 export interface OceanProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /** Plane size `[width, depth]`, in units. With `follow` on (the default) this patch tracks
    *  the camera, so keep it large enough to reach past the world fog. */
   size?: [number, number]

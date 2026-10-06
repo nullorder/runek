@@ -49,7 +49,7 @@ export type CoreData = {
 }
 
 /** Load `@runek/core/data` as installed in the project at any of `bases`. */
-export async function loadCoreData(bases: string[]): Promise<CoreData> {
+export async function loadCoreData(bases: string[], command = 'check-world'): Promise<CoreData> {
   for (const base of bases) {
     let resolved: string
     try {
@@ -60,7 +60,7 @@ export async function loadCoreData(bases: string[]): Promise<CoreData> {
     return (await import(pathToFileURL(resolved).href)) as CoreData
   }
   throw new Error(
-    'check-world needs @runek/core 0.14 or newer installed in this project (it provides the ground query)',
+    `${command} needs @runek/core 0.14 or newer installed in this project (run "runek add" first, or install @runek/core)`,
   )
 }
 
@@ -70,7 +70,7 @@ const isSurface = (value: unknown): value is SurfaceDef =>
   typeof (value as SurfaceDef).kind === 'string' &&
   typeof (value as SurfaceDef).build === 'function'
 
-function listFiles(dir: string, match: RegExp): string[] {
+export function listFiles(dir: string, match: RegExp): string[] {
   if (!existsSync(dir)) return []
   const out: string[] = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {

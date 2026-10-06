@@ -22,23 +22,25 @@ import { Slab } from './runek/Slab'
 <Slab position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Slab", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface SlabProps extends WorldComponentProps {
-  /** Footprint `[width, depth]`, in units. The top surface sits at the component origin. */
-  size?: [number, number]
-  /** `pill` is a rounded rectangle, `disc` an ellipse. */
-  shape?: SlabShape
-  /** Pill corner radius, in units; clamped to half the smaller extent (a full stadium). */
-  cornerRadius?: number
-  thickness?: number
-  /** Curve smoothness of the rounded edges. */
-  curveSegments?: number
-  /** Defaults to the world palette's `wall` slot. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | `[number, number]` | `[8, 8]` | Footprint `[width, depth]`, in units. The top surface sits at the component origin. |
+| `shape` | `"pill" \| "disc"` | `"pill"` | `pill` is a rounded rectangle, `disc` an ellipse. |
+| `cornerRadius` | `number` |  | Pill corner radius, in units; clamped to half the smaller extent (a full stadium). |
+| `thickness` | `number` | `0.35` | Thickness, in units. |
+| `curveSegments` | `number` | `24` | Curve smoothness of the rounded edges. |
+| `color` | `color` | palette `wall` | Defaults to the world palette's `wall` slot. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 

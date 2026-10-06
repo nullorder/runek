@@ -112,6 +112,9 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   CoffeeMachine: { camera: [0.45, 0.4, 0.6], target: [0, 0.16, 0] },
   ArcadeCabinet: { camera: [1.4, 1.6, 2], target: [0, 1, 0] },
   PoolTable: { camera: [2.4, 2.2, 2.6], target: [0, 0.7, 0] },
+  // The arc sits `radius` out from its origin; a smaller arc pulled back to the center frames
+  // (and fits a library pedestal) instead of standing in front of the camera.
+  CurvedWall: { props: { radius: 2, arc: 1.6, height: 2.4, position: [0, 0, -1.7] } },
   Birds: {
     camera: [0, 3.5, 11],
     target: [0, 3.5, 0],

@@ -14,6 +14,8 @@ export interface WallOpening {
 export interface WallProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   /** Length along the wall's local X axis, in units. */
   width?: number
   height?: number

@@ -72,7 +72,7 @@ Dependency direction is one-way: `app → components → core`.
 4. **Regenerate the registry and docs:**
 
    ```sh
-   just registry    # builds registry/components/*.json (inlined source + derived deps)
+   just registry    # builds registry/components/*.json (inlined source + derived deps), props.json, world.schema.json
    just gen-docs    # writes apps/docs/src/content/docs/components/<name>.md
    ```
 

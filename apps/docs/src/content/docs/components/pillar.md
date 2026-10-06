@@ -22,21 +22,23 @@ import { Pillar } from './runek/Pillar'
 <Pillar position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Pillar", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface PillarProps {
-  position?: Vec3
-  rotation?: Vec3
-  height?: number
-  /** Shaft radius at the base, in units. */
-  radius?: number
-  /** Vertical flutes around the shaft; 0 = smooth. */
-  flutes?: number
-  /** Defaults to the world palette's `stone` slot. */
-  color?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `height` | `number` | `3` | Height, in units. |
+| `radius` | `number` | `0.28` | Shaft radius at the base, in units. |
+| `flutes` | `number` | `0` | Vertical flutes around the shaft; 0 = smooth. |
+| `color` | `color` | palette `stone` | Defaults to the world palette's `stone` slot. |
 
 ## Registry manifest
 

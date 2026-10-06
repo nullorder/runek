@@ -19,27 +19,28 @@ Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.13.0`, `three@^0.184.0`.
 ```tsx
 import { Hut } from './runek/Hut'
 
-<Hut position={[0, 0, 0]} />
+<Hut position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Hut", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface HutProps extends WorldComponentProps {
-  /** Wall radius, in units. */
-  radius?: number
-  /** Wall height at the eaves, in units. */
-  wallHeight?: number
-  /** Conical roof height above the eaves, in units. */
-  roofHeight?: number
-  /** Doorway width at the front (local +Z), in units. */
-  doorWidth?: number
-  /** Wall color; defaults to the palette's `wall`. */
-  wallColor?: string
-  /** Roof color; defaults to the palette's `roof`. */
-  roofColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `radius` | `number` | `3` | Wall radius, in units. |
+| `wallHeight` | `number` | `2.9` | Wall height at the eaves, in units. |
+| `roofHeight` | `number` | `1.5` | Conical roof height above the eaves, in units. |
+| `doorWidth` | `number` | `1.3` | Doorway width at the front (local +Z), in units. |
+| `wallColor` | `color` |  | Wall color; defaults to the palette's `wall`. |
+| `roofColor` | `color` |  | Roof color; defaults to the palette's `roof`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

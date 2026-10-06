@@ -4,6 +4,8 @@ import { useWorld, type Vec3 } from '@runek/core'
 export interface PillarProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   height?: number
   /** Shaft radius at the base, in units. */
   radius?: number

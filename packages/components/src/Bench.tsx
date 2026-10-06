@@ -4,6 +4,8 @@ import { useWorld, type Vec3 } from '@runek/core'
 export interface BenchProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   length?: number
   depth?: number
   seatHeight?: number

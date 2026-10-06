@@ -37,9 +37,10 @@ build: build-core build-cli build-docs
 preview:
     pnpm --filter @runek/docs preview
 
-# Rebuild the served registry (registry/components/*.json) from the index + source
+# Rebuild the served registry (components/*.json, props.json, world.schema.json) from the index + source
 registry:
     @node scripts/build-registry.mjs
+    @node scripts/build-prop-schema.mjs
 
 # Regenerate per-component docs (apps/docs) from the registry
 gen-docs:

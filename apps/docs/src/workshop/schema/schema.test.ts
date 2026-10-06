@@ -1,6 +1,7 @@
+import { matches } from '@runek/core/data'
 import { describe, expect, it } from 'vitest'
 import { codeOnlyProps, editableProps, SCHEMA } from '.'
-import { controlKind, emptyValue, labelFor, matches, numberRange, variantOf } from './controls'
+import { controlKind, emptyValue, labelFor, numberRange, variantOf } from './controls'
 import type { PropType } from './types'
 
 describe('generated schema', () => {

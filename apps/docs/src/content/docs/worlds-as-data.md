@@ -11,6 +11,7 @@ Every component is a deterministic function of its props, so an entire scene can
 
 ```ts
 interface WorldData {
+  $schema?: string // editor hint: https://runek.nullorder.org/r/world.schema.json
   version: 1
   meta?: WorldMeta // the world's identity (title, authors, license, source)
   unit?: number
@@ -50,6 +51,20 @@ A small world:
 ```
 
 The look of a world is data too: `palette` re-themes every component at once and `fog` sets the atmosphere — both diff as cleanly as any node.
+
+## Validate it
+
+Start a world file with a `$schema` line and editors check it and complete component names, props, and enum values as you type:
+
+```json
+{
+  "$schema": "https://runek.nullorder.org/r/world.schema.json",
+  "version": 1,
+  "nodes": []
+}
+```
+
+The [world schema](/r/world.schema.json) is generated from the [prop schema](/r/props.json): every prop of every component with its type, default, and doc, read from the TypeScript source. `npx @runek/cli validate world.json` runs the same checks from a terminal (see the [CLI reference](/docs/cli)), and `serializeWorld` keeps the `$schema` line when it saves.
 
 ## World settings (the rules)
 

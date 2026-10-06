@@ -7,6 +7,8 @@ import type { Mesh } from 'three'
 export interface FountainProps {
   position?: Vec3
   rotation?: Vec3
+  /** Accepted for the component contract; this component has no seeded variation yet. */
+  seed?: number
   radius?: number
   /** Stone color; defaults to the world palette's `stone` slot. */
   color?: string

@@ -22,24 +22,24 @@ import { Fence } from './runek/Fence'
 <Fence position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Fence", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface FenceProps {
-  position?: Vec3
-  rotation?: Vec3
-  /** Total length along local X, in units. */
-  length?: number
-  height?: number
-  /** Spacing between posts, in units. */
-  postSpacing?: number
-  /** Number of horizontal rails. */
-  rails?: number
-  /** Defaults to the world palette's `wood` slot. */
-  color?: string
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `length` | `number` | `6` | Total length along local X, in units. |
+| `height` | `number` | `1.1` | Height, in units. |
+| `postSpacing` | `number` | `1.5` | Spacing between posts, in units. |
+| `rails` | `number` | `2` | Number of horizontal rails. |
+| `color` | `color` | palette `wood` | Defaults to the world palette's `wood` slot. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

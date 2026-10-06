@@ -19,24 +19,28 @@ Pulls `@react-three/drei@^10.7.7`, `@react-three/rapier@^2.2.0`, `@runek/core@^0
 ```tsx
 import { Fridge } from './runek/Fridge'
 
-<Fridge position={[0, 0, 0]} />
+<Fridge position={[0, 0, 0]} seed={1} />
+```
+
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Fridge", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
 
-```ts
-export interface FridgeProps extends WorldComponentProps {
-  width?: number
-  height?: number
-  depth?: number
-  /** Seeded when unset. */
-  layout?: FridgeLayout
-  /** Body color. Seeded between an enamel white and brushed steel when unset. */
-  color?: string
-  /** Handles; defaults to the palette's `metal`. */
-  handleColor?: string
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `width` | `number` | `0.7` | Width, in units. |
+| `height` | `number` | `1.8` | Height, in units. |
+| `depth` | `number` | `0.68` | Depth, in units. |
+| `layout` | `"top" \| "bottom" \| "single"` |  | Seeded when unset. |
+| `color` | `color` |  | Body color. Seeded between an enamel white and brushed steel when unset. |
+| `handleColor` | `color` |  | Handles; defaults to the palette's `metal`. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

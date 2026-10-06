@@ -17,6 +17,8 @@ npx @runek/cli list                          # browse the catalog
 
 `add` resolves dependencies for you: it installs `@runek/core` (the `<World>` provider, seeded `rng`, and contract types) from npm, and `house` pulls the walls, floor, roof, door, and window it composes from as source.
 
+Working with a coding agent? Point it at [Runek for agents](/docs/for-agents) (or [llms.txt](/llms.txt)).
+
 ## Compose a world
 
 The CLI copies components into `src/runek/` by default; they import the runtime from `@runek/core`, which it installs for you:

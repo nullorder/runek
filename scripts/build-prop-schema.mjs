@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 // Derive a JSON prop schema for every registry component from its TypeScript
 // source: types, literal unions, tuples, nested specs, destructured defaults,
-// palette fallbacks and JSDoc. The workshop bundles the result.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+// palette fallbacks and JSDoc. Writes registry/props.json (served at /r/props.json,
+// bundled by the workshop, read by the CLI) and the world JSON Schema built from it.
+import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
+import { worldSchema } from './world-schema.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const componentsDir = join(here, '../../../packages/components/src')
-const registryIndex = join(here, '../../../registry/registry.json')
-const outFile = join(here, '../src/workshop/schema/props.json')
+const componentsDir = join(here, '../packages/components/src')
+const registryDir = join(here, '../registry')
+const registryIndex = join(registryDir, 'registry.json')
 const MAX_DEPTH = 4
 
 const program = ts.createProgram([join(componentsDir, 'registry.ts')], {
@@ -105,7 +107,7 @@ function describeProps(type, ctx, depth, defaults) {
     if (!decl) continue
     const propType = checker.getTypeOfSymbolAtLocation(symbol, decl)
     const entry = describe(propType, ctx, depth, symbol.name)
-    const doc = docOf(symbol)
+    const doc = docOf(symbol) || (depth === 0 ? standardDoc(symbol.name) : '')
     if (doc) entry.doc = doc
     if (symbol.flags & ts.SymbolFlags.Optional) entry.optional = true
     const slot = doc.match(/palette's `(\w+)` slot/)
@@ -122,6 +124,21 @@ function describeProps(type, ctx, depth, defaults) {
     props[symbol.name] = entry
   }
   return props
+}
+
+// The contract props mean the same thing everywhere, so undocumented ones get the shared meaning.
+const STANDARD_DOCS = {
+  position: 'Position [x, y, z] in units (1 unit = 1 m, Y-up).',
+  rotation: 'Euler rotation [x, y, z] in radians.',
+  seed: 'Seed for the deterministic variation: same seed, same result.',
+}
+const UNSEEDED_DOC =
+  'Accepted for the component contract; this component has no seeded variation yet.'
+
+function standardDoc(name) {
+  if (STANDARD_DOCS[name]) return STANDARD_DOCS[name]
+  const size = name.match(/^(width|height|depth|length|thickness|radius)$/i)
+  return size ? `${size[1][0].toUpperCase()}${size[1].slice(1)}, in units.` : ''
 }
 
 function isColor(name, entry) {
@@ -213,6 +230,19 @@ function destructuredDefaults(fn) {
   return out
 }
 
+/** Whether the component reads its `seed` (some accept it only to meet the contract). */
+function usesSeed(fn) {
+  const param = fn.parameters[0]
+  if (!param) return false
+  const file = fn.getSourceFile()
+  const body = fn.body?.getText(file) ?? ''
+  if (ts.isIdentifier(param.name)) return new RegExp(`\\b${param.name.text}\\.seed\\b`).test(body)
+  if (!ts.isObjectBindingPattern(param.name)) return false
+  const elements = param.name.elements
+  if (elements.some((el) => (el.propertyName ?? el.name).getText(file) === 'seed')) return true
+  return elements.some((el) => el.dotDotDotToken) && /\bseed\b/.test(body)
+}
+
 function registryObject() {
   let found
   ts.forEachChild(registryFile, function visit(node) {
@@ -238,8 +268,11 @@ for (const prop of registryObject().properties) {
       ? describeProps(checker.getTypeAtLocation(param), ctx, 0, destructuredDefaults(fn))
       : {}
     const doc = docOf(symbol)
+    const seeded = usesSeed(fn)
+    if (!seeded && props.seed?.doc === STANDARD_DOCS.seed) props.seed.doc = UNSEEDED_DOC
     components[name] = {
       kind: 'component',
+      seeded,
       ...(doc ? { doc } : {}),
       props,
       ...(Object.keys(ctx.defs).length ? { defs: ctx.defs } : {}),
@@ -253,6 +286,7 @@ for (const prop of registryObject().properties) {
     const def = JSON.parse(readFileSync(join(componentsDir, imp.moduleSpecifier.text), 'utf8'))
     components[name] = {
       kind: 'composite',
+      seeded: true,
       ...(def.description ? { doc: def.description } : {}),
       props: {
         position: { type: 'vec3', optional: true },
@@ -278,6 +312,9 @@ for (const [title, entry] of Object.entries(components)) {
     })
 }
 
-mkdirSync(dirname(outFile), { recursive: true })
-writeFileSync(outFile, `${JSON.stringify(components)}\n`)
-console.log(`prop schema → ${Object.keys(components).length} components`)
+writeFileSync(join(registryDir, 'props.json'), `${JSON.stringify(components, null, 2)}\n`)
+writeFileSync(
+  join(registryDir, 'world.schema.json'),
+  `${JSON.stringify(worldSchema(components), null, 2)}\n`,
+)
+console.log(`prop schema → ${Object.keys(components).length} components (+ world.schema.json)`)

@@ -4,7 +4,7 @@ Guidelines for AI agents (Claude Code and others) working in this repository.
 
 ## What this is
 
-**Runek** — a source registry of procedural 3D components for React Three Fiber ("shadcn for 3D worlds"): you pull a component's source into your project and own it. Every component generates its geometry from props + a `seed`; a whole world is serializable `{ component, props, seed }[]` data. No binary assets, no server, static deploy.
+**Runek** — a source registry of procedural 3D components for React Three Fiber ("shadcn for 3D worlds"): you pull a component's source into your project and own it. Every component generates its geometry from props + a `seed`; a whole world is a JSON file (`{ "version": 1, "nodes": [{ "type": "Bench", "props": { "seed": 7 } }] }`, see `apps/docs/src/content/docs/worlds-as-data.md`). No binary assets, no server, static deploy.
 
 ## Repository layout
 
@@ -12,17 +12,26 @@ Guidelines for AI agents (Claude Code and others) working in this repository.
 packages/
   core/         @runek/core        — <World>, useWorld, seeded rng, contract types
   components/   @runek/components   — the procedural components (depends on core)
-  cli/          runek              — the `runek` CLI: init / add / list / check-world (source registry)
+  cli/          runek              — the `runek` CLI: init / add / list / info / validate / check-world / preview / skill
 apps/
   docs/         the docs site (Astro + R3F): pre-rendered flat Markdown pages + a walkable 3D library world; also serves the registry at /r
-registry/       the served source registry: registry.json (index) + generated components/*.json
+registry/       the served source registry: registry.json (index) + generated components/*.json, props.json, world.schema.json
 ```
 
 Dependency direction is strictly one-way: `docs → components → core`. Nothing in the library imports from an app. The CLI is standalone (Node built-ins only) and reads the registry. Standalone worlds live in their own repos — **Helicon**, the showcase world, lives at `nullorder/helicon` and consumes Runek via the CLI-vendored source registry; the monorepo holds the library plus the docs harness.
 
 ## Distribution: source registry (the shadcn split)
 
-Decided model — **the shadcn split**: users pull editable component **source** into their project via `npx @runek/cli add <name>` (no black box), while the small runtime is the published **`@runek/core`** npm package the components import. `registry/registry.json` is the hand-maintained index; `registry/components/*.json` are **generated** (`just registry`) self-contained manifests with inlined source + auto-derived deps (each component declares `@runek/core` as an npm dependency, pinned to core's version). Component source is written verbatim — there's no import to rewrite. After editing any component or the index, run `just registry` to refresh the manifests.
+Decided model — **the shadcn split**: users pull editable component **source** into their project via `npx @runek/cli add <name>` (no black box), while the small runtime is the published **`@runek/core`** npm package the components import. `registry/registry.json` is the hand-maintained index; `registry/components/*.json` are **generated** (`just registry`) self-contained manifests with inlined source + auto-derived deps (each component declares `@runek/core` as an npm dependency, pinned to core's version). Component source is written verbatim — there's no import to rewrite. After editing any component or the index, run `just registry` to refresh the manifests, the prop schema (`props.json`), and the world JSON Schema (`world.schema.json`).
+
+## Agent-facing surface
+
+Runek is meant to be easy for coding agents to use, and these are generated, so keep them in sync rather than editing them by hand:
+
+- `/llms.txt`, `/llms-full.txt`, and `/docs/<slug>.md` are built from the docs content collection.
+- `registry/props.json` (every component's props, types, defaults, docs) and `registry/world.schema.json` come from the component TypeScript via `just registry`. Clear prop names and JSDoc on props are what agents (and the workshop inspector) read.
+- `validateWorld` in `@runek/core/data` backs both the workshop's checks and `runek validate`.
+- `registry/agents/SKILL.md` is the agent skill `runek skill` installs; update it when the workflow or CLI changes.
 
 ## Commands
 

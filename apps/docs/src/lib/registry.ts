@@ -40,9 +40,3 @@ export function getComponents(): IndexItem[] {
 export function getManifest(name: string): Manifest {
   return JSON.parse(readFileSync(join(registryDir, 'components', `${name}.json`), 'utf8'))
 }
-
-/** Pull the `export interface XProps { ... }` block out of a component's source. */
-export function extractPropsInterface(source: string): string | null {
-  const match = source.match(/export interface \w*Props \{[\s\S]*?\n\}/)
-  return match ? match[0] : null
-}

@@ -22,20 +22,23 @@ import { Campfire } from './runek/Campfire'
 <Campfire position={[0, 0, 0]} seed={1} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Campfire", "props": { "position": [0, 0, 0], "seed": 1 } }
+```
+
 ## Props
 
-```ts
-export interface CampfireProps {
-  position?: Vec3
-  rotation?: Vec3
-  radius?: number
-  /** Log color; defaults to the world palette's `wood` slot. */
-  logColor?: string
-  flameColor?: string
-  intensity?: number
-  seed?: number
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `radius` | `number` | `0.5` | Radius, in units. |
+| `logColor` | `color` | palette `wood` | Log color; defaults to the world palette's `wood` slot. |
+| `flameColor` | `color` | `"#ff7a1a"` |  |
+| `intensity` | `number` | `14` |  |
+| `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest
 

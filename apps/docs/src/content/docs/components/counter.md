@@ -22,25 +22,25 @@ import { Counter } from './runek/Counter'
 <Counter position={[0, 0, 0]} />
 ```
 
+Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
+
+```json
+{ "type": "Counter", "props": { "position": [0, 0, 0] } }
+```
+
 ## Props
 
-```ts
-export interface CounterProps extends WorldComponentProps {
-  /** Length along local X, in units. */
-  length?: number
-  /** Counter height, in units. */
-  height?: number
-  /** Depth along local Z, in units. */
-  depth?: number
-  /** Body color; defaults to the palette's `wood`. */
-  color?: string
-  /** Worktop color; defaults to the palette's `woodDark`. */
-  topColor?: string
-  /** A kitchen stove at the +X end: a glass hob with four burners on the worktop and an oven
-   *  door in the front below it. */
-  hob?: boolean
-}
-```
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `length` | `number` | `3` | Length along local X, in units. |
+| `height` | `number` | `1.1` | Counter height, in units. |
+| `depth` | `number` | `0.6` | Depth along local Z, in units. |
+| `color` | `color` |  | Body color; defaults to the palette's `wood`. |
+| `topColor` | `color` |  | Worktop color; defaults to the palette's `woodDark`. |
+| `hob` | `boolean` | `false` | A kitchen stove at the +X end: a glass hob with four burners on the worktop and an oven door in the front below it. |
+| `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
+| `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
+| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 
 ## Registry manifest
 
