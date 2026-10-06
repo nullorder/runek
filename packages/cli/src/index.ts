@@ -3,10 +3,12 @@ import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
+import { versionOutput } from './banner.ts'
 import { applyFixes, describeIssue, loadCoreData, loadGroundRegistry } from './check.ts'
 import { componentInfo, formatInfo, resolveItem } from './info.ts'
 import {
   type Config,
+  cliVersion,
   collectDependencies,
   configExists,
   DEFAULT_CONFIG,
@@ -69,6 +71,7 @@ ${bold('Usage')}
   runek check-world <file> [opts]   Find buried and floating nodes in a world file
   runek preview <file> [--open]     Print a workshop link that opens the world in the browser
   runek skill [--out <path>]        Install the Runek agent skill for coding agents
+  runek version                     Print the CLI version
 
 ${bold('Options')}
   --registry <url|path>   Registry base (default: ${DEFAULT_CONFIG.registry})
@@ -82,6 +85,7 @@ ${bold('Options')}
   --json                  (list, info, validate, check-world) machine-readable output
   --out <path>            (skill) where to write the skill (default: ${SKILL_PATH})
   --open                  (preview) open the link in your browser
+  -v, --version           Print the CLI version
   -h, --help              Show this help
 
 ${bold('Examples')}
@@ -109,12 +113,23 @@ async function main(): Promise<void> {
       out: { type: 'string' },
       open: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
+      version: { type: 'boolean', short: 'v' },
     },
   })
 
   const [command, ...names] = positionals
-  const opts = values as Options & { help?: boolean }
+  const opts = values as Options & { help?: boolean; version?: boolean }
 
+  if (opts.version || command === 'version') {
+    process.stdout.write(
+      versionOutput(cliVersion(), {
+        tty: Boolean(process.stdout.isTTY),
+        columns: process.stdout.columns,
+        color: !process.env.NO_COLOR,
+      }),
+    )
+    return
+  }
   if (opts.help || command === 'help' || !command) {
     process.stdout.write(HELP)
     return

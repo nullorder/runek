@@ -71,6 +71,11 @@ export const DEFAULT_CONFIG: Config = {
   dir: 'src/runek',
 }
 
+/** The CLI's own version; `package.json` sits one level up from both `src/` and `dist/`. */
+export function cliVersion(): string {
+  return JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version
+}
+
 // --- config ----------------------------------------------------------------
 
 export function configExists(cwd: string): boolean {

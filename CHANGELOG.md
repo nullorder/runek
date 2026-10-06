@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`.claude/skills/runek/SKILL.md` by default).
 - `--json` output for `runek list`, `runek check-world`, and
   `runek validate`.
+- `runek --version` (`-v`, or `runek version`) prints the CLI version:
+  a Pixelspace banner in a terminal, the bare version when piped.
 - `validateWorld`, `suggest`, `matches`, `describeType`, and the prop
   schema types (`SchemaMap`, `ComponentSchema`, `PropSchema`) are
   exported from `@runek/core` and `@runek/core/data`, so the same world

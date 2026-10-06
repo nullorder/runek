@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { collectDependencies, installCommand, resolveItems } from './lib.ts'
+import { cliVersion, collectDependencies, installCommand, resolveItems } from './lib.ts'
 
 const localRegistry = fileURLToPath(new URL('../../../registry', import.meta.url))
 
@@ -68,5 +68,12 @@ describe('resolveItems', () => {
       expect(names.indexOf(part)).toBeGreaterThanOrEqual(0)
       expect(names.indexOf(part)).toBeLessThan(names.indexOf('house'))
     }
+  })
+})
+
+describe('cliVersion', () => {
+  it("reads the CLI's package.json", async () => {
+    const pkg = await import('../package.json', { with: { type: 'json' } })
+    expect(cliVersion()).toBe(pkg.default.version)
   })
 })

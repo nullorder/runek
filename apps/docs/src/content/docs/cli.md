@@ -126,6 +126,7 @@ Installs the Runek agent skill (served at `/r/agents/SKILL.md`): how to add comp
 | `--json` | list, info, validate, check-world | Machine-readable JSON on stdout, for scripts and agents. |
 | `--out <path>` | skill | Where to write the skill (default `.claude/skills/runek/SKILL.md`). |
 | `--open` | preview | Open the link in your browser. |
+| `-v, --version` | — | Print the CLI version (also `runek version`): a pixel banner in a terminal, the bare version when piped. |
 | `-h, --help` | — | Show help. |
 
 ## runek.config.json

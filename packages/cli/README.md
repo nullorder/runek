@@ -55,6 +55,7 @@ Same `seed` → same world, every time.
 --json                  (list, info, validate, check-world) machine-readable output
 --out <path>            (skill) where to write the skill (default: .claude/skills/runek/SKILL.md)
 --open                  (preview) open the link in your browser
+-v, --version           Print the CLI version
 ```
 
 Full reference: [runek.nullorder.org/docs/cli](https://runek.nullorder.org/docs/cli).
