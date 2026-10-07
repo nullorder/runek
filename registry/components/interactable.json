@@ -5,7 +5,7 @@
   "description": "Wrap anything to make it something the player can act on: walk within range and a prompt shows its actions with the keys the world binds to them; press one and onAction gets its id. Only the nearest in range takes the key, and keys yield to text fields.",
   "dependencies": [
     "@react-three/drei@^10.7.7",
-    "@runek/core@^0.13.0",
+    "@runek/core@^0.14.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [

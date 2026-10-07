@@ -5,7 +5,7 @@
   "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a seeded pixel game.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0",
+    "@runek/core@^0.14.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

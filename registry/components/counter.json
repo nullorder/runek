@@ -5,7 +5,7 @@
   "description": "A service / bar counter: a solid body under a worktop that overhangs the front; one cuboid collider. With hob, a kitchen stove: a glass cooktop and an oven door.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0"
+    "@runek/core@^0.14.0"
   ],
   "registryDependencies": [],
   "files": [

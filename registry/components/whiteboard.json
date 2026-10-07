@@ -5,7 +5,7 @@
   "description": "A whiteboard on a rolling stand or a wall, with seeded marker diagrams (boxes, arrows, lines of writing) and optional text across the top.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0",
+    "@runek/core@^0.14.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [

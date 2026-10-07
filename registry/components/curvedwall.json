@@ -5,7 +5,7 @@
   "description": "An arc of wall around the origin — solid concrete or a floor-to-ceiling glass curtain wall with mullions. Compose several arcs to leave door gaps; chords carry cuboid colliders.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0",
+    "@runek/core@^0.14.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

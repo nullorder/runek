@@ -5,7 +5,7 @@
   "description": "Table with a top on four legs, or on pedestals with rounded ends for a conference table.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0",
+    "@runek/core@^0.14.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

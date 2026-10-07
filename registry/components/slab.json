@@ -5,7 +5,7 @@
   "description": "A rounded structural plate (pill or ellipse) for curved-modernist decks, cantilevered roofs, terraces, or a lawn disc. Walkable, with a single convex-hull collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0",
+    "@runek/core@^0.14.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

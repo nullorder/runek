@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add book
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.13.0`.
+Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.14.0`.
 
 ## Use it
 

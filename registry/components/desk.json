@@ -5,7 +5,7 @@
   "description": "A work desk: a top over slim legs, a drawer pedestal, or side panels, with a modesty panel at the back. Base and drawers seeded, each pinnable. One cuboid collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0"
+    "@runek/core@^0.14.0"
   ],
   "registryDependencies": [],
   "files": [

@@ -6,7 +6,7 @@
   "dependencies": [
     "@react-three/drei@^10.7.7",
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.13.0"
+    "@runek/core@^0.14.0"
   ],
   "registryDependencies": [],
   "files": [
