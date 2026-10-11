@@ -13,6 +13,8 @@ import { PLACEABLE, SCHEMA } from '../schema'
 import { SNIPPETS } from '../snippets'
 import { walk } from '../state/ops'
 import {
+  newDressFigure,
+  openDressing,
   redoWorld,
   requestCamera,
   reseedAll,
@@ -86,6 +88,13 @@ function commands(state: WorkshopState): Command[] {
         requestCamera({ kind: 'frame', id })
       },
     })
+    if (node.type === 'Person')
+      out.push({
+        id: `dress:${id}`,
+        group: 'Dress',
+        label: `Customize Person ${id}`,
+        run: () => openDressing(id),
+      })
   })
   out.push(
     {
@@ -97,6 +106,22 @@ function commands(state: WorkshopState): Command[] {
     },
     { id: 'mode:lab', group: 'Mode', label: 'Lab mode', hint: '2', run: () => setMode('lab') },
     { id: 'mode:code', group: 'Mode', label: 'Code mode', hint: '3', run: () => setMode('code') },
+    {
+      id: 'mode:dress',
+      group: 'Mode',
+      label: 'Dressing room',
+      hint: '4',
+      run: () => openDressing(),
+    },
+    {
+      id: 'dress:new',
+      group: 'Dress',
+      label: 'New person in the dressing room',
+      run: () => {
+        openDressing(null)
+        newDressFigure()
+      },
+    },
     {
       id: 'stage:room',
       group: 'Stage',

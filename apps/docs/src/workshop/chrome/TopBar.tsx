@@ -5,6 +5,8 @@ import { live } from '../scene/refs'
 import type { Mode } from '../share/codec'
 import { encodeShare, SHARE_SOFT_LIMIT } from '../share/codec'
 import {
+  dressProps,
+  openDressing,
   redoWorld,
   setMode,
   startPlay,
@@ -18,6 +20,7 @@ const MODES: [Mode, string, string][] = [
   ['build', 'Build', 'Compose a world'],
   ['lab', 'Lab', 'One component under the microscope'],
   ['code', 'Code', 'world.json and live App.tsx'],
+  ['dress', 'Dress', 'The dressing room: customise a person'],
 ]
 
 function Menu({
@@ -60,7 +63,8 @@ function Menu({
 }
 
 export async function shareLink(withCode: boolean) {
-  const { world, code, mode, stage, lab } = useWorkshop.getState()
+  const state = useWorkshop.getState()
+  const { world, code, mode, stage, lab } = state
   const payload = await encodeShare({
     world,
     ...(withCode && code ? { code } : {}),
@@ -68,6 +72,7 @@ export async function shareLink(withCode: boolean) {
     stage,
     ...(live.camera ? { camera: live.camera } : {}),
     ...(mode === 'lab' ? { lab: { type: lab.type, props: lab.props } } : {}),
+    ...(mode === 'dress' ? { dress: { props: dressProps(state) } } : {}),
   })
   return `${location.origin}${location.pathname}#s=${payload}`
 }
@@ -112,7 +117,7 @@ export default function TopBar() {
             type="button"
             className={mode === id ? 'is-on' : ''}
             title={hint}
-            onClick={() => setMode(id)}
+            onClick={() => (id === 'dress' ? openDressing() : setMode(id))}
           >
             {label}
           </button>
@@ -253,7 +258,7 @@ export default function TopBar() {
           </>
         )}
       </Menu>
-      {mode !== 'lab' && (
+      {mode !== 'lab' && mode !== 'dress' && (
         <button
           type="button"
           className={`ws-btn ws-btn--primary ${playing ? 'is-on' : ''}`}

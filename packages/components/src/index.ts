@@ -105,8 +105,12 @@ export type {
   PersonSkin,
   PersonSkinName,
   PersonStyle,
+  PersonTrait,
+  PersonTraitSource,
+  ResolvedGarment,
+  ResolvedPerson,
 } from './Person'
-export { PERSON_SKINS, Person, tripAt } from './Person'
+export { PERSON_COLORS, PERSON_SKINS, Person, resolvePerson, tripAt } from './Person'
 export type { PillarProps } from './Pillar'
 export { Pillar } from './Pillar'
 export type { PlantProps } from './Plant'

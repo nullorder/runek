@@ -242,30 +242,37 @@ const NOSES: readonly PersonNose[] = ['button', 'straight', 'broad']
 
 // Skin and hair have no palette slot and no honest mapping onto one, so they roll from curated
 // sets instead (the seeded book-spine precedent, CONTRACT §7). Any explicit color wins.
-const SKIN_TONES = [
-  '#f6ddc3',
-  '#efc9a4',
-  '#e9b896',
-  '#e0aa7e',
-  '#c98d63',
-  '#a9714a',
-  '#8a5a3b',
-  '#65402a',
-  '#48301f',
-]
-const HAIR_COLORS = [
-  '#171310',
-  '#2b1d14',
-  '#4a3122',
-  '#6b4a2a',
-  '#6e3d24',
-  '#8c6b3f',
-  '#b08d57',
-  '#c9b18a',
-  '#9a9a9a',
-  '#7d3320',
-]
-const EYE_COLORS = ['#4a3424', '#2f2a26', '#3d7ab8', '#3f6a48', '#6b5a2e', '#6b7a85']
+/** The curated colors a seeded `Person` rolls from: skin tones, hair colors, and eye colors. Handy
+ *  as swatches in an editor; any other color works too. */
+export const PERSON_COLORS = {
+  skin: [
+    '#f6ddc3',
+    '#efc9a4',
+    '#e9b896',
+    '#e0aa7e',
+    '#c98d63',
+    '#a9714a',
+    '#8a5a3b',
+    '#65402a',
+    '#48301f',
+  ],
+  hair: [
+    '#171310',
+    '#2b1d14',
+    '#4a3122',
+    '#6b4a2a',
+    '#6e3d24',
+    '#8c6b3f',
+    '#b08d57',
+    '#c9b18a',
+    '#9a9a9a',
+    '#7d3320',
+  ],
+  eyes: ['#4a3424', '#2f2a26', '#3d7ab8', '#3f6a48', '#6b5a2e', '#6b7a85'],
+} as const
+const SKIN_TONES = PERSON_COLORS.skin
+const HAIR_COLORS = PERSON_COLORS.hair
+const EYE_COLORS = PERSON_COLORS.eyes
 
 const HAIR_STYLES: Record<PersonGender, readonly PersonHair[]> = {
   feminine: ['long', 'bun', 'ponytail', 'braid', 'swept', 'long', 'ponytail'],
@@ -273,13 +280,13 @@ const HAIR_STYLES: Record<PersonGender, readonly PersonHair[]> = {
   neutral: ['short', 'swept', 'cropped', 'ponytail', 'bun', 'long'],
 }
 
-interface KindPreset {
+export interface KindPreset {
   outfit: PersonOutfit
   hat: PersonHat
   accessories: PersonAccessory[]
 }
 
-const KINDS: Record<PersonKind, KindPreset> = {
+export const KINDS: Record<PersonKind, KindPreset> = {
   villager: { outfit: 'tunic', hat: 'none', accessories: ['belt'] },
   merchant: { outfit: 'apron', hat: 'cap', accessories: ['bag', 'belt'] },
   guard: { outfit: 'uniform', hat: 'cap', accessories: ['belt'] },
@@ -499,6 +506,13 @@ export interface FigureSpec {
   }
 }
 
+/** The colors the flat `topColor` / `bottomColor` / `shoeColor` props stand for, settled. */
+export interface SlotColors {
+  top: string
+  bottom: string
+  shoe: string
+}
+
 /** Per-figure animation phases; never part of the mesh. */
 export interface MotionSpec {
   phase: number
@@ -557,7 +571,7 @@ export function resolveFigure(
   t: TraitInput,
   palette: WorldPalette,
   unit: number,
-): { spec: FigureSpec; motion: MotionSpec } {
+): { spec: FigureSpec; motion: MotionSpec; slots: SlotColors } {
   const r = rng(t.seed)
   const sk: PersonSkin | undefined = typeof t.skin === 'string' ? PERSON_SKINS[t.skin] : t.skin
   const hairObj = typeof t.hair === 'object' ? t.hair : undefined
@@ -644,11 +658,12 @@ export function resolveFigure(
   }
 
   const hat = t.hat ?? sk?.hat ?? preset.hat
-  const layers = resolveLayers(t, sk, preset, palette, {
+  const slots: SlotColors = {
     top: t.topColor ?? sk?.topColor ?? topRoll,
     bottom: t.bottomColor ?? sk?.bottomColor ?? bottomRoll,
     shoe: t.shoeColor ?? sk?.shoeColor ?? palette.metal,
-  })
+  }
+  const layers = resolveLayers(t, sk, preset, palette, slots)
 
   const outerTop = [...layers].reverse().find((l) => l.region === 'top' && l.type !== 'apron')
   colors.hat =
@@ -686,6 +701,7 @@ export function resolveFigure(
       colors,
     },
     motion,
+    slots,
   }
 }
 
@@ -694,7 +710,7 @@ function resolveLayers(
   sk: PersonSkin | undefined,
   preset: KindPreset,
   palette: WorldPalette,
-  slot: { top: string; bottom: string; shoe: string },
+  slot: SlotColors,
 ): Layer[] {
   const accessories = t.accessories ?? sk?.accessories ?? preset.accessories
   let stack: Array<PersonGarment & { slot?: Slot }>

@@ -29,6 +29,15 @@ describe('share codec', () => {
     expect(text.length).toBeLessThan(1500)
   })
 
+  it('carries the dressing room figure', async () => {
+    const dress = {
+      world: payload.world,
+      mode: 'dress' as const,
+      dress: { props: { seed: 4, hair: { style: 'bun' } } },
+    }
+    expect(await decodeShare(await encodeShare(dress))).toEqual(dress)
+  })
+
   it('rejects garbage', async () => {
     await expect(decodeShare('not-a-link')).rejects.toThrow()
   })
@@ -36,6 +45,7 @@ describe('share codec', () => {
   it('parses hash params', () => {
     expect(parseHash('#m=lab&c=Bookshelf')).toEqual({ mode: 'lab', component: 'Bookshelf' })
     expect(parseHash('#s=abc').share).toBe('abc')
+    expect(parseHash('#m=dress').mode).toBe('dress')
     expect(parseHash('#m=nope').mode).toBeUndefined()
   })
 })
