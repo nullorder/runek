@@ -1,8 +1,8 @@
 import type { JsonValue } from '@runek/core/data'
 import { PropsForm, SeedRow } from '../inspector/Inspector'
 import { Panel } from '../panels/Panel'
-import { setDress, useWorkshop } from '../state/store'
-import { Choice, optionsOf, Slider, Swatches, Tiles, TraitRow, useDress } from './controls'
+import { setStudio, useWorkshop } from '../state/store'
+import { Choice, optionsOf, Slider, Swatches, Tiles, TraitRow, useStudio } from './controls'
 import { LayerStack } from './LayerStack'
 import { shuffle } from './shuffle'
 import { EYES, FASHION, HAIR, LIPS, SKIN } from './swatches'
@@ -22,22 +22,22 @@ const IDENTITY: Props = {
 }
 
 function Looks() {
-  const { props, resolved, write, replace } = useDress()
-  const seeds = useWorkshop((s) => s.dress.seeds)
+  const { props, resolved, write, replace } = useStudio()
+  const seeds = useWorkshop((s) => s.studio.seeds)
   const skin = typeof props.skin === 'string' ? props.skin : undefined
   return (
     <>
       <SeedRow
         seed={typeof props.seed === 'number' ? props.seed : undefined}
-        onChange={(seed) => replace({ ...props, seed: seed ?? 1 }, 'dress:seed')}
+        onChange={(seed) => replace({ ...props, seed: seed ?? 1 }, 'studio:seed')}
       />
-      <div className="ws-dress__row">
+      <div className="ws-avatar__row">
         <button
           type="button"
           className={`ws-btn ws-btn--small ${seeds ? 'is-on' : ''}`}
           title="See the neighbouring seeds side by side"
           onClick={() =>
-            setDress({
+            setStudio({
               seeds: !seeds,
               seedBase: typeof props.seed === 'number' ? Math.max(1, props.seed - 4) : 1,
             })
@@ -72,7 +72,7 @@ function Looks() {
 }
 
 function Body() {
-  const { resolved, write } = useDress()
+  const { resolved, write } = useStudio()
   return (
     <>
       <TraitRow id="style" hint="Proportions and face template">
@@ -111,14 +111,14 @@ function Body() {
           min={0.6}
           max={2.2}
           step={0.01}
-          onChange={(n) => write('height', n, 'dress:height')}
+          onChange={(n) => write('height', n, 'studio:height')}
         />
       </TraitRow>
       <TraitRow id="tone">
         <Swatches
           colors={SKIN}
           value={resolved.tone.value}
-          onPick={(c) => write('tone', c, 'dress:tone')}
+          onPick={(c) => write('tone', c, 'studio:tone')}
         />
       </TraitRow>
     </>
@@ -126,14 +126,14 @@ function Body() {
 }
 
 function Face() {
-  const { resolved, write } = useDress()
+  const { resolved, write } = useStudio()
   return (
     <>
       <TraitRow id="eyeColor">
         <Swatches
           colors={EYES}
           value={resolved.eyeColor.value}
-          onPick={(c) => write('eyeColor', c, 'dress:eyeColor')}
+          onPick={(c) => write('eyeColor', c, 'studio:eyeColor')}
         />
       </TraitRow>
       <TraitRow id="eyeSize" hint="A multiplier on the style's eye size">
@@ -142,14 +142,14 @@ function Face() {
           min={0.6}
           max={1.6}
           step={0.01}
-          onChange={(n) => write('eyeSize', n, 'dress:eyeSize')}
+          onChange={(n) => write('eyeSize', n, 'studio:eyeSize')}
         />
       </TraitRow>
       <TraitRow id="browColor" hint="Defaults to the hair color">
         <Swatches
           colors={HAIR}
           value={resolved.browColor.value}
-          onPick={(c) => write('browColor', c, 'dress:browColor')}
+          onPick={(c) => write('browColor', c, 'studio:browColor')}
         />
       </TraitRow>
       <TraitRow id="browWeight">
@@ -158,7 +158,7 @@ function Face() {
           min={0}
           max={1.6}
           step={0.01}
-          onChange={(n) => write('browWeight', n, 'dress:browWeight')}
+          onChange={(n) => write('browWeight', n, 'studio:browWeight')}
         />
       </TraitRow>
       <TraitRow id="nose">
@@ -172,7 +172,7 @@ function Face() {
         <Swatches
           colors={LIPS}
           value={resolved.lipColor.value}
-          onPick={(c) => write('lipColor', c, 'dress:lipColor')}
+          onPick={(c) => write('lipColor', c, 'studio:lipColor')}
         />
       </TraitRow>
       <TraitRow id="lipFullness">
@@ -181,7 +181,7 @@ function Face() {
           min={0.5}
           max={1.6}
           step={0.01}
-          onChange={(n) => write('lipFullness', n, 'dress:lipFullness')}
+          onChange={(n) => write('lipFullness', n, 'studio:lipFullness')}
         />
       </TraitRow>
       <TraitRow id="blush" hint="Cheek flush, 0 (none) to 1">
@@ -190,7 +190,7 @@ function Face() {
           min={0}
           max={1}
           step={0.01}
-          onChange={(n) => write('blush', n, 'dress:blush')}
+          onChange={(n) => write('blush', n, 'studio:blush')}
         />
       </TraitRow>
       <TraitRow id="facialHair">
@@ -208,7 +208,7 @@ function Face() {
 }
 
 function Hair() {
-  const { resolved, write } = useDress()
+  const { resolved, write } = useStudio()
   return (
     <>
       <TraitRow id="hair">
@@ -224,7 +224,7 @@ function Hair() {
         <Swatches
           colors={HAIR}
           value={resolved.hairColor.value}
-          onPick={(c) => write('hairColor', c, 'dress:hairColor')}
+          onPick={(c) => write('hairColor', c, 'studio:hairColor')}
         />
       </TraitRow>
     </>
@@ -232,7 +232,7 @@ function Hair() {
 }
 
 function Clothes() {
-  const { resolved, palette, write } = useDress()
+  const { resolved, palette, write } = useStudio()
   const slots = [palette.fabric, palette.accent, palette.wall, palette.foliage]
   const lower = [palette.woodDark, palette.stone, palette.metal]
   return (
@@ -253,21 +253,21 @@ function Clothes() {
         <Swatches
           colors={[...slots, ...FASHION]}
           value={resolved.topColor.value}
-          onPick={(c) => write('topColor', c, 'dress:topColor')}
+          onPick={(c) => write('topColor', c, 'studio:topColor')}
         />
       </TraitRow>
       <TraitRow id="bottomColor" hint="Recolors every bottom">
         <Swatches
           colors={[...lower, ...FASHION]}
           value={resolved.bottomColor.value}
-          onPick={(c) => write('bottomColor', c, 'dress:bottomColor')}
+          onPick={(c) => write('bottomColor', c, 'studio:bottomColor')}
         />
       </TraitRow>
       <TraitRow id="shoeColor" hint="Recolors the footwear">
         <Swatches
           colors={[palette.metal, palette.woodDark, ...FASHION]}
           value={resolved.shoeColor.value}
-          onPick={(c) => write('shoeColor', c, 'dress:shoeColor')}
+          onPick={(c) => write('shoeColor', c, 'studio:shoeColor')}
         />
       </TraitRow>
       <TraitRow id="clothes" hint="Every layer, inner to outer">
@@ -278,7 +278,7 @@ function Clothes() {
 }
 
 function Extras() {
-  const { resolved, write } = useDress()
+  const { resolved, write } = useStudio()
   const worn = resolved.accessories.value
   const asLayers = new Set(['belt', 'scarf', 'cape'])
   return (
@@ -324,13 +324,13 @@ function Extras() {
 }
 
 function Pose() {
-  const { props, write } = useDress()
+  const { props, write } = useStudio()
   const text = (id: 'bubble' | 'label', placeholder: string) => (
     <input
       className="ws-text"
       value={typeof props[id] === 'string' ? (props[id] as string) : ''}
       placeholder={placeholder}
-      onChange={(e) => write(id, e.target.value || undefined, `dress:${id}`)}
+      onChange={(e) => write(id, e.target.value || undefined, `studio:${id}`)}
     />
   )
   return (
@@ -370,7 +370,7 @@ function Pose() {
 }
 
 function More() {
-  const { props, replace } = useDress()
+  const { props, replace } = useStudio()
   return (
     <>
       <p className="ws-field__doc">
@@ -380,7 +380,7 @@ function More() {
       <PropsForm
         type="Person"
         props={props}
-        scope="dress"
+        scope="studio"
         only={moreProps()}
         onPatch={(patch, key) => {
           const next = { ...props }
@@ -407,8 +407,8 @@ const CONTENT: Record<TabId, () => React.ReactNode> = {
 }
 
 export function AvatarPanel() {
-  const tab = useWorkshop((s) => s.dress.tab)
-  const { props, replace } = useDress()
+  const tab = useWorkshop((s) => s.studio.tab)
+  const { props, replace } = useStudio()
   const Content = CONTENT[tab]
   const canShuffle = tab !== 'more'
   return (
@@ -431,21 +431,21 @@ export function AvatarPanel() {
         )
       }
     >
-      <div className="ws-dress">
-        <nav className="ws-dress__tabs" aria-label="Avatar sections">
+      <div className="ws-avatar">
+        <nav className="ws-avatar__tabs" aria-label="Avatar sections">
           {TABS.map(([id, label]) => (
             <button
               key={id}
               type="button"
               aria-pressed={tab === id}
               className={tab === id ? 'is-on' : ''}
-              onClick={() => setDress({ tab: id })}
+              onClick={() => setStudio({ tab: id })}
             >
               {label}
             </button>
           ))}
         </nav>
-        <div className="ws-dress__body">
+        <div className="ws-avatar__body">
           <Content />
         </div>
       </div>

@@ -4,12 +4,12 @@ import { jsxFor } from '../code/generate'
 import { locate, walk } from '../state/ops'
 import {
   addNodes,
-  dressProps,
   replaceNode,
-  setDress,
+  setStudio,
+  studioProps,
   toast,
   useWorkshop,
-  writeDress,
+  writeStudio,
 } from '../state/store'
 import { avatarBody, lookFile, lookOf, parseLook, wearLook } from './traits'
 
@@ -21,22 +21,22 @@ const placed = (props: Props) => {
   return rest
 }
 
-/** Put the new figure into the scene where the room was entered from; the room keeps dressing it. */
-export function addDressToScene() {
-  const { dress, world } = get()
-  const back = dress.back?.target ?? [0, 0, 0]
-  const props = { ...dress.draft, position: [back[0], world.ground ?? 0, back[2]] }
+/** Put the new figure into the scene where the room was entered from; the room keeps editing it. */
+export function addFigureToScene() {
+  const { studio, world } = get()
+  const back = studio.back?.target ?? [0, 0, 0]
+  const props = { ...studio.draft, position: [back[0], world.ground ?? 0, back[2]] }
   const [id] = addNodes([{ type: 'Person', props }])
   if (id) {
-    setDress({ target: id, original: props })
+    setStudio({ target: id, original: props })
     toast('Added to the scene: edits now land on it')
   }
 }
 
-/** Dress the play avatar in this look: the world's `Player` body, or a new `Player` wearing it. */
+/** Give the play avatar this look: the world's `Player` body, or a new `Player` wearing it. */
 export function useAsAvatar() {
   const state = get()
-  const look = lookOf(dressProps(state))
+  const look = lookOf(studioProps(state))
   let player: WorldNode | null = null
   walk(state.world.nodes, (node) => {
     if (!player && node.type === 'Player') player = node
@@ -59,7 +59,7 @@ export function useAsAvatar() {
     toast('The play avatar wears this look now')
     return
   }
-  const back = state.dress.back?.target ?? [0, 0, 0]
+  const back = state.studio.back?.target ?? [0, 0, 0]
   addNodes([
     {
       type: 'Player',
@@ -71,7 +71,7 @@ export function useAsAvatar() {
 }
 
 export function exportLook() {
-  const props = dressProps(get())
+  const props = studioProps(get())
   const name = typeof props.label === 'string' ? props.label : `person-${props.seed ?? 1}`
   const slug =
     name
@@ -85,23 +85,23 @@ export function exportLook() {
 export async function importLook(file: File) {
   try {
     const look = parseLook(await file.text())
-    writeDress(wearLook(dressProps(get()), look))
+    writeStudio(wearLook(studioProps(get()), look))
     toast(`Wearing ${file.name}`)
   } catch (error) {
     toast(`Couldn't read ${file.name}: ${(error as Error).message}`)
   }
 }
 
-export const copyJsx = () => copyText(jsxFor('Person', placed(dressProps(get()))), 'JSX copied')
+export const copyJsx = () => copyText(jsxFor('Person', placed(studioProps(get()))), 'JSX copied')
 
 export const copyNode = () =>
   copyText(
-    JSON.stringify({ type: 'Person', props: placed(dressProps(get())) }, null, 2),
+    JSON.stringify({ type: 'Person', props: placed(studioProps(get())) }, null, 2),
     'Person node copied',
   )
 
-/** The scene node the room is dressing, if it still exists. */
-export function dressTarget() {
-  const { dress, world } = get()
-  return dress.target ? (locate(world.nodes, dress.target)?.node ?? null) : null
+/** The scene node the room is editing, if it still exists. */
+export function studioTarget() {
+  const { studio, world } = get()
+  return studio.target ? (locate(world.nodes, studio.target)?.node ?? null) : null
 }

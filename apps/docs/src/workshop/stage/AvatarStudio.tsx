@@ -24,7 +24,7 @@ export const DOOR = { width: 2.2, height: 2.8 }
 const DEPTH = 10
 const WIDTH = 10
 const CX = HALL_WEST - DEPTH / 2
-/** The turntable platform: where the figure being dressed stands. */
+/** The turntable platform: where the figure being customised stands. */
 export const PLATFORM = {
   position: [HALL_WEST - 6, 0, DOOR_Z] as [number, number, number],
   height: 0.22,
@@ -89,7 +89,7 @@ function Mirror({ position, rotation }: { position: [number, number, number]; ro
   )
 }
 
-/** The room's door wall and a strip of the hall beyond it: what the dressing room's own canvas
+/** The room's door wall and a strip of the hall beyond it: what the avatar studio's own canvas
  *  shows of the hall, instead of the whole hall and its lamps. */
 export function HallSide() {
   return (
@@ -107,14 +107,14 @@ export function HallSide() {
   )
 }
 
-/** The dressing room behind the hall's west door: a platform, mirrors, a clothes rail, and (when
+/** The avatar studio behind the hall's west door: a platform, mirrors, a clothes rail, and (when
  *  `full`, seen from inside) lamps and two mannequins. Seen through the door from the hall it
  *  stays light, since every lamp is one more light in every shader. Built from catalog
  *  components like the hall itself. */
-export const DressingRoom = memo(function DressingRoom({ full = false }: { full?: boolean }) {
+export const AvatarStudio = memo(function AvatarStudio({ full = false }: { full?: boolean }) {
   const [px, , pz] = PLATFORM.position
   return (
-    <group name="dressing-room">
+    <group name="avatar-studio">
       <Floor position={[CX, 0, DOOR_Z]} size={[DEPTH, WIDTH]} color="#6b5440" />
       <Wall position={[CX, 0, DOOR_Z - WIDTH / 2]} width={DEPTH + 0.2} height={H} color={WALL} />
       <Wall position={[CX, 0, DOOR_Z + WIDTH / 2]} width={DEPTH + 0.2} height={H} color={WALL} />
@@ -143,7 +143,7 @@ export const DressingRoom = memo(function DressingRoom({ full = false }: { full?
         color={GREEN}
         glow
       >
-        DRESSING ROOM
+        AVATAR STUDIO
       </Sign>
       <Mirror position={[HALL_WEST - DEPTH + 0.1, 0, DOOR_Z - 2.6]} rotation={Math.PI / 2} />
       <Mirror position={[HALL_WEST - DEPTH + 0.1, 0, DOOR_Z + 2.6]} rotation={Math.PI / 2} />

@@ -17,8 +17,8 @@ import {
   commit,
   duplicateSelected,
   groupSelected,
-  openDressing,
   openInLab,
+  openStudio,
   patchLab,
   patchNode,
   removeSelected,
@@ -243,8 +243,8 @@ function NodeInspector({
             <button
               type="button"
               className="ws-btn ws-btn--small ws-btn--primary"
-              title="Dress it in the dressing room (4)"
-              onClick={() => openDressing(id)}
+              title="Customise it in the avatar studio (4)"
+              onClick={() => openStudio(id)}
             >
               customize
             </button>

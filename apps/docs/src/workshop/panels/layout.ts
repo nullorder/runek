@@ -11,7 +11,7 @@ export type PanelId =
   | 'issues'
   | 'picker'
   | 'avatar'
-  | 'fitting'
+  | 'studio'
 
 export interface Rect {
   x: number
@@ -41,7 +41,7 @@ export const PANEL_TITLES: Record<PanelId, string> = {
   console: 'Console',
   issues: 'Issues',
   avatar: 'Avatar',
-  fitting: 'Dressing room',
+  studio: 'Avatar studio',
 }
 
 /** Which panels each mode can show, in strip order. */
@@ -49,14 +49,14 @@ export const MODE_PANELS: Record<Mode, PanelId[]> = {
   build: ['outliner', 'inspector', 'world', 'code', 'issues', 'console'],
   code: ['outliner', 'inspector', 'code', 'console', 'world', 'issues'],
   lab: ['picker', 'inspector', 'lab'],
-  dress: ['fitting', 'avatar'],
+  studio: ['studio', 'avatar'],
 }
 
 const DEFAULT_OPEN: Record<Mode, Partial<Record<PanelId, boolean>>> = {
   build: { outliner: true, inspector: true },
   code: { outliner: true, inspector: true, code: true },
   lab: { picker: true, inspector: true, lab: true },
-  dress: { fitting: true, avatar: true },
+  studio: { studio: true, avatar: true },
 }
 
 export function defaultRects(width: number, height: number): Record<PanelId, Rect> {
@@ -70,7 +70,7 @@ export function defaultRects(width: number, height: number): Record<PanelId, Rec
     world: { x: right - 310, y: TOP, w: 300, h: Math.round(usable * 0.75) },
     lab: { x: right - 300, y: TOP, w: 288, h: Math.round(usable * 0.58) },
     avatar: { x: width - 380 - MARGIN, y: TOP, w: 380, h: usable },
-    fitting: { x: MARGIN, y: TOP, w: 264, h: Math.round(usable * 0.8) },
+    studio: { x: MARGIN, y: TOP, w: 264, h: Math.round(usable * 0.8) },
     code: { x: 284, y: TOP + Math.round(usable * 0.36), w: codeW, h: Math.round(usable * 0.64) },
     console: {
       x: MARGIN,

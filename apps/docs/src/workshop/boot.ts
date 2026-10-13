@@ -4,7 +4,7 @@ import { live } from './scene/refs'
 import { SCHEMA } from './schema'
 import { decodeShare, parseHash } from './share/codec'
 import { loadSession, restoreSession } from './share/persist'
-import { DEFAULT_DRESS, DEFAULT_LAB, setLabType, toast, useWorkshop } from './state/store'
+import { DEFAULT_LAB, DEFAULT_STUDIO, setLabType, toast, useWorkshop } from './state/store'
 import { templateById } from './templates'
 
 /** Pick the starting state: a share link wins, then `?src=`, then the saved session, then the
@@ -28,7 +28,7 @@ export async function boot() {
         lab: payload.lab
           ? { ...DEFAULT_LAB, type: payload.lab.type, props: payload.lab.props }
           : s.lab,
-        dress: payload.dress ? { ...DEFAULT_DRESS, draft: payload.dress.props } : s.dress,
+        studio: payload.studio ? { ...DEFAULT_STUDIO, draft: payload.studio.props } : s.studio,
       }))
       if (payload.camera) live.camera = payload.camera
       toast(

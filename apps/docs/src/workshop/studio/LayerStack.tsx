@@ -1,7 +1,7 @@
 import { type ResolvedGarment, resolvePerson } from '@runek/components'
 import type { JsonValue } from '@runek/core/data'
 import { useState } from 'react'
-import { Choice, defOptions, Slider, Swatches, Tiles, useDress } from './controls'
+import { Choice, defOptions, Slider, Swatches, Tiles, useStudio } from './controls'
 import { FASHION } from './swatches'
 
 type Garment = Record<string, JsonValue> & { type: string }
@@ -46,7 +46,7 @@ const MANNEQUIN = { seed: 5, gender: 'neutral', skinTone: '#d9d4ca', hair: 'bald
 /** The clothes, inner to outer: the order decides the fit (a top before the trousers is tucked
  *  in), so rows drag to reorder, and the badge shows what tucks. */
 export function LayerStack() {
-  const { props, resolved, palette, write } = useDress()
+  const { props, resolved, palette, write } = useStudio()
   const [open, setOpen] = useState<number | null>(null)
   const [adding, setAdding] = useState(false)
   const [dragging, setDragging] = useState<number | null>(null)
@@ -159,7 +159,7 @@ export function LayerStack() {
                     <Swatches
                       colors={[...FASHION, ...slots]}
                       value={typeof own === 'string' ? own : layer.color}
-                      onPick={(c) => patch(i, 'color', c, `dress:layer:${i}:color`)}
+                      onPick={(c) => patch(i, 'color', c, `studio:layer:${i}:color`)}
                     />
                     {own !== undefined && (
                       <button
@@ -198,7 +198,7 @@ export function LayerStack() {
                       min={0}
                       max={1}
                       step={0.01}
-                      onChange={(n) => patch(i, 'length', n, `dress:layer:${i}:length`)}
+                      onChange={(n) => patch(i, 'length', n, `studio:layer:${i}:length`)}
                     />
                   </div>
                 </div>

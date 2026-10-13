@@ -5,12 +5,12 @@ import { live } from '../scene/refs'
 import type { Mode } from '../share/codec'
 import { encodeShare, SHARE_SOFT_LIMIT } from '../share/codec'
 import {
-  dressProps,
-  openDressing,
+  openStudio,
   redoWorld,
   setMode,
   startPlay,
   stopPlay,
+  studioProps,
   toast,
   undoWorld,
   useWorkshop,
@@ -20,7 +20,7 @@ const MODES: [Mode, string, string][] = [
   ['build', 'Build', 'Compose a world'],
   ['lab', 'Lab', 'One component under the microscope'],
   ['code', 'Code', 'world.json and live App.tsx'],
-  ['dress', 'Dress', 'The dressing room: customise a person'],
+  ['studio', 'Studio', 'The avatar studio: customise a person'],
 ]
 
 function Menu({
@@ -72,7 +72,7 @@ export async function shareLink(withCode: boolean) {
     stage,
     ...(live.camera ? { camera: live.camera } : {}),
     ...(mode === 'lab' ? { lab: { type: lab.type, props: lab.props } } : {}),
-    ...(mode === 'dress' ? { dress: { props: dressProps(state) } } : {}),
+    ...(mode === 'studio' ? { studio: { props: studioProps(state) } } : {}),
   })
   return `${location.origin}${location.pathname}#s=${payload}`
 }
@@ -117,7 +117,7 @@ export default function TopBar() {
             type="button"
             className={mode === id ? 'is-on' : ''}
             title={hint}
-            onClick={() => (id === 'dress' ? openDressing() : setMode(id))}
+            onClick={() => (id === 'studio' ? openStudio() : setMode(id))}
           >
             {label}
           </button>
@@ -258,7 +258,7 @@ export default function TopBar() {
           </>
         )}
       </Menu>
-      {mode !== 'lab' && mode !== 'dress' && (
+      {mode !== 'lab' && mode !== 'studio' && (
         <button
           type="button"
           className={`ws-btn ws-btn--primary ${playing ? 'is-on' : ''}`}

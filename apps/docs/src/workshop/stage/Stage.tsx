@@ -21,8 +21,8 @@ import {
 } from '@runek/components'
 import { memo, useState } from 'react'
 import type { Stage as StageKind } from '../share/codec'
-import { leaveDressing, openDressing } from '../state/store'
-import { DOOR, DOOR_Z, DressingRoom, HALL_WEST } from './DressingRoom'
+import { leaveStudio, openStudio } from '../state/store'
+import { AvatarStudio, DOOR, DOOR_Z, HALL_WEST } from './AvatarStudio'
 
 const GREEN = '#3df58a'
 const HALF = 15
@@ -30,21 +30,21 @@ const WALL_H = 5.5
 const WALL = '#c3bcae'
 const FLOOR = '#585c62'
 
-/** What clicking the dressing-room doorway does: step in, step back out, or nothing. */
+/** What clicking the avatar-studio doorway does: step in, step back out, or nothing. */
 export type DoorAction = 'enter' | 'leave' | null
 
-/** An invisible click target filling the dressing-room doorway. */
+/** An invisible click target filling the avatar-studio doorway. */
 export function Doorway({ action }: { action: Exclude<DoorAction, null> }) {
   const [hover, setHover] = useState(false)
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: a three.js mesh, not a DOM element; the Dress mode button serves the keyboard
+    // biome-ignore lint/a11y/noStaticElementInteractions: a three.js mesh, not a DOM element; the Studio mode button serves the keyboard
     <mesh
       position={[HALL_WEST, DOOR.height / 2, DOOR_Z]}
       onClick={(e) => {
         e.stopPropagation()
         document.body.style.cursor = ''
-        if (action === 'enter') openDressing()
-        else leaveDressing()
+        if (action === 'enter') openStudio()
+        else leaveStudio()
       }}
       onPointerOver={(e) => {
         e.stopPropagation()
@@ -63,7 +63,7 @@ export function Doorway({ action }: { action: Exclude<DoorAction, null> }) {
 }
 
 /** The library's next room: a hall with a lit 20 × 20 m build plot in the middle, and the
- *  dressing room through its west door. Not part of the world being built; the floor sits at the
+ *  avatar studio through its west door. Not part of the world being built; the floor sits at the
  *  world's ground baseline. */
 export const Hall = memo(function Hall({
   grid,
@@ -106,7 +106,7 @@ export const Hall = memo(function Hall({
         color={WALL}
         openings={[{ offset: -DOOR_Z, ...DOOR }]}
       />
-      <DressingRoom />
+      <AvatarStudio />
       {door && <Doorway action={door} />}
       <Sign
         position={[-HALF + 0.16, 3.25, DOOR_Z]}
@@ -115,7 +115,7 @@ export const Hall = memo(function Hall({
         color={GREEN}
         glow
       >
-        DRESSING ROOM →
+        AVATAR STUDIO →
       </Sign>
 
       <Sign position={[0, 4.3, -HALF + 0.16]} size={0.85} color={GREEN} glow>
