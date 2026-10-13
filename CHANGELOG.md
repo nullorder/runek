@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.14.0...HEAD)
 
+### Added
+
+- The workshop's dressing room: a room behind the hall's west door for
+  customising a `Person`. Open it from the inspector's **customize**,
+  the doorway, the **Dress** mode, or `4`. The figure stands on a
+  turntable while the **Avatar** panel edits it tab by tab (looks, body,
+  face, hair, clothes, hat and extras, pose) with picture tiles, color
+  swatches, and sliders, and the camera frames the part you are on.
+  Clothes are a drag-to-reorder layer stack that shows what tucks in.
+  Each trait shows whether you set it or it came from the skin, the
+  kind, the seed, or a default, with reset, pin, and a per-tab shuffle.
+  A 3 × 3 seed grid, look export and import (`.look.json`), and "use as
+  play avatar" round it out.
+- `resolvePerson(props)` reports what each of a `Person`'s traits
+  resolves to and where it came from (`prop`, `skin`, `kind`, `seed`,
+  or `default`), without building any geometry. `PERSON_COLORS` holds
+  the curated skin, hair, and eye colors a seed rolls from.
+
 ## [0.14.0](https://github.com/nullorder/runek/compare/v0.13.0...v0.14.0) - 2026-10-07
 
 ### Added

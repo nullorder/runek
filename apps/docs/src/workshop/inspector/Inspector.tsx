@@ -17,6 +17,7 @@ import {
   commit,
   duplicateSelected,
   groupSelected,
+  openDressing,
   openInLab,
   patchLab,
   patchNode,
@@ -35,11 +36,14 @@ export function PropsForm({
   props,
   onPatch,
   scope,
+  only,
 }: {
   type: string
   props: Record<string, JsonValue>
   onPatch: (patch: Record<string, JsonValue | undefined>, key?: string) => void
   scope: string
+  /** Limit the form to these props. */
+  only?: string[]
 }) {
   const world = useWorkshop((s) => s.world)
   const [filter, setFilter] = useState('')
@@ -51,18 +55,19 @@ export function PropsForm({
   if (!schema)
     return <p className="ws-muted">No schema for “{type}”. Edit its props as JSON below.</p>
   const ctx: FieldContext = { component: type, defs: schema.defs, palette, scope }
-  const fields = editableProps(type).filter(
+  const editable = editableProps(type).filter(([name]) => !only || only.includes(name))
+  const fields = editable.filter(
     ([name]) => !filter || name.toLowerCase().includes(filter.toLowerCase()),
   )
   const changed = fields.filter(([name]) => props[name] !== undefined).length
 
   return (
     <div className="ws-form">
-      {editableProps(type).length > 7 && (
+      {editable.length > 7 && (
         <div className="ws-form__filter">
           <input
             className="ws-text"
-            placeholder={`Filter ${editableProps(type).length} props…`}
+            placeholder={`Filter ${editable.length} props…`}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
@@ -234,6 +239,16 @@ function NodeInspector({
           >
             duplicate
           </button>
+          {node.type === 'Person' && (
+            <button
+              type="button"
+              className="ws-btn ws-btn--small ws-btn--primary"
+              title="Dress it in the dressing room (4)"
+              onClick={() => openDressing(id)}
+            >
+              customize
+            </button>
+          )}
           {schemaFor(node.type)?.kind === 'component' && (
             <button
               type="button"

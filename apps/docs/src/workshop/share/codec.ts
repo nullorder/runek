@@ -1,6 +1,6 @@
 import type { JsonValue, WorldData } from '@runek/core/data'
 
-export type Mode = 'build' | 'lab' | 'code'
+export type Mode = 'build' | 'lab' | 'code' | 'dress'
 export type Stage = 'room' | 'plot' | 'none'
 type Vec3 = [number, number, number]
 
@@ -22,6 +22,8 @@ export interface SharePayload {
   stage?: Stage
   camera?: CameraState
   lab?: LabShare
+  /** The figure in the dressing room, when the link opens there. */
+  dress?: { props: Record<string, JsonValue> }
 }
 
 /** Beyond this many characters a link gets unwieldy; the share menu offers a file instead. */
@@ -67,7 +69,8 @@ export function parseHash(hash: string): { share?: string; mode?: Mode; componen
   const mode = params.get('m')
   return {
     share: params.get('s') ?? undefined,
-    mode: mode === 'build' || mode === 'lab' || mode === 'code' ? mode : undefined,
+    mode:
+      mode === 'build' || mode === 'lab' || mode === 'code' || mode === 'dress' ? mode : undefined,
     component: params.get('c') ?? undefined,
   }
 }

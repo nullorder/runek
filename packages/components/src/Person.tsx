@@ -58,8 +58,15 @@ import type {
 } from './person/types'
 import { Sign } from './Sign'
 
+export {
+  type PersonTrait,
+  type PersonTraitSource,
+  type ResolvedGarment,
+  type ResolvedPerson,
+  resolvePerson,
+} from './person/resolve'
 export { tripAt } from './person/route'
-export { PERSON_SKINS, type PersonSkinName } from './person/spec'
+export { PERSON_COLORS, PERSON_SKINS, type PersonSkinName } from './person/spec'
 export type {
   PersonAccessory,
   PersonAge,
@@ -273,6 +280,10 @@ function useBuild(
  *
  * Meshes build in the background a few milliseconds per frame, coarse first; the full-detail
  * mesh only builds near the camera. Identical figures share one build.
+ *
+ * `resolvePerson(props)` reports what every trait resolves to and where it came from (prop,
+ * skin, kind, seed, or default), so an editor can show what the seed chose; `PERSON_COLORS`
+ * holds the curated skin, hair, and eye colors the seed rolls from.
  */
 export function Person({
   position,

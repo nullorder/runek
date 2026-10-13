@@ -53,7 +53,7 @@ export default function BottomStrip() {
 
   return (
     <footer className="ws-strip">
-      {mode !== 'lab' && (
+      {mode !== 'lab' && mode !== 'dress' && (
         <>
           <div className="ws-seg ws-seg--small">
             <span className="ws-strip__label">stage</span>
@@ -137,7 +137,7 @@ export default function BottomStrip() {
         </>
       )}
       <span className="ws-strip__spacer" />
-      {view.stats && mode !== 'lab' && <Stats />}
+      {view.stats && mode !== 'lab' && mode !== 'dress' && <Stats />}
       <div className="ws-strip__panels">
         {MODE_PANELS[mode].map((id) => (
           <button

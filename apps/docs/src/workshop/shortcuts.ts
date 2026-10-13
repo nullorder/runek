@@ -6,6 +6,7 @@ import { locate } from './state/ops'
 import {
   addNodes,
   duplicateSelected,
+  openDressing,
   redoWorld,
   removeSelected,
   requestCamera,
@@ -32,7 +33,7 @@ export const SHORTCUTS: [string, string][] = [
   ['⌘C · ⌘V', 'Copy · paste nodes as world JSON'],
   ['p', 'Play (walk the world)'],
   ['Tab', 'Hide / show every panel'],
-  ['1 · 2 · 3', 'Build · Lab · Code'],
+  ['1 · 2 · 3 · 4', 'Build · Lab · Code · Dress'],
   ['w', 'World panel'],
   ['⌘↵', 'Run App.tsx'],
   ['?', 'This sheet'],
@@ -85,6 +86,8 @@ export function useShortcuts() {
         return
       }
       if (mod || e.altKey) return
+      // The dressing room edits one figure; node shortcuts would act on the scene behind it.
+      if (s.mode === 'dress' && !['1', '2', '3', '4', '?', 'Tab'].includes(e.key)) return
 
       switch (e.key) {
         case 'g':
@@ -107,7 +110,7 @@ export function useShortcuts() {
           removeSelected()
           break
         case 'p':
-          if (s.mode !== 'lab') startPlay()
+          if (s.mode !== 'lab' && s.mode !== 'dress') startPlay()
           break
         case 'Tab':
           e.preventDefault()
@@ -121,6 +124,9 @@ export function useShortcuts() {
           break
         case '3':
           setMode('code')
+          break
+        case '4':
+          openDressing()
           break
         case 'w':
           togglePanel(s.mode, 'world')

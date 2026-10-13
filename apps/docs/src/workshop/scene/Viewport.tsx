@@ -56,7 +56,13 @@ export default function Viewport() {
       <GlProbe />
       <ThumbnailBaker />
       {view.stats && <StatsProbe />}
-      <StageView stage={stage} grid={view.grid && !playing} sky={!hasSky} exit={playing} />
+      <StageView
+        stage={stage}
+        grid={view.grid && !playing}
+        sky={!hasSky}
+        exit={playing}
+        door={playing ? null : 'enter'}
+      />
       {playing ? (
         <PlayScene world={world} />
       ) : (

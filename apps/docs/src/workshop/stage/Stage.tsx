@@ -19,8 +19,10 @@ import {
   Wall,
   Whiteboard,
 } from '@runek/components'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import type { Stage as StageKind } from '../share/codec'
+import { leaveDressing, openDressing } from '../state/store'
+import { DOOR, DOOR_Z, DressingRoom, HALL_WEST } from './DressingRoom'
 
 const GREEN = '#3df58a'
 const HALF = 15
@@ -28,9 +30,50 @@ const WALL_H = 5.5
 const WALL = '#c3bcae'
 const FLOOR = '#585c62'
 
-/** The library's next room: a hall with a lit 20 × 20 m build plot in the middle. Not part of
- *  the world being built; the floor sits at the world's ground baseline. */
-export const Hall = memo(function Hall({ grid, exit }: { grid: boolean; exit: boolean }) {
+/** What clicking the dressing-room doorway does: step in, step back out, or nothing. */
+export type DoorAction = 'enter' | 'leave' | null
+
+/** An invisible click target filling the dressing-room doorway. */
+export function Doorway({ action }: { action: Exclude<DoorAction, null> }) {
+  const [hover, setHover] = useState(false)
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: a three.js mesh, not a DOM element; the Dress mode button serves the keyboard
+    <mesh
+      position={[HALL_WEST, DOOR.height / 2, DOOR_Z]}
+      onClick={(e) => {
+        e.stopPropagation()
+        document.body.style.cursor = ''
+        if (action === 'enter') openDressing()
+        else leaveDressing()
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation()
+        setHover(true)
+        document.body.style.cursor = 'pointer'
+      }}
+      onPointerOut={() => {
+        setHover(false)
+        document.body.style.cursor = ''
+      }}
+    >
+      <boxGeometry args={[0.5, DOOR.height, DOOR.width]} />
+      <meshBasicMaterial color={GREEN} transparent opacity={hover ? 0.12 : 0} depthWrite={false} />
+    </mesh>
+  )
+}
+
+/** The library's next room: a hall with a lit 20 × 20 m build plot in the middle, and the
+ *  dressing room through its west door. Not part of the world being built; the floor sits at the
+ *  world's ground baseline. */
+export const Hall = memo(function Hall({
+  grid,
+  exit,
+  door = null,
+}: {
+  grid: boolean
+  exit: boolean
+  door?: DoorAction
+}) {
   return (
     <group name="stage">
       <Floor position={[0, 0, 0]} size={[HALF * 2 + 0.4, HALF * 2 + 0.4]} color={FLOOR} />
@@ -61,7 +104,19 @@ export const Hall = memo(function Hall({ grid, exit }: { grid: boolean; exit: bo
         width={HALF * 2}
         height={WALL_H}
         color={WALL}
+        openings={[{ offset: -DOOR_Z, ...DOOR }]}
       />
+      <DressingRoom />
+      {door && <Doorway action={door} />}
+      <Sign
+        position={[-HALF + 0.16, 3.25, DOOR_Z]}
+        rotation={[0, Math.PI / 2, 0]}
+        size={0.3}
+        color={GREEN}
+        glow
+      >
+        DRESSING ROOM →
+      </Sign>
 
       <Sign position={[0, 4.3, -HALF + 0.16]} size={0.85} color={GREEN} glow>
         WORKSHOP
@@ -178,18 +233,20 @@ export function StageView({
   grid,
   sky,
   exit = false,
+  door = null,
 }: {
   stage: StageKind
   grid: boolean
   sky: boolean
   /** Walking out of the Workshop's door leads back to the library (in play only). */
   exit?: boolean
+  door?: DoorAction
 }) {
   if (stage === 'none') return grid ? <PlotGrid size={20} infinite /> : null
   return (
     <>
       {sky && <Sky />}
-      {stage === 'room' ? <Hall grid={grid} exit={exit} /> : <Plot grid={grid} />}
+      {stage === 'room' ? <Hall grid={grid} exit={exit} door={door} /> : <Plot grid={grid} />}
     </>
   )
 }

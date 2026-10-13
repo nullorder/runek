@@ -1,6 +1,8 @@
 import { assignNodeIds, type JsonValue, type WorldData, type WorldNode } from '@runek/core/data'
 import { create } from 'zustand'
 import { PREVIEW } from '../../lib/preview'
+import { diffPatch, type TabId } from '../dressing/traits'
+import { live } from '../scene/refs'
 import { hasSeed, schemaFor } from '../schema'
 import type { CameraState, Mode, Stage } from '../share/codec'
 import { emptyHistory, type History, record, redo, undo } from './history'
@@ -30,6 +32,27 @@ export type LabBackdrop = 'stage' | 'grey' | 'checker' | 'transparent'
 export type LabGround = 'pedestal' | 'grid' | 'floor' | 'terrain' | 'none'
 export type LabView = 'single' | 'seeds' | 'compare'
 export type CodeStyle = 'data' | 'jsx'
+export type DressLight = 'studio' | 'warm' | 'dusk' | 'night'
+export type DressAngle = 'front' | 'three' | 'side' | 'back'
+
+/** The dressing room: which figure is on the platform, and how the room shows it. */
+export interface DressState {
+  /** The scene node being dressed (edits land on it live), or null for a new figure. */
+  target: string | null
+  /** A new figure's props, until it is added to the scene. */
+  draft: Record<string, JsonValue>
+  /** The target's props when the room opened, for Revert. */
+  original: Record<string, JsonValue> | null
+  tab: TabId
+  turntable: boolean
+  light: DressLight
+  angle: DressAngle
+  /** Show a 3×3 grid of neighbouring seeds instead of the platform. */
+  seeds: boolean
+  seedBase: number
+  /** The build camera to return to when leaving the room. */
+  back: CameraState | null
+}
 
 export interface ViewOptions {
   grid: boolean
@@ -112,6 +135,7 @@ export interface WorkshopState {
   gizmo: GizmoMode
   view: ViewOptions
   lab: LabState
+  dress: DressState
   sandbox: SandboxState
   playing: boolean
   focusMode: boolean
@@ -161,6 +185,19 @@ export const DEFAULT_LAB: LabState = {
   checkRun: 0,
 }
 
+export const DEFAULT_DRESS: DressState = {
+  target: null,
+  draft: { seed: 7 },
+  original: null,
+  tab: 'looks',
+  turntable: false,
+  light: 'studio',
+  angle: 'three',
+  seeds: false,
+  seedBase: 1,
+  back: null,
+}
+
 export const EMPTY_WORLD: WorldData = { version: 1, nodes: [] }
 
 let cameraN = 0
@@ -181,6 +218,7 @@ export const useWorkshop = create<WorkshopState>(() => ({
   gizmo: 'translate',
   view: DEFAULT_VIEW,
   lab: DEFAULT_LAB,
+  dress: DEFAULT_DRESS,
   sandbox: {
     running: false,
     autoRun: true,
@@ -368,7 +406,16 @@ export const toggleLocked = (id: string) =>
     return { locked: next, selection: selection === id ? null : selection }
   })
 
-export const setMode = (mode: Mode) => set({ mode, playing: false })
+export function setMode(mode: Mode) {
+  const { dress } = get()
+  // Leaving the dressing room puts the camera back where the room was entered from.
+  if (get().mode === 'dress' && mode !== 'dress' && dress.back) {
+    live.camera = dress.back
+    const [x, , z] = dress.back.target
+    set({ focusPoint: [x, 0, z] })
+  }
+  set({ mode, playing: false })
+}
 export const setStage = (stage: Stage) => set({ stage })
 export const setGizmo = (gizmo: GizmoMode) => set({ gizmo })
 export const setView = (patch: Partial<ViewOptions>) =>
@@ -445,6 +492,74 @@ export function applyLab(targetId: string | null) {
     at: get().focusPoint,
   })
   toast(`Added ${lab.type} to the scene`)
+}
+
+export const setDress = (patch: Partial<DressState>) =>
+  set(({ dress }) => ({ dress: { ...dress, ...patch } }))
+
+/** The props of the figure on the platform: the live scene node, or the new figure's draft. */
+export function dressProps(state: Pick<WorkshopState, 'dress' | 'world'>) {
+  const { target, draft } = state.dress
+  const found = target ? locate(state.world.nodes, target) : null
+  return (found?.node.props ?? draft) as Record<string, JsonValue>
+}
+
+/** Step into the dressing room with a Person node (the selection when it is one), or with the
+ *  new figure being drafted. */
+export function openDressing(id: string | null = get().selection) {
+  const { world, mode } = get()
+  const dress = { ...get().dress, back: mode === 'dress' ? get().dress.back : live.camera }
+  const found = id ? locate(world.nodes, id) : null
+  if (found?.node.type === 'Person') {
+    const props = (found.node.props ?? {}) as Record<string, JsonValue>
+    set({
+      mode: 'dress',
+      playing: false,
+      dress: {
+        ...dress,
+        target: id,
+        original: dress.target === id && dress.original ? dress.original : props,
+        seeds: false,
+      },
+    })
+    return
+  }
+  const stale = dress.target && !locate(world.nodes, dress.target)
+  set({
+    mode: 'dress',
+    playing: false,
+    dress: stale ? { ...dress, target: null, original: null } : dress,
+  })
+}
+
+/** Start a new figure in the room (the scene node, if any, keeps its edits). */
+export const newDressFigure = (draft: Record<string, JsonValue> = { seed: randomSeed() }) =>
+  setDress({ target: null, original: null, draft, seeds: false })
+
+/** Replace the platform figure's props: onto the scene node (one undo step per `key` run), or the draft. */
+export function writeDress(next: Record<string, JsonValue>, key: string | null = null) {
+  const state = get()
+  const { target } = state.dress
+  if (target && locate(state.world.nodes, target)) {
+    const patch = diffPatch(dressProps(state), next)
+    if (Object.keys(patch).length) patchNode(target, patch, key)
+  } else setDress({ draft: next })
+}
+
+/** Back to build mode, where the room was entered from, with the dressed figure selected. */
+export function leaveDressing() {
+  const { dress, world } = get()
+  const target = dress.target && locate(world.nodes, dress.target) ? dress.target : null
+  setMode('build')
+  set({ selection: target ?? get().selection })
+}
+
+export function revertDress() {
+  const { dress, world } = get()
+  if (dress.target && dress.original && locate(world.nodes, dress.target)) {
+    const original = dress.original
+    replaceNode(dress.target, (node) => ({ ...node, props: original }))
+  } else setDress({ draft: { seed: randomSeed() } })
 }
 
 export const setSandbox = (patch: Partial<SandboxState>) =>

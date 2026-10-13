@@ -1,7 +1,9 @@
 import { live } from '../scene/refs'
 import {
   type CodeStyle,
+  DEFAULT_DRESS,
   DEFAULT_LAB,
+  type DressState,
   type LabState,
   useWorkshop,
   type ViewOptions,
@@ -21,6 +23,7 @@ interface Saved {
   lab: Pick<LabState, 'type' | 'props' | 'light' | 'backdrop' | 'ground' | 'grid' | 'instruments'>
   camera: CameraState | null
   autoRun: boolean
+  dress?: Pick<DressState, 'target' | 'draft' | 'original' | 'tab' | 'light' | 'angle' | 'back'>
 }
 
 export function loadSession(): Saved | null {
@@ -61,6 +64,15 @@ export function persistSession() {
       },
       camera: live.camera,
       autoRun: s.sandbox.autoRun,
+      dress: {
+        target: s.dress.target,
+        draft: s.dress.draft,
+        original: s.dress.original,
+        tab: s.dress.tab,
+        light: s.dress.light,
+        angle: s.dress.angle,
+        back: s.dress.back,
+      },
     }
     try {
       localStorage.setItem(KEY, JSON.stringify(saved))
@@ -74,6 +86,7 @@ export function persistSession() {
       state.stage === prev.stage &&
       state.view === prev.view &&
       state.lab === prev.lab &&
+      state.dress === prev.dress &&
       state.focusPoint === prev.focusPoint
     )
       return
@@ -100,6 +113,7 @@ export function restoreSession(saved: Saved) {
       ...saved.lab,
       instruments: { ...DEFAULT_LAB.instruments, ...saved.lab?.instruments },
     },
+    dress: { ...DEFAULT_DRESS, ...saved.dress },
     sandbox: { ...s.sandbox, autoRun: saved.autoRun ?? true },
   }))
   if (saved.camera) live.camera = saved.camera

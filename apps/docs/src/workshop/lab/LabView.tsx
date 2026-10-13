@@ -1,8 +1,8 @@
 import { createPortal, useFrame, useThree } from '@react-three/fiber'
 import { Floor, Terrain } from '@runek/components'
-import { type JsonValue, World } from '@runek/core'
+import { World } from '@runek/core'
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
-import { type Group, type Object3D, type PerspectiveCamera, Scene } from 'three'
+import { type Group, type Object3D, Scene } from 'three'
 import { PREVIEW } from '../../lib/preview'
 import { ThumbnailBaker } from '../outliner/Thumbs'
 import { CameraRig } from '../scene/CameraRig'
@@ -12,6 +12,7 @@ import { hasSeed } from '../schema'
 import { StageView } from '../stage/Stage'
 import { type LabLight, requestCamera, setLab, useWorkshop } from '../state/store'
 import { Bounds, Normals, ScaleReference, Wireframe } from './Instruments'
+import { MultiView } from './MultiView'
 import { hashGeometry, measure, signature, useLabMeasure } from './measure'
 import { Subject } from './Subject'
 
@@ -110,74 +111,9 @@ function LabGround() {
   return null
 }
 
-/** Renders N subjects (seed grid, A/B) into scissored viewports of one canvas, one camera. */
-function MultiView({
-  cells,
-  columns,
-}: {
-  cells: { key: string; props: Record<string, JsonValue> }[]
-  columns: number
-}) {
-  const type = useWorkshop((s) => s.lab.type)
-  const backdrop = useWorkshop((s) => s.lab.backdrop)
-  const { gl, camera, size } = useThree()
-  const scenes = useMemo(() => cells.map(() => new Scene()), [cells])
-  const rows = Math.ceil(cells.length / columns)
-
-  useFrame(() => {
-    const cam = camera as PerspectiveCamera
-    const w = size.width / columns
-    const h = size.height / rows
-    const aspect = cam.aspect
-    cam.aspect = w / h
-    cam.updateProjectionMatrix()
-    gl.setScissorTest(true)
-    scenes.forEach((scene, i) => {
-      const x = (i % columns) * w
-      const y = size.height - (Math.floor(i / columns) + 1) * h
-      gl.setViewport(x + 1, y + 1, w - 2, h - 2)
-      gl.setScissor(x + 1, y + 1, w - 2, h - 2)
-      gl.setClearColor(
-        backdrop === 'transparent' ? '#000000' : i % 2 ? '#1d2229' : '#1a1e25',
-        backdrop === 'transparent' ? 0 : 1,
-      )
-      gl.clear()
-      gl.render(scene, cam)
-    })
-    gl.setScissorTest(false)
-    gl.setViewport(0, 0, size.width, size.height)
-    cam.aspect = aspect
-    cam.updateProjectionMatrix()
-  }, 1)
-
-  return (
-    <>
-      {cells.map((cell, i) => (
-        <Fragment key={cell.key}>
-          {createPortal(
-            <>
-              <ambientLight intensity={0.8} />
-              <directionalLight position={[6, 10, 6]} intensity={1.6} />
-              <directionalLight position={[-5, 4, -6]} intensity={0.4} />
-              <group
-                ref={(g) => {
-                  if (g && i === 0) nodeObjects.set('lab:subject', g)
-                }}
-              >
-                <Subject type={type} props={cell.props} />
-              </group>
-            </>,
-            scenes[i],
-            { events: { enabled: false } },
-          )}
-        </Fragment>
-      ))}
-    </>
-  )
-}
-
 function SeedGrid() {
   const lab = useWorkshop((s) => s.lab)
+  const transparent = lab.backdrop === 'transparent'
   const cells = useMemo(
     () =>
       Array.from({ length: lab.grid * lab.grid }, (_, i) => ({
@@ -186,10 +122,12 @@ function SeedGrid() {
       })),
     [lab.grid, lab.seedBase, lab.props],
   )
-  return <MultiView cells={cells} columns={lab.grid} />
+  return <MultiView type={lab.type} cells={cells} columns={lab.grid} transparent={transparent} />
 }
 
 function Compare() {
+  const type = useWorkshop((s) => s.lab.type)
+  const transparent = useWorkshop((s) => s.lab.backdrop === 'transparent')
   const props = useWorkshop((s) => s.lab.props)
   const propsB = useWorkshop((s) => s.lab.propsB)
   const cells = useMemo(
@@ -199,7 +137,7 @@ function Compare() {
     ],
     [props, propsB],
   )
-  return <MultiView cells={cells} columns={2} />
+  return <MultiView type={type} cells={cells} columns={2} transparent={transparent} />
 }
 
 /** Builds the subject twice (and once with the next seed) off-screen, then hashes the geometry. */
