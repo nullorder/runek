@@ -8,28 +8,28 @@ import { BOTTOM, panelState, TOP, useLayout } from '../panels/layout'
 import { CameraRig } from '../scene/CameraRig'
 import { GlProbe } from '../scene/Probes'
 import type { CameraState } from '../share/codec'
-import { DressingRoom, FACING, HallSide, PLATFORM } from '../stage/DressingRoom'
+import { AvatarStudio, FACING, HallSide, PLATFORM } from '../stage/AvatarStudio'
 import { Doorway } from '../stage/Stage'
 import {
-  type DressAngle,
-  type DressLight,
-  dressProps,
   requestCamera,
-  setDress,
+  type StudioAngle,
+  type StudioLight,
+  setStudio,
+  studioProps,
   useWorkshop,
-  writeDress,
+  writeStudio,
 } from '../state/store'
 import { TileBaker } from './tiles'
 import { LOOK_KEYS, type TabId } from './traits'
 
-const LIGHT_TIMES: Record<DressLight, string> = {
+const LIGHT_TIMES: Record<StudioLight, string> = {
   studio: '13:00',
   warm: '17:40',
   dusk: '19:10',
   night: '23:00',
 }
 const HEADS = { stylized: 6.2, realistic: 7.5, anime: 6.8 } as const
-const ANGLES: Record<DressAngle, number> = {
+const ANGLES: Record<StudioAngle, number> = {
   front: 0,
   three: 0.6,
   side: Math.PI / 2,
@@ -50,7 +50,7 @@ const shown = (props: Props) => {
 /** Where the camera stands for a tab: what to look at and how much of the figure to fit. */
 export function framing(
   tab: TabId,
-  angle: DressAngle,
+  angle: StudioAngle,
   figure: { height: number; style: keyof typeof HEADS; age: string; seated?: boolean },
   origin: [number, number, number] = [PLATFORM.position[0], PLATFORM.height, PLATFORM.position[2]],
   /** Where the clear part of the screen is centered, as a fraction of its width off center
@@ -105,8 +105,8 @@ function clearArea() {
   const width = window.innerWidth
   if (width < 900) return { left: 0, right: 0, top: TOP, bottom: BOTTOM }
   const { open } = useLayout.getState()
-  const left = open.dress?.fitting ? panelState('fitting') : null
-  const right = open.dress?.avatar ? panelState('avatar') : null
+  const left = open.studio?.studio ? panelState('studio') : null
+  const right = open.studio?.avatar ? panelState('avatar') : null
   return {
     left: left && !left.collapsed && left.x < width / 2 ? left.x + left.w + 8 : 0,
     right: right && !right.collapsed && right.x > width / 2 ? width - right.x + 8 : 0,
@@ -116,12 +116,12 @@ function clearArea() {
 }
 
 const useClearArea = () => {
-  useLayout((s) => JSON.stringify([s.open.dress, s.panels.fitting, s.panels.avatar]))
+  useLayout((s) => JSON.stringify([s.open.studio, s.panels.studio, s.panels.avatar]))
   return clearArea()
 }
 
 function useFigure() {
-  const props = useWorkshop((s) => dressProps(s))
+  const props = useWorkshop((s) => studioProps(s))
   const palette = useWorkshop((s) => s.world.palette)
   const unit = useWorkshop((s) => s.world.unit)
   const look = useMemo(() => shown(props), [props])
@@ -134,7 +134,7 @@ function useFigure() {
 
 function Platform() {
   const { look, resolved } = useFigure()
-  const turntable = useWorkshop((s) => s.dress.turntable)
+  const turntable = useWorkshop((s) => s.studio.turntable)
   const spin = useRef<Group>(null)
   useFrame((_, dt) => {
     if (turntable && spin.current) spin.current.rotation.y += dt * 0.45
@@ -200,9 +200,9 @@ function KeyLights() {
 
 /** Re-frames the camera when the tab, angle, or figure size changes. */
 function Framing() {
-  const tab = useWorkshop((s) => s.dress.tab)
-  const angle = useWorkshop((s) => s.dress.angle)
-  const seeds = useWorkshop((s) => s.dress.seeds)
+  const tab = useWorkshop((s) => s.studio.tab)
+  const angle = useWorkshop((s) => s.studio.angle)
+  const seeds = useWorkshop((s) => s.studio.seeds)
   const { look, resolved } = useFigure()
   const figure = {
     height: resolved.height.value,
@@ -211,7 +211,7 @@ function Framing() {
     seated: SEATED.has(String(look.pose)),
   }
   const aspect = useThree((s) => s.size.width / s.size.height)
-  const panels = useLayout((s) => JSON.stringify([s.open.dress, s.panels.fitting, s.panels.avatar]))
+  const panels = useLayout((s) => JSON.stringify([s.open.studio, s.panels.studio, s.panels.avatar]))
   const key = `${panels}:${aspect.toFixed(2)}:${tab}:${angle}:${seeds}:${figure.height.toFixed(2)}:${figure.style}:${figure.age}:${figure.seated}`
   useEffect(() => {
     requestCamera({
@@ -225,8 +225,8 @@ function Framing() {
 }
 
 function Seeds() {
-  const props = useWorkshop((s) => dressProps(s))
-  const base = useWorkshop((s) => s.dress.seedBase)
+  const props = useWorkshop((s) => studioProps(s))
+  const base = useWorkshop((s) => s.studio.seedBase)
   const cells = useMemo(() => {
     const look = shown(props)
     return Array.from({ length: 9 }, (_, i) => ({
@@ -238,18 +238,18 @@ function Seeds() {
   return <MultiView type="Person" cells={cells} columns={3} inset={inset} />
 }
 
-/** The dressing room's own canvas: the room (with the hall through its door), the platform
+/** The avatar studio's own canvas: the room (with the hall through its door), the platform
  *  figure under its key lights, or a grid of neighbouring seeds. */
-export default function DressingView() {
-  const light = useWorkshop((s) => s.dress.light)
-  const seeds = useWorkshop((s) => s.dress.seeds)
+export default function StudioView() {
+  const light = useWorkshop((s) => s.studio.light)
+  const seeds = useWorkshop((s) => s.studio.seeds)
   const initial = useMemo(() => {
     const s = useWorkshop.getState()
-    const look = shown(dressProps(s))
+    const look = shown(studioProps(s))
     const r = resolvePerson(look as never)
     return framing(
-      s.dress.tab,
-      s.dress.angle,
+      s.studio.tab,
+      s.studio.angle,
       {
         height: r.height.value,
         style: r.style.value,
@@ -271,14 +271,14 @@ export default function DressingView() {
         ) : (
           <>
             <Sky />
-            <DressingRoom full />
+            <AvatarStudio full />
             <HallSide />
             <Doorway action="leave" />
             <KeyLights />
             <Platform />
           </>
         )}
-        <CameraRig scope="dressing-room" initial={initial} />
+        <CameraRig scope="avatar-studio" initial={initial} />
         <Framing />
       </World>
       {seeds && <SeedCells />}
@@ -287,8 +287,8 @@ export default function DressingView() {
 }
 
 function SeedCells() {
-  const base = useWorkshop((s) => s.dress.seedBase)
-  const current = useWorkshop((s) => dressProps(s).seed)
+  const base = useWorkshop((s) => s.studio.seedBase)
+  const current = useWorkshop((s) => studioProps(s).seed)
   const { left, right, top, bottom } = useClearArea()
   return (
     <div
@@ -304,8 +304,8 @@ function SeedCells() {
             className={`ws-cell ${current === seed ? 'is-on' : ''}`}
             title="Wear this seed"
             onClick={() => {
-              writeDress({ ...dressProps(useWorkshop.getState()), seed }, 'dress:seed')
-              setDress({ seeds: false })
+              writeStudio({ ...studioProps(useWorkshop.getState()), seed }, 'studio:seed')
+              setStudio({ seeds: false })
             }}
           >
             <span>seed {seed}</span>

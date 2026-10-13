@@ -1,46 +1,46 @@
 import { useRef } from 'react'
 import { Panel } from '../panels/Panel'
 import {
-  type DressAngle,
-  type DressLight,
-  leaveDressing,
-  newDressFigure,
-  revertDress,
-  setDress,
+  leaveStudio,
+  newStudioFigure,
+  revertStudio,
+  type StudioAngle,
+  type StudioLight,
+  setStudio,
   useWorkshop,
 } from '../state/store'
 import { AvatarPanel } from './AvatarPanel'
 import {
-  addDressToScene,
+  addFigureToScene,
   copyJsx,
   copyNode,
-  dressTarget,
   exportLook,
   importLook,
+  studioTarget,
   useAsAvatar,
 } from './actions'
-import { Choice, DressProvider } from './controls'
+import { Choice, StudioProvider } from './controls'
 
-const ANGLES: [DressAngle, string][] = [
+const ANGLES: [StudioAngle, string][] = [
   ['front', 'front'],
   ['three', '¾'],
   ['side', 'side'],
   ['back', 'back'],
 ]
-const LIGHTS: DressLight[] = ['studio', 'warm', 'dusk', 'night']
+const LIGHTS: StudioLight[] = ['studio', 'warm', 'dusk', 'night']
 
-function FittingPanel() {
-  const dress = useWorkshop((s) => s.dress)
+function StudioPanel() {
+  const studio = useWorkshop((s) => s.studio)
   useWorkshop((s) => s.world)
-  const target = dressTarget()
+  const target = studioTarget()
   const file = useRef<HTMLInputElement>(null)
   const changed =
-    target && dress.original && JSON.stringify(target.props) !== JSON.stringify(dress.original)
+    target && studio.original && JSON.stringify(target.props) !== JSON.stringify(studio.original)
 
   return (
-    <Panel id="fitting">
-      <div className="ws-fitting">
-        <div className="ws-fitting__who">
+    <Panel id="studio">
+      <div className="ws-studio">
+        <div className="ws-studio__who">
           {target ? (
             <>
               <strong>Person</strong> <code className="ws-muted">{target.id}</code>
@@ -49,18 +49,18 @@ function FittingPanel() {
           ) : (
             <>
               <strong>A new figure</strong>
-              <p className="ws-muted">Not in your scene yet. Dress it, then add it.</p>
+              <p className="ws-muted">Not in your scene yet. Customise it, then add it.</p>
             </>
           )}
         </div>
-        <div className="ws-fitting__actions">
+        <div className="ws-studio__actions">
           {target ? (
             <button
               type="button"
               className="ws-btn ws-btn--small"
               disabled={!changed}
               title="Undo every change since you came in"
-              onClick={revertDress}
+              onClick={revertStudio}
             >
               revert
             </button>
@@ -68,7 +68,7 @@ function FittingPanel() {
             <button
               type="button"
               className="ws-btn ws-btn--small ws-btn--primary"
-              onClick={addDressToScene}
+              onClick={addFigureToScene}
             >
               add to scene
             </button>
@@ -77,14 +77,14 @@ function FittingPanel() {
             type="button"
             className="ws-btn ws-btn--small"
             title="Start a new figure from a random seed"
-            onClick={() => newDressFigure()}
+            onClick={() => newStudioFigure()}
           >
             new figure
           </button>
           <button
             type="button"
             className="ws-btn ws-btn--small"
-            title="Dress the play avatar (the world's Player body) in this look"
+            title="Give the play avatar (the world's Player body) this look"
             onClick={useAsAvatar}
           >
             use as play avatar
@@ -92,7 +92,7 @@ function FittingPanel() {
           <button
             type="button"
             className="ws-btn ws-btn--small ws-btn--primary"
-            onClick={leaveDressing}
+            onClick={leaveStudio}
           >
             done
           </button>
@@ -101,41 +101,41 @@ function FittingPanel() {
         <h4>View</h4>
         <Choice
           options={ANGLES.map(([, label]) => label)}
-          value={ANGLES.find(([id]) => id === dress.angle)?.[1]}
+          value={ANGLES.find(([id]) => id === studio.angle)?.[1]}
           onPick={(label) =>
-            setDress({ angle: ANGLES.find(([, l]) => l === label)?.[0] ?? 'three' })
+            setStudio({ angle: ANGLES.find(([, l]) => l === label)?.[0] ?? 'three' })
           }
         />
         <Choice
           options={LIGHTS}
-          value={dress.light}
-          onPick={(light) => setDress({ light: light as DressLight })}
+          value={studio.light}
+          onPick={(light) => setStudio({ light: light as StudioLight })}
         />
         <label className="ws-checkline">
           <input
             type="checkbox"
-            checked={dress.turntable}
-            onChange={(e) => setDress({ turntable: e.target.checked })}
+            checked={studio.turntable}
+            onChange={(e) => setStudio({ turntable: e.target.checked })}
           />
           turntable
         </label>
-        {dress.seeds && (
-          <div className="ws-dress__row">
+        {studio.seeds && (
+          <div className="ws-avatar__row">
             <button
               type="button"
               className="ws-btn ws-btn--small"
-              disabled={dress.seedBase <= 1}
-              onClick={() => setDress({ seedBase: Math.max(1, dress.seedBase - 9) })}
+              disabled={studio.seedBase <= 1}
+              onClick={() => setStudio({ seedBase: Math.max(1, studio.seedBase - 9) })}
             >
               ‹ seeds
             </button>
             <span className="ws-muted">
-              {dress.seedBase}–{dress.seedBase + 8}
+              {studio.seedBase}–{studio.seedBase + 8}
             </span>
             <button
               type="button"
               className="ws-btn ws-btn--small"
-              onClick={() => setDress({ seedBase: dress.seedBase + 9 })}
+              onClick={() => setStudio({ seedBase: studio.seedBase + 9 })}
             >
               seeds ›
             </button>
@@ -143,7 +143,7 @@ function FittingPanel() {
         )}
 
         <h4>Look file</h4>
-        <div className="ws-fitting__actions">
+        <div className="ws-studio__actions">
           <button
             type="button"
             className="ws-btn ws-btn--small"
@@ -187,12 +187,12 @@ function FittingPanel() {
   )
 }
 
-/** The dressing room's panels: the fitting controls on the left, the avatar editor on the right. */
-export default function DressingPanels() {
+/** The avatar studio's panels: the studio controls on the left, the avatar editor on the right. */
+export default function StudioPanels() {
   return (
-    <DressProvider>
-      <FittingPanel />
+    <StudioProvider>
+      <StudioPanel />
       <AvatarPanel />
-    </DressProvider>
+    </StudioProvider>
   )
 }

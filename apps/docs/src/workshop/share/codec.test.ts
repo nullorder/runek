@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { decodeShare, encodeShare, parseHash, type SharePayload } from './codec'
+import { asMode, decodeShare, encodeShare, parseHash, type SharePayload } from './codec'
 
 const payload: SharePayload = {
   world: {
@@ -29,13 +29,13 @@ describe('share codec', () => {
     expect(text.length).toBeLessThan(1500)
   })
 
-  it('carries the dressing room figure', async () => {
-    const dress = {
+  it('carries the avatar studio figure', async () => {
+    const studio = {
       world: payload.world,
-      mode: 'dress' as const,
-      dress: { props: { seed: 4, hair: { style: 'bun' } } },
+      mode: 'studio' as const,
+      studio: { props: { seed: 4, hair: { style: 'bun' } } },
     }
-    expect(await decodeShare(await encodeShare(dress))).toEqual(dress)
+    expect(await decodeShare(await encodeShare(studio))).toEqual(studio)
   })
 
   it('rejects garbage', async () => {
@@ -45,7 +45,13 @@ describe('share codec', () => {
   it('parses hash params', () => {
     expect(parseHash('#m=lab&c=Bookshelf')).toEqual({ mode: 'lab', component: 'Bookshelf' })
     expect(parseHash('#s=abc').share).toBe('abc')
-    expect(parseHash('#m=dress').mode).toBe('dress')
+    expect(parseHash('#m=studio').mode).toBe('studio')
     expect(parseHash('#m=nope').mode).toBeUndefined()
+  })
+
+  it('drops modes it does not know, like the old dress mode', () => {
+    expect(asMode('studio')).toBe('studio')
+    expect(asMode('dress')).toBeUndefined()
+    expect(asMode(undefined)).toBeUndefined()
   })
 })

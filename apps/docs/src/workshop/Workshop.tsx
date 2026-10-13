@@ -23,8 +23,8 @@ const ConsolePanel = lazy(() => import('./code/ConsolePanel'))
 const SandboxView = lazy(() => import('./sandbox/SandboxView'))
 const LabView = lazy(() => import('./lab/LabView'))
 const LabPanels = lazy(() => import('./lab/LabPanels'))
-const DressingView = lazy(() => import('./dressing/DressingView'))
-const DressingPanels = lazy(() => import('./dressing/DressingPanels'))
+const StudioView = lazy(() => import('./studio/StudioView'))
+const StudioPanels = lazy(() => import('./studio/StudioPanels'))
 const IssuesPanel = lazy(() => import('./outliner/IssuesPanel'))
 const CommandPalette = lazy(() => import('./chrome/CommandPalette'))
 
@@ -32,7 +32,7 @@ function Stage() {
   const mode = useWorkshop((s) => s.mode)
   const running = useWorkshop((s) => s.sandbox.running)
   if (mode === 'lab') return <LabView />
-  if (mode === 'dress') return <DressingView />
+  if (mode === 'studio') return <StudioView />
   if (running) return <SandboxView />
   return <Viewport />
 }
@@ -124,9 +124,9 @@ export default function Workshop() {
               <Suspense fallback={null}>
                 <LabPanels />
               </Suspense>
-            ) : mode === 'dress' ? (
+            ) : mode === 'studio' ? (
               <Suspense fallback={null}>
-                <DressingPanels />
+                <StudioPanels />
               </Suspense>
             ) : (
               <>

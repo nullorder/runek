@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- The workshop's dressing room: a room behind the hall's west door for
+- The workshop's avatar studio: a room behind the hall's west door for
   customising a `Person`. Open it from the inspector's **customize**,
-  the doorway, the **Dress** mode, or `4`. The figure stands on a
+  the doorway, the **Studio** mode, or `4`. The figure stands on a
   turntable while the **Avatar** panel edits it tab by tab (looks, body,
   face, hair, clothes, hat and extras, pose) with picture tiles, color
   swatches, and sliders, and the camera frames the part you are on.

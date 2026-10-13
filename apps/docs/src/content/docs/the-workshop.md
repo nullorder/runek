@@ -1,6 +1,6 @@
 ---
 title: The workshop
-summary: Build a world in your browser, tune every prop, edit it as JSON or live TSX, put one component in the lab, dress a person in the dressing room, and share it all as a link.
+summary: Build a world in your browser, tune every prop, edit it as JSON or live TSX, put one component in the lab, customise a person in the avatar studio, and share it all as a link.
 category: guide
 order: 11
 ---
@@ -14,11 +14,11 @@ You can also walk there: in the [library](/library), the door on the right wall 
 - **Build** composes a world. The **Outliner** lists the nodes (drag to reorder or nest them under a `Group`), and its **+ Add**, **Templates** and **Snippets** tabs drop things at the point the camera looks at. Click anything in the room to select it, then move or rotate it with the gizmo (`g`, `r`), or edit it in the **Inspector**.
 - **Lab** puts one component on a pedestal with instruments: bounds in meters, a 1.8 m figure for scale, wireframe, normals, colliders, triangle and draw-call counts, and how long it took to build. The **seed grid** shows 9, 16 or 25 seeds side by side; **A / B** compares two prop sets; **check determinism** builds the component twice and compares geometry hashes.
 - **Code** opens the code panel: `world.json`, a live `App.tsx`, and the install commands for your world.
-- **Dress** opens the dressing room, a room of its own for customising a `Person` (below).
+- **Studio** opens the avatar studio, a room of its own for customising a `Person` (below).
 
-## The dressing room
+## The avatar studio
 
-Behind the door in the hall's west wall is a room for one job: dressing a person. Select a `Person` and press **customize** in the inspector (or click the doorway, press `4`, or pick **Dress**), and it stands on a turntable platform under good light. Edits land on the figure in your scene as you make them, so undo works as usual and **revert** puts back what you came in with. With no person selected you dress a new figure, then **add to scene**.
+Behind the door in the hall's west wall is a room for one job: customising a person. Select a `Person` and press **customize** in the inspector (or click the doorway, press `4`, or pick **Studio**), and it stands on a turntable platform under good light. Edits land on the figure in your scene as you make them, so undo works as usual and **revert** puts back what you came in with. With no person selected you start a new figure, then **add to scene**.
 
 The **Avatar** panel has a tab per part of the figure, and the camera frames that part:
 
@@ -31,7 +31,7 @@ The **Avatar** panel has a tab per part of the figure, and the camera frames tha
 
 Every trait shows where its value comes from: **set** by you, from the **skin** or **kind**, **seeded**, or the component's **default**. ⟲ clears what you set, so the skin, kind or seed decides again. 📌 pins what the seed chose, so it stays when the seed changes. **🎲 shuffle** rerolls only the open tab (on Looks, it picks a new seed). Choices you make are written into the figure's part objects (`body`, `face`, `hair`), the canonical form.
 
-**export .look.json** downloads the look (who the figure is and what it wears, not where it stands) as a `Person` node, and **import…** puts one on the figure. **use as play avatar** dresses the world's `Player` body in the same look, adding a `Player` if the world has none.
+**export .look.json** downloads the look (who the figure is and what it wears, not where it stands) as a `Person` node, and **import…** puts one on the figure. **use as play avatar** gives the world's `Player` body the same look, adding a `Player` if the world has none.
 
 ## Every prop, generated
 
@@ -80,6 +80,6 @@ Your work autosaves in the browser. **Templates** start you from a reading room,
 | `⌘C` · `⌘V` | Copy · paste nodes as JSON (paste a whole world too) |
 | `p` · `Esc` | Play · back |
 | `Tab` | Hide or show all panels |
-| `1` `2` `3` `4` | Build, Lab, Code, Dress |
+| `1` `2` `3` `4` | Build, Lab, Code, Studio |
 | `⌘↵` | Run App.tsx |
 | `?` | All shortcuts |

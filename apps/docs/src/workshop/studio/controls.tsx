@@ -9,13 +9,13 @@ import type { JsonValue } from '@runek/core/data'
 import { createContext, type ReactNode, useContext, useMemo } from 'react'
 import { schemaFor } from '../schema'
 import type { PropType } from '../schema/types'
-import { dressProps, useWorkshop, writeDress } from '../state/store'
+import { studioProps, useWorkshop, writeStudio } from '../state/store'
 import { type Crop, TILE_BASE, TileImage } from './tiles'
 import { getPath, TRAITS, type TraitId, writeTrait } from './traits'
 
 type Props = Record<string, JsonValue>
 
-interface DressContext {
+interface StudioContext {
   props: Props
   resolved: ResolvedPerson
   palette: Record<string, string>
@@ -25,28 +25,28 @@ interface DressContext {
   replace: (next: Props, key?: string) => void
 }
 
-const Ctx = createContext<DressContext | null>(null)
+const Ctx = createContext<StudioContext | null>(null)
 
-export function DressProvider({ children }: { children: ReactNode }) {
-  const props = useWorkshop((s) => dressProps(s))
+export function StudioProvider({ children }: { children: ReactNode }) {
+  const props = useWorkshop((s) => studioProps(s))
   const worldPalette = useWorkshop((s) => s.world.palette)
   const unit = useWorkshop((s) => s.world.unit)
-  const value = useMemo<DressContext>(() => {
+  const value = useMemo<StudioContext>(() => {
     const palette = { ...DEFAULT_PALETTE, ...worldPalette } as Record<string, string>
     return {
       props,
       palette,
       resolved: resolvePerson(props as never, palette as never, unit ?? 1),
-      write: (id, v, key) => writeDress(writeTrait(props, id, v), key ?? null),
-      replace: (next, key) => writeDress(next, key ?? null),
+      write: (id, v, key) => writeStudio(writeTrait(props, id, v), key ?? null),
+      replace: (next, key) => writeStudio(next, key ?? null),
     }
   }, [props, worldPalette, unit])
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
-export function useDress() {
+export function useStudio() {
   const ctx = useContext(Ctx)
-  if (!ctx) throw new Error('useDress outside DressProvider')
+  if (!ctx) throw new Error('useStudio outside StudioProvider')
   return ctx
 }
 
@@ -101,7 +101,7 @@ export function TraitRow({
   children: ReactNode
   hint?: string
 }) {
-  const { props, resolved, write } = useDress()
+  const { props, resolved, write } = useStudio()
   const def = TRAITS[id]
   const trait = 'resolved' in def ? resolved[def.resolved] : null
   const set = trait ? trait.from === 'prop' : getPath(props, def.path) !== undefined

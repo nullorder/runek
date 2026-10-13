@@ -13,8 +13,8 @@ import { PLACEABLE, SCHEMA } from '../schema'
 import { SNIPPETS } from '../snippets'
 import { walk } from '../state/ops'
 import {
-  newDressFigure,
-  openDressing,
+  newStudioFigure,
+  openStudio,
   redoWorld,
   requestCamera,
   reseedAll,
@@ -90,10 +90,10 @@ function commands(state: WorkshopState): Command[] {
     })
     if (node.type === 'Person')
       out.push({
-        id: `dress:${id}`,
-        group: 'Dress',
+        id: `studio:${id}`,
+        group: 'Studio',
         label: `Customize Person ${id}`,
-        run: () => openDressing(id),
+        run: () => openStudio(id),
       })
   })
   out.push(
@@ -107,19 +107,19 @@ function commands(state: WorkshopState): Command[] {
     { id: 'mode:lab', group: 'Mode', label: 'Lab mode', hint: '2', run: () => setMode('lab') },
     { id: 'mode:code', group: 'Mode', label: 'Code mode', hint: '3', run: () => setMode('code') },
     {
-      id: 'mode:dress',
+      id: 'mode:studio',
       group: 'Mode',
-      label: 'Dressing room',
+      label: 'Avatar studio',
       hint: '4',
-      run: () => openDressing(),
+      run: () => openStudio(),
     },
     {
-      id: 'dress:new',
-      group: 'Dress',
-      label: 'New person in the dressing room',
+      id: 'studio:new',
+      group: 'Studio',
+      label: 'New person in the avatar studio',
       run: () => {
-        openDressing(null)
-        newDressFigure()
+        openStudio(null)
+        newStudioFigure()
       },
     },
     {

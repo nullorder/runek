@@ -15,7 +15,7 @@ import {
 import { create } from 'zustand'
 import { useWorkshop } from '../state/store'
 
-const KEY = 'runek-workshop:dress-tiles:v1'
+const KEY = 'runek-workshop:studio-tiles:v1'
 const SIZE = 112
 
 /** `head` crops to the face and hair, `body` frames the whole figure. */
@@ -95,7 +95,7 @@ const getRenderer = () => {
   return renderer
 }
 
-/** Lives inside the dressing room's canvas: bakes queued tiles one at a time. */
+/** Lives inside the avatar studio's canvas: bakes queued tiles one at a time. */
 export function TileBaker() {
   const job = useTiles((s) => s.queue[0])
   const busy = useWorkshop((s) => s.playing)
