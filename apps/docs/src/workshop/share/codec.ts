@@ -1,6 +1,12 @@
 import type { JsonValue, WorldData } from '@runek/core/data'
 
 export type Mode = 'build' | 'lab' | 'code' | 'studio'
+
+const MODES: readonly Mode[] = ['build', 'lab', 'code', 'studio']
+
+/** A known mode, or undefined for anything else (e.g. one saved by an older build). */
+export const asMode = (value: unknown): Mode | undefined =>
+  MODES.includes(value as Mode) ? (value as Mode) : undefined
 export type Stage = 'room' | 'plot' | 'none'
 type Vec3 = [number, number, number]
 
@@ -66,11 +72,9 @@ export async function decodeShare(text: string): Promise<SharePayload> {
 /** Read `#s=…` (share) or legacy-free `#m=lab&c=bookshelf` style params from a hash. */
 export function parseHash(hash: string): { share?: string; mode?: Mode; component?: string } {
   const params = new URLSearchParams(hash.replace(/^#/, ''))
-  const mode = params.get('m')
   return {
     share: params.get('s') ?? undefined,
-    mode:
-      mode === 'build' || mode === 'lab' || mode === 'code' || mode === 'studio' ? mode : undefined,
+    mode: asMode(params.get('m')),
     component: params.get('c') ?? undefined,
   }
 }

@@ -2,7 +2,7 @@ import { assignNodeIds, parseWorld, type WorldData } from '@runek/core/data'
 import { importWorldText } from './actions'
 import { live } from './scene/refs'
 import { SCHEMA } from './schema'
-import { decodeShare, parseHash } from './share/codec'
+import { asMode, decodeShare, parseHash } from './share/codec'
 import { loadSession, restoreSession } from './share/persist'
 import { DEFAULT_LAB, DEFAULT_STUDIO, setLabType, toast, useWorkshop } from './state/store'
 import { templateById } from './templates'
@@ -21,7 +21,7 @@ export async function boot() {
       const world = assignNodeIds(parseWorld(JSON.stringify(payload.world)))
       useWorkshop.setState((s) => ({
         world,
-        mode: payload.mode ?? 'build',
+        mode: asMode(payload.mode) ?? 'build',
         stage: payload.stage ?? 'room',
         code: payload.code ?? null,
         sandbox: { ...s.sandbox, gated: !!payload.code, running: false },

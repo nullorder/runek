@@ -9,7 +9,7 @@ import {
   type ViewOptions,
   type WorkshopState,
 } from '../state/store'
-import type { CameraState, Mode, Stage } from './codec'
+import { asMode, type CameraState, type Mode, type Stage } from './codec'
 
 const KEY = 'runek-workshop:session:v1'
 
@@ -105,7 +105,7 @@ export function restoreSession(saved: Saved) {
     world: saved.world,
     code: saved.code ?? null,
     codeStyle: saved.codeStyle ?? 'data',
-    mode: saved.mode ?? 'build',
+    mode: asMode(saved.mode) ?? 'build',
     stage: saved.stage ?? 'room',
     view: { ...s.view, ...saved.view },
     lab: {
