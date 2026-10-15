@@ -20,6 +20,16 @@ export const DEFAULT_TARGET: [number, number, number] = [0, 0.9, 0]
 /** Components whose geometry visibly changes with `seed` — these get the re-roll control.
  *  (`House` qualifies as a composite: its seed cascades to seeded children like `Plant`.) */
 export const SEEDED = new Set([
+  'CeilingLight',
+  'Chandelier',
+  'ChessBoard',
+  'DeskLamp',
+  'GameConsole',
+  'Poster',
+  'Screen',
+  'TableTennis',
+  'Tableware',
+  'TikiTorch',
   'Whiteboard',
   'Tv',
   'PoolTable',
@@ -112,6 +122,18 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   CoffeeMachine: { camera: [0.45, 0.4, 0.6], target: [0, 0.16, 0] },
   ArcadeCabinet: { camera: [1.4, 1.6, 2], target: [0, 1, 0] },
   PoolTable: { camera: [2.4, 2.2, 2.6], target: [0, 0.7, 0] },
+  // Ceiling fittings hang below their origin, so the preview lifts them to a ceiling height.
+  CeilingLight: { camera: [1.1, 1.5, 1.8], target: [0, 1.5, 0], props: { position: [0, 2, 0] } },
+  Chandelier: { camera: [1.6, 1.6, 2.4], target: [0, 1.5, 0], props: { position: [0, 2.3, 0] } },
+  DeskLamp: { camera: [0.45, 0.45, 0.65], target: [0, 0.18, 0] },
+  PictureLight: { camera: [0.7, 0.8, 1.1], target: [0, 0.5, 0], props: { position: [0, 0.6, 0] } },
+  TikiTorch: { camera: [1.3, 1.6, 2.1], target: [0, 1.1, 0] },
+  Tableware: { camera: [0.4, 0.45, 0.55], target: [0, 0.03, 0], props: { kind: 'setting' } },
+  GameConsole: { camera: [0.6, 0.5, 0.85], target: [0, 0.08, 0.1] },
+  TableTennis: { camera: [2.6, 2.2, 3], target: [0, 0.7, 0] },
+  ChessBoard: { camera: [0.8, 1.25, 1], target: [0, 0.72, 0], props: { table: true } },
+  Screen: { camera: [0.9, 1.2, 2.2], target: [0, 1, 0], props: { position: [0, 1, 0] } },
+  Poster: { camera: [0.3, 0.7, 1.3], target: [0, 0.6, 0], props: { position: [0, 0.6, 0] } },
   // The arc sits `radius` out from its origin; a smaller arc pulled back to the center frames
   // (and fits a library pedestal) instead of standing in front of the camera.
   CurvedWall: { props: { radius: 2, arc: 1.6, height: 2.4, position: [0, 0, -1.7] } },

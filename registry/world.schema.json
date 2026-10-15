@@ -233,7 +233,7 @@
   "additionalProperties": false,
   "$defs": {
     "props.ArcadeCabinet": {
-      "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a seeded pixel game.",
+      "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a pixel game laid out from the seed: invaders, falling blocks, a maze, a snake, or a paddle duel.",
       "type": "object",
       "properties": {
         "width": {
@@ -257,8 +257,19 @@
         },
         "on": {
           "type": "boolean",
-          "description": "Lit screen showing a seeded game; off, dark glass.",
+          "description": "Lit screen showing the game; off, dark glass.",
           "default": true
+        },
+        "game": {
+          "enum": [
+            "invaders",
+            "blocks",
+            "maze",
+            "snake",
+            "paddle"
+          ],
+          "description": "Which game is running; each is laid out from the seed. Invaders when unset.",
+          "default": "invaders"
         },
         "players": {
           "enum": [
@@ -1213,6 +1224,126 @@
       },
       "additionalProperties": false
     },
+    "props.CeilingLight": {
+      "description": "A ceiling fitting hanging from its origin: a flush dome, a pendant shade on a cord, or an aimed spot can. Can light only after dusk.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "flush",
+            "pendant",
+            "spot"
+          ],
+          "description": "Seeded when unset."
+        },
+        "shade": {
+          "enum": [
+            "dome",
+            "cone",
+            "drum",
+            "globe"
+          ],
+          "description": "Pendant only; seeded when unset."
+        },
+        "drop": {
+          "type": "number",
+          "description": "Pendant cord length from the ceiling to the shade, in units.",
+          "default": 0.6
+        },
+        "size": {
+          "type": "number",
+          "description": "Shade size across, in units.",
+          "default": 0.36
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Canopy, cord, and can; defaults to the palette's `metal`."
+        },
+        "shadeColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The shade. Seeded when unset."
+        },
+        "lightColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The light and the glowing bulb.",
+          "default": "#ffe2b8"
+        },
+        "intensity": {
+          "type": "number",
+          "description": "Light strength.",
+          "default": 12
+        },
+        "on": {
+          "type": "boolean",
+          "description": "Switched on.",
+          "default": true
+        },
+        "nightOnly": {
+          "type": "boolean",
+          "description": "Light only while the world's sun is down.",
+          "default": false
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Chair": {
       "description": "Chair with seat, back, and legs.",
       "type": "object",
@@ -1289,6 +1420,226 @@
             "#7a5a40"
           ],
           "description": "Defaults to the world palette's `wood` slot."
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.Chandelier": {
+      "description": "A hanging chandelier: a chain, a turned brass body, one or two rings of curved arms with candle bulbs, and optional glass drops. Instanced, with one shared light; can light only after dusk.",
+      "type": "object",
+      "properties": {
+        "arms": {
+          "type": "number",
+          "description": "Arms on the lower tier. Seeded (5 to 8) when unset."
+        },
+        "tiers": {
+          "enum": [
+            1,
+            2
+          ],
+          "description": "One ring of arms, or two (the upper one smaller). Seeded when unset."
+        },
+        "radius": {
+          "type": "number",
+          "description": "Reach of the lower arms from the center, in units.",
+          "default": 0.45
+        },
+        "drop": {
+          "type": "number",
+          "description": "Chain length from the ceiling to the body, in units.",
+          "default": 0.4
+        },
+        "crystals": {
+          "type": "boolean",
+          "description": "Glass drops hanging from the arms. Seeded when unset."
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Frame, arms, and cups; defaults to the palette's `accent` (brass)."
+        },
+        "lightColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The light and the glowing bulb.",
+          "default": "#ffd9a0"
+        },
+        "intensity": {
+          "type": "number",
+          "description": "Light strength.",
+          "default": 22
+        },
+        "on": {
+          "type": "boolean",
+          "description": "Switched on.",
+          "default": true
+        },
+        "nightOnly": {
+          "type": "boolean",
+          "description": "Light only while the world's sun is down.",
+          "default": false
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.ChessBoard": {
+      "description": "A chess board with a full set of turned pieces, set from a FEN position or played out from the seed into a mid-game, on a table top or its own pedestal.",
+      "type": "object",
+      "properties": {
+        "fen": {
+          "type": "string",
+          "description": "A position in Forsyth-Edwards Notation (the placement field is enough), or `start`.\nUnset, the seed plays out a mid-game: some pieces taken, pawns pushed, pieces developed."
+        },
+        "size": {
+          "type": "number",
+          "description": "Board width across its frame, in units.",
+          "default": 0.45
+        },
+        "table": {
+          "type": "boolean",
+          "description": "Stand it on its own pedestal table; otherwise it lies on whatever top it is placed on.",
+          "default": false
+        },
+        "lightSquare": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The light squares.",
+          "default": "#e8d7b0"
+        },
+        "darkSquare": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The dark squares (a1 is dark).",
+          "default": "#6b4a2b"
+        },
+        "frameColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The frame and the pedestal; defaults to the palette's `wood`."
+        },
+        "whiteColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "White's pieces.",
+          "default": "#efe6d2"
+        },
+        "blackColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Black's pieces.",
+          "default": "#2a2522"
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
         }
       },
       "additionalProperties": false
@@ -2105,6 +2456,104 @@
       },
       "additionalProperties": false
     },
+    "props.DeskLamp": {
+      "description": "A banker's desk lamp: a brass base and stem under a cased glass shade with a pull chain, pooling light on the desk. Can light only after dusk.",
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "number",
+          "description": "Shade width, in units.",
+          "default": 0.3
+        },
+        "shadeColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The glass shade. Seeded (mostly library green) when unset."
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Base, stem, and harp; defaults to the palette's `accent` (brass)."
+        },
+        "lightColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The light and the glowing bulb.",
+          "default": "#ffe2b0"
+        },
+        "intensity": {
+          "type": "number",
+          "description": "Light strength.",
+          "default": 3
+        },
+        "on": {
+          "type": "boolean",
+          "description": "Switched on.",
+          "default": true
+        },
+        "nightOnly": {
+          "type": "boolean",
+          "description": "Light only while the world's sun is down.",
+          "default": false
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Dock": {
       "description": "A plank jetty on pilings reaching out over water; walkable deck colliders, side stringers, and seaward mooring posts.",
       "type": "object",
@@ -2754,6 +3203,93 @@
             "#7a5a40"
           ],
           "description": "Handles; defaults to the palette's `metal`."
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.GameConsole": {
+      "description": "A games console (tower, slab, or cube) with up to four controllers laid out in front, to sit under a TV.",
+      "type": "object",
+      "properties": {
+        "style": {
+          "enum": [
+            "tower",
+            "slab",
+            "cube"
+          ],
+          "description": "Seeded when unset."
+        },
+        "controllers": {
+          "type": "number",
+          "description": "Controllers laid out in front of the console, 0 to 4. Seeded (1 or 2) when unset."
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Console and controllers. Seeded (black or white) when unset."
+        },
+        "accent": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Power light and trim. Seeded when unset."
+        },
+        "on": {
+          "type": "boolean",
+          "description": "Powered on: the light glows.",
+          "default": true
         },
         "position": {
           "type": "array",
@@ -3692,7 +4228,7 @@
       "additionalProperties": false
     },
     "props.Monitor": {
-      "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry.",
+      "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry, or shows a texture the app hands it.",
       "type": "object",
       "properties": {
         "width": {
@@ -4868,6 +5404,106 @@
       ],
       "additionalProperties": false
     },
+    "props.PictureLight": {
+      "description": "A brass picture light on one or two arms that washes the face below it: over a picture on a wall, or on the top of a bookshelf. Can light only after dusk.",
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "number",
+          "description": "Length of the hood, in units.",
+          "default": 0.5
+        },
+        "reach": {
+          "type": "number",
+          "description": "How far the hood stands out from the mount, in units.",
+          "default": 0.16
+        },
+        "fall": {
+          "type": "number",
+          "description": "How far below the mount the light falls, in units: the picture's or the shelf's height.",
+          "default": 1.2
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Hood, arms, and back plate; defaults to the palette's `accent` (brass)."
+        },
+        "lightColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The light and the glowing bulb.",
+          "default": "#ffe6c0"
+        },
+        "intensity": {
+          "type": "number",
+          "description": "Light strength.",
+          "default": 6
+        },
+        "on": {
+          "type": "boolean",
+          "description": "Switched on.",
+          "default": true
+        },
+        "nightOnly": {
+          "type": "boolean",
+          "description": "Light only while the world's sun is down.",
+          "default": false
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract; this component has no seeded variation yet."
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Pillar": {
       "description": "Column with a plinth, a tapered (optionally fluted) shaft, and a capital.",
       "type": "object",
@@ -5345,6 +5981,124 @@
         "seed": {
           "type": "number",
           "description": "Accepted for the component contract; this component has no seeded variation yet."
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.Poster": {
+      "description": "A wall print of seeded flat art (shapes, color bands, a retro sunset, mountain peaks) with an optional caption and a slim or wide frame.",
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "The print, [width, height] in units.",
+          "default": [
+            0.5,
+            0.7
+          ]
+        },
+        "art": {
+          "enum": [
+            "shapes",
+            "bands",
+            "sunset",
+            "peaks"
+          ],
+          "description": "Seeded when unset."
+        },
+        "frame": {
+          "enum": [
+            "none",
+            "thin",
+            "wide"
+          ],
+          "description": "Seeded when unset."
+        },
+        "title": {
+          "type": "string",
+          "description": "A caption printed under the art."
+        },
+        "frameColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The frame; defaults to the palette's `woodDark`."
+        },
+        "paper": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The paper behind the art and the caption.",
+          "default": "#f4f1ea"
+        },
+        "ink": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The caption's ink.",
+          "default": "#222222"
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
         }
       },
       "additionalProperties": false
@@ -5828,6 +6582,132 @@
           ],
           "description": "Sail color.",
           "default": "#eee6d0"
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.Screen": {
+      "description": "A display of any size (a phone, a monitor, a TV, a digital frame, a billboard) on a wall, a stand, a desk foot, or in a frame. Shows a seeded picture or desktop, a text banner, animated static, or a color, or a texture the app hands it.",
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "The lit area, [width, height] in units: a phone, a TV, a billboard.",
+          "default": [
+            1.6,
+            0.9
+          ]
+        },
+        "mount": {
+          "enum": [
+            "stand",
+            "wall",
+            "desk",
+            "frame"
+          ],
+          "description": "Where it hangs or stands; `wall` by default.",
+          "default": "wall"
+        },
+        "content": {
+          "enum": [
+            "picture",
+            "windows",
+            "banner",
+            "static",
+            "color"
+          ],
+          "description": "A seeded `picture` (sky, sun, hills) or desktop `windows`, a `banner` of `text`, animated\n`static`, or a plain `color`. Seeded between picture and windows when unset."
+        },
+        "text": {
+          "type": "string",
+          "description": "The banner's words.",
+          "default": "Runek"
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Background glow, and the tint of the picture and windows. Seeded when unset."
+        },
+        "textColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Banner text color.",
+          "default": "#ffffff"
+        },
+        "on": {
+          "type": "boolean",
+          "description": "Lit; off, dark glass.",
+          "default": true
+        },
+        "frameColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Bezel and stand; defaults to the palette's `metal` (`wood` for a frame)."
         },
         "position": {
           "type": "array",
@@ -6774,6 +7654,199 @@
       },
       "additionalProperties": false
     },
+    "props.TableTennis": {
+      "description": "A regulation table tennis table with its lines, a net, a folding undercarriage, and paddles and a ball left on it.",
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The playing top. Seeded (blue or green) when unset."
+        },
+        "lineColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "White lines along the edges and down the middle.",
+          "default": "#f4f4f4"
+        },
+        "frameColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Legs and net posts; defaults to the palette's `metal`."
+        },
+        "paddles": {
+          "type": "boolean",
+          "description": "Two paddles lying on the table.",
+          "default": true
+        },
+        "ball": {
+          "type": "boolean",
+          "description": "A ball on the table.",
+          "default": true
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.Tableware": {
+      "description": "Tableware to set a table: a plate, bowl, glass, cup, or water jug turned from a profile, or a whole place setting. Drinks fill to a line; plates and bowls stack.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "glass",
+            "plate",
+            "bowl",
+            "cup",
+            "jug",
+            "setting"
+          ],
+          "description": "Which piece; a plate by default.",
+          "default": "plate"
+        },
+        "size": {
+          "type": "number",
+          "description": "Scale on the piece's true size (a 26 cm plate, an 11 cm glass, a 23 cm jug).",
+          "default": 1
+        },
+        "stack": {
+          "type": "number",
+          "description": "Plates or bowls stacked on each other.",
+          "default": 1
+        },
+        "fill": {
+          "type": "number",
+          "description": "How full a glass, cup, or jug is, 0 to 1. Seeded when unset."
+        },
+        "drinkColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The drink: water by default.",
+          "default": "#9fd3e8"
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Glaze for plates, bowls, and cups. Seeded (mostly white) when unset."
+        },
+        "glassColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Glass for glasses and the jug.",
+          "default": "#d8eef6"
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Tent": {
       "description": "An A-frame ridge tent: striped wind-rippled fabric, entrance flaps pinned open, guy ropes and stakes; solid sides and back, open front.",
       "type": "object",
@@ -7001,6 +8074,104 @@
       },
       "additionalProperties": false
     },
+    "props.TikiTorch": {
+      "description": "A bamboo tiki torch with a woven head and a flickering flame and light, for a beach path or a garden. Can burn only after dusk.",
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": "number",
+          "description": "Height to the top of the head, in units.",
+          "default": 1.7
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Bamboo pole and joints."
+        },
+        "headColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Woven head and bindings. Defaults to the palette's `bark`."
+        },
+        "flameColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The outer flame.",
+          "default": "#ff7a1a"
+        },
+        "intensity": {
+          "type": "number",
+          "description": "Light strength; it flickers around this.",
+          "default": 6
+        },
+        "on": {
+          "type": "boolean",
+          "description": "Burning, or cold.",
+          "default": true
+        },
+        "nightOnly": {
+          "type": "boolean",
+          "description": "Burn only while the world's sun is down.",
+          "default": false
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Trees": {
       "description": "L-system trees grown by a 3D turtle, deterministic from seed.",
       "type": "object",
@@ -7086,7 +8257,7 @@
       "additionalProperties": false
     },
     "props.Tv": {
-      "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes.",
+      "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes, or a texture the app hands it.",
       "type": "object",
       "properties": {
         "width": {
@@ -7097,8 +8268,8 @@
         "mount": {
           "enum": [
             "stand",
-            "console",
-            "wall"
+            "wall",
+            "console"
           ],
           "description": "`stand` and `console` are seeded when unset; `wall` must be asked for. On a wall the origin\nis the middle of the screen with its back against the wall (local -Z)."
         },
@@ -7657,7 +8828,10 @@
                 "Bridge",
                 "Bush",
                 "Campfire",
+                "CeilingLight",
                 "Chair",
+                "Chandelier",
+                "ChessBoard",
                 "Cliff",
                 "Clock",
                 "Clouds",
@@ -7667,6 +8841,7 @@
                 "Crate",
                 "CurvedWall",
                 "Desk",
+                "DeskLamp",
                 "Dock",
                 "Door",
                 "Fence",
@@ -7675,6 +8850,7 @@
                 "Flowers",
                 "Fountain",
                 "Fridge",
+                "GameConsole",
                 "Grass",
                 "Hedge",
                 "House",
@@ -7690,18 +8866,21 @@
                 "Palm",
                 "Path",
                 "Person",
+                "PictureLight",
                 "Pillar",
                 "Plant",
                 "Player",
                 "Pool",
                 "PoolTable",
                 "Portal",
+                "Poster",
                 "Road",
                 "Rocks",
                 "Roof",
                 "Room",
                 "Rug",
                 "Sailboat",
+                "Screen",
                 "Shelf",
                 "Shore",
                 "Sign",
@@ -7712,8 +8891,11 @@
                 "Staircase",
                 "Stool",
                 "Table",
+                "TableTennis",
+                "Tableware",
                 "Tent",
                 "Terrain",
+                "TikiTorch",
                 "Trees",
                 "Tv",
                 "Wall",
@@ -7964,6 +9146,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "CeilingLight"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.CeilingLight"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Chair"
               }
             },
@@ -7975,6 +9176,44 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Chair"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Chandelier"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Chandelier"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ChessBoard"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.ChessBoard"
               }
             }
           }
@@ -8154,6 +9393,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "DeskLamp"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.DeskLamp"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Dock"
               }
             },
@@ -8298,6 +9556,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Fridge"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "GameConsole"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.GameConsole"
               }
             }
           }
@@ -8591,6 +9868,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "PictureLight"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.PictureLight"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Pillar"
               }
             },
@@ -8705,6 +10001,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "Poster"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Poster"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Road"
               }
             },
@@ -8811,6 +10126,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Sailboat"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Screen"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Screen"
               }
             }
           }
@@ -9009,6 +10343,44 @@
           "if": {
             "properties": {
               "type": {
+                "const": "TableTennis"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.TableTennis"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Tableware"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Tableware"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Tent"
               }
             },
@@ -9039,6 +10411,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Terrain"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "TikiTorch"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.TikiTorch"
               }
             }
           }

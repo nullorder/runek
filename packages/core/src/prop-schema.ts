@@ -15,6 +15,8 @@ export type PropType =
   | { type: 'union'; variants: PropType[] }
   | { type: 'function' }
   | { type: 'node' }
+  /** A live three.js object (a `Texture`), handed over in code. */
+  | { type: 'instance'; text?: string }
   | { type: 'unknown'; text?: string }
 
 export type PropSchema = PropType & {
@@ -75,6 +77,11 @@ export function matches(type: PropType, value: JsonValue | undefined): boolean {
   }
 }
 
+/** Props that only work in code (callbacks, React children, live three.js objects), never in a
+ *  world file. */
+export const isCodeOnly = (type: PropType) =>
+  type.type === 'function' || type.type === 'node' || type.type === 'instance'
+
 /** A short human name for a type, for errors and completion details. */
 export function describeType(type: PropType): string {
   switch (type.type) {
@@ -92,6 +99,8 @@ export function describeType(type: PropType): string {
       return type.variants.map(describeType).join(' | ')
     case 'color':
       return 'color'
+    case 'instance':
+      return type.text ?? 'object'
     default:
       return type.type
   }

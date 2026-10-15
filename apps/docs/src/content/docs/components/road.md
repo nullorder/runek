@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add road
 ```
 
-Pulls `@runek/core@^0.14.0`.
+Pulls `@runek/core@^0.15.0`.
 
 ## Use it
 

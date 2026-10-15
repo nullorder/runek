@@ -1,7 +1,7 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { pick, range, rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
 import { useMemo } from 'react'
-import { Color } from 'three'
+import { Color, type Texture } from 'three'
 
 /** A round `foot` with a neck, a flat `plate` with a neck, or two splayed `legs`. */
 export type MonitorStand = 'foot' | 'plate' | 'legs'
@@ -19,6 +19,9 @@ export interface MonitorProps extends WorldComponentProps {
   on?: boolean
   /** Bezel and stand; defaults to the palette's `metal`. */
   color?: string
+  /** JSX only: a texture the app owns (a video, a canvas, a render target) shown in place of the
+   *  seeded windows. The monitor loads nothing itself. */
+  texture?: Texture
 }
 
 interface Panel {
@@ -47,6 +50,7 @@ export function Monitor({
   screen,
   on = true,
   color,
+  texture,
 }: MonitorProps) {
   const { unit, palette } = useWorld()
   const frame = color ?? palette.metal
@@ -104,13 +108,16 @@ export function Monitor({
       <group position={[0, cy, thick / 2 + 0.0005 * unit]}>
         <mesh>
           <planeGeometry args={[W, Hs]} />
-          {on ? (
+          {on && texture ? (
+            <meshBasicMaterial map={texture} toneMapped={false} />
+          ) : on ? (
             <meshBasicMaterial color={look.glow} toneMapped={false} />
           ) : (
             <meshStandardMaterial color={OFF} roughness={0.15} metalness={0.4} />
           )}
         </mesh>
         {on &&
+          !texture &&
           look.panels.map((p) => (
             <mesh
               key={`${p.pos[0].toFixed(4)}:${p.pos[1].toFixed(4)}:${p.pos[2].toFixed(5)}`}

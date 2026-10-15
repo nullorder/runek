@@ -1,7 +1,5 @@
 import { Sky as DreiSky, Stars } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
-import { currentHours, sunState, useWorld, type Vec3 } from '@runek/core'
-import { useState } from 'react'
+import { useSun, type Vec3 } from '@runek/core'
 
 export interface SkyProps {
   /** Accepted for the component contract; this component has no seeded variation yet. */
@@ -27,23 +25,11 @@ export function Sky({
   rayleigh = 1.4,
   nightColor = '#04060e',
 }: SkyProps) {
-  const { time } = useWorld()
-  const pinned = sunPosition !== undefined
-
-  // Sample time-of-day. A pinned world never changes; a live world advances slowly,
-  // so re-render only when the sun has moved enough to matter (~1 min of clock time).
-  const [hours, setHours] = useState(() => currentHours(time))
-  useFrame(() => {
-    if (pinned || !time.live) return
-    const h = currentHours(time)
-    setHours((prev) => (Math.abs(h - prev) > 0.02 ? h : prev))
-  })
-
-  if (pinned) {
+  const sun = useSun()
+  if (sunPosition) {
     return <DreiSky sunPosition={sunPosition} turbidity={turbidity} rayleigh={rayleigh} />
   }
 
-  const sun = sunState(hours)
   if (!sun.day) {
     return (
       <>

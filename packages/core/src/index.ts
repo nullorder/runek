@@ -45,7 +45,7 @@ export type {
   PropType,
   SchemaMap,
 } from './prop-schema'
-export { describeType, matches } from './prop-schema'
+export { describeType, isCodeOnly, matches } from './prop-schema'
 export type { Rng } from './rng'
 export { int, pick, range, rng, sub } from './rng'
 export type { SunState, WorldTime } from './time'
@@ -68,6 +68,7 @@ export type {
   WorldFog,
 } from './types'
 export { useGround } from './useGround'
+export { useSun } from './useSun'
 export { useWorld } from './useWorld'
 export type { JsonPath, ValidationIssue } from './validate'
 export { suggest, validateWorld } from './validate'

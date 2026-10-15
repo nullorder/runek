@@ -28,6 +28,7 @@ export type IndexItem = {
 /** The prop schema shape (mirrors `@runek/core/data`; the CLI stays dependency-free). */
 export type PropType =
   | { type: 'number' | 'boolean' | 'color' | 'vec3' | 'function' | 'node' }
+  | { type: 'instance'; text?: string }
   | { type: 'string'; suggestions?: string[]; multiline?: boolean }
   | { type: 'enum'; options: (string | number)[] }
   | { type: 'tuple'; items: PropType[] }

@@ -29,7 +29,7 @@ export type {
   PropType,
   SchemaMap,
 } from './prop-schema.ts'
-export { describeType, matches } from './prop-schema.ts'
+export { describeType, isCodeOnly, matches } from './prop-schema.ts'
 export type { JsonPath, ValidationIssue } from './validate.ts'
 export { suggest, validateWorld } from './validate.ts'
 export type {

@@ -37,7 +37,7 @@ Every trait shows where its value comes from: **set** by you, from the **skin** 
 
 The inspector is not hand-written. At build time the docs site reads each component's TypeScript (its props interface, the defaults in its signature, the JSDoc) and turns it into a schema. Numbers get sliders, colors get swatches that show the palette slot they fall back to, string unions become segmented choices or dropdowns, `[x, y, z]` gets three scrubbable fields, and nested specs (a `Person`'s `clothes`, a `Wall`'s `openings`) get list editors. A dot marks props you changed, and ⟲ resets one to its default (it disappears from the file). Drag a number's label sideways to scrub it.
 
-Callbacks and React children can't live in a world file; the inspector lists them under **Code-only props**, to use from `App.tsx`. **Export → Prop schema** downloads the whole schema as JSON.
+Callbacks, React children, and live three.js objects (a `Screen`'s `texture`) can't live in a world file; the inspector lists them under **Code-only props**, to use from `App.tsx`. **Export → Prop schema** downloads the whole schema as JSON.
 
 ## world.json and App.tsx
 

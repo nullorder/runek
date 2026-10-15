@@ -85,11 +85,11 @@ function describe(type, ctx, depth, hint) {
     const raw = nameOfType(type)
     const name = !raw || raw === '__type' || raw === '__object' ? `${ctx.component}.${hint}` : raw
     if (
-      /^(Object3D|Group|Mesh|Vector3|Color|Euler|Quaternion|Ref|RefObject|MutableRefObject)$/.test(
+      /^(Object3D|Group|Mesh|Vector3|Color|Euler|Quaternion|Texture|Ref|RefObject|MutableRefObject)$/.test(
         name,
       )
     ) {
-      return { type: 'unknown', text }
+      return { type: 'instance', text: name }
     }
     if (!(name in ctx.defs)) {
       ctx.defs[name] = null

@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nullorder/runek/compare/v0.14.0...HEAD)
+## [Unreleased](https://github.com/nullorder/runek/compare/v0.15.0...HEAD)
+
+## [0.15.0](https://github.com/nullorder/runek/compare/v0.14.0...v0.15.0) - 2026-10-16
 
 ### Added
 
@@ -24,6 +26,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   resolves to and where it came from (`prop`, `skin`, `kind`, `seed`,
   or `default`), without building any geometry. `PERSON_COLORS` holds
   the curated skin, hair, and eye colors a seed rolls from.
+- Lights: `TikiTorch` (a bamboo torch with a flickering flame),
+  `CeilingLight` (flush, pendant, or spot), `Chandelier` (one or two
+  rings of arms, instanced, one shared light), `DeskLamp` (a banker's
+  lamp), and `PictureLight` (over a picture or on a bookshelf). Each
+  takes `on` and `nightOnly`, which lights it only while the world's sun
+  is down.
+- `Tableware`: a plate, bowl, glass, cup, or water jug, or a whole place
+  `setting`, with a drink `fill` line and stacking plates and bowls.
+- `GameConsole` with up to four controllers, `TableTennis` at
+  regulation size, and `ChessBoard`, set from a FEN position or played
+  out from the seed, on a table or its own pedestal (`chessPieces` gives
+  the placement without rendering).
+- `Screen`, a display of any `size` on a wall, a stand, a desk foot, or
+  in a frame, showing a seeded picture or desktop, a text banner,
+  animated static, or a color. `Poster`, a wall print of seeded flat art
+  with an optional caption and frame.
+- A code-only `texture` prop on `Screen`, `Poster`, `Tv`, and `Monitor`:
+  hand it a texture your app owns (a video, a canvas, a render target)
+  to show instead of the built-in content. The components still load
+  nothing themselves, and the prop schema lists it as code only.
+- `ArcadeCabinet` `game`: `invaders` (the default, unchanged), `blocks`,
+  `maze`, `snake`, or `paddle`, each laid out from the seed.
+- `useSun()` in `@runek/core`: the sun for the world's time of day, for
+  components that react to day and night. `Sky` and `LightRig` now use it.
+- `isCodeOnly(prop)` in `@runek/core/data`, and an `instance` prop type in
+  the prop schema for live three.js objects such as a `Texture`.
 
 ## [0.14.0](https://github.com/nullorder/runek/compare/v0.13.0...v0.14.0) - 2026-10-07
 
