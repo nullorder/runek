@@ -1,6 +1,6 @@
 ---
 title: "Staircase"
-summary: "Stepped staircase with per-step colliders."
+summary: "Stepped staircase with per-step colliders: solid (a built-in stair on a floor) or floating (thin treads on sloped stringers, open underneath, to span a void)."
 category: component
 component: staircase
 order: 100
@@ -39,6 +39,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `totalHeight` | `number` | `1.5` | Total rise, in units. Ascends along +y and +z from the origin. |
 | `width` | `number` | `1.2` | Width, in units. |
 | `depth` | `number` | `2.4` | Total run (depth), in units. |
+| `form` | `"solid" \| "floating"` | `"solid"` | `solid` fills each step down to the origin, a built-in stair that sits on a floor. `floating` lays thin treads on two sloped stringers, open underneath, for a flight that spans a void (an atrium, a loft, a mezzanine). |
 | `color` | `color` | palette `stone` | Defaults to the world palette's `stone` slot. |
 
 ## Registry manifest

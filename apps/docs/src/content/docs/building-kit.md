@@ -50,6 +50,16 @@ upper slab's `opening` sits over the staircase run, so you can actually walk
 up through it — the slab splits into strips around the hole and the colliders
 match the visual exactly.
 
+A flight that spans a void instead of sitting on a floor (an atrium, a loft, a
+mezzanine) takes `form="floating"`: thin treads on two sloped stringers, open
+underneath. Start it at the lower floor's height and point it at the upper
+slab's edge:
+
+```tsx
+<Staircase position={[0, 3, 2]} rotation={[0, Math.PI, 0]} form="floating"
+  steps={16} totalHeight={3} depth={6} width={1.6} />
+```
+
 ## Composites: arrangements as data
 
 A **composite** is a named arrangement of nodes, held in the registry as JSON
