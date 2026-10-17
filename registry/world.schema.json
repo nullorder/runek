@@ -7404,7 +7404,7 @@
       "additionalProperties": false
     },
     "props.Staircase": {
-      "description": "Stepped staircase with per-step colliders.",
+      "description": "Stepped staircase with per-step colliders: solid (a built-in stair on a floor) or floating (thin treads on sloped stringers, open underneath, to span a void).",
       "type": "object",
       "properties": {
         "position": {
@@ -7473,6 +7473,14 @@
           "type": "number",
           "description": "Total run (depth), in units.",
           "default": 2.4
+        },
+        "form": {
+          "enum": [
+            "solid",
+            "floating"
+          ],
+          "description": "`solid` fills each step down to the origin, a built-in stair that sits on a floor.\n`floating` lays thin treads on two sloped stringers, open underneath, for a flight that\nspans a void (an atrium, a loft, a mezzanine).",
+          "default": "solid"
         },
         "color": {
           "type": "string",

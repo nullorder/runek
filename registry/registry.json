@@ -215,7 +215,7 @@
       "title": "Staircase",
       "type": "registry:component",
       "category": "structures",
-      "description": "Stepped staircase with per-step colliders.",
+      "description": "Stepped staircase with per-step colliders: solid (a built-in stair on a floor) or floating (thin treads on sloped stringers, open underneath, to span a void).",
       "files": [
         {
           "path": "packages/components/src/Staircase.tsx",

@@ -19,7 +19,7 @@ import {
 } from '@runek/components'
 import { World, type WorldPalette } from '@runek/core'
 import { useEffect, useMemo, useState } from 'react'
-import GalleryWing from './GalleryWing'
+import GalleryHall from './GalleryHall'
 
 export type DocMeta = {
   slug: string
@@ -177,11 +177,14 @@ function clockZoneLabel(): string {
 export default function LibraryWorld({
   docs,
   componentDocs = [],
+  componentCategories = {},
   version,
 }: {
   docs: DocMeta[]
-  /** One doc per registry component — the gallery wing's guide books. */
+  /** One doc per registry component — the gallery hall's guide books. */
   componentDocs?: DocMeta[]
+  /** Registry category per component, keyed by registry name; sorts the gallery hall's floors. */
+  componentCategories?: Record<string, string>
   /** Current Runek version, painted under the wall mark (e.g. "0.13.0"). */
   version?: string
 }) {
@@ -224,10 +227,17 @@ export default function LibraryWorld({
         {/* Night over the open-topped room: Sky reads the world's late hour and
             renders the dark dome + starfield itself. */}
         <Sky />
-        <LightRig sunPosition={[4, 16, -8]} sunColor="#fff4e0" sunIntensity={1.7} ambient={0.6} />
+        {/* The shadow range reaches the far wall of the gallery hall. */}
+        <LightRig
+          sunPosition={[4, 16, -8]}
+          sunColor="#fff4e0"
+          sunIntensity={1.7}
+          ambient={0.6}
+          shadowRange={42}
+        />
 
         {/* The reading room, composed from Walls (not Room) so the right (-x)
-            wall can take a doorway into the gallery wing. Same 14×14 footprint,
+            wall can take a doorway into the gallery hall. Same 14×14 footprint,
             walls at ±6.9 with 0.2 thickness, open to the night sky. */}
         <Floor size={[14, 14]} color={LIBRARY_PALETTE.wall} />
         <Wall position={[0, 0, -6.9]} width={14} height={4.5} />
@@ -295,10 +305,14 @@ export default function LibraryWorld({
           color={RUNE_GREEN}
         />
 
-        {/* The gallery wing beyond the doorway: every component on display,
-            each with its integration guide. Selecting a guide opens the same
-            reader the shelf books use. */}
-        <GalleryWing componentDocs={componentDocs} onSelect={setSelected} />
+        {/* The gallery hall beyond the doorway: every component on display,
+            a floor per category, each with its integration guide. Selecting a
+            guide opens the same reader the shelf books use. */}
+        <GalleryHall
+          componentDocs={componentDocs}
+          categories={componentCategories}
+          onSelect={setSelected}
+        />
 
         {/* The Runek mark on the far wall, above the shelves — the room's focal point. */}
         <RunekEmblem position={[0, 3.2, 6.78]} />

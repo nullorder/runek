@@ -4,9 +4,10 @@ import { marked } from 'marked'
 import changelogRaw from '../../../../CHANGELOG.md?raw'
 import core from '../../../../packages/core/package.json'
 import LibraryWorld from '../components/world/LibraryWorld.tsx'
+import { getComponents } from '../lib/registry'
 import '../styles/global.css'
 
-// The library is the guides reading room; the gallery wing displays the full
+// The library is the guides reading room; the gallery hall displays the full
 // component catalog with an integration guide per exhibit. Markdown is rendered
 // to HTML here (build time) and read in-world; marked never reaches the client
 // bundle.
@@ -29,6 +30,8 @@ const docs = all
   .filter((d) => SHELVED.has(d.data.category))
   .sort((a, b) => a.data.order - b.data.order)
   .map(toMeta)
+// Registry category per component, keyed by registry name (PascalCase title).
+const componentCategories = Object.fromEntries(getComponents().map((i) => [i.title, i.category]))
 const componentDocs = all
   .filter((d) => d.data.category === 'component' && d.data.component)
   .map(toMeta)
@@ -52,6 +55,7 @@ const componentDocs = all
       client:only="react"
       docs={docs}
       componentDocs={componentDocs}
+      componentCategories={componentCategories}
       version={core.version}
     />
   </body>
