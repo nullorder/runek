@@ -2,7 +2,7 @@
   "ArcadeCabinet": {
     "kind": "component",
     "seeded": true,
-    "doc": "An upright arcade cabinet: side panels cut to the classic profile, a lit marquee, a joystick\nand buttons on the control panel, and a glowing screen running a seeded pixel game (a row of\ninvaders over a ship, drawn as instanced squares). One cuboid collider.",
+    "doc": "An upright arcade cabinet: side panels cut to the classic profile, a lit marquee, a joystick\nand buttons on the control panel, and a glowing screen running a pixel game laid out from the\nseed: invaders by default, or falling blocks, a maze, a snake, or a paddle duel, drawn as\ninstanced squares. One cuboid collider.",
     "props": {
       "width": {
         "type": "number",
@@ -22,9 +22,22 @@
       },
       "on": {
         "type": "boolean",
-        "doc": "Lit screen showing a seeded game; off, dark glass.",
+        "doc": "Lit screen showing the game; off, dark glass.",
         "optional": true,
         "default": true
+      },
+      "game": {
+        "type": "enum",
+        "options": [
+          "invaders",
+          "blocks",
+          "maze",
+          "snake",
+          "paddle"
+        ],
+        "doc": "Which game is running; each is laid out from the seed. Invaders when unset.",
+        "optional": true,
+        "default": "invaders"
       },
       "players": {
         "type": "enum",
@@ -64,7 +77,7 @@
     },
     "name": "arcadecabinet",
     "category": "interiors",
-    "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a seeded pixel game."
+    "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a pixel game laid out from the seed: invaders, falling blocks, a maze, a snake, or a paddle duel."
   },
   "Arch": {
     "kind": "component",
@@ -788,6 +801,109 @@
     "category": "environment",
     "description": "Stone ring, a tepee of logs, and an animated flame with a warm flickering light."
   },
+  "CeilingLight": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A ceiling fitting, its origin at the ceiling with the fitting hanging below (local -Y): a\nfrosted `flush` dome, a `pendant` shade on a cord, or a `spot` can throwing a cone of light\ndown. `nightOnly` switches it on with the world's dusk. Decorative: no collider.",
+    "props": {
+      "kind": {
+        "type": "enum",
+        "options": [
+          "flush",
+          "pendant",
+          "spot"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "shade": {
+        "type": "enum",
+        "options": [
+          "dome",
+          "cone",
+          "drum",
+          "globe"
+        ],
+        "doc": "Pendant only; seeded when unset.",
+        "optional": true
+      },
+      "drop": {
+        "type": "number",
+        "doc": "Pendant cord length from the ceiling to the shade, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "size": {
+        "type": "number",
+        "doc": "Shade size across, in units.",
+        "optional": true,
+        "default": 0.36
+      },
+      "color": {
+        "type": "color",
+        "doc": "Canopy, cord, and can; defaults to the palette's `metal`.",
+        "optional": true
+      },
+      "shadeColor": {
+        "type": "color",
+        "doc": "The shade. Seeded when unset.",
+        "optional": true
+      },
+      "lightColor": {
+        "type": "color",
+        "doc": "The light and the glowing bulb.",
+        "optional": true,
+        "default": "#ffe2b8"
+      },
+      "intensity": {
+        "type": "number",
+        "doc": "Light strength.",
+        "optional": true,
+        "default": 12
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Switched on.",
+        "optional": true,
+        "default": true
+      },
+      "nightOnly": {
+        "type": "boolean",
+        "doc": "Light only while the world's sun is down.",
+        "optional": true,
+        "default": false
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "ceilinglight",
+    "category": "interiors",
+    "description": "A ceiling fitting hanging from its origin: a flush dome, a pendant shade on a cord, or an aimed spot can. Can light only after dusk."
+  },
   "Chair": {
     "kind": "component",
     "seeded": false,
@@ -849,6 +965,184 @@
     "name": "chair",
     "category": "interiors",
     "description": "Chair with seat, back, and legs."
+  },
+  "Chandelier": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A hanging chandelier, its origin at the ceiling: a chain, a turned brass body, and one or two\nrings of curved arms each ending in a cup and a candle bulb, with optional glass drops. Every\nrepeated part is instanced and the whole fitting shares one light, so a ballroom of them stays\ncheap. `nightOnly` lights it with the world's dusk. Decorative: no collider.",
+    "props": {
+      "arms": {
+        "type": "number",
+        "doc": "Arms on the lower tier. Seeded (5 to 8) when unset.",
+        "optional": true
+      },
+      "tiers": {
+        "type": "enum",
+        "options": [
+          1,
+          2
+        ],
+        "doc": "One ring of arms, or two (the upper one smaller). Seeded when unset.",
+        "optional": true
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Reach of the lower arms from the center, in units.",
+        "optional": true,
+        "default": 0.45
+      },
+      "drop": {
+        "type": "number",
+        "doc": "Chain length from the ceiling to the body, in units.",
+        "optional": true,
+        "default": 0.4
+      },
+      "crystals": {
+        "type": "boolean",
+        "doc": "Glass drops hanging from the arms. Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Frame, arms, and cups; defaults to the palette's `accent` (brass).",
+        "optional": true
+      },
+      "lightColor": {
+        "type": "color",
+        "doc": "The light and the glowing bulb.",
+        "optional": true,
+        "default": "#ffd9a0"
+      },
+      "intensity": {
+        "type": "number",
+        "doc": "Light strength.",
+        "optional": true,
+        "default": 22
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Switched on.",
+        "optional": true,
+        "default": true
+      },
+      "nightOnly": {
+        "type": "boolean",
+        "doc": "Light only while the world's sun is down.",
+        "optional": true,
+        "default": false
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "chandelier",
+    "category": "interiors",
+    "description": "A hanging chandelier: a chain, a turned brass body, one or two rings of curved arms with candle bulbs, and optional glass drops. Instanced, with one shared light; can light only after dusk."
+  },
+  "ChessBoard": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A chess board with a full set of turned pieces, set from a position in FEN or played out from\nthe seed into a mid-game. Files run along local X (a to h) and white sits at local +Z. It lies\non whatever it is placed on (its origin is the board's underside), or stands on its own\npedestal table with `table`. Squares and pieces are instanced: a few draw calls for the set.\nWith a table it has one cuboid collider; a bare board has none.",
+    "props": {
+      "fen": {
+        "type": "string",
+        "doc": "A position in Forsyth-Edwards Notation (the placement field is enough), or `start`.\nUnset, the seed plays out a mid-game: some pieces taken, pawns pushed, pieces developed.",
+        "optional": true
+      },
+      "size": {
+        "type": "number",
+        "doc": "Board width across its frame, in units.",
+        "optional": true,
+        "default": 0.45
+      },
+      "table": {
+        "type": "boolean",
+        "doc": "Stand it on its own pedestal table; otherwise it lies on whatever top it is placed on.",
+        "optional": true,
+        "default": false
+      },
+      "lightSquare": {
+        "type": "color",
+        "doc": "The light squares.",
+        "optional": true,
+        "default": "#e8d7b0"
+      },
+      "darkSquare": {
+        "type": "color",
+        "doc": "The dark squares (a1 is dark).",
+        "optional": true,
+        "default": "#6b4a2b"
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "The frame and the pedestal; defaults to the palette's `wood`.",
+        "optional": true
+      },
+      "whiteColor": {
+        "type": "color",
+        "doc": "White's pieces.",
+        "optional": true,
+        "default": "#efe6d2"
+      },
+      "blackColor": {
+        "type": "color",
+        "doc": "Black's pieces.",
+        "optional": true,
+        "default": "#2a2522"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "chessboard",
+    "category": "interiors",
+    "description": "A chess board with a full set of turned pieces, set from a FEN position or played out from the seed into a mid-game, on a table top or its own pedestal."
   },
   "Cliff": {
     "kind": "component",
@@ -1489,6 +1783,82 @@
     "category": "interiors",
     "description": "A work desk: a top over slim legs, a drawer pedestal, or side panels, with a modesty panel at the back. Base and drawers seeded, each pinnable. One cuboid collider."
   },
+  "DeskLamp": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A banker's desk lamp: a brass base and stem holding a cased glass shade over the work, with a\npull chain. Its origin is the foot, so it sits on a `Desk` or `Table` top, and its small light\npools on the desk below. `nightOnly` lights it with the world's dusk. Decorative: no collider.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Shade width, in units.",
+        "optional": true,
+        "default": 0.3
+      },
+      "shadeColor": {
+        "type": "color",
+        "doc": "The glass shade. Seeded (mostly library green) when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Base, stem, and harp; defaults to the palette's `accent` (brass).",
+        "optional": true
+      },
+      "lightColor": {
+        "type": "color",
+        "doc": "The light and the glowing bulb.",
+        "optional": true,
+        "default": "#ffe2b0"
+      },
+      "intensity": {
+        "type": "number",
+        "doc": "Light strength.",
+        "optional": true,
+        "default": 3
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Switched on.",
+        "optional": true,
+        "default": true
+      },
+      "nightOnly": {
+        "type": "boolean",
+        "doc": "Light only while the world's sun is down.",
+        "optional": true,
+        "default": false
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "desklamp",
+    "category": "interiors",
+    "description": "A banker's desk lamp: a brass base and stem under a cased glass shade with a pull chain, pooling light on the desk. Can light only after dusk."
+  },
   "Dock": {
     "kind": "component",
     "seeded": true,
@@ -2035,6 +2405,73 @@
     "name": "fridge",
     "category": "interiors",
     "description": "A kitchen fridge with a top or bottom freezer or one tall door, bar handles, and a seeded enamel or steel finish."
+  },
+  "GameConsole": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A games console with its controllers, to sit on the media console under a `Tv`: an upright\n`tower`, a flat `slab`, or a small `cube`, with a power light and a vent, and up to four\ncontrollers laid out in front of it (local +Z). Its origin is the console's foot. Decorative:\nno collider.",
+    "props": {
+      "style": {
+        "type": "enum",
+        "options": [
+          "tower",
+          "slab",
+          "cube"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "controllers": {
+        "type": "number",
+        "doc": "Controllers laid out in front of the console, 0 to 4. Seeded (1 or 2) when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Console and controllers. Seeded (black or white) when unset.",
+        "optional": true
+      },
+      "accent": {
+        "type": "color",
+        "doc": "Power light and trim. Seeded when unset.",
+        "optional": true
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Powered on: the light glows.",
+        "optional": true,
+        "default": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "gameconsole",
+    "category": "interiors",
+    "description": "A games console (tower, slab, or cube) with up to four controllers laid out in front, to sit under a TV."
   },
   "Grass": {
     "kind": "component",
@@ -2793,6 +3230,12 @@
         "doc": "Bezel and stand; defaults to the palette's `metal`.",
         "optional": true
       },
+      "texture": {
+        "type": "instance",
+        "text": "Texture",
+        "doc": "JSX only: a texture the app owns (a video, a canvas, a render target) shown in place of the\nseeded windows. The monitor loads nothing itself.",
+        "optional": true
+      },
       "position": {
         "type": "vec3",
         "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
@@ -2822,7 +3265,7 @@
     },
     "name": "monitor",
     "category": "interiors",
-    "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry."
+    "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry, or shows a texture the app hands it."
   },
   "Ocean": {
     "kind": "component",
@@ -3825,6 +4268,88 @@
     "category": "character",
     "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body."
   },
+  "PictureLight": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A picture light: a brass hood on one or two arms (two past 0.6 m), washing the face below it.\nIts origin is the mount point on a vertical face, which it stands out from along local +Z: fix\nit over a picture on a `Wall`, or on the top front edge of a `Bookshelf` to light the books.\nAccepts `seed` for the contract; it has no seeded variation. Decorative: no collider.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Length of the hood, in units.",
+        "optional": true,
+        "default": 0.5
+      },
+      "reach": {
+        "type": "number",
+        "doc": "How far the hood stands out from the mount, in units.",
+        "optional": true,
+        "default": 0.16
+      },
+      "fall": {
+        "type": "number",
+        "doc": "How far below the mount the light falls, in units: the picture's or the shelf's height.",
+        "optional": true,
+        "default": 1.2
+      },
+      "color": {
+        "type": "color",
+        "doc": "Hood, arms, and back plate; defaults to the palette's `accent` (brass).",
+        "optional": true
+      },
+      "lightColor": {
+        "type": "color",
+        "doc": "The light and the glowing bulb.",
+        "optional": true,
+        "default": "#ffe6c0"
+      },
+      "intensity": {
+        "type": "number",
+        "doc": "Light strength.",
+        "optional": true,
+        "default": 6
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Switched on.",
+        "optional": true,
+        "default": true
+      },
+      "nightOnly": {
+        "type": "boolean",
+        "doc": "Light only while the world's sun is down.",
+        "optional": true,
+        "default": false
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "picturelight",
+    "category": "interiors",
+    "description": "A brass picture light on one or two arms that washes the face below it: over a picture on a wall, or on the top of a bookshelf. Can light only after dusk."
+  },
   "Pillar": {
     "kind": "component",
     "seeded": false,
@@ -4212,6 +4737,108 @@
     "name": "portal",
     "category": "systems",
     "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports."
+  },
+  "Poster": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A print for a wall: seeded flat art (overlapping shapes, color bands, a retro sunset, or\nmountain peaks) on paper, with an optional caption and a slim or wide frame. Its origin is the\nmiddle of the print with its back to the wall (local -Z). An app can print its own `texture`\ninstead; the poster loads nothing itself. Decorative: no collider.",
+    "props": {
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "The print, [width, height] in units.",
+        "optional": true,
+        "default": [
+          0.5,
+          0.7
+        ]
+      },
+      "art": {
+        "type": "enum",
+        "options": [
+          "shapes",
+          "bands",
+          "sunset",
+          "peaks"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "frame": {
+        "type": "enum",
+        "options": [
+          "none",
+          "thin",
+          "wide"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "title": {
+        "type": "string",
+        "doc": "A caption printed under the art.",
+        "optional": true
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "The frame; defaults to the palette's `woodDark`.",
+        "optional": true
+      },
+      "paper": {
+        "type": "color",
+        "doc": "The paper behind the art and the caption.",
+        "optional": true,
+        "default": "#f4f1ea"
+      },
+      "ink": {
+        "type": "color",
+        "doc": "The caption's ink.",
+        "optional": true,
+        "default": "#222222"
+      },
+      "texture": {
+        "type": "instance",
+        "text": "Texture",
+        "doc": "JSX only: a texture the app owns, printed in place of the seeded art. The poster loads\nnothing itself.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "poster",
+    "category": "interiors",
+    "description": "A wall print of seeded flat art (shapes, color bands, a retro sunset, mountain peaks) with an optional caption and a slim or wide frame."
   },
   "Road": {
     "kind": "component",
@@ -4626,6 +5253,117 @@
     "name": "sailboat",
     "category": "water",
     "description": "A small procedural sailboat: a station-built low-poly hull, mast, boom, and mainsail, floating at the waterline with a gentle moored bob."
+  },
+  "Screen": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A display of any size: a phone, a computer screen, a TV, a digital picture frame, or a large\ndigital banner. It shows a seeded picture or desktop, a banner of text, animated static, or a\nplain color, all geometry, and an app can hand it a live `texture` (video, canvas, a render of\nanother camera) to show instead; the screen itself never loads anything. On a `wall` or in a\n`frame` its origin is the middle of the screen with its back to the wall (local -Z); on a\n`stand` or a `desk` it is the foot. One cuboid collider.",
+    "props": {
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "The lit area, [width, height] in units: a phone, a TV, a billboard.",
+        "optional": true,
+        "default": [
+          1.6,
+          0.9
+        ]
+      },
+      "mount": {
+        "type": "enum",
+        "options": [
+          "stand",
+          "wall",
+          "desk",
+          "frame"
+        ],
+        "doc": "Where it hangs or stands; `wall` by default.",
+        "optional": true,
+        "default": "wall"
+      },
+      "content": {
+        "type": "enum",
+        "options": [
+          "picture",
+          "windows",
+          "banner",
+          "static",
+          "color"
+        ],
+        "doc": "A seeded `picture` (sky, sun, hills) or desktop `windows`, a `banner` of `text`, animated\n`static`, or a plain `color`. Seeded between picture and windows when unset.",
+        "optional": true
+      },
+      "text": {
+        "type": "string",
+        "doc": "The banner's words.",
+        "optional": true,
+        "default": "Runek"
+      },
+      "color": {
+        "type": "color",
+        "doc": "Background glow, and the tint of the picture and windows. Seeded when unset.",
+        "optional": true
+      },
+      "textColor": {
+        "type": "color",
+        "doc": "Banner text color.",
+        "optional": true,
+        "default": "#ffffff"
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Lit; off, dark glass.",
+        "optional": true,
+        "default": true
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "Bezel and stand; defaults to the palette's `metal` (`wood` for a frame).",
+        "optional": true
+      },
+      "texture": {
+        "type": "instance",
+        "text": "Texture",
+        "doc": "JSX only: a texture the app owns (a `VideoTexture`, a `CanvasTexture`, a render target's\ntexture) drawn in place of `content`. The screen loads nothing itself.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "screen",
+    "category": "interiors",
+    "description": "A display of any size (a phone, a monitor, a TV, a digital frame, a billboard) on a wall, a stand, a desk foot, or in a frame. Shows a seeded picture or desktop, a text banner, animated static, or a color, or a texture the app hands it."
   },
   "Shelf": {
     "kind": "component",
@@ -5360,6 +6098,154 @@
     "category": "interiors",
     "description": "Table with a top on four legs, or on pedestals with rounded ends for a conference table."
   },
+  "TableTennis": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A table tennis table at regulation size, long along local X: a painted top with its white\nlines, a net with posts across the middle, a folding undercarriage, and a pair of paddles and a\nball left on it at seeded spots. One cuboid collider for the table; it stands on the ground.",
+    "props": {
+      "color": {
+        "type": "color",
+        "doc": "The playing top. Seeded (blue or green) when unset.",
+        "optional": true
+      },
+      "lineColor": {
+        "type": "color",
+        "doc": "White lines along the edges and down the middle.",
+        "optional": true,
+        "default": "#f4f4f4"
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "Legs and net posts; defaults to the palette's `metal`.",
+        "optional": true
+      },
+      "paddles": {
+        "type": "boolean",
+        "doc": "Two paddles lying on the table.",
+        "optional": true,
+        "default": true
+      },
+      "ball": {
+        "type": "boolean",
+        "doc": "A ball on the table.",
+        "optional": true,
+        "default": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "tabletennis",
+    "category": "interiors",
+    "description": "A regulation table tennis table with its lines, a net, a folding undercarriage, and paddles and a ball left on it."
+  },
+  "Tableware": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "Tableware to set a `Table` or a `Counter`: a plate, a bowl, a glass, a cup, or a water jug,\neach turned from a profile, or a whole place `setting`. Glasses, cups, and the jug hold a drink\nto a `fill` line. Its origin is the foot, so it sits on the top it is placed on; a setting faces\nthe diner along local +Z. Plates and bowls stack. Decorative: no collider.",
+    "props": {
+      "kind": {
+        "type": "enum",
+        "options": [
+          "glass",
+          "plate",
+          "bowl",
+          "cup",
+          "jug",
+          "setting"
+        ],
+        "doc": "Which piece; a plate by default.",
+        "optional": true,
+        "default": "plate"
+      },
+      "size": {
+        "type": "number",
+        "doc": "Scale on the piece's true size (a 26 cm plate, an 11 cm glass, a 23 cm jug).",
+        "optional": true,
+        "default": 1
+      },
+      "stack": {
+        "type": "number",
+        "doc": "Plates or bowls stacked on each other.",
+        "optional": true,
+        "default": 1
+      },
+      "fill": {
+        "type": "number",
+        "doc": "How full a glass, cup, or jug is, 0 to 1. Seeded when unset.",
+        "optional": true
+      },
+      "drinkColor": {
+        "type": "color",
+        "doc": "The drink: water by default.",
+        "optional": true,
+        "default": "#9fd3e8"
+      },
+      "color": {
+        "type": "color",
+        "doc": "Glaze for plates, bowls, and cups. Seeded (mostly white) when unset.",
+        "optional": true
+      },
+      "glassColor": {
+        "type": "color",
+        "doc": "Glass for glasses and the jug.",
+        "optional": true,
+        "default": "#d8eef6"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "tableware",
+    "category": "interiors",
+    "description": "Tableware to set a table: a plate, bowl, glass, cup, or water jug turned from a profile, or a whole place setting. Drinks fill to a line; plates and bowls stack."
+  },
   "Tent": {
     "kind": "component",
     "seeded": false,
@@ -5552,6 +6438,82 @@
     "category": "terrain",
     "description": "Procedural fbm-displaced ground with a matching trimesh collider, a flat build-pad option, and an optional radial island falloff. Its surface is queryable (`useGround`, anchors, `runek check-world`)."
   },
+  "TikiTorch": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A bamboo tiki torch: a jointed pole with a seeded lean, a woven head bound in cord, and an\nanimated flame with a warm flickering light, for a beachfront path or a garden at dusk.\n`nightOnly` lights it only after sunset. One thin cuboid collider.",
+    "props": {
+      "height": {
+        "type": "number",
+        "doc": "Height to the top of the head, in units.",
+        "optional": true,
+        "default": 1.7
+      },
+      "color": {
+        "type": "color",
+        "doc": "Bamboo pole and joints.",
+        "optional": true
+      },
+      "headColor": {
+        "type": "color",
+        "doc": "Woven head and bindings. Defaults to the palette's `bark`.",
+        "optional": true
+      },
+      "flameColor": {
+        "type": "color",
+        "doc": "The outer flame.",
+        "optional": true,
+        "default": "#ff7a1a"
+      },
+      "intensity": {
+        "type": "number",
+        "doc": "Light strength; it flickers around this.",
+        "optional": true,
+        "default": 6
+      },
+      "on": {
+        "type": "boolean",
+        "doc": "Burning, or cold.",
+        "optional": true,
+        "default": true
+      },
+      "nightOnly": {
+        "type": "boolean",
+        "doc": "Burn only while the world's sun is down.",
+        "optional": true,
+        "default": false
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "tikitorch",
+    "category": "environment",
+    "description": "A bamboo tiki torch with a woven head and a flickering flame and light, for a beach path or a garden. Can burn only after dusk."
+  },
   "Trees": {
     "kind": "component",
     "seeded": true,
@@ -5632,8 +6594,8 @@
         "type": "enum",
         "options": [
           "stand",
-          "console",
-          "wall"
+          "wall",
+          "console"
         ],
         "doc": "`stand` and `console` are seeded when unset; `wall` must be asked for. On a wall the origin\nis the middle of the screen with its back against the wall (local -Z).",
         "optional": true
@@ -5657,6 +6619,12 @@
       "consoleColor": {
         "type": "color",
         "doc": "The console's wood; defaults to the palette's `woodDark`.",
+        "optional": true
+      },
+      "texture": {
+        "type": "instance",
+        "text": "Texture",
+        "doc": "JSX only: a texture the app owns (a video, a canvas, a render target) shown in place of the\nseeded picture. The TV loads nothing itself.",
         "optional": true
       },
       "position": {
@@ -5688,7 +6656,7 @@
     },
     "name": "tv",
     "category": "interiors",
-    "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes."
+    "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes, or a texture the app hands it."
   },
   "Wall": {
     "kind": "component",

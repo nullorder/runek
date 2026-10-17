@@ -1,5 +1,5 @@
 import { DEFAULT_PALETTE } from './palette.ts'
-import { describeType, matches, type SchemaMap } from './prop-schema.ts'
+import { describeType, isCodeOnly, matches, type SchemaMap } from './prop-schema.ts'
 
 export type JsonPath = (string | number)[]
 
@@ -220,7 +220,7 @@ export function validateWorld(
               message: `${node.type} has no prop "${key}".${mean(key, known)}`,
               severity: 'warning',
             })
-          } else if (prop.type === 'function' || (prop.type === 'node' && key !== 'children')) {
+          } else if (isCodeOnly(prop) && !(prop.type === 'node' && key === 'children')) {
             issues.push({
               path: [...path, 'props', key],
               key: true,

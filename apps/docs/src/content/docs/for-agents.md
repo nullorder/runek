@@ -98,7 +98,7 @@ prints a link to the [workshop](/docs/the-workshop) with your world loaded: walk
 - **`seed`** (an integer) picks a variation. The same seed always gives the same geometry; change it to roll a new one, keep it to lock one in. Every component accepts `seed`, but some have nothing to vary: `props.json` marks those `"seeded": false`, so don't spend effort picking seeds for them.
 - **`anchor: "ground"`** makes `position[1]` a height above the terrain at that spot, so nothing ends up buried. Use `"surface"` to stand on the highest thing there (a dock, a floor). See [Placing things on uneven ground](/docs/placing-things-on-uneven-ground).
 - **Colors** are CSS color strings. Leave them unset to follow the world `palette`, which re-themes every component at once.
-- **Callbacks and React children** (`onEnter`, `onSelect`, ...) can't live in JSON. The props tables mark them "code only"; use them from TSX.
+- **Callbacks, React children, and live three.js objects** (`onEnter`, `onSelect`, a `Screen`'s `texture`, ...) can't live in JSON. The props tables mark them "code only"; use them from TSX.
 - Only ever use props listed in the component's props table or in `props.json`. Defaults are listed too, so leave out anything you don't need to change.
 
 ## Common mistakes

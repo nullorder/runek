@@ -50,7 +50,7 @@ function objectSchema(props, component) {
   const properties = {}
   const required = []
   for (const [name, prop] of Object.entries(props)) {
-    if (prop.type === 'function' || prop.type === 'node') continue
+    if (['function', 'node', 'instance'].includes(prop.type)) continue
     properties[name] = {
       ...propType(prop, component),
       ...(prop.doc ? { description: prop.doc } : {}),

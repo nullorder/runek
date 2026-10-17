@@ -1,7 +1,7 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { pick, range, rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
 import { useMemo } from 'react'
-import { Color } from 'three'
+import { Color, type Texture } from 'three'
 
 /** On a center `stand`, on a low media `console`, or flat on a `wall`. */
 export type TvMount = 'stand' | 'console' | 'wall'
@@ -20,6 +20,9 @@ export interface TvProps extends WorldComponentProps {
   color?: string
   /** The console's wood; defaults to the palette's `woodDark`. */
   consoleColor?: string
+  /** JSX only: a texture the app owns (a video, a canvas, a render target) shown in place of the
+   *  seeded picture. The TV loads nothing itself. */
+  texture?: Texture
 }
 
 interface Blob {
@@ -46,6 +49,7 @@ export function Tv({
   screen,
   color,
   consoleColor,
+  texture,
 }: TvProps) {
   const { unit, palette } = useWorld()
   const frame = color ?? palette.metal
@@ -114,7 +118,12 @@ export function Tv({
         <meshStandardMaterial color={frame} roughness={0.4} metalness={0.3} />
       </mesh>
       <group position={[0, cy, cz + thick / 2 + 0.0005 * unit]}>
-        {on ? (
+        {on && texture ? (
+          <mesh>
+            <planeGeometry args={[W, Hs]} />
+            <meshBasicMaterial map={texture} toneMapped={false} />
+          </mesh>
+        ) : on ? (
           <>
             <mesh position={[0, (Hs / 2 + look.horizon) / 2, 0]}>
               <planeGeometry args={[W, Hs / 2 - look.horizon]} />

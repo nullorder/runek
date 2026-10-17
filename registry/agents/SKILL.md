@@ -43,7 +43,7 @@ Docs index: https://runek.nullorder.org/llms.txt (every page is also Markdown: a
 - `seed` is an integer: same seed, same geometry. Change it to vary, keep it to lock. Components marked `"seeded": false` in props.json look the same for every seed.
 - `"anchor": "ground"` makes `position[1]` a height above the terrain at that spot; `"surface"` stands on the highest thing there (dock, floor). Prefer anchoring over guessing heights on uneven terrain.
 - Leave colors unset to follow the world `palette`; set a CSS color string to override.
-- Callbacks and React children are code only; they cannot appear in JSON.
+- Callbacks, React children, and live three.js objects (a `Screen`'s `texture`) are code only; they cannot appear in JSON.
 - Components are owned source: edit them in `src/runek/` when a prop is not enough. Keep them deterministic (geometry from props and `seed` only, no `Math.random`, no binary assets).
 
 ## Reference

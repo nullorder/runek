@@ -1,4 +1,4 @@
-import { type JsonValue, matches } from '@runek/core/data'
+import { isCodeOnly, type JsonValue, matches } from '@runek/core/data'
 import { useEffect, useId, useRef, useState } from 'react'
 import {
   controlKind,
@@ -614,7 +614,7 @@ function ObjectEditor({
   return (
     <div className="ws-sub">
       {Object.entries(def.props)
-        .filter(([, prop]) => prop.type !== 'function' && prop.type !== 'node')
+        .filter(([, prop]) => !isCodeOnly(prop))
         .map(([key, prop]) => (
           <Field
             key={key}

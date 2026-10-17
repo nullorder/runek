@@ -24,6 +24,11 @@ describe('generated schema', () => {
     expect(codeOnlyProps('Bookshelf')).toContain('onBookSelect')
     expect(editableProps('Sign').map(([n]) => n)).toContain('children')
   })
+
+  it('keeps live three.js objects out of the form', () => {
+    expect(editableProps('Screen').map(([n]) => n)).not.toContain('texture')
+    expect(codeOnlyProps('Screen')).toContain('texture')
+  })
 })
 
 describe('controls', () => {

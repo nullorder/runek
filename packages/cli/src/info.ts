@@ -72,6 +72,8 @@ export function describeType(type: PropType): string {
       return type.variants.map(describeType).join(' | ')
     case 'string':
       return type.multiline ? 'string (text)' : 'string'
+    case 'instance':
+      return type.text ?? 'object'
     default:
       return type.type
   }
@@ -86,7 +88,7 @@ function propInfo(name: string, prop: PropSchema): PropInfo {
     ...(prop.computed ? { computed: prop.computed } : {}),
     ...(prop.palette ? { palette: prop.palette } : {}),
     ...(prop.doc ? { doc: prop.doc } : {}),
-    ...(prop.type === 'function' || prop.type === 'node' ? { codeOnly: true } : {}),
+    ...(['function', 'node', 'instance'].includes(prop.type) ? { codeOnly: true } : {}),
   }
 }
 

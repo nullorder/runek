@@ -5,7 +5,7 @@ import { type Diagnostic, linter } from '@codemirror/lint'
 import { type Extension, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, type DecorationSet, EditorView } from '@codemirror/view'
 import { DEFAULT_PALETTE } from '@runek/core'
-import { describeType, type JsonPath, validateWorld } from '@runek/core/data'
+import { describeType, isCodeOnly, type JsonPath, validateWorld } from '@runek/core/data'
 import { COMPONENT_NAMES, SCHEMA } from '../schema'
 import type { PropSchema } from '../schema/types'
 import { SNIPPETS } from '../snippets'
@@ -229,7 +229,7 @@ function complete(context: CompletionContext): CompletionResult | null {
     else if (last === 'props' && nodePath && nodePath.length === path.length - 1) {
       const type = typeOf(context.state, nodePath)
       for (const [name, prop] of Object.entries((type && SCHEMA[type]?.props) || {})) {
-        if (prop.type === 'function' || prop.type === 'node') continue
+        if (isCodeOnly(prop)) continue
         options.push({
           label: name,
           type: 'property',

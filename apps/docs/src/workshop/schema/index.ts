@@ -1,3 +1,4 @@
+import { isCodeOnly } from '@runek/core/data'
 import raw from './props.json'
 import type { ComponentSchema, ObjectDef, PropSchema, SchemaMap } from './types'
 
@@ -34,19 +35,16 @@ export function editableProps(type: string): [string, PropSchema][] {
   const schema = SCHEMA[type]
   if (!schema) return []
   return Object.entries(schema.props).filter(
-    ([name, prop]) =>
-      !['position', 'rotation', 'seed'].includes(name) &&
-      prop.type !== 'function' &&
-      prop.type !== 'node',
+    ([name, prop]) => !['position', 'rotation', 'seed'].includes(name) && !isCodeOnly(prop),
   )
 }
 
-/** Props that only make sense in code: callbacks and React children. */
+/** Props that only make sense in code: callbacks, React children, live three.js objects. */
 export function codeOnlyProps(type: string): string[] {
   const schema = SCHEMA[type]
   if (!schema) return []
   return Object.entries(schema.props)
-    .filter(([, prop]) => prop.type === 'function' || prop.type === 'node')
+    .filter(([, prop]) => isCodeOnly(prop))
     .map(([name]) => name)
 }
 

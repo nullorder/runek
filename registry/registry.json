@@ -341,6 +341,58 @@
       ]
     },
     {
+      "name": "ceilinglight",
+      "title": "CeilingLight",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A ceiling fitting hanging from its origin: a flush dome, a pendant shade on a cord, or an aimed spot can. Can light only after dusk.",
+      "files": [
+        {
+          "path": "packages/components/src/CeilingLight.tsx",
+          "target": "CeilingLight.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chandelier",
+      "title": "Chandelier",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A hanging chandelier: a chain, a turned brass body, one or two rings of curved arms with candle bulbs, and optional glass drops. Instanced, with one shared light; can light only after dusk.",
+      "files": [
+        {
+          "path": "packages/components/src/Chandelier.tsx",
+          "target": "Chandelier.tsx"
+        }
+      ]
+    },
+    {
+      "name": "desklamp",
+      "title": "DeskLamp",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A banker's desk lamp: a brass base and stem under a cased glass shade with a pull chain, pooling light on the desk. Can light only after dusk.",
+      "files": [
+        {
+          "path": "packages/components/src/DeskLamp.tsx",
+          "target": "DeskLamp.tsx"
+        }
+      ]
+    },
+    {
+      "name": "picturelight",
+      "title": "PictureLight",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A brass picture light on one or two arms that washes the face below it: over a picture on a wall, or on the top of a bookshelf. Can light only after dusk.",
+      "files": [
+        {
+          "path": "packages/components/src/PictureLight.tsx",
+          "target": "PictureLight.tsx"
+        }
+      ]
+    },
+    {
       "name": "rug",
       "title": "Rug",
       "type": "registry:component",
@@ -786,7 +838,7 @@
       "title": "Monitor",
       "type": "registry:component",
       "category": "interiors",
-      "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry.",
+      "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry, or shows a texture the app hands it.",
       "files": [
         {
           "path": "packages/components/src/Monitor.tsx",
@@ -825,11 +877,37 @@
       "title": "Tv",
       "type": "registry:component",
       "category": "interiors",
-      "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes.",
+      "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes, or a texture the app hands it.",
       "files": [
         {
           "path": "packages/components/src/Tv.tsx",
           "target": "Tv.tsx"
+        }
+      ]
+    },
+    {
+      "name": "screen",
+      "title": "Screen",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A display of any size (a phone, a monitor, a TV, a digital frame, a billboard) on a wall, a stand, a desk foot, or in a frame. Shows a seeded picture or desktop, a text banner, animated static, or a color, or a texture the app hands it.",
+      "files": [
+        {
+          "path": "packages/components/src/Screen.tsx",
+          "target": "Screen.tsx"
+        }
+      ]
+    },
+    {
+      "name": "poster",
+      "title": "Poster",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A wall print of seeded flat art (shapes, color bands, a retro sunset, mountain peaks) with an optional caption and a slim or wide frame.",
+      "files": [
+        {
+          "path": "packages/components/src/Poster.tsx",
+          "target": "Poster.tsx"
         }
       ]
     },
@@ -877,7 +955,7 @@
       "title": "ArcadeCabinet",
       "type": "registry:component",
       "category": "interiors",
-      "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a seeded pixel game.",
+      "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a pixel game laid out from the seed: invaders, falling blocks, a maze, a snake, or a paddle duel.",
       "files": [
         {
           "path": "packages/components/src/ArcadeCabinet.tsx",
@@ -895,6 +973,58 @@
         {
           "path": "packages/components/src/PoolTable.tsx",
           "target": "PoolTable.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tabletennis",
+      "title": "TableTennis",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A regulation table tennis table with its lines, a net, a folding undercarriage, and paddles and a ball left on it.",
+      "files": [
+        {
+          "path": "packages/components/src/TableTennis.tsx",
+          "target": "TableTennis.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chessboard",
+      "title": "ChessBoard",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A chess board with a full set of turned pieces, set from a FEN position or played out from the seed into a mid-game, on a table top or its own pedestal.",
+      "files": [
+        {
+          "path": "packages/components/src/ChessBoard.tsx",
+          "target": "ChessBoard.tsx"
+        }
+      ]
+    },
+    {
+      "name": "gameconsole",
+      "title": "GameConsole",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A games console (tower, slab, or cube) with up to four controllers laid out in front, to sit under a TV.",
+      "files": [
+        {
+          "path": "packages/components/src/GameConsole.tsx",
+          "target": "GameConsole.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tableware",
+      "title": "Tableware",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "Tableware to set a table: a plate, bowl, glass, cup, or water jug turned from a profile, or a whole place setting. Drinks fill to a line; plates and bowls stack.",
+      "files": [
+        {
+          "path": "packages/components/src/Tableware.tsx",
+          "target": "Tableware.tsx"
         }
       ]
     },
@@ -960,6 +1090,19 @@
         {
           "path": "packages/components/src/Campfire.tsx",
           "target": "Campfire.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tikitorch",
+      "title": "TikiTorch",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "A bamboo tiki torch with a woven head and a flickering flame and light, for a beach path or a garden. Can burn only after dusk.",
+      "files": [
+        {
+          "path": "packages/components/src/TikiTorch.tsx",
+          "target": "TikiTorch.tsx"
         }
       ]
     },

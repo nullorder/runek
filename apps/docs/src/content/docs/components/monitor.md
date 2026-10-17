@@ -1,6 +1,6 @@
 ---
 title: "Monitor"
-summary: "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry."
+summary: "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry, or shows a texture the app hands it."
 category: component
 component: monitor
 order: 100
@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add monitor
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.14.0`, `three@^0.184.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.15.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -38,6 +38,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `screen` | `color` |  | The screen's glow when on. Seeded from a few calm tints when unset. |
 | `on` | `boolean` | `true` | Lit, showing a few seeded windows; off, a dark glass. |
 | `color` | `color` |  | Bezel and stand; defaults to the palette's `metal`. |
+| `texture` | `Texture` (code only) |  | JSX only: a texture the app owns (a video, a canvas, a render target) shown in place of the seeded windows. The monitor loads nothing itself. |
 | `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
 | `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
 | `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |

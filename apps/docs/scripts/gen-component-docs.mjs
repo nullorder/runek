@@ -4,7 +4,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { describeType } from '../../../packages/core/src/prop-schema.ts'
+import { describeType, isCodeOnly } from '../../../packages/core/src/prop-schema.ts'
 import { MIGRATIONS } from './migrations.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../../..')
@@ -111,7 +111,7 @@ function defaultOf(prop) {
 
 function propsTable(props) {
   const rows = Object.entries(props).map(([name, prop]) => {
-    const codeOnly = prop.type === 'function' || prop.type === 'node'
+    const codeOnly = isCodeOnly(prop)
     const type = `\`${cell(describeType(prop))}\`${codeOnly ? ' (code only)' : ''}`
     return `| \`${name}\` | ${type} | ${defaultOf(prop)} | ${cell(prop.doc ?? '')} |`
   })

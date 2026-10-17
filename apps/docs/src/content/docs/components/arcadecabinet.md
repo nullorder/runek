@@ -1,6 +1,6 @@
 ---
 title: "ArcadeCabinet"
-summary: "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a seeded pixel game."
+summary: "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a pixel game laid out from the seed: invaders, falling blocks, a maze, a snake, or a paddle duel."
 category: component
 component: arcadecabinet
 order: 100
@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add arcadecabinet
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.14.0`, `three@^0.184.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.15.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -35,7 +35,8 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `width` | `number` | `0.66` | Cabinet width, in units. |
 | `color` | `color` |  | Body color. Seeded when unset. |
 | `accent` | `color` |  | Side-art stripe and marquee glow. Seeded when unset. |
-| `on` | `boolean` | `true` | Lit screen showing a seeded game; off, dark glass. |
+| `on` | `boolean` | `true` | Lit screen showing the game; off, dark glass. |
+| `game` | `"invaders" \| "blocks" \| "maze" \| "snake" \| "paddle"` | `"invaders"` | Which game is running; each is laid out from the seed. Invaders when unset. |
 | `players` | `1 \| 2` |  | Control sets on the panel (one or two players). Seeded when unset. |
 | `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
 | `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
