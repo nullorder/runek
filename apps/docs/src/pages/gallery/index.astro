@@ -1,20 +1,11 @@
 ---
 import ComponentPreview from '../../components/gallery/ComponentPreview.tsx'
 import BaseLayout from '../../layouts/BaseLayout.astro'
+import { CATEGORY_ORDER } from '../../lib/categories'
 import { getComponents } from '../../lib/registry'
 
-const order = [
-  'structures',
-  'interiors',
-  'water',
-  'environment',
-  'vegetation',
-  'terrain',
-  'character',
-  'systems',
-]
 const components = getComponents()
-const groups = order
+const groups = CATEGORY_ORDER
   .map((category) => ({ category, items: components.filter((i) => i.category === category) }))
   .filter((g) => g.items.length > 0)
 ---

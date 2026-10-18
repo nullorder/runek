@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.15.0...HEAD)
 
+### Added
+
+- `Staircase` `form`: `solid` (the default, unchanged) or `floating`, thin
+  treads on two sloped stringers, open underneath, for a flight that spans a
+  void such as an atrium, a loft, or a mezzanine.
+
+### Changed
+
+- The library world's component gallery is now a three-floor hall around an
+  open atrium instead of one long corridor. Each floor holds a category
+  (Grounds, Structures, Interiors), exhibits run alphabetically along the
+  walls with a label where each section starts, and two floating flights
+  cross the atrium between floors. A directory on the ground floor shows
+  what each floor holds. The hall widens on its own as the catalog grows.
+- Gallery miniatures live in their own paused physics world, so an
+  exhibit's colliders can no longer block or push visitors (a `Terrain`
+  or `Shore` miniature used to leave an invisible full-size floor over the
+  walkway).
+
 ## [0.15.0](https://github.com/nullorder/runek/compare/v0.14.0...v0.15.0) - 2026-10-16
 
 ### Added
