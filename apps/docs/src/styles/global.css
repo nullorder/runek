@@ -151,6 +151,18 @@ h1,
 .site-nav .brand:hover {
   text-decoration: none;
 }
+.site-nav .version-pill {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--green);
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  text-shadow: none;
+}
 .site-nav .brand:hover img {
   transform: rotate(-8deg) scale(1.08);
 }
