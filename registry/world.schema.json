@@ -5906,7 +5906,7 @@
       "additionalProperties": false
     },
     "props.Portal": {
-      "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports.",
+      "description": "A travel gate: a glowing vortex around a dark core that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports.",
       "type": "object",
       "properties": {
         "to": {
@@ -5919,7 +5919,7 @@
         },
         "radius": {
           "type": "number",
-          "description": "Ring radius, in units.",
+          "description": "Radius of the swirling vortex around the dark core, in units.",
           "default": 2.2
         },
         "color": {
@@ -5927,7 +5927,7 @@
           "examples": [
             "#7a5a40"
           ],
-          "description": "Glow / ring color; defaults to the world palette's `accent` slot."
+          "description": "Glow / swirl color; defaults to the world palette's `accent` slot."
         },
         "active": {
           "type": "boolean",
@@ -5980,7 +5980,8 @@
         },
         "seed": {
           "type": "number",
-          "description": "Accepted for the component contract; this component has no seeded variation yet."
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
         }
       },
       "additionalProperties": false

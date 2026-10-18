@@ -21,7 +21,7 @@
       "title": "Portal",
       "type": "registry:component",
       "category": "systems",
-      "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports.",
+      "description": "A travel gate: a glowing vortex around a dark core that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports.",
       "files": [
         {
           "path": "packages/components/src/Portal.tsx",

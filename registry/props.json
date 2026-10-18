@@ -4672,8 +4672,8 @@
   },
   "Portal": {
     "kind": "component",
-    "seeded": false,
-    "doc": "A travel gate: a glowing ring that fires a one-shot event when the avatar — or a vehicle —\npasses through it. The visual is procedural and asset-free; the trigger is a Rapier sensor.\nDrive transitions with the optional `onEnter` callback, or set `to` and let it navigate.\nUse it for world-to-world travel, level/hub transitions, or in-world teleports; for a single\ncontinuous space, move the camera instead.",
+    "seeded": true,
+    "doc": "A travel gate: a swirling vortex around a lightless core, wrapped in a soft glow, that\nfires a one-shot event when the avatar — or a vehicle — passes through it. The visual is\nprocedural and asset-free (the seed shapes the swirl and the drifting motes); the trigger\nis a Rapier sensor. Drive transitions with the optional `onEnter` callback, or set `to` and\nlet it navigate. Use it for world-to-world travel, level/hub transitions, or in-world\nteleports; for a single continuous space, move the camera instead.",
     "props": {
       "to": {
         "type": "string",
@@ -4692,13 +4692,13 @@
       },
       "radius": {
         "type": "number",
-        "doc": "Ring radius, in units.",
+        "doc": "Radius of the swirling vortex around the dark core, in units.",
         "optional": true,
         "default": 2.2
       },
       "color": {
         "type": "color",
-        "doc": "Glow / ring color; defaults to the world palette's `accent` slot.",
+        "doc": "Glow / swirl color; defaults to the world palette's `accent` slot.",
         "optional": true,
         "palette": "accent"
       },
@@ -4730,13 +4730,14 @@
       },
       "seed": {
         "type": "number",
-        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
-        "optional": true
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
       }
     },
     "name": "portal",
     "category": "systems",
-    "description": "A travel gate: a glowing sensor ring that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports."
+    "description": "A travel gate: a glowing vortex around a dark core that fires onEnter (or navigates to a destination) when the avatar or a vehicle passes through — for world-to-world travel, level transitions, and teleports."
   },
   "Poster": {
     "kind": "component",

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.15.0...HEAD)
 
+### Changed
+
+- `Portal` is now a swirling vortex around a lightless core instead of a
+  spinning ring: spiral arms, a bright photon rim, drifting motes that
+  fall inward, a soft halo, and light pooled on the ground beneath it. It
+  faces the camera from any side, and `seed` now shapes the swirl and the
+  motes.
+
 ## [0.15.0](https://github.com/nullorder/runek/compare/v0.14.0...v0.15.0) - 2026-10-18
 
 ### Added
