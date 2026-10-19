@@ -1,10 +1,12 @@
 import { OrbitControls, TransformControls } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
 import { Leva, useControls } from 'leva'
 import { type ComponentRef, type CSSProperties, useEffect, useRef, useState } from 'react'
-import type { Object3D } from 'three'
+import { type Object3D, Vector3 } from 'three'
 import { GroundContext } from './context'
 import { ANCHOR_KINDS, type GroundIndex, type NodeAnchor } from './ground'
 import { isEditableTarget } from './input'
+import { groundForward, MOVE_KEYS, useOrbitKeys } from './orbitKeys'
 import type { Vec3 } from './types'
 import { World, type WorldProps } from './World'
 import { WorldAbout } from './WorldAbout'
@@ -50,6 +52,8 @@ const NON_SELECTABLE = new Set(['Sky', 'LightRig'])
 const SKIPPED = new Set(['Player'])
 
 const HISTORY_LIMIT = 100
+/** Nudges this close together on one node become a single undo step. */
+const NUDGE_COALESCE_MS = 1000
 
 /** The gizmo handle being dragged ("X", "XZ", …); typed private upstream, public at runtime. */
 const activeAxis = (controls: unknown) =>
@@ -82,6 +86,10 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
   const history = useRef<WorldData[]>([])
   const ground = useGroundIndex(data, registry)
   const gizmo = useRef<ComponentRef<typeof TransformControls>>(null)
+  const lastNudge = useRef({ index: -1, at: 0 })
+  // Key repeat can outrun a render; nudges build on the newest world, not this render's.
+  const latest = useRef(data)
+  latest.current = data
 
   /** Contribution is offered only when the world declares where it lives. */
   const canContribute = !!data.meta?.source?.url
@@ -105,6 +113,26 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
       i === index ? { ...node, props: { ...node.props, ...patch } } : node,
     )
     apply({ ...data, nodes })
+  }
+
+  /** Step the selection by `delta` (world units); a burst of steps is one undo. */
+  const nudgeSelected = (delta: Vec3) => {
+    const world = latest.current
+    const node = selected && world.nodes[selected.index]
+    if (!selected || !node) return
+    const at = asVec3(node.props?.position) ?? [0, 0, 0]
+    const position = at.map((n, i) => round(n + delta[i])) as Vec3
+    const nodes = world.nodes.map((n, i) =>
+      i === selected.index ? { ...n, props: { ...n.props, position } } : n,
+    )
+    const next = { ...world, nodes }
+    const now = performance.now()
+    const last = lastNudge.current
+    const continuing = last.index === selected.index && now - last.at < NUDGE_COALESCE_MS
+    lastNudge.current = { index: selected.index, at: now }
+    latest.current = next
+    if (continuing) onChange(next)
+    else apply(next)
   }
 
   const replaceNode = (index: number, node: WorldNode) =>
@@ -218,15 +246,21 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (isEditableTarget(event.target)) return
-      if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
+      const mod = event.metaKey || event.ctrlKey
+      if (mod && event.key === 'z') {
         event.preventDefault()
         undo()
         return
       }
+      if (mod && event.key === 'd') {
+        event.preventDefault()
+        duplicateSelected()
+        return
+      }
+      if (mod || event.altKey) return
       if (event.key === 'Escape') setSelected(null)
       else if (event.key === 'g') setMode('translate')
       else if (event.key === 'r') setMode('rotate')
-      else if (event.key === 'd') duplicateSelected()
       else if (event.key === 'Delete' || event.key === 'Backspace') deleteSelected()
     }
     window.addEventListener('keydown', onKey)
@@ -251,6 +285,7 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         onPointerMissed={() => setSelected(null)}
       >
         <OrbitControls makeDefault />
+        <EditorKeys selected={selected !== null} onNudge={nudgeSelected} />
         <GroundContext.Provider value={ground}>
           <EditableNodes
             nodes={data.nodes}
@@ -292,8 +327,9 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         onUndo={undo}
         onContribute={() => setContributeOpen(true)}
       />
-      {selected !== null && (
+      {selected !== null && data.nodes[selected.index] && (
         <NodeControls
+          key={data.nodes[selected.index].id ?? selected.index}
           index={selected.index}
           node={data.nodes[selected.index]}
           onPatch={patchNode}
@@ -398,33 +434,30 @@ interface NodeControlsProps {
 
 function NodeControls({ index, node, onPatch }: NodeControlsProps) {
   const props = node.props ?? {}
-  const position = asVec3(props.position) ?? [0, 0, 0]
-  const rotation = asVec3(props.rotation) ?? [0, 0, 0]
+  const [px, py, pz] = asVec3(props.position) ?? [0, 0, 0]
+  const [rx, ry, rz] = asVec3(props.rotation) ?? [0, 0, 0]
   const seed = typeof props.seed === 'number' ? props.seed : undefined
+  // The panel is built once per node; its handlers must still patch the latest world.
+  const patch = useRef(onPatch)
+  patch.current = onPatch
 
-  useControls(
+  const [, set] = useControls(
     `${node.type} #${index}`,
     () => ({
       position: {
-        value: { x: position[0], y: position[1], z: position[2] },
+        value: { x: px, y: py, z: pz },
         step: 0.1,
-        onChange: (
-          v: { x: number; y: number; z: number },
-          _path: string,
-          ctx: { initial: boolean },
-        ) => {
-          if (!ctx.initial) onPatch(index, { position: [v.x, v.y, v.z] })
+        onChange: (v: XYZ, _path: string, ctx: LevaChange) => {
+          if (!ctx.initial && ctx.fromPanel)
+            patch.current(index, { position: [round(v.x), round(v.y), round(v.z)] })
         },
       },
       rotation: {
-        value: { x: rotation[0], y: rotation[1], z: rotation[2] },
+        value: { x: rx, y: ry, z: rz },
         step: 0.05,
-        onChange: (
-          v: { x: number; y: number; z: number },
-          _path: string,
-          ctx: { initial: boolean },
-        ) => {
-          if (!ctx.initial) onPatch(index, { rotation: [v.x, v.y, v.z] })
+        onChange: (v: XYZ, _path: string, ctx: LevaChange) => {
+          if (!ctx.initial && ctx.fromPanel)
+            patch.current(index, { rotation: [round(v.x), round(v.y), round(v.z)] })
         },
       },
       ...(seed !== undefined
@@ -432,8 +465,8 @@ function NodeControls({ index, node, onPatch }: NodeControlsProps) {
             seed: {
               value: seed,
               step: 1,
-              onChange: (v: number, _path: string, ctx: { initial: boolean }) => {
-                if (!ctx.initial) onPatch(index, { seed: Math.round(v) })
+              onChange: (v: number, _path: string, ctx: LevaChange) => {
+                if (!ctx.initial && ctx.fromPanel) patch.current(index, { seed: Math.round(v) })
               },
             },
           }
@@ -441,6 +474,59 @@ function NodeControls({ index, node, onPatch }: NodeControlsProps) {
     }),
     [index],
   )
+
+  // Follow edits made elsewhere (gizmo, keys, undo) so the panel never shows stale numbers.
+  useEffect(() => {
+    set({
+      position: { x: px, y: py, z: pz },
+      rotation: { x: rx, y: ry, z: rz },
+      ...(seed !== undefined ? { seed } : {}),
+    })
+  }, [set, px, py, pz, rx, ry, rz, seed])
+
+  return null
+}
+
+type XYZ = { x: number; y: number; z: number }
+/** What leva hands an `onChange`: `fromPanel` is false for values we `set` ourselves. */
+type LevaChange = { initial: boolean; fromPanel?: boolean }
+
+const forward = new Vector3()
+
+/** Snaps a ground direction to the nearest world axis (±X or ±Z). */
+const snapToAxis = (v: Vector3) =>
+  Math.abs(v.x) > Math.abs(v.z) ? v.set(Math.sign(v.x), 0, 0) : v.set(0, 0, Math.sign(v.z) || 1)
+
+/**
+ * Keyboard for the editor camera: WASD / QE pan, arrows orbit. With a selection, WASD / QE step
+ * it instead, along the world axis nearest the camera's forward and right (0.1, ⇧ for 1).
+ */
+function EditorKeys({ selected, onNudge }: { selected: boolean; onNudge: (delta: Vec3) => void }) {
+  const camera = useThree((s) => s.camera)
+  const latest = useRef({ selected, onNudge })
+  latest.current = { selected, onNudge }
+
+  useOrbitKeys({ skip: (code) => code in MOVE_KEYS && latest.current.selected })
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const move = MOVE_KEYS[e.code]
+      if (!move || !latest.current.selected) return
+      if (e.metaKey || e.ctrlKey || e.altKey || isEditableTarget(e.target)) return
+      e.preventDefault()
+      snapToAxis(groundForward(camera, forward))
+      const step = e.shiftKey ? 1 : 0.1
+      const [right, up, ahead] = move
+      // Right of forward (fx, fz) on the ground is (-fz, fx).
+      latest.current.onNudge([
+        (forward.x * ahead - forward.z * right) * step,
+        up * step,
+        (forward.z * ahead + forward.x * right) * step,
+      ])
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [camera])
 
   return null
 }
@@ -587,7 +673,7 @@ function EditorToolbar({
         style={button(false, !hasSelection)}
         disabled={!hasSelection}
         onClick={onDuplicate}
-        title="Duplicate selection (d)"
+        title="Duplicate selection (⌘D)"
       >
         Duplicate
       </button>
@@ -668,7 +754,9 @@ function EditorToolbar({
         </button>
       )}
       <span style={HINT}>
-        {selected === null ? 'click a component · Esc deselects' : `selected #${selected}`}
+        {selected === null
+          ? 'click a component · WASD QE pan · arrows orbit'
+          : `selected #${selected} · WASD QE move · Esc deselects`}
       </span>
     </div>
   )

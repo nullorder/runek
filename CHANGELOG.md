@@ -13,8 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (the default, unchanged), `"tall"` (a meadow) or `"very-tall"` (reeds
   up to your chest). A number in units still works. Taller grass grows
   thicker blades that lean a little, so it doesn't read as needles.
+- Keyboard navigation in `<WorldEditor>` and the workshop's Build view:
+  hold `W` `A` `S` `D` to pan across the ground (`Q` / `E` for down and
+  up) and the arrow keys to orbit, with `⇧` to go faster. With a node
+  selected, `W` `A` `S` `D` `Q` `E` step it along the world axis nearest
+  the camera instead (0.1 m, or one snap step in the workshop; `⇧` for
+  ten), and a burst of steps undoes as one. `@runek/core` exports the
+  camera half as `useOrbitKeys` for your own orbit views.
 
 ### Changed
+
+- Duplicate moved from `d` to `⌘D` in `<WorldEditor>` and the workshop,
+  and the workshop's World panel from `w` to `,`, to make room for WASD.
 
 - `Portal` is now a swirling vortex around a lightless core instead of a
   spinning ring: spiral arms, a bright photon rim, drifting motes that
@@ -39,6 +49,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `<WorldEditor>`'s props panel keeps up with the world: it shows where
+  a node is after a gizmo drag, a nudge, or an undo instead of the
+  numbers it opened with, and editing one field no longer snaps the
+  node's other fields (or earlier edits) back to those stale values.
+- The workshop inspector's number fields keep a value stepped with the
+  arrow keys (it reverted on blur), show up to three decimals instead of
+  rounding to the step (so a y of 0.002 no longer reads as 0), and no
+  longer rewrite a value just because you clicked in and out.
+- The workshop's wall sign no longer draws its "build · tune · share"
+  line over the WORKSHOP lettering.
 - The camera no longer shakes while walking, most visibly in first person
   and on high refresh rate displays. `<World>` now steps physics once per
   rendered frame (splitting long frames into short sub-steps), in step

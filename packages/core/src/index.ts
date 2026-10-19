@@ -36,6 +36,8 @@ export {
   keyLabel,
   resolveControls,
 } from './keyboard'
+export type { OrbitKeysOptions } from './orbitKeys'
+export { groundForward, MOVE_KEYS, useOrbitKeys } from './orbitKeys'
 export type { WorldPalette } from './palette'
 export { DEFAULT_PALETTE } from './palette'
 export type {

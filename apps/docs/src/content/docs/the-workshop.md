@@ -75,8 +75,10 @@ Your work autosaves in the browser. **Templates** start you from a reading room,
 | `⌘K` | Command palette: add anything, load templates, jump to a node |
 | `⌘Z` · `⇧⌘Z` | Undo · redo |
 | `g` · `r` | Move · rotate |
+| `W` `A` `S` `D` · `Q` `E` | Pan the view across the ground · down and up. With a node selected, step it along the nearest axis instead (`⇧` for bigger steps) |
+| `←` `→` `↑` `↓` | Orbit the view around its focus |
 | `f` · `Home` | Frame the selection · frame everything |
-| `d` · `⌫` | Duplicate · delete |
+| `⌘D` · `⌫` | Duplicate · delete |
 | `⌘C` · `⌘V` | Copy · paste nodes as JSON (paste a whole world too) |
 | `p` · `Esc` | Play · back |
 | `Tab` | Hide or show all panels |

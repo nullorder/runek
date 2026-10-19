@@ -234,7 +234,7 @@ function NodeInspector({
           <button
             type="button"
             className="ws-btn ws-btn--small"
-            title="Duplicate (d)"
+            title="Duplicate (⌘D)"
             onClick={duplicateSelected}
           >
             duplicate

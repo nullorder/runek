@@ -117,6 +117,8 @@ import { WorldEditor } from '@runek/core/editor'
 <WorldEditor data={world} registry={registry} onChange={setWorld} />
 ```
 
+In the editor, drag to orbit, hold `W` `A` `S` `D` to pan across the ground (`Q` / `E` for down and up) and the arrow keys to orbit, with `⇧` to go faster. Click a node to select it: the gizmo moves or rotates it (`g` / `r`), the props panel edits its numbers, and `W` `A` `S` `D` `Q` `E` now step it 0.1 along the world axis nearest the camera (`⇧` for 1). `⌘D` duplicates, `⌫` deletes, `⌘Z` undoes, `Esc` deselects.
+
 ## Identity & contribution
 
 A world is a creative work, so its identity travels *in the file* under `meta` (the way `package.json` carries a package's name, author, and `repository`):

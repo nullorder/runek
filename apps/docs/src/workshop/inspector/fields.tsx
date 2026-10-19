@@ -22,8 +22,9 @@ export interface FieldContext {
 
 const isEqual = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
+// At least 3 decimals (the precision transforms are stored at), so a value is never shown rounded.
 const fmt = (n: number, step: number) => {
-  const decimals = Math.min(4, Math.max(0, -Math.floor(Math.log10(step || 1))))
+  const decimals = Math.min(6, Math.max(3, -Math.floor(Math.log10(step || 1))))
   return Number(n.toFixed(decimals)).toString()
 }
 
@@ -113,9 +114,9 @@ export function NumberInput({
       onFocus={() => {
         focused.current = true
       }}
-      onBlur={(e) => {
+      onBlur={() => {
+        // Typing already committed every valid value; just tidy the text.
         focused.current = false
-        commit(e.target.value)
         setText(value === undefined ? '' : fmt(value, step))
       }}
       onChange={(e) => {
@@ -128,7 +129,9 @@ export function NumberInput({
           const mult = e.shiftKey ? 10 : e.altKey ? 0.1 : 1
           const next = (value ?? 0) + (e.key === 'ArrowUp' ? 1 : -1) * step * mult
           const clamped = Math.min(max ?? Infinity, Math.max(min ?? -Infinity, next))
-          onChange(integer ? Math.round(clamped) : Number(clamped.toFixed(6)))
+          const n = integer ? Math.round(clamped) : Number(clamped.toFixed(6))
+          setText(fmt(n, step))
+          onChange(n)
         } else if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
       }}
     />

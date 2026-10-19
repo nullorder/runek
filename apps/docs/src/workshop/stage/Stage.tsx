@@ -118,10 +118,10 @@ export const Hall = memo(function Hall({
         AVATAR STUDIO →
       </Sign>
 
-      <Sign position={[0, 4.3, -HALF + 0.16]} size={0.85} color={GREEN} glow>
+      <Sign position={[0, 3.9, -HALF + 0.16]} size={0.85} color={GREEN} anchorY="bottom" glow>
         WORKSHOP
       </Sign>
-      <Sign position={[0, 3.75, -HALF + 0.16]} size={0.2} color="#8fb8a8">
+      <Sign position={[0, 3.75, -HALF + 0.16]} size={0.2} color="#8fb8a8" anchorY="top">
         build · tune · share · take it home
       </Sign>
       <Clock position={[7.5, 3.9, -HALF + 0.12]} accentColor={GREEN} frameColor="#2c2118" />

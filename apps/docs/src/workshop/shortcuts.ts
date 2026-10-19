@@ -1,7 +1,8 @@
-import { isEditableTarget } from '@runek/core'
+import { isEditableTarget, MOVE_KEYS } from '@runek/core'
 import { useEffect } from 'react'
 import { copyText, focusDrop, importWorldText } from './actions'
 import { togglePanel } from './panels/layout'
+import { nudgeSelected, nudgeTarget } from './scene/nudge'
 import { locate } from './state/ops'
 import {
   addNodes,
@@ -26,15 +27,17 @@ export const SHORTCUTS: [string, string][] = [
   ['⌘K', 'Command palette'],
   ['⌘Z · ⇧⌘Z', 'Undo · redo'],
   ['g · r', 'Move · rotate gizmo'],
+  ['W A S D · Q E', 'Pan the view, or move the selection (⇧ for bigger steps)'],
+  ['← → ↑ ↓', 'Orbit the view'],
   ['f · Home', 'Frame selection · frame all'],
-  ['d', 'Duplicate selection'],
+  ['⌘D', 'Duplicate selection'],
   ['⌫', 'Delete selection'],
   ['Esc', 'Deselect, stop playing, close'],
   ['⌘C · ⌘V', 'Copy · paste nodes as world JSON'],
   ['p', 'Play (walk the world)'],
   ['Tab', 'Hide / show every panel'],
   ['1 · 2 · 3 · 4', 'Build · Lab · Code · Studio'],
-  ['w', 'World panel'],
+  [',', 'World panel'],
   ['⌘↵', 'Run App.tsx'],
   ['?', 'This sheet'],
 ]
@@ -72,6 +75,11 @@ export function useShortcuts() {
         else undoWorld()
         return
       }
+      if (mod && e.key.toLowerCase() === 'd') {
+        e.preventDefault()
+        duplicateSelected()
+        return
+      }
       if (mod && e.key.toLowerCase() === 'y') {
         e.preventDefault()
         redoWorld()
@@ -88,6 +96,14 @@ export function useShortcuts() {
       if (mod || e.altKey) return
       // The avatar studio edits one figure; node shortcuts would act on the scene behind it.
       if (s.mode === 'studio' && !['1', '2', '3', '4', '?', 'Tab'].includes(e.key)) return
+      // Otherwise the camera rig reads these as a held pan.
+      if (e.code in MOVE_KEYS) {
+        if (nudgeTarget(s)) {
+          e.preventDefault()
+          nudgeSelected(e.code, e.shiftKey)
+        }
+        return
+      }
 
       switch (e.key) {
         case 'g':
@@ -101,9 +117,6 @@ export function useShortcuts() {
           break
         case 'Home':
           requestCamera({ kind: 'all' })
-          break
-        case 'd':
-          duplicateSelected()
           break
         case 'Delete':
         case 'Backspace':
@@ -128,7 +141,7 @@ export function useShortcuts() {
         case '4':
           openStudio()
           break
-        case 'w':
+        case ',':
           togglePanel(s.mode, 'world')
           break
         case '?':

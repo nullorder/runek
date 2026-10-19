@@ -1,9 +1,11 @@
 import { OrbitControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
+import { MOVE_KEYS, useOrbitKeys } from '@runek/core'
 import { type ComponentRef, useEffect, useRef } from 'react'
 import { Box3, type PerspectiveCamera, Sphere, Vector3 } from 'three'
 import type { CameraState } from '../share/codec'
 import { useWorkshop } from '../state/store'
+import { nudgeTarget } from './nudge'
 import { live, nodeObjects } from './refs'
 
 const box = new Box3()
@@ -106,6 +108,18 @@ export function CameraRig({
       fly(target.clone().add(offset.normalize().multiplyScalar(d)), target)
     }
   }, [request])
+
+  // WASD / QE pan the view (unless they nudge the selection), arrows orbit it.
+  useOrbitKeys({
+    skip: (code) => {
+      const s = useWorkshop.getState()
+      return s.playing || s.paletteOpen || (code in MOVE_KEYS && !!nudgeTarget(s))
+    },
+    onStart: () => {
+      flight.current = null
+    },
+    onEnd: publish,
+  })
 
   useFrame(() => {
     const f = flight.current
