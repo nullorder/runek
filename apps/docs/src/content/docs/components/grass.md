@@ -19,13 +19,13 @@ Pulls `@react-three/fiber@^9.6.1`, `@runek/core@^0.15.0`, `three@^0.184.0`.
 ```tsx
 import { Grass } from './runek/Grass'
 
-<Grass position={[0, 0, 0]} seed={1} />
+<Grass position={[0, 0, 0]} height="tall" seed={1} />
 ```
 
 Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 ```json
-{ "type": "Grass", "props": { "position": [0, 0, 0], "seed": 1 } }
+{ "type": "Grass", "props": { "position": [0, 0, 0], "height": "tall", "seed": 1 } }
 ```
 
 ## Props
@@ -36,7 +36,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
 | `area` | `[number, number]` | `[10, 10]` | Patch extent `[width, depth]`, in units. |
 | `count` | `number` | `600` |  |
-| `height` | `number` | `0.35` | Height, in units. |
+| `height` | `"short" \| "medium" \| "tall" \| "very-tall" \| number` | `"medium"` | Blade height: a preset (`short` lawn, `medium`, `tall` meadow, `very-tall` reeds) or a number in units. Taller grass grows thicker blades that lean a little. Default `medium` (0.35). |
 | `color` | `color` | palette `foliage` | Defaults to the world palette's `foliage` slot. |
 | `sway` | `number` | `1` | Wind sway strength; 0 disables the animation. |
 | `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |

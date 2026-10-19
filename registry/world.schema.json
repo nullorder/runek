@@ -831,6 +831,11 @@
           "type": "string",
           "description": "Navigated to on click when no `onSelect` is given."
         },
+        "reach": {
+          "type": "number",
+          "description": "How close the player's avatar (its eyes) must be to hover or click the book, in units.\nOnly applies while a `Player` is mounted; with a free camera it's always in reach.",
+          "default": 3
+        },
         "seed": {
           "type": "number",
           "description": "Seed for the deterministic variation: same seed, same result.",
@@ -937,6 +942,11 @@
             "$ref": "#/$defs/Bookshelf.BookSpec"
           },
           "description": "Explicit, addressable books. When provided, these replace the procedural\n`fill` and are the only books rendered. Pass `[]` for an empty shelf and\nappend to make books appear. A book is clickable when `onBookSelect` is set\nor it carries an `href`."
+        },
+        "reach": {
+          "type": "number",
+          "description": "How close the player's avatar (its eyes) must be to a book to hover or click it, in units.\nOnly applies while a `Player` is mounted; with a free camera every book is in reach.",
+          "default": 3
         },
         "label": {
           "type": "string",
@@ -3414,9 +3424,21 @@
           "default": 600
         },
         "height": {
-          "type": "number",
-          "description": "Height, in units.",
-          "default": 0.35
+          "anyOf": [
+            {
+              "enum": [
+                "short",
+                "medium",
+                "tall",
+                "very-tall"
+              ]
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "description": "Blade height: a preset (`short` lawn, `medium`, `tall` meadow, `very-tall` reeds) or a\nnumber in units. Taller grass grows thicker blades that lean a little. Default `medium`\n(0.35).",
+          "default": "medium"
         },
         "color": {
           "type": "string",
@@ -4528,7 +4550,7 @@
       "additionalProperties": false
     },
     "props.Palm": {
-      "description": "A coconut palm: leaning bowed trunk and a crown of drooping instanced fronds, deterministic from seed.",
+      "description": "A coconut palm: leaning bowed trunk and a full crown of feathery fronds, young ones standing up and old ones arching down, deterministic from seed.",
       "type": "object",
       "properties": {
         "height": {
@@ -4544,12 +4566,12 @@
         "fronds": {
           "type": "number",
           "description": "Frond count.",
-          "default": 11
+          "default": 16
         },
         "frondLength": {
           "type": "number",
           "description": "Frond length, in units.",
-          "default": 2.2
+          "default": 2.8
         },
         "trunkColor": {
           "type": "string",
@@ -5014,7 +5036,7 @@
         "lookRadius": {
           "type": "number",
           "description": "How close the avatar must be for `lookAt` to engage, in units.",
-          "default": 9
+          "default": 5
         },
         "label": {
           "type": "string",
@@ -5244,8 +5266,8 @@
         },
         "sleeves": {
           "enum": [
-            "none",
             "short",
+            "none",
             "long"
           ],
           "description": "Tops only."

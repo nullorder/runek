@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber'
-import { type RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type Object3D, Vector3 } from 'three'
 import type { Interactor } from './types'
 import { useWorld } from './useWorld'
@@ -109,4 +109,26 @@ export function useInteraction(
   }, [keyboard, live, self, interactions, controls])
 
   return focused && live
+}
+
+/** How far from the avatar's eyes a thing can be pointed at and clicked by default, in units. */
+export const DEFAULT_REACH = 3
+
+/**
+ * A test for whether a world point is within `radius` units of the player avatar's eyes. Pointer
+ * interactions (clicking a book, hovering a shelf) check their hit point with it, so things across
+ * the room can't be clicked. With no `Player` mounted (a free or orbit camera, the editor, a
+ * preview) there's no one to be near, so everything is in reach.
+ */
+export function useReach(radius = DEFAULT_REACH): (point: Vector3) => boolean {
+  const { unit, player } = useWorld()
+  const eyes = useMemo(() => new Vector3(), [])
+  return useCallback(
+    (point: Vector3) => {
+      const avatar = player?.current
+      if (!avatar) return true
+      return avatar.getWorldPosition(eyes).distanceTo(point) <= radius * unit
+    },
+    [player, radius, unit, eyes],
+  )
 }

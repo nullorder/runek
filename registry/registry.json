@@ -562,6 +562,7 @@
       "type": "registry:component",
       "category": "environment",
       "description": "Instanced grass blades (seeded scatter).",
+      "example": { "height": "tall" },
       "files": [
         {
           "path": "packages/components/src/Grass.tsx",
@@ -587,7 +588,7 @@
       "title": "Palm",
       "type": "registry:component",
       "category": "vegetation",
-      "description": "A coconut palm: leaning bowed trunk and a crown of drooping instanced fronds, deterministic from seed.",
+      "description": "A coconut palm: leaning bowed trunk and a full crown of feathery fronds, young ones standing up and old ones arching down, deterministic from seed.",
       "files": [
         {
           "path": "packages/components/src/Palm.tsx",

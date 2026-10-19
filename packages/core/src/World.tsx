@@ -1,6 +1,6 @@
 import { KeyboardControls, type KeyboardControlsEntry } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Physics } from '@react-three/rapier'
+import { Physics, useRapier } from '@react-three/rapier'
 import { type ReactNode, useMemo, useRef } from 'react'
 import type { Object3D } from 'three'
 import { WorldContext } from './context'
@@ -161,13 +161,34 @@ export function World({
               />
             </>
           )}
-          <Physics gravity={gravity} paused={paused} debug={debug}>
+          {/* Stepped by <FrameStep> below, never by rapier's own loop. */}
+          <Physics gravity={gravity} paused debug={debug} timeStep="vary">
+            <FrameStep />
             {children}
           </Physics>
         </WorldContext.Provider>
       </Canvas>
     </KeyboardControls>
   )
+}
+
+// The longest single physics step. A longer frame (a hitch, a tab coming back into view) is split
+// into sub-steps so nothing moves far enough in one step to pass through a thin collider.
+const MAX_STEP = 1 / 30
+
+/**
+ * Step physics once per rendered frame, by that frame's delta. The avatar controller
+ * (ecctrl) pushes its body and moves its camera every rendered frame, so a fixed 1/60 step that
+ * runs zero or two times a frame (always, on a 120 Hz display) makes the view stall and lurch.
+ */
+function FrameStep() {
+  const { step } = useRapier()
+  useFrame((_, dt) => {
+    const frame = Math.min(dt, 0.5)
+    const n = Math.ceil(frame / MAX_STEP)
+    for (let i = 0; i < n; i++) step(frame / n)
+  })
+  return null
 }
 
 /**

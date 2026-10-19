@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add book
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.15.0`.
+Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@runek/core@^0.15.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -43,6 +43,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `title` | `string` |  | Shown as a hover label when the book is interactive. |
 | `href` | `string` |  | Navigated to on click when no `onSelect` is given. |
 | `onSelect` | `function` (code only) |  | Called on click. Optional, so the book still renders from data. |
+| `reach` | `number` | `3` | How close the player's avatar (its eyes) must be to hover or click the book, in units. Only applies while a `Player` is mounted; with a free camera it's always in reach. |
 | `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 
 ## Registry manifest

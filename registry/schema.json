@@ -39,6 +39,10 @@
             ]
           },
           "description": { "type": "string" },
+          "example": {
+            "type": "object",
+            "description": "Props the docs' usage snippet shows beside `position` and `seed`: the ones that show off what the component can do."
+          },
           "files": {
             "type": "array",
             "minItems": 1,

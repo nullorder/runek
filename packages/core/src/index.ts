@@ -27,7 +27,7 @@ export {
 } from './ground'
 export { isEditableTarget } from './input'
 export type { InteractionAction, InteractionOptions } from './interaction'
-export { isNearest, useInteraction } from './interaction'
+export { DEFAULT_REACH, isNearest, useInteraction, useReach } from './interaction'
 export type { WorldControls } from './keyboard'
 export {
   controlsToMap,

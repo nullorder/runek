@@ -37,13 +37,9 @@ for (const item of components) {
   const hasSeed = Boolean(component?.seeded)
   const deps = [...manifest.registryDependencies, ...manifest.dependencies]
 
-  const usage = hasSeed
-    ? `<${item.title} position={[0, 0, 0]} seed={1} />`
-    : `<${item.title} position={[0, 0, 0]} />`
-  const node = inline({
-    type: item.title,
-    props: hasSeed ? { position: [0, 0, 0], seed: 1 } : { position: [0, 0, 0] },
-  })
+  const props = { position: [0, 0, 0], ...item.example, ...(hasSeed ? { seed: 1 } : {}) }
+  const usage = `<${item.title} ${Object.entries(props).map(jsxProp).join(' ')} />`
+  const node = inline({ type: item.title, props })
 
   const body = `---
 title: ${JSON.stringify(item.title)}
@@ -91,6 +87,12 @@ Browse the whole catalog in the **[gallery →](/gallery)**.
 console.log(`\nWrote ${components.length} component docs.`)
 
 /** One-line JSON with readable spacing: `{ "a": [0, 0, 0] }`. */
+function jsxProp([name, value]) {
+  return typeof value === 'string'
+    ? `${name}=${JSON.stringify(value)}`
+    : `${name}={${inline(value)}}`
+}
+
 function inline(value) {
   return JSON.stringify(value, null, 1)
     .replace(/\n\s*/g, ' ')

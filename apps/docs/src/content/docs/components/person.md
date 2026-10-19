@@ -64,7 +64,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `gait` | `number` |  | Walk-cycle speed, in units per second, for a figure something else moves (a cart, a script). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed. |
 | `idle` | `boolean` | `true` | Breathing, weight shift, and blinking. |
 | `lookAt` | `boolean` | `true` | Turn the head (and eyes) toward the player's avatar (or the camera, when no `Player` is mounted) when it comes within `lookRadius`. |
-| `lookRadius` | `number` | `9` | How close the avatar must be for `lookAt` to engage, in units. |
+| `lookRadius` | `number` | `5` | How close the avatar must be for `lookAt` to engage, in units. |
 | `label` | `string` |  | Floating name above the head. |
 | `bubble` | `string` |  | A short line in a speech bubble over the head (what the figure is saying or doing right now). Long lines wrap and are cut after a few. |
 | `emote` | `"sleep" \| "alert" \| "think" \| "happy" \| "coffee"` |  | A small animated sign over the head: `sleep` (rising z's), `alert` (a bouncing !), `think` (pulsing dots), `happy` (a heart), `coffee` (a steaming cup). |
@@ -123,7 +123,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 |---|---|---|---|
 | `type` | `"tshirt" \| "shirt" \| "sweater" \| "hoodie" \| "blazer" \| "vest" \| "tunic" \| "coat" \| "dress" \| "robe" \| "apron" \| "trousers" \| "jeans" \| "shorts" \| "skirt" \| "shoes" \| "boots" \| "belt" \| "scarf" \| "cape"` | **required** |  |
 | `color` | `color` |  |  |
-| `sleeves` | `"none" \| "short" \| "long"` |  | Tops only. |
+| `sleeves` | `"short" \| "none" \| "long"` |  | Tops only. |
 | `neck` | `"crew" \| "v" \| "collar"` |  | Tops only. |
 | `length` | `number` |  | 0 to 1: how far it reaches (a top's hem, a leg's length, a skirt or boot's drop). |
 

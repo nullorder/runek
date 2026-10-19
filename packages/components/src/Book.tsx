@@ -1,6 +1,8 @@
 import { Html } from '@react-three/drei'
-import { rng, useWorld, type Vec3 } from '@runek/core'
-import { useMemo, useState } from 'react'
+import { type ThreeEvent, useFrame } from '@react-three/fiber'
+import { DEFAULT_REACH, rng, useReach, useWorld, type Vec3 } from '@runek/core'
+import { useMemo, useRef, useState } from 'react'
+import type { Vector3 } from 'three'
 
 export type BookPose = 'standing' | 'lying' | 'open'
 
@@ -27,6 +29,9 @@ export interface BookProps {
   href?: string
   /** Called on click. Optional, so the book still renders from data. */
   onSelect?: () => void
+  /** How close the player's avatar (its eyes) must be to hover or click the book, in units.
+   *  Only applies while a `Player` is mounted; with a free camera it's always in reach. */
+  reach?: number
   seed?: number
 }
 
@@ -48,10 +53,22 @@ export function Book({
   title,
   href,
   onSelect,
+  reach = DEFAULT_REACH,
   seed = 1,
 }: BookProps) {
   const { unit } = useWorld()
   const [hovered, setHovered] = useState(false)
+  const inReach = useReach(reach)
+  const lastHit = useRef<Vector3 | null>(null)
+
+  const hover = (on: boolean) => {
+    if (on !== hovered) setHovered(on)
+    document.body.style.cursor = on ? 'pointer' : 'auto'
+  }
+  // Walking away with the pointer still on the book leaves no pointer event to clear it.
+  useFrame(() => {
+    if (hovered && lastHit.current && !inReach(lastHit.current)) hover(false)
+  })
 
   const w = width * unit
   const h = height * unit
@@ -69,20 +86,19 @@ export function Book({
   const interactive = onSelect != null || href != null
   const handlers = interactive
     ? {
-        onClick: (e: { stopPropagation: () => void }) => {
+        onClick: (e: ThreeEvent<MouseEvent>) => {
+          if (!inReach(e.point)) return
           e.stopPropagation()
           if (onSelect) onSelect()
           else if (href) window.location.href = href
         },
-        onPointerOver: (e: { stopPropagation: () => void }) => {
-          e.stopPropagation()
-          setHovered(true)
-          document.body.style.cursor = 'pointer'
+        onPointerMove: (e: ThreeEvent<PointerEvent>) => {
+          lastHit.current = e.point.clone()
+          const near = inReach(e.point)
+          if (near) e.stopPropagation()
+          hover(near)
         },
-        onPointerOut: () => {
-          setHovered(false)
-          document.body.style.cursor = 'auto'
-        },
+        onPointerOut: () => hover(false),
       }
     : {}
 

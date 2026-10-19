@@ -1,7 +1,17 @@
 import { useFrame } from '@react-three/fiber'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, sub, useWorld, type Vec3 } from '@runek/core'
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+
+/** Named blade heights, from a mown lawn to reeds you can hide in. */
+export type GrassHeight = 'short' | 'medium' | 'tall' | 'very-tall'
+
+const HEIGHTS: Record<GrassHeight, number> = {
+  short: 0.15,
+  medium: 0.35,
+  tall: 0.8,
+  'very-tall': 1.5,
+}
 
 export interface GrassProps {
   position?: Vec3
@@ -9,7 +19,12 @@ export interface GrassProps {
   /** Patch extent `[width, depth]`, in units. */
   area?: [number, number]
   count?: number
-  height?: number
+  /**
+   * Blade height: a preset (`short` lawn, `medium`, `tall` meadow, `very-tall` reeds) or a
+   * number in units. Taller grass grows thicker blades that lean a little. Default `medium`
+   * (0.35).
+   */
+  height?: GrassHeight | number
   /** Defaults to the world palette's `foliage` slot. */
   color?: string
   /** Wind sway strength; 0 disables the animation. */
@@ -23,6 +38,7 @@ interface Blade {
   rot: number
   scale: number
   shade: number
+  lean: number
 }
 
 /** Decorative instanced blades with a vertex-shader wind sway — no collider. */
@@ -31,7 +47,7 @@ export function Grass({
   rotation = [0, 0, 0],
   area = [10, 10],
   count = 600,
-  height = 0.35,
+  height = 'medium',
   color,
   sway = 1,
   seed = 1,
@@ -40,7 +56,12 @@ export function Grass({
   const bladeColor = color ?? palette.foliage
   const w = area[0] * unit
   const d = area[1] * unit
-  const h = height * unit
+  const meters = typeof height === 'number' ? height : (HEIGHTS[height] ?? HEIGHTS.medium)
+  const h = meters * unit
+  // Thicker blades for taller grass, so a reed doesn't read as a needle; `medium` is the baseline.
+  const radius = 0.015 * unit * Math.min(Math.max(Math.sqrt(meters / HEIGHTS.medium), 0.8), 2)
+  // Grass up to `medium` stands straight; taller blades lean up to this far, in radians.
+  const maxLean = 0.35 * Math.min(Math.max((meters - HEIGHTS.medium) / 1.15, 0), 1)
   const ref = useRef<THREE.InstancedMesh>(null)
 
   // Shared uniform objects so the patched shader and useFrame see the same values.
@@ -88,14 +109,17 @@ export function Grass({
 
   const blades = useMemo<Blade[]>(() => {
     const next = rng(seed)
+    // Its own stream, so adding lean left every seed's blade layout where it was.
+    const tilt = rng(sub(seed, 1))
     return Array.from({ length: count }, () => ({
       x: (next() - 0.5) * w,
       z: (next() - 0.5) * d,
       rot: next() * Math.PI,
       scale: 0.6 + next() * 0.8,
       shade: 0.8 + next() * 0.4,
+      lean: tilt() * maxLean,
     }))
-  }, [w, d, count, seed])
+  }, [w, d, count, seed, maxLean])
 
   useLayoutEffect(() => {
     const mesh = ref.current
@@ -103,9 +127,12 @@ export function Grass({
     const dummy = new THREE.Object3D()
     const base = new THREE.Color(bladeColor)
     const tint = new THREE.Color()
+    const center = new THREE.Vector3()
     blades.forEach((b, i) => {
-      dummy.position.set(b.x, (h * b.scale) / 2, b.z)
-      dummy.rotation.set(0, b.rot, 0)
+      // Lean about the blade's root, not its middle, so it stays planted.
+      dummy.rotation.set(b.lean, b.rot, 0, 'YXZ')
+      center.set(0, (h * b.scale) / 2, 0).applyEuler(dummy.rotation)
+      dummy.position.set(b.x + center.x, center.y, b.z + center.z)
       dummy.scale.set(1, b.scale, 1)
       dummy.updateMatrix()
       mesh.setMatrixAt(i, dummy.matrix)
@@ -124,7 +151,7 @@ export function Grass({
         castShadow
         receiveShadow
       >
-        <coneGeometry args={[0.015 * unit, h, 4]} />
+        <coneGeometry args={[radius, h, 4]} />
       </instancedMesh>
     </group>
   )

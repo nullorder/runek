@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.15.0...HEAD)
 
+### Added
+
+- `Grass` takes a height preset: `height="short"` (a lawn), `"medium"`
+  (the default, unchanged), `"tall"` (a meadow) or `"very-tall"` (reeds
+  up to your chest). A number in units still works. Taller grass grows
+  thicker blades that lean a little, so it doesn't read as needles.
+
 ### Changed
 
 - `Portal` is now a swirling vortex around a lightless core instead of a
@@ -14,6 +21,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fall inward, a soft halo, and light pooled on the ground beneath it. It
   faces the camera from any side, and `seed` now shapes the swirl and the
   motes.
+- `Palm` grows a full, feathery crown instead of a handful of drooping
+  ribbons: each frond is an arching midrib lined with leaflets, the young
+  fronds stand up at the top, and the older ones arch out and hang lower,
+  turning slightly yellow. `fronds` now defaults to 16 (was 11) and
+  `frondLength` to 2.8 (was 2.2), so an existing seed grows a different
+  crown.
+- `Person` turns its head toward the player from 5 units away instead of
+  9, so figures across a room no longer all stare at you. Set
+  `lookRadius` to change it.
+- `Book` and `Bookshelf` books are only hoverable and clickable once the
+  player's avatar is within reach (3 units from its eyes), so a shelf
+  across the room can't be opened from where you stand. Tune it with the
+  new `reach` prop. Without a `Player` (an orbit camera, the editor)
+  everything stays clickable. `@runek/core` exports the check as
+  `useReach` for your own clickable meshes.
+
+### Fixed
+
+- The camera no longer shakes while walking, most visibly in first person
+  and on high refresh rate displays. `<World>` now steps physics once per
+  rendered frame (splitting long frames into short sub-steps), in step
+  with the avatar controller, instead of on a fixed 1/60 s clock.
 
 ## [0.15.0](https://github.com/nullorder/runek/compare/v0.14.0...v0.15.0) - 2026-10-18
 

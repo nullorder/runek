@@ -321,7 +321,7 @@ export function Person({
   gait,
   idle = true,
   lookAt = true,
-  lookRadius = 9,
+  lookRadius = 5,
   label,
   bubble,
   emote,

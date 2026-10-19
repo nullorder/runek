@@ -474,6 +474,12 @@
         "doc": "Called on click. Optional, so the book still renders from data.",
         "optional": true
       },
+      "reach": {
+        "type": "number",
+        "doc": "How close the player's avatar (its eyes) must be to hover or click the book, in units.\nOnly applies while a `Player` is mounted; with a free camera it's always in reach.",
+        "optional": true,
+        "default": 3
+      },
       "seed": {
         "type": "number",
         "doc": "Seed for the deterministic variation: same seed, same result.",
@@ -570,6 +576,12 @@
         "type": "function",
         "doc": "Called with the clicked book. When omitted, a book's `href` is navigated to.",
         "optional": true
+      },
+      "reach": {
+        "type": "number",
+        "doc": "How close the player's avatar (its eyes) must be to a book to hover or click it, in units.\nOnly applies while a `Player` is mounted; with a free camera every book is in reach.",
+        "optional": true,
+        "default": 3
       },
       "label": {
         "type": "string",
@@ -2521,10 +2533,24 @@
         "default": 600
       },
       "height": {
-        "type": "number",
-        "doc": "Height, in units.",
+        "type": "union",
+        "variants": [
+          {
+            "type": "enum",
+            "options": [
+              "short",
+              "medium",
+              "tall",
+              "very-tall"
+            ]
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Blade height: a preset (`short` lawn, `medium`, `tall` meadow, `very-tall` reeds) or a\nnumber in units. Taller grass grows thicker blades that lean a little. Default `medium`\n(0.35).",
         "optional": true,
-        "default": 0.35
+        "default": "medium"
       },
       "color": {
         "type": "color",
@@ -3426,7 +3452,7 @@
   "Palm": {
     "kind": "component",
     "seeded": true,
-    "doc": "A coconut palm: a leaning, gently bowed trunk topped with a crown of drooping fronds.\nTrunk rings and fronds are instanced; the seed drives lean direction, frond spread, and\ncoconut placement. One trunk cylinder collider.",
+    "doc": "A coconut palm: a leaning, gently bowed trunk topped with a full crown of feathery fronds,\nthe young ones standing up and the old ones arching over and down. Trunk rings are instanced\nand the crown is one mesh; the seed drives lean direction, frond spread, and coconut\nplacement. One trunk cylinder collider.",
     "props": {
       "height": {
         "type": "number",
@@ -3444,13 +3470,13 @@
         "type": "number",
         "doc": "Frond count.",
         "optional": true,
-        "default": 11
+        "default": 16
       },
       "frondLength": {
         "type": "number",
         "doc": "Frond length, in units.",
         "optional": true,
-        "default": 2.2
+        "default": 2.8
       },
       "trunkColor": {
         "type": "color",
@@ -3499,7 +3525,7 @@
     },
     "name": "palm",
     "category": "vegetation",
-    "description": "A coconut palm: leaning bowed trunk and a crown of drooping instanced fronds, deterministic from seed."
+    "description": "A coconut palm: leaning bowed trunk and a full crown of feathery fronds, young ones standing up and old ones arching down, deterministic from seed."
   },
   "Path": {
     "kind": "component",
@@ -3895,7 +3921,7 @@
         "type": "number",
         "doc": "How close the avatar must be for `lookAt` to engage, in units.",
         "optional": true,
-        "default": 9
+        "default": 5
       },
       "label": {
         "type": "string",
@@ -4112,8 +4138,8 @@
           "sleeves": {
             "type": "enum",
             "options": [
-              "none",
               "short",
+              "none",
               "long"
             ],
             "doc": "Tops only.",

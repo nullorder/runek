@@ -1,6 +1,6 @@
 ---
 title: "Palm"
-summary: "A coconut palm: leaning bowed trunk and a crown of drooping instanced fronds, deterministic from seed."
+summary: "A coconut palm: leaning bowed trunk and a full crown of feathery fronds, young ones standing up and old ones arching down, deterministic from seed."
 category: component
 component: palm
 order: 100
@@ -34,8 +34,8 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 |---|---|---|---|
 | `height` | `number` | `6` | Trunk height, in units. |
 | `lean` | `number` | `0.18` | Sideways lean of the crown, as a fraction of height. |
-| `fronds` | `number` | `11` | Frond count. |
-| `frondLength` | `number` | `2.2` | Frond length, in units. |
+| `fronds` | `number` | `16` | Frond count. |
+| `frondLength` | `number` | `2.8` | Frond length, in units. |
 | `trunkColor` | `color` | palette `bark` | Defaults to the world palette's `bark` slot. |
 | `frondColor` | `color` | palette `foliage` | Defaults to the world palette's `foliage` slot. |
 | `coconuts` | `boolean` | `true` | Grow a coconut cluster under the crown. |

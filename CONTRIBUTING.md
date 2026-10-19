@@ -69,6 +69,8 @@ Dependency direction is one-way: `app → components → core`.
 
    `dependencies` and `registryDependencies` are **derived from your imports** — you don't hand-write them.
 
+   Optionally add `"example": { "height": "tall" }` to show props beside `position` and `seed` in the docs page's usage snippet. Pick the ones that show off what the component can do.
+
 4. **Regenerate the registry and docs:**
 
    ```sh

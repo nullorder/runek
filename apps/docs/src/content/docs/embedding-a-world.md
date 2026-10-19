@@ -134,3 +134,10 @@ Anything else can offer actions the same way by wrapping it in `Interactable` (w
   <Sofa />
 </Interactable>
 ```
+
+Clicking works the same way: a `Book` or a `Bookshelf` book only lights up and takes a click once the avatar is within `reach` of it (3 units from its eyes by default), so a shelf across the room can't be opened from where you stand. With no `Player` mounted, as in an orbit-camera viewer or the editor, everything stays clickable. Your own clickable meshes can follow the same rule with `useReach` from `@runek/core`:
+
+```tsx
+const inReach = useReach() // or useReach(2) for a tighter reach
+<mesh onClick={(e) => inReach(e.point) && open()} />
+```

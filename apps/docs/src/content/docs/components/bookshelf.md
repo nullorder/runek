@@ -44,6 +44,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 | `books` | `BookSpec[]` |  | Explicit, addressable books. When provided, these replace the procedural `fill` and are the only books rendered. Pass `[]` for an empty shelf and append to make books appear. A book is clickable when `onBookSelect` is set or it carries an `href`. |
 | `onBookSelect` | `function` (code only) |  | Called with the clicked book. When omitted, a book's `href` is navigated to. |
+| `reach` | `number` | `3` | How close the player's avatar (its eyes) must be to a book to hover or click it, in units. Only applies while a `Player` is mounted; with a free camera every book is in reach. |
 | `label` | `string` |  | Section label rendered above the shelf, e.g. `"Guides"`. Drawn as a `Sign` in the world's `display` face. |
 | `labelColor` | `color` | palette `accent` | Label color. Defaults to the world palette's `accent` slot. |
 | `labelSize` | `number` | `0.08` | Label cap height in units. |
