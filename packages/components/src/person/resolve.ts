@@ -67,7 +67,7 @@ const trait = <T>(value: T, from: PersonTraitSource): PersonTrait<T> => ({ value
 /**
  * Resolve a `Person`'s props the way the component does and report every trait with its source,
  * so an editor (or an agent) can tell what the seed chose: `resolvePerson({ seed: 3 }).hair` is
- * `{ value: 'bun', from: 'seed' }`. Pass the world's palette and unit to match a figure in a
+ * `{ value: 'braid', from: 'seed' }`. Pass the world's palette and unit to match a figure in a
  * world that sets them. Pure and cheap: no geometry is built.
  */
 export function resolvePerson(

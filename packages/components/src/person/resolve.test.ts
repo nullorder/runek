@@ -18,6 +18,13 @@ describe('resolvePerson', () => {
     expect(r.clothes.value.map((g) => g.type)).toEqual(spec.layers.map((l) => l.type))
   })
 
+  it('rolls every gender among small seeds', () => {
+    const genders = new Set(
+      Array.from({ length: 30 }, (_, i) => resolvePerson({ seed: i + 1 }).gender.value),
+    )
+    expect(genders).toEqual(new Set(['feminine', 'masculine', 'neutral']))
+  })
+
   it('walks the precedence chain: prop, then skin, then kind', () => {
     const r = resolvePerson({ seed: 2, kind: 'farmer', skin: 'winter', hat: 'cap' })
     expect(r.hat).toEqual({ value: 'cap', from: 'prop' })

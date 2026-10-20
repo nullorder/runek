@@ -30,6 +30,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** `rng(seed)` scrambles the seed before its first step, so
+  every seeded component looks different for the same seed after you
+  upgrade. Re-pick any seed you chose by eye. Before, the first value
+  drawn for a small seed was close to 0 (every `Person` seed below 100
+  came out with the same gender), and `rng(0)` returned 0 forever. Same
+  seed, same result still holds within a version.
 - Duplicate moved from `d` to `⌘D` in `<WorldEditor>` and the workshop,
   and the workshop's World panel from `w` to `,`, to make room for WASD.
 
