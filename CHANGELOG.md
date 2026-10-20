@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `Portal2`, a pair of linked rifts for walkable shortcuts within one
+- `Rift`, a pair of linked rifts for walkable shortcuts within one
   world. Each end is a ragged, breathing tear in the air with an
   iridescent pink, violet and cyan rim that sheds glitter, and shows the
   other end live with real parallax. Walk into either and you come out
