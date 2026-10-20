@@ -4526,7 +4526,7 @@
       },
       "children": {
         "type": "node",
-        "doc": "Custom avatar visual, replacing the default capsule. Size it to the capsule\nenvelope (~1.3 units tall, centered at the character origin); it is hidden in\nfirst-person view. In world JSON, nest it as a child node of the Player.",
+        "doc": "Custom avatar visual, replacing the default capsule. Size it to the capsule\nenvelope (1.3 units tall, centered at the character origin, so feet go at y = -0.65);\nthe Player lowers it onto the ground beneath the floating capsule. It is hidden in\nfirst-person view. In world JSON, nest it as a child node of the Player.",
         "optional": true
       }
     },

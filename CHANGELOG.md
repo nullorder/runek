@@ -76,6 +76,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and on high refresh rate displays. `<World>` now steps physics once per
   rendered frame (splitting long frames into short sub-steps), in step
   with the avatar controller, instead of on a fixed 1/60 s clock.
+- A custom `Player` body (a `Person` from the workshop's "use as play
+  avatar", say) stands on the ground instead of hovering about 26 cm
+  above it. The controller floats its capsule on a spring, and `Player`
+  now lowers the body (and the default capsule) by that float, at any
+  frame rate. Bodies placed as documented, feet at `y = -0.65`, need no
+  change. If you lowered yours by hand to make up for it, put it back.
 
 ## [0.15.0](https://github.com/nullorder/runek/compare/v0.14.0...v0.15.0) - 2026-10-18
 
