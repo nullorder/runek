@@ -6008,6 +6008,121 @@
       },
       "additionalProperties": false
     },
+    "props.Portal2": {
+      "description": "A pair of linked rifts torn in the air, ragged and edged in iridescent, glitter-shedding light. Each shows the other end live and in parallax, and walking into either carries you to the other: walkable shortcuts within one world (use Portal for other worlds or pages).",
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Where the other end stands (the foot of its rift), in world coordinates. Each end shows\nthe other live through its opening, and walking into either carries you to the other.\nDefault: 8 units behind `position`."
+        },
+        "destinationRotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation of the far end, in radians: which way its caption faces. Default `rotation`."
+        },
+        "label": {
+          "type": "string",
+          "description": "Floating caption above the rift at `position` (e.g. the name of where it leads)."
+        },
+        "returnLabel": {
+          "type": "string",
+          "description": "Floating caption above the rift at `destination`."
+        },
+        "radius": {
+          "type": "number",
+          "description": "Radius of each opening, in units. The ragged edge breathes around it.",
+          "default": 1.5
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Tint for the rims and glitter. Unset, the rims are an iridescent pink, violet and cyan film."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Open both rifts and let them carry travelers. When false they shrink to small shimmering\nbubbles and stay inert; flipping it to true tears them open. Default true.",
+          "default": true
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Poster": {
       "description": "A wall print of seeded flat art (shapes, color bands, a retro sunset, mountain peaks) with an optional caption and a slim or wide frame.",
       "type": "object",
@@ -8904,6 +9019,7 @@
                 "Pool",
                 "PoolTable",
                 "Portal",
+                "Portal2",
                 "Poster",
                 "Road",
                 "Rocks",
@@ -10024,6 +10140,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Portal"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Portal2"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Portal2"
               }
             }
           }
