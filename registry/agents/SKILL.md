@@ -12,7 +12,7 @@ Docs index: https://runek.nullorder.org/llms.txt (every page is also Markdown: a
 ## Workflow
 
 1. **Discover.** `npx @runek/cli list --json` for the catalog, `npx @runek/cli info <name>` for one component's props, types, defaults and an example. Never guess prop names: use only what `info` or https://runek.nullorder.org/r/props.json lists.
-2. **Install.** `npx @runek/cli init` once, then `npx @runek/cli add <name...>`. It pulls dependent components as source and installs npm packages (`--no-install` prints the command instead).
+2. **Install.** `npx @runek/cli init` once, then `npx @runek/cli add <name...>`. It pulls dependent components as source and installs npm packages (`--no-install` prints the command instead). The CLI reads the registry for the project's installed `@runek/core`, so `list` and `info` show what that version has. If a component is only in a newer release, `add` says so: ask the user before passing `--core latest`, since it also upgrades `@runek/core`.
 3. **Compose.** Write the world as JSON (below), or as JSX inside `<World>` from `@runek/core`. Render JSON with `<WorldRenderer data={parseWorld(text)} registry={{ Bench, Sky, ... }} />`, where the registry keys are the node `type`s.
 4. **Check.** `npx @runek/cli validate world.json` (unknown types and props, wrong value types, with suggestions), then `npx @runek/cli check-world world.json --fix` (snaps buried or floating nodes to the ground). Both accept `--json` and `--strict`. Fix every reported issue before moving on.
 5. **Preview.** `npx @runek/cli preview world.json` prints a workshop link with the world loaded, for a person to walk and tune.

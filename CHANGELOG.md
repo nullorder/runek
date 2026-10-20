@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the camera instead (0.1 m, or one snap step in the workshop; `⇧` for
   ten), and a burst of steps undoes as one. `@runek/core` exports the
   camera half as `useOrbitKeys` for your own orbit views.
+- The registry is versioned: `/r/<version>/` serves each release's
+  components, and `/r/versions.json` lists them. `runek add` (and
+  `list`, `info`, `validate`, `skill`) now read the snapshot that matches
+  your project's `@runek/core`, so the source you pull only uses core APIs
+  you have. `--core <version|latest>` picks another one; `--core latest`
+  also upgrades `@runek/core`. A registry without `versions.json` (a local
+  checkout, a fork) works as before.
 
 ### Changed
 
@@ -49,6 +56,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `runek add` no longer installs components that need a newer
+  `@runek/core` than npm has. The registry at `/r` served source from the
+  unreleased main branch, so `runek add bookshelf` with `@runek/core`
+  0.15.0 failed to typecheck (`useReach` and `DEFAULT_REACH` missing).
+  `/r` now serves the latest release, which also fixes older CLIs.
+  ([#21](https://github.com/nullorder/runek/issues/21))
 - `<WorldEditor>`'s props panel keeps up with the world: it shows where
   a node is after a gizmo drag, a nudge, or an undo instead of the
   numbers it opened with, and editing one field no longer snaps the

@@ -29,4 +29,4 @@ npx @runek/cli list                         # browse the catalog
 
 A custom or local registry works via `--registry <url|path>` (e.g. point it at this folder during development: `just cli add bookshelf --registry ./registry`).
 
-The published default registry is `https://runek.nullorder.org/r`, which serves `registry.json`, `components/<name>.json`, `props.json`, `world.schema.json`, and `agents/SKILL.md` from this directory.
+The published default registry is `https://runek.nullorder.org/r`, which serves `registry.json`, `components/<name>.json`, `props.json`, `world.schema.json`, and `agents/SKILL.md`. It's versioned by release: the docs deploy copies this directory as committed at each `v*` tag to `/r/<version>/`, lists them in `/r/versions.json`, and serves the latest stable release at `/r`. This directory on `main` is never served, so unreleased components only reach users once their release (and its `@runek/core`) is out. The CLI reads the snapshot matching a project's installed `@runek/core`.

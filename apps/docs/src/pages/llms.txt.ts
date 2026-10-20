@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { markdownUrl, SITE, sortedDocs } from '../lib/markdown'
-import { getComponents } from '../lib/registry'
+import { getComponents, isReleased } from '../lib/registry'
 
 export const GET: APIRoute = async () => {
   const docs = (await sortedDocs()).filter((d) => d.data.category !== 'component')
@@ -27,7 +27,7 @@ ${guides.map((d) => link(d.data.title, markdownUrl(d.id), d.data.summary)).join(
 ${getComponents()
   .map((c) =>
     link(
-      `${c.title} (\`${c.name}\`, ${c.category})`,
+      `${c.title} (\`${c.name}\`, ${c.category}${isReleased(c.name) ? '' : ', unreleased'})`,
       markdownUrl(`components/${c.name}`),
       c.description,
     ),

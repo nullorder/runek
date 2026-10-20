@@ -3,7 +3,7 @@ import { Code } from 'astro:components'
 import { getCollection, render } from 'astro:content'
 import ComponentPreview from '../../components/gallery/ComponentPreview.tsx'
 import DocLayout from '../../layouts/DocLayout.astro'
-import { getManifest } from '../../lib/registry'
+import { getManifest, isReleased, UNRELEASED_NOTE } from '../../lib/registry'
 
 export async function getStaticPaths() {
   const docs = await getCollection('docs')
@@ -15,6 +15,7 @@ const { Content } = await render(entry)
 // Component docs carry a live, slowly rotating preview of the real component.
 const isComponent = entry.data.category === 'component' && Boolean(entry.data.component)
 const files = isComponent ? getManifest(entry.data.component as string).files : []
+const unreleased = isComponent && !isReleased(entry.data.component as string)
 ---
 
 <DocLayout
@@ -33,6 +34,7 @@ const files = isComponent ? getManifest(entry.data.component as string).files : 
       </div>
     )
   }
+  {unreleased && <p class="doc-unreleased">{UNRELEASED_NOTE}</p>}
   <Content />
   {
     files.length > 0 && (

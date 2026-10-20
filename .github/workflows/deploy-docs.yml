@@ -1,11 +1,14 @@
 # Build apps/docs (Astro) and deploy it to GitHub Pages at runek.nullorder.org.
-# The same artifact serves the registry at /r — `runek add` resolves against it —
-# so deploying the docs *is* publishing the component library.
+# The site follows main. The same artifact serves the registry `runek add` resolves
+# against, versioned by release: /r/<version>/ is each release tag's registry and /r
+# is the latest stable one, so unreleased source never reaches users. A release tag
+# push redeploys (still from main) to publish its /r/<version>/.
 name: Deploy docs
 
 on:
   push:
     branches: [main]
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -22,7 +25,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Always main, even for a tag push, so a release never rolls the site back.
+      # Full history: sync-registry.mjs reads every release tag's registry/.
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       # Reads the pnpm version from the root package.json "packageManager" field.
       - uses: pnpm/action-setup@v4
@@ -35,12 +43,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Regenerate the served manifests from component source so /r can never
-      # ship stale relative to the deployed commit (same as `just registry`).
+      # Regenerate the working-tree manifests (same as `just registry`): the docs,
+      # gallery and workshop read them. /r itself is served from release tags.
       - name: Rebuild the registry
         run: node scripts/build-registry.mjs
 
-      # `build` runs sync-registry.mjs first, copying registry/ -> public/r.
+      # `build` runs sync-registry.mjs first: release tags -> public/r/<version>/,
+      # the latest stable -> public/r, plus public/r/versions.json.
       - name: Build the docs site
         run: pnpm --filter @runek/docs build
 

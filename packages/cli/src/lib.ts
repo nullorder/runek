@@ -102,7 +102,7 @@ function isHttp(base: string): boolean {
 
 async function readText(base: string, ...segments: string[]): Promise<string> {
   if (isHttp(base)) {
-    const url = [base.replace(/\/+$/, ''), ...segments].join('/')
+    const url = joinBase(base, ...segments)
     const res = await fetch(url)
     if (!res.ok) throw new Error(`registry request failed (${res.status}) for ${url}`)
     return await res.text()
@@ -114,6 +114,24 @@ async function readText(base: string, ...segments: string[]): Promise<string> {
 
 async function readJson<T>(base: string, ...segments: string[]): Promise<T> {
   return JSON.parse(await readText(base, ...segments)) as T
+}
+
+/** Like `readJson`, but `null` when the file doesn't exist (HTTP 404 or no such path). */
+export async function readOptionalJson<T>(base: string, ...segments: string[]): Promise<T | null> {
+  if (isHttp(base)) {
+    const url = joinBase(base, ...segments)
+    const res = await fetch(url)
+    if (res.status === 404) return null
+    if (!res.ok) throw new Error(`registry request failed (${res.status}) for ${url}`)
+    return (await res.json()) as T
+  }
+  const path = join(isAbsolute(base) ? base : resolve(base), ...segments)
+  return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as T) : null
+}
+
+/** Append path segments to a registry base, URL or local path alike. */
+export function joinBase(base: string, ...segments: string[]): string {
+  return isHttp(base) ? [base.replace(/\/+$/, ''), ...segments].join('/') : join(base, ...segments)
 }
 
 export function fetchIndex(base: string): Promise<RegistryIndex> {

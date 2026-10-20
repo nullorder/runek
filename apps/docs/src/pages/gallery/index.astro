@@ -2,7 +2,7 @@
 import ComponentPreview from '../../components/gallery/ComponentPreview.tsx'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { CATEGORY_ORDER } from '../../lib/categories'
-import { getComponents } from '../../lib/registry'
+import { getComponents, isReleased } from '../../lib/registry'
 
 const components = getComponents()
 const groups = CATEGORY_ORDER
@@ -35,6 +35,7 @@ const groups = CATEGORY_ORDER
                   <a class="card-title" href={`/docs/components/${item.name}`}>
                     {item.title}
                   </a>
+                  {!isReleased(item.name) && <span class="badge-unreleased">unreleased</span>}
                   <a class="card-lab" href={`/workshop#m=lab&c=${item.title}`}>open in the workshop →</a>
                   <p>{item.description}</p>
                 </div>

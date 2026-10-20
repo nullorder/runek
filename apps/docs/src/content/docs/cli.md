@@ -116,6 +116,7 @@ Installs the Runek agent skill (served at `/r/agents/SKILL.md`): how to add comp
 | Option | Commands | Description |
 |---|---|---|
 | `--registry <url\|path>` | all | Registry base. Defaults to the configured one (`https://runek.nullorder.org/r`). A local path works for development. |
+| `--core <version\|latest>` | add, list, info, validate, skill | Read the registry for this `@runek/core` instead of the project's (see [Versions](#versions)). `latest` is the newest release. |
 | `--dir <path>` | init, add, validate, check-world | Install directory (default `src/runek`). |
 | `--overwrite` | add, skill | Replace files that already exist (otherwise they're skipped). |
 | `--no-install` | add | Print the dependency install command instead of running it. |
@@ -139,7 +140,7 @@ Installs the Runek agent skill (served at `/r/agents/SKILL.md`): how to add comp
 }
 ```
 
-- **registry** — where components are fetched from.
+- **registry** — where components are fetched from: the base URL or path, without a version (the CLI adds it).
 - **dir** — where component source is written. The runtime comes from the `@runek/core` npm package, not copied here.
 
 ## Registry index
@@ -151,3 +152,20 @@ The default registry is served at [`https://runek.nullorder.org/r`](https://rune
 <span class="manifest-card__path">/r/registry.json</span>
 <span class="manifest-card__hint">The catalog the CLI reads first: every component name, type, and description.</span>
 </a>
+
+## Versions
+
+Component source is written against a particular `@runek/core`, so the registry keeps one snapshot per release: `/r/0.15.0/registry.json`, `/r/0.15.0/components/bookshelf.json`, and so on. [`/r/versions.json`](https://runek.nullorder.org/r/versions.json) lists them, and `/r` itself serves the latest release.
+
+Every command that reads the registry picks the snapshot that matches your project's `@runek/core`, and says which on stderr:
+
+```text
+$ npx @runek/cli add bookshelf
+registry 0.15.0 (matches installed @runek/core 0.15.0)
+```
+
+- It reads the installed `node_modules/@runek/core`, else the version range in your `package.json`. With neither (a new project), it uses the latest release, and `add` installs the matching core.
+- With no exact snapshot it takes the newest older one in the same release line (`0.15.3` → `0.15.2`). Before 1.0 a minor can break, so it never crosses into another minor.
+- A component that only exists in a newer release fails with the fix: `--core latest` pulls from the newest release and upgrades `@runek/core` to match. Components you added earlier came from the old snapshot, so re-add them (`--overwrite`) if the new core breaks them.
+- Releases before 0.14.0 serve only components, not the prop schema or the agent skill, so `info`, `validate` and `skill` ask you to upgrade there.
+- A registry without `versions.json` (a local checkout, your own fork) is used as-is, so `--registry ./registry` behaves as before.

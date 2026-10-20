@@ -2,6 +2,7 @@
 // /llms-full.txt. Server-only.
 import { type CollectionEntry, getCollection } from 'astro:content'
 import changelog from '../../../../CHANGELOG.md?raw'
+import { isReleased, UNRELEASED_NOTE } from './registry'
 
 export const SITE = 'https://runek.nullorder.org'
 
@@ -42,5 +43,7 @@ export function docBody(doc: Doc): string {
 
 export function docMarkdown(doc: Doc): string {
   const summary = doc.data.summary ? `\n\n> ${doc.data.summary}` : ''
-  return `# ${doc.data.title}${summary}\n\n${docBody(doc)}\n`
+  const component = doc.data.category === 'component' ? doc.data.component : undefined
+  const note = component && !isReleased(component) ? `\n\n**${UNRELEASED_NOTE}**` : ''
+  return `# ${doc.data.title}${summary}${note}\n\n${docBody(doc)}\n`
 }

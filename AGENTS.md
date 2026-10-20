@@ -24,6 +24,8 @@ Dependency direction is strictly one-way: `docs → components → core`. Nothin
 
 Decided model — **the shadcn split**: users pull editable component **source** into their project via `npx @runek/cli add <name>` (no black box), while the small runtime is the published **`@runek/core`** npm package the components import. `registry/registry.json` is the hand-maintained index; `registry/components/*.json` are **generated** (`just registry`) self-contained manifests with inlined source + auto-derived deps (each component declares `@runek/core` as an npm dependency, pinned to core's version). Component source is written verbatim — there's no import to rewrite. After editing any component or the index, run `just registry` to refresh the manifests, the prop schema (`props.json`), and the world JSON Schema (`world.schema.json`).
 
+The served registry is **versioned by release**: the docs deploy (`apps/docs/scripts/sync-registry.mjs`) copies each `v*` tag's committed `registry/` to `/r/<version>/`, writes `/r/versions.json`, and serves the latest stable release at `/r` itself. `main`'s registry is never served, so unreleased source can't reach users ahead of the `@runek/core` it needs; the CLI picks the snapshot matching a project's installed core (`--core` overrides). This relies on each release tag carrying a freshly generated `registry/`, which `just publish` guarantees.
+
 ## Agent-facing surface
 
 Runek is meant to be easy for coding agents to use, and these are generated, so keep them in sync rather than editing them by hand:
@@ -60,7 +62,7 @@ Both are centralized — do not hand-edit them in individual `package.json` file
 
 - **Dependency versions** live in one place: the `catalog:` block in `pnpm-workspace.yaml`. Every `package.json` references `"catalog:"` instead of a literal version. To bump a dependency (e.g. three.js), edit its catalog entry **once**, then `just install`.
 - **Package versions** are kept in lockstep across all workspace packages. Change them with **`just version X.Y.Z`** (writes every `package.json` via `scripts/set-version.mjs`) — never edit a `version` field by hand.
-- Releases: **`just publish`** runs the gate, npm-publishes the `runek` CLI, tags `vX.Y.Z`, and creates a GitHub release (`just publish-help` shows the steps). The component library ships as source via the registry, which goes live by deploying `apps/docs` (serves `/r`).
+- Releases: **`just publish`** runs the gate, npm-publishes the `runek` CLI, tags `vX.Y.Z`, and creates a GitHub release (`just publish-help` shows the steps). The component library ships as source via the registry: pushing the release tag redeploys `apps/docs`, which publishes `/r/X.Y.Z/` and points `/r` at it.
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md) follows [Keep a Changelog](https://keepachangelog.com) + semver. Every user-facing change (new component or prop, behavior change, fix, CLI or release tooling) gets an entry under `## [Unreleased]` in the matching category (Added / Changed / Fixed / Removed), with breaking changes marked **Breaking:**. Internal-only chores can skip it. At release, the Unreleased section is retitled to the new version (with its compare link and date) and a fresh Unreleased section starts. The docs site renders this same file at `/docs/changelog` via `apps/docs/src/content/docs/changelog.mdx`.
 
 ## Core principles (the moat — never compromise these)

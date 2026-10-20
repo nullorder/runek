@@ -755,6 +755,25 @@ pre.astro-code code {
   color: var(--green);
 }
 
+/* A component on main that the latest release doesn't serve yet */
+.doc-unreleased {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: var(--blue-soft);
+  font-size: 0.9rem;
+}
+.badge-unreleased {
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--blue);
+  border-radius: 6px;
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  vertical-align: 0.1em;
+}
+
 /* Live component preview, floated to the right of a component doc's text */
 .doc-preview {
   float: right;

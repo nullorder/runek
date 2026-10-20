@@ -203,12 +203,13 @@ _validate-channel CHANNEL="":
     echo "✓ channel: {{ if CHANNEL != "" { CHANNEL } else { "stable (latest)" } }} for v{{version}}"
 
 # Full release: gate → npm (@runek/core + CLI) → git tag + GitHub release.
-# Component source goes live by deploying the docs site (serves /r). Pass a
+# Component source goes live when the tag push redeploys the docs site, which
+# serves the tag's registry at /r/<version>/ (and at /r when stable). Pass a
 # CHANNEL (alpha/beta/rc) to ship a prerelease: npm publishes under that
 # dist-tag and the GitHub release is marked pre-release, e.g. `just publish rc`.
 publish CHANNEL="": (_validate-channel CHANNEL) prepare-publish check-npm-login check-gh-login (publish-core CHANNEL) (publish-cli CHANNEL) (gh-release CHANNEL)
     @echo "✓ Released v{{version}}{{ if CHANNEL != "" { " (" + CHANNEL + " prerelease)" } else { "" } }}: @runek/core + @runek/cli on npm, tagged, GitHub release created."
-    @echo "  Next: deploy apps/docs to publish the registry at https://runek.nullorder.org/r"
+    @echo "  The tag push deploys the registry at https://runek.nullorder.org/r/{{version}} (Deploy docs workflow)."
 
 # What `just publish` does, and the version it would cut
 publish-help:

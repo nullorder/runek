@@ -46,6 +46,7 @@ Same `seed` → same world, every time.
 
 ```
 --registry <url|path>   Registry base (default: https://runek.nullorder.org/r)
+--core <version|latest> Use the registry for this @runek/core (default: the project's)
 --dir <path>            Install directory (default: src/runek)
 --overwrite             Overwrite files that already exist
 --no-install            Print the dependency install command instead of running it

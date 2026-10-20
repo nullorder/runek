@@ -1,10 +1,13 @@
 // Build-time readers for the served registry. Server-only (uses node:fs) — import
 // from .astro frontmatter / getStaticPaths, never from a client island.
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const registryDir = join(dirname(fileURLToPath(import.meta.url)), '../../../../registry')
+const here = dirname(fileURLToPath(import.meta.url))
+const registryDir = join(here, '../../../../registry')
+// What /r serves: the latest release (sync-registry.mjs), so it lags the working tree.
+const servedIndex = join(here, '../../public/r/registry.json')
 
 export type IndexItem = {
   name: string
@@ -36,6 +39,25 @@ export function getComponents(): IndexItem[] {
     (i) => i.type === 'registry:component' || i.type === 'registry:composite',
   )
 }
+
+let released: Set<string> | null | undefined
+
+/** False for a component on main that the latest release doesn't serve yet. */
+export function isReleased(name: string): boolean {
+  if (released === undefined) {
+    released = existsSync(servedIndex)
+      ? new Set(
+          (JSON.parse(readFileSync(servedIndex, 'utf8')) as { items: IndexItem[] }).items.map(
+            (i) => i.name,
+          ),
+        )
+      : null
+  }
+  return released?.has(name) ?? true
+}
+
+export const UNRELEASED_NOTE =
+  "Unreleased: this lands in the next release. Until then, runek add can't install it."
 
 export function getManifest(name: string): Manifest {
   return JSON.parse(readFileSync(join(registryDir, 'components', `${name}.json`), 'utf8'))
