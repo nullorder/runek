@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Portal2`, a pair of linked rifts for walkable shortcuts within one
+  world. Each end is a ragged, breathing tear in the air with an
+  iridescent pink, violet and cyan rim that sheds glitter, and shows the
+  other end live with real parallax. Walk into either and you come out
+  of the other, momentum and all. Set the far end with `destination`.
+  With `active={false}` both rest as small shimmering bubbles. For
+  travel to another world or page, `Portal` is still the one to use.
 - `Grass` takes a height preset: `height="short"` (a lawn), `"medium"`
   (the default, unchanged), `"tall"` (a meadow) or `"very-tall"` (reeds
   up to your chest). A number in units still works. Taller grass grows

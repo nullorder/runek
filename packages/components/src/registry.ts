@@ -56,6 +56,7 @@ import { Player } from './Player'
 import { Pool } from './Pool'
 import { PoolTable } from './PoolTable'
 import { Portal } from './Portal'
+import { Portal2 } from './Portal2'
 import { Poster } from './Poster'
 import { Road } from './Road'
 import { Rocks } from './Rocks'
@@ -146,6 +147,7 @@ export const registry: ComponentRegistry = {
   Pool,
   PoolTable,
   Portal,
+  Portal2,
   Poster,
   Road,
   Rocks,
