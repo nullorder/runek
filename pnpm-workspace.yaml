@@ -6,9 +6,9 @@ packages:
 # Reference as "catalog:" in any package.json. Bump here once; every package follows.
 # Note: @react-three/fiber@9 peers react ">=19 <19.3", so React resolves to 19.2.x today.
 catalog:
-  "@astrojs/check": ^0.9.4
-  "@astrojs/mdx": ^4.0.0
-  "@astrojs/react": ^4.0.0
+  "@astrojs/check": ^0.9.11
+  "@astrojs/mdx": ^8.1.0
+  "@astrojs/react": ^7.1.0
   "@biomejs/biome": ^2.4.16
   "@codemirror/autocomplete": ^6.20.3
   "@codemirror/commands": ^6.11.1
@@ -29,8 +29,8 @@ catalog:
   "@types/react": ^19.2.16
   "@types/react-dom": ^19.2.3
   "@types/three": ^0.184.1
-  "@vitejs/plugin-react": ^6.0.2
-  astro: ^5.0.0
+  "@vitejs/plugin-react": ^6.1.2
+  astro: ^7.4.1
   ecctrl: ^1.0.97
   leva: ^0.10.1
   marked: ^15.0.0
@@ -41,6 +41,6 @@ catalog:
   three: ^0.184.0
   tsup: ^8.0.0
   typescript: ^6.0.3
-  vite: ^8.0.16
-  vitest: ^4.1.8
+  vite: ^8.3.4
+  vitest: ^4.1.12
   zustand: ^5.0.15
