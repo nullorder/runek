@@ -1,13 +1,12 @@
 // Build-time readers for the served registry. Server-only (uses node:fs) — import
 // from .astro frontmatter / getStaticPaths, never from a client island.
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
-const here = dirname(fileURLToPath(import.meta.url))
-const registryDir = join(here, '../../../../registry')
+// Resolved from the docs app root (Astro's cwd): import.meta.url moves with the build's chunk layout.
+const registryDir = join(process.cwd(), '../../registry')
 // What /r serves: the latest release (sync-registry.mjs), so it lags the working tree.
-const servedIndex = join(here, '../../public/r/registry.json')
+const servedIndex = join(process.cwd(), 'public/r/registry.json')
 
 export type IndexItem = {
   name: string

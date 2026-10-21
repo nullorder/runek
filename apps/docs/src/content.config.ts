@@ -1,5 +1,6 @@
-import { defineCollection, z } from 'astro:content'
+import { defineCollection } from 'astro:content'
 import { glob } from 'astro/loaders'
+import { z } from 'astro/zod'
 
 // Single source of truth for the docs: one Markdown file per topic/component,
 // rendered two ways — these flat pages (SEO/a11y) and books in the 3D library.
