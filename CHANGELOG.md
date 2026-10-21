@@ -37,6 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** `rng(seed)` scrambles the seed before its first step, so
+  every seeded component looks different for the same seed after you
+  upgrade. Re-pick any seed you chose by eye. Before, the first value
+  drawn for a small seed was close to 0 (every `Person` seed below 100
+  came out with the same gender), and `rng(0)` returned 0 forever. Same
+  seed, same result still holds within a version.
 - Duplicate moved from `d` to `⌘D` in `<WorldEditor>` and the workshop,
   and the workshop's World panel from `w` to `,`, to make room for WASD.
 
@@ -83,6 +89,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and on high refresh rate displays. `<World>` now steps physics once per
   rendered frame (splitting long frames into short sub-steps), in step
   with the avatar controller, instead of on a fixed 1/60 s clock.
+- A custom `Player` body (a `Person` from the workshop's "use as play
+  avatar", say) stands on the ground instead of hovering about 26 cm
+  above it. The controller floats its capsule on a spring, and `Player`
+  now lowers the body (and the default capsule) by that float, at any
+  frame rate. Bodies placed as documented, feet at `y = -0.65`, need no
+  change. If you lowered yours by hand to make up for it, put it back.
 
 ## [0.15.0](https://github.com/nullorder/runek/compare/v0.14.0...v0.15.0) - 2026-10-18
 
