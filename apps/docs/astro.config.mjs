@@ -8,6 +8,8 @@ import { defineConfig } from 'astro/config'
 export default defineConfig({
   site: 'https://runek.nullorder.org',
   integrations: [react(), mdx()],
+  // Astro 7 defaults to 'jsx', which drops whitespace between inline elements; keep v5's spacing.
+  compressHTML: true,
   markdown: {
     shikiConfig: { theme: 'night-owl' },
   },
