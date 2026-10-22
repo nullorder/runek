@@ -5,6 +5,7 @@ import { type AvatarView, PlayerMotionContext, useWorld, type Vec3 } from '@rune
 import Ecctrl, { type CustomEcctrlRigidBody } from 'ecctrl'
 import { type ReactNode, type RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Group, Object3D, Scene } from 'three'
+import { PaniniLens } from './player/PaniniLens'
 
 export type PlayerView = AvatarView
 
@@ -160,6 +161,20 @@ export interface PlayerProps {
   view?: PlayerView
   /** Initial camera yaw in radians (0 faces +z). */
   yaw?: number
+  /** How wide the first-person view is, in degrees across, on a 16:9 screen. The default,
+   *  140, takes in most of what both eyes see, so the world wraps around you instead of
+   *  sitting behind a window. Like most games it follows the screen's shape, not its size: a
+   *  wider screen (an ultrawide or curved monitor) keeps the same angle top to bottom and sees
+   *  more across, up to 200°; a narrower one sees less across, down to 110°, then holds that
+   *  and opens up top to bottom, until a tall phone screen just shows less across. It is drawn
+   *  through a gently curved (Panini) lens: true to life straight ahead, the sides squeezed in
+   *  rather than stretched as a flat camera would. Third-person and overhead keep the world
+   *  camera's own lens. */
+  fov?: number
+  /** How blurred the very edge of the first-person view is, in CSS pixels, easing to sharp
+   *  toward the centre the way peripheral vision does; turn to look at something and it comes
+   *  into focus. 0 turns it off. */
+  peripheralBlur?: number
   /** Custom avatar visual, replacing the default capsule. Size it to the capsule
    *  envelope (1.3 units tall, centered at the character origin, so feet go at y = -0.65);
    *  the Player lowers it onto the ground beneath the floating capsule. It is hidden in
@@ -228,7 +243,14 @@ const SPRING_K = 1.2
 // Where the avatar's eyes sit on the capsule: what others look at when they look at the player.
 const EYE_HEIGHT = 0.5
 
-export function Player({ position = [0, 3, 0], view, yaw = 0, children }: PlayerProps) {
+export function Player({
+  position = [0, 3, 0],
+  view,
+  yaw = 0,
+  fov = 140,
+  peripheralBlur = 4,
+  children,
+}: PlayerProps) {
   const { avatar, player, keyboard, controls } = useWorld()
   const scene = useThree((s) => s.scene)
   const wanted = view ?? avatar ?? 'first'
@@ -329,6 +351,7 @@ export function Player({ position = [0, 3, 0], view, yaw = 0, children }: Player
       </group>
       <object3D ref={eyes} position={[0, EYE_HEIGHT, 0]} />
       <CameraKeyLook pitchable={!cam.locked} />
+      {firstPerson && <PaniniLens fov={fov} blur={peripheralBlur} />}
       {!firstPerson && <MotionProbe body={body} motion={motion} />}
       {!firstPerson && <StandOnGround body={body} lift={lift} />}
       {!grounded && <GroundGuard body={body} onGrounded={() => setGrounded(true)} />}

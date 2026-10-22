@@ -1,6 +1,6 @@
 import { Html } from '@react-three/drei'
 import { type ThreeEvent, useFrame } from '@react-three/fiber'
-import { DEFAULT_REACH, rng, useReach, useWorld, type Vec3 } from '@runek/core'
+import { DEFAULT_REACH, rng, useLensPosition, useReach, useWorld, type Vec3 } from '@runek/core'
 import { useMemo, useRef, useState } from 'react'
 import type { Vector3 } from 'three'
 
@@ -57,6 +57,7 @@ export function Book({
   seed = 1,
 }: BookProps) {
   const { unit } = useWorld()
+  const labelAt = useLensPosition()
   const [hovered, setHovered] = useState(false)
   const inReach = useReach(reach)
   const lastHit = useRef<Vector3 | null>(null)
@@ -166,7 +167,13 @@ export function Book({
         {body}
       </group>
       {hovered && title && (
-        <Html position={[0, labelY, 0]} center distanceFactor={6} zIndexRange={[30, 0]}>
+        <Html
+          position={[0, labelY, 0]}
+          calculatePosition={labelAt}
+          center
+          distanceFactor={6}
+          zIndexRange={[30, 0]}
+        >
           <div
             style={{
               padding: '2px 8px',

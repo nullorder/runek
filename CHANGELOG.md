@@ -45,6 +45,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   seed, same result still holds within a version.
 - Duplicate moved from `d` to `⌘D` in `<WorldEditor>` and the workshop,
   and the workshop's World panel from `w` to `,`, to make room for WASD.
+- `Player`'s first-person view is much wider and softer at the edges,
+  closer to how people see. It shows 140° across on a 16:9 screen (was
+  about 90°) through a gently curved lens, so the room wraps around you
+  without the tunnel stretch a flat camera gives at that width. Like
+  most games it follows the screen's shape: an ultrawide sees more
+  across (about 160° at 21:9, up to 200°), a narrower screen less, down
+  to 110°, and a phone held upright shows a narrower slice of that.
+  Focus falls off smoothly with the angle off straight ahead, so turning
+  toward something brings it into focus. Tune them with the new `fov`
+  and `peripheralBlur` props (`peripheralBlur={0}` turns the blur off).
+  Clicks and hover labels follow the lens. Third-person and overhead
+  views are unchanged. `@runek/core` exports `useLensPosition` for your
+  own `<Html>` labels.
 
 - `Portal` is now a swirling vortex around a lightless core instead of a
   spinning ring: spiral arms, a bright photon rim, drifting motes that

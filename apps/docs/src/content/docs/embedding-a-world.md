@@ -141,3 +141,14 @@ Clicking works the same way: a `Book` or a `Bookshelf` book only lights up and t
 const inReach = useReach() // or useReach(2) for a tighter reach
 <mesh onClick={(e) => inReach(e.point) && open()} />
 ```
+
+## The first-person lens
+
+In first person, `Player` draws the world through a gently curved lens instead of the camera's flat projection, and softens the edges of the view the way peripheral vision does (`peripheralBlur`, 0 to turn it off). Like most games, the view follows the canvas's shape rather than its size: 140° across on a 16:9 canvas (set it with `fov`), more across on a wider one (about 160° at 21:9, up to 200°), and less on a narrower one, down to 110°, below which a tall canvas like an upright phone just shows less across. It takes over the frame's render while it's on, so a post-processing pass that also renders the scene itself won't combine with it; use third person, or a lower-level effect, if you need one.
+
+Clicks and hovers already follow the lens. If you pin a drei `<Html>` label to something in the world, give it `calculatePosition={useLensPosition()}` from `@runek/core` so it stays on its target near the edges of the view:
+
+```tsx
+const labelAt = useLensPosition()
+<Html position={[0, 1, 0]} calculatePosition={labelAt}>…</Html>
+```
