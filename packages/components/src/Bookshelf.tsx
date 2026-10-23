@@ -1,7 +1,7 @@
 import { Html } from '@react-three/drei'
 import { type ThreeEvent, useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { DEFAULT_REACH, rng, useReach, useWorld, type Vec3 } from '@runek/core'
+import { DEFAULT_REACH, rng, useLensPosition, useReach, useWorld, type Vec3 } from '@runek/core'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Sign } from './Sign'
@@ -105,6 +105,7 @@ export function Bookshelf({
   labelSize = 0.08,
 }: BookshelfProps) {
   const { unit, palette } = useWorld()
+  const labelAt = useLensPosition()
   const frameColor = color ?? palette.wood
   const panelColor = backColor ?? palette.woodDark
   const w = width * unit
@@ -339,6 +340,7 @@ export function Bookshelf({
             hoveredBook.y + hoveredBook.height / 2 + 0.12 * unit,
             hoveredBook.depth,
           ]}
+          calculatePosition={labelAt}
           center
           distanceFactor={6}
           zIndexRange={[30, 0]}

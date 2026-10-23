@@ -2,6 +2,7 @@ import type { RefObject } from 'react'
 import type { Object3D } from 'three'
 import type { WorldFonts } from './font'
 import type { WorldControls } from './keyboard'
+import type { Lens } from './lens'
 import type { WorldPalette } from './palette'
 import type { WorldTime } from './time'
 
@@ -77,6 +78,11 @@ export interface WorldContextValue {
    *  player *is*, which in third person is not where the camera is. Absent under a
    *  hand-rolled provider, where components fall back to the camera. */
   player?: RefObject<Object3D | null>
+  /** The curved projection the screen is drawn through, set by a `Player` with a wide
+   *  first-person view (`null` while the camera's own flat projection is used). Read
+   *  `lens.current` per frame, or use `useLensPosition` for `<Html>` labels. Absent under a
+   *  hand-rolled provider. */
+  lens?: RefObject<Lens | null>
   /** Every figure currently walking a route. Mutable, not state: add yourself on mount, remove
    *  on unmount, and read it inside `useFrame`. Absent under a hand-rolled provider. */
   walkers?: Set<Walker>

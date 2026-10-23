@@ -5720,6 +5720,16 @@
           "type": "number",
           "description": "Initial camera yaw in radians (0 faces +z).",
           "default": 0
+        },
+        "fov": {
+          "type": "number",
+          "description": "How wide the first-person view is, in degrees across, on a 16:9 screen. The default,\n140, takes in most of what both eyes see, so the world wraps around you instead of\nsitting behind a window. Like most games it follows the screen's shape, not its size: a\nwider screen (an ultrawide or curved monitor) keeps the same angle top to bottom and sees\nmore across, up to 200°; a narrower one sees less across, down to 110°, then holds that\nand opens up top to bottom, until a tall phone screen just shows less across. It is drawn\nthrough a gently curved (Panini) lens: true to life straight ahead, the sides squeezed in\nrather than stretched as a flat camera would. Third-person and overhead keep the world\ncamera's own lens.",
+          "default": 140
+        },
+        "peripheralBlur": {
+          "type": "number",
+          "description": "How blurred the very edge of the first-person view is, in CSS pixels, easing to sharp\ntoward the centre the way peripheral vision does; turn to look at something and it comes\ninto focus. 0 turns it off.",
+          "default": 4
         }
       },
       "additionalProperties": false

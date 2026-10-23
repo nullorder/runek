@@ -36,6 +36,8 @@ export {
   keyLabel,
   resolveControls,
 } from './keyboard'
+export type { Lens } from './lens'
+export { useLensPosition } from './lens'
 export type { OrbitKeysOptions } from './orbitKeys'
 export { groundForward, MOVE_KEYS, useOrbitKeys } from './orbitKeys'
 export type { WorldPalette } from './palette'

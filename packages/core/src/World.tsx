@@ -7,6 +7,7 @@ import { WorldContext } from './context'
 import { DEFAULT_FONTS, type WorldFonts } from './font'
 import { useKeySource } from './input'
 import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
+import type { Lens } from './lens'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { resolveWorldTime } from './time'
 import type { AvatarView, Interactor, Vec3, Walker, WorldFog } from './types'
@@ -97,6 +98,7 @@ export function World({
   const keySource = useKeySource(input && !paused)
 
   const player = useRef<Object3D | null>(null)
+  const lens = useRef<Lens | null>(null)
   const walkers = useMemo(() => new Set<Walker>(), [])
   const interactions = useMemo(() => new Set<Interactor>(), [])
 
@@ -111,6 +113,7 @@ export function World({
       avatar,
       controls: resolvedControls,
       player,
+      lens,
       walkers,
       interactions,
       keyboard: keySource,
