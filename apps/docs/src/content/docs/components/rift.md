@@ -1,15 +1,15 @@
 ---
-title: "Portal2"
+title: "Rift"
 summary: "A pair of linked rifts torn in the air, ragged and edged in iridescent, glitter-shedding light. Each shows the other end live and in parallax, and walking into either carries you to the other: walkable shortcuts within one world (use Portal for other worlds or pages)."
 category: component
-component: portal2
+component: rift
 order: 100
 ---
 
 ## Add it
 
 ```bash
-npx @runek/cli add portal2
+npx @runek/cli add rift
 ```
 
 Pulls `sign`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.15.0`, `three@^0.184.0`.
@@ -17,15 +17,15 @@ Pulls `sign`, `@react-three/fiber@^9.6.1`, `@react-three/rapier@^2.2.0`, `@runek
 ## Use it
 
 ```tsx
-import { Portal2 } from './runek/Portal2'
+import { Rift } from './runek/Rift'
 
-<Portal2 position={[0, 0, 0]} seed={1} />
+<Rift position={[0, 0, 0]} seed={1} />
 ```
 
 Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 ```json
-{ "type": "Portal2", "props": { "position": [0, 0, 0], "seed": 1 } }
+{ "type": "Rift", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
@@ -46,10 +46,10 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 ## Registry manifest
 
-<a class="manifest-card" href="https://runek.nullorder.org/r/components/portal2.json">
+<a class="manifest-card" href="https://runek.nullorder.org/r/components/rift.json">
 <span class="manifest-card__label">registry manifest</span>
-<span class="manifest-card__path">/r/components/portal2.json</span>
-<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add portal2</code> fetches.</span>
+<span class="manifest-card__path">/r/components/rift.json</span>
+<span class="manifest-card__hint">Self-contained JSON: inlined source plus resolved dependencies, exactly what <code>runek add rift</code> fetches.</span>
 </a>
 
 Browse the whole catalog in the **[gallery →](/gallery)**.

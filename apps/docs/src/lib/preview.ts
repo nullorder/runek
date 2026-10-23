@@ -101,7 +101,7 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   Plant: { camera: [1.8, 1.5, 2.2], target: [0, 0.5, 0] },
   Windmill: { camera: [7, 6, 13], target: [0, 5.5, 0] },
   Portal: { camera: [3.5, 2.6, 7.5], target: [0, 2.4, 0] },
-  Portal2: {
+  Rift: {
     camera: [1.5, 2, 6.4],
     target: [1.5, 1, 0],
     props: { destination: [3, 0, 0], radius: 0.9 },

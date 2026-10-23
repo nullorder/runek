@@ -20,7 +20,7 @@ import {
 } from 'three'
 import { Sign } from './Sign'
 
-export interface Portal2Props extends WorldComponentProps {
+export interface RiftProps extends WorldComponentProps {
   /**
    * Where the other end stands (the foot of its rift), in world coordinates. Each end shows
    * the other live through its opening, and walking into either carries you to the other.
@@ -228,7 +228,7 @@ const isCameraRig = (o: Object3D) =>
  * procedural and asset-free (the seed shapes the edges and the glitter). Each open rift on
  * screen costs a second render of the scene, clipped to the rift's footprint.
  */
-export function Portal2({
+export function Rift({
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   seed = 1,
@@ -240,7 +240,7 @@ export function Portal2({
   color,
   active = true,
   onTravel,
-}: Portal2Props) {
+}: RiftProps) {
   const { unit, player } = useWorld()
   const scene = useThree((s) => s.scene)
   const get = useThree((s) => s.get)
@@ -299,7 +299,7 @@ export function Portal2({
   const common = { R, unit, shared, color, active, ends }
   return (
     <>
-      <Rift
+      <RiftEnd
         {...common}
         end={near}
         core={nearCore}
@@ -311,7 +311,7 @@ export function Portal2({
         arrivals={arrivals[0]}
         onEnter={(body) => travel(body, nearCore, farCore, there, arrivals[1])}
       />
-      <Rift
+      <RiftEnd
         {...common}
         end={far}
         core={farCore}
@@ -327,7 +327,7 @@ export function Portal2({
   )
 }
 
-interface RiftProps {
+interface RiftEndProps {
   end: RefObject<Group | null>
   /** The center of this rift and of the other one; the view and travel follow their world positions. */
   core: RefObject<Group | null>
@@ -346,7 +346,7 @@ interface RiftProps {
   onEnter: (body: RapierRigidBody) => void
 }
 
-function Rift({
+function RiftEnd({
   end,
   core,
   otherCore,
@@ -362,7 +362,7 @@ function Rift({
   shared,
   arrivals,
   onEnter,
-}: RiftProps) {
+}: RiftEndProps) {
   const pane = useRef<Mesh>(null)
 
   const view = useMemo(() => {

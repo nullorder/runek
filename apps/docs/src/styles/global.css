@@ -639,15 +639,38 @@ pre.astro-code code {
   color: var(--green);
   text-decoration: none;
 }
-.card-lab {
-  float: right;
-  margin-top: 0.15rem;
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: var(--muted);
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
-.card-lab:hover {
+.card-head .badge-unreleased {
+  margin-left: 0;
+}
+.card-lab {
+  margin-left: auto;
+  display: inline-flex;
+  padding: 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease;
+}
+.card-lab svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.card-lab:hover,
+.card-lab:focus-visible {
   color: var(--green);
+  border-color: var(--green-line);
+  background: var(--green-soft);
   text-decoration: none;
 }
 .card-meta p {

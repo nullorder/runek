@@ -32,11 +32,24 @@ const groups = CATEGORY_ORDER
               <div class="card">
                 <ComponentPreview client:visible title={item.title} />
                 <div class="card-meta">
-                  <a class="card-title" href={`/docs/components/${item.name}`}>
-                    {item.title}
-                  </a>
-                  {!isReleased(item.name) && <span class="badge-unreleased">unreleased</span>}
-                  <a class="card-lab" href={`/workshop#m=lab&c=${item.title}`}>open in the workshop →</a>
+                  <div class="card-head">
+                    <a class="card-title" href={`/docs/components/${item.name}`}>
+                      {item.title}
+                    </a>
+                    {!isReleased(item.name) && <span class="badge-unreleased">unreleased</span>}
+                    <a
+                      class="card-lab"
+                      href={`/workshop#m=lab&c=${item.title}`}
+                      title="Open in the workshop"
+                      aria-label={`Open ${item.title} in the workshop`}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                        <path d="M13 4H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5" />
+                        <path d="M2 20h20" />
+                        <path d="M11 11l9-9M15 2h5v5" />
+                      </svg>
+                    </a>
+                  </div>
                   <p>{item.description}</p>
                 </div>
               </div>
