@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A brass picture light on one or two arms that washes the face below it: over a picture on a wall, or on the top of a bookshelf. Can light only after dusk.",
   "dependencies": [
-    "@runek/core@^0.15.0",
+    "@runek/core@^0.16.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

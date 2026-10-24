@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nullorder/runek/compare/v0.15.0...HEAD)
+## [Unreleased](https://github.com/nullorder/runek/compare/v0.16.0...HEAD)
+
+## [0.16.0](https://github.com/nullorder/runek/compare/v0.15.0...v0.16.0) - 2026-10-24
 
 ### Added
 
@@ -58,7 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Clicks and hover labels follow the lens. Third-person and overhead
   views are unchanged. `@runek/core` exports `useLensPosition` for your
   own `<Html>` labels.
-
 - `Portal` is now a swirling vortex around a lightless core instead of a
   spinning ring: spiral arms, a bright photon rim, drifting motes that
   fall inward, a soft halo, and light pooled on the ground beneath it. It

@@ -5,7 +5,7 @@
   "description": "A chess board with a full set of turned pieces, set from a FEN position or played out from the seed into a mid-game, on a table top or its own pedestal.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.15.0",
+    "@runek/core@^0.16.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

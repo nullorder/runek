@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A banker's desk lamp: a brass base and stem under a cased glass shade with a pull chain, pooling light on the desk. Can light only after dusk.",
   "dependencies": [
-    "@runek/core@^0.15.0"
+    "@runek/core@^0.16.0"
   ],
   "registryDependencies": [],
   "files": [

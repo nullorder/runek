@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A games console (tower, slab, or cube) with up to four controllers laid out in front, to sit under a TV.",
   "dependencies": [
-    "@runek/core@^0.15.0"
+    "@runek/core@^0.16.0"
   ],
   "registryDependencies": [],
   "files": [

@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A hanging chandelier: a chain, a turned brass body, one or two rings of curved arms with candle bulbs, and optional glass drops. Instanced, with one shared light; can light only after dusk.",
   "dependencies": [
-    "@runek/core@^0.15.0",
+    "@runek/core@^0.16.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],
