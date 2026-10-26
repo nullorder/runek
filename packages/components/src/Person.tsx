@@ -1,11 +1,13 @@
 import { useFrame } from '@react-three/fiber'
 import { CapsuleCollider, type RapierRigidBody, RigidBody } from '@react-three/rapier'
 import {
+  Dynamic,
   type InteractionAction,
   PlayerMotionContext,
   rng,
   sub,
   useInteraction,
+  useMaterial,
   useWorld,
   type Vec3,
   type WorldComponentProps,
@@ -15,7 +17,6 @@ import {
   CylinderGeometry,
   type Group,
   Mesh,
-  MeshPhysicalMaterial,
   type Object3D,
   Quaternion,
   Group as ThreeGroup,
@@ -516,14 +517,19 @@ export function Person({
   }, [pose, marks, motion.stoop])
 
   // A mug for `drink`, held in the right hand and kept upright whatever the wrist does.
+  const mugMaterial = useMaterial({
+    kind: 'physical',
+    color: '#efe9df',
+    roughness: 0.35,
+    clearcoat: 0.4,
+  })
   const mug = useMemo(() => {
     const k = H / 1.7
     const body = new CylinderGeometry(0.036 * k, 0.032 * k, 0.09 * k, 14)
     const handle = new TorusGeometry(0.022 * k, 0.006 * k, 6, 12, Math.PI)
-    const mat = new MeshPhysicalMaterial({ color: '#efe9df', roughness: 0.35, clearcoat: 0.4 })
     const g = new ThreeGroup()
-    const cup = new Mesh(body, mat)
-    const ear = new Mesh(handle, mat)
+    const cup = new Mesh(body, mugMaterial)
+    const ear = new Mesh(handle, mugMaterial)
     ear.rotation.z = -Math.PI / 2
     ear.position.set(0, 0, -0.036 * k)
     ear.rotation.y = Math.PI / 2
@@ -533,10 +539,9 @@ export function Person({
     const dispose = () => {
       body.dispose()
       handle.dispose()
-      mat.dispose()
     }
     return { group: g, dispose }
-  }, [H])
+  }, [H, mugMaterial])
   useEffect(() => {
     if (!p.drink) return
     const hand = rig.bones['hand.R']
@@ -731,7 +736,9 @@ export function Person({
     return (
       <group ref={nodeFrame} position={at} rotation={rotation}>
         <group ref={walker}>
-          <group ref={facing}>{figure}</group>
+          <group ref={facing}>
+            <Dynamic>{figure}</Dynamic>
+          </group>
         </group>
         {driven && (
           <RouteDriver
@@ -773,7 +780,9 @@ export function Person({
           ) : (
             <CapsuleCollider args={[half, radius]} position={[0, (top + bottom) / 2, 0]} />
           ))}
-        <group ref={facing}>{figure}</group>
+        <group ref={facing}>
+          <Dynamic>{figure}</Dynamic>
+        </group>
       </RigidBody>
     </>
   )

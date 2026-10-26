@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -55,25 +55,31 @@ export function Plant({
     })
   }, [potR, potH, H, foliage, seed, unit])
 
+  const m = useMaterials({
+    pot: { color: pot, roughness: 0.9 },
+    soil: { color: '#3a2a1a', roughness: 1 },
+  })
+  const leafMaterials = useMaterials(
+    leaves.map((l) => ({ color: l.color, flatShading: true, roughness: 0.9 })),
+  )
+
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[potR, potH / 2, potR]} position={[0, potH / 2, 0]} />
-      <mesh castShadow receiveShadow position={[0, potH / 2, 0]}>
+      <mesh material={m.pot} castShadow receiveShadow position={[0, potH / 2, 0]}>
         <cylinderGeometry args={[potR, potR * 0.78, potH, 16]} />
-        <meshStandardMaterial color={pot} roughness={0.9} />
       </mesh>
-      <mesh position={[0, potH - 0.01 * unit, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh material={m.soil} position={[0, potH - 0.01 * unit, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[potR * 0.92, 16]} />
-        <meshStandardMaterial color="#3a2a1a" roughness={1} />
       </mesh>
-      {leaves.map((l) => (
+      {leaves.map((l, i) => (
         <mesh
           key={`leaf-${l.pos[0].toFixed(3)}:${l.pos[1].toFixed(3)}`}
+          material={leafMaterials[i]}
           castShadow
           position={l.pos}
         >
           <icosahedronGeometry args={[l.r, 0]} />
-          <meshStandardMaterial color={l.color} flatShading roughness={0.9} />
         </mesh>
       ))}
     </RigidBody>

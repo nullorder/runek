@@ -1,5 +1,14 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, range, rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type Vec3,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { Color, type InstancedMesh, Object3D } from 'three'
 import { Sign } from './Sign'
@@ -55,6 +64,12 @@ export function Whiteboard({
   const wall = mount === 'wall'
   const cy = wall ? 0 : 0.75 * unit + H / 2
   const cz = wall ? t / 2 + 0.01 * unit : 0
+  const m = useMaterials({
+    frame: { color: frame, roughness: 0.4, metalness: 0.4 },
+    board: { color: BOARD, roughness: 0.25 },
+    ink: { kind: 'basic' },
+    wheel: { color: '#1c1c1e', roughness: 0.6 },
+  })
 
   const strokes = useMemo<Stroke[]>(() => {
     if (!doodles) return []
@@ -141,23 +156,21 @@ export function Whiteboard({
           position={[0, (cy + H / 2) / 2, 0]}
         />
       )}
-      <mesh position={[0, cy, cz]} castShadow>
+      <mesh material={m.frame} position={[0, cy, cz]} castShadow>
         <boxGeometry args={[W + 0.04 * unit, H + 0.04 * unit, t]} />
-        <meshStandardMaterial color={frame} roughness={0.4} metalness={0.4} />
       </mesh>
       <group position={[0, cy, cz + t / 2 + 0.0008 * unit]}>
-        <mesh receiveShadow>
+        <mesh material={m.board} receiveShadow>
           <planeGeometry args={[W, H]} />
-          <meshStandardMaterial color={BOARD} roughness={0.25} />
         </mesh>
         {strokes.length > 0 && (
           <instancedMesh
             key={strokes.length}
             ref={ink}
             args={[undefined, undefined, strokes.length]}
+            material={m.ink}
           >
             <planeGeometry args={[1, 1]} />
-            <meshBasicMaterial />
           </instancedMesh>
         )}
         {text && (
@@ -172,26 +185,22 @@ export function Whiteboard({
           </Sign>
         )}
         {/* marker tray */}
-        <mesh position={[0, -H / 2 - 0.03 * unit, 0.02 * unit]} castShadow>
+        <mesh material={m.frame} position={[0, -H / 2 - 0.03 * unit, 0.02 * unit]} castShadow>
           <boxGeometry args={[W * 0.5, 0.015 * unit, 0.05 * unit]} />
-          <meshStandardMaterial color={frame} roughness={0.4} metalness={0.4} />
         </mesh>
       </group>
       {!wall &&
         [-1, 1].map((s) => (
           <group key={s} position={[s * (W / 2 + 0.03 * unit), 0, 0]}>
-            <mesh position={[0, (cy + H / 2) / 2, 0]} castShadow>
+            <mesh material={m.frame} position={[0, (cy + H / 2) / 2, 0]} castShadow>
               <boxGeometry args={[0.03 * unit, cy + H / 2, 0.03 * unit]} />
-              <meshStandardMaterial color={frame} roughness={0.4} metalness={0.4} />
             </mesh>
-            <mesh position={[0, 0.05 * unit, 0]} castShadow>
+            <mesh material={m.frame} position={[0, 0.05 * unit, 0]} castShadow>
               <boxGeometry args={[0.04 * unit, 0.03 * unit, 0.5 * unit]} />
-              <meshStandardMaterial color={frame} roughness={0.4} metalness={0.4} />
             </mesh>
             {[-1, 1].map((z) => (
-              <mesh key={z} position={[0, 0.025 * unit, z * 0.23 * unit]}>
+              <mesh key={z} material={m.wheel} position={[0, 0.025 * unit, z * 0.23 * unit]}>
                 <sphereGeometry args={[0.025 * unit, 8, 6]} />
-                <meshStandardMaterial color="#1c1c1e" roughness={0.6} />
               </mesh>
             ))}
           </group>

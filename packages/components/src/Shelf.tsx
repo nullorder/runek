@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 
 export interface ShelfProps {
   position?: Vec3
@@ -25,7 +25,7 @@ export function Shelf({
   color,
 }: ShelfProps) {
   const { unit, palette } = useWorld()
-  const frameColor = color ?? palette.wood
+  const wood = useMaterial({ color: color ?? palette.wood })
   const w = width * unit
   const h = height * unit
   const d = depth * unit
@@ -38,19 +38,22 @@ export function Shelf({
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[w / 2, h / 2, d / 2]} position={[0, h / 2, 0]} />
 
-      <mesh castShadow receiveShadow position={[-w / 2 + plank / 2, h / 2, 0]}>
+      <mesh material={wood} castShadow receiveShadow position={[-w / 2 + plank / 2, h / 2, 0]}>
         <boxGeometry args={[plank, h, d]} />
-        <meshStandardMaterial color={frameColor} />
       </mesh>
-      <mesh castShadow receiveShadow position={[w / 2 - plank / 2, h / 2, 0]}>
+      <mesh material={wood} castShadow receiveShadow position={[w / 2 - plank / 2, h / 2, 0]}>
         <boxGeometry args={[plank, h, d]} />
-        <meshStandardMaterial color={frameColor} />
       </mesh>
 
       {plankYs.map((y) => (
-        <mesh key={`plank-${y.toFixed(4)}`} castShadow receiveShadow position={[0, y, 0]}>
+        <mesh
+          key={`plank-${y.toFixed(4)}`}
+          material={wood}
+          castShadow
+          receiveShadow
+          position={[0, y, 0]}
+        >
           <boxGeometry args={[inner, plank, d]} />
-          <meshStandardMaterial color={frameColor} />
         </mesh>
       ))}
     </RigidBody>

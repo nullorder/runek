@@ -1,6 +1,15 @@
-import { pick, range, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterial,
+  useMaterials,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
-import { LatheGeometry, Vector2 } from 'three'
+import { DoubleSide, LatheGeometry, Vector2 } from 'three'
 
 /** One piece, or a whole place `setting` (a plate, a glass, a knife, and a fork). */
 export type TablewareKind = 'plate' | 'bowl' | 'glass' | 'cup' | 'jug' | 'setting'
@@ -157,43 +166,39 @@ function Piece({
     [shape, fill, k],
   )
   const glassy = kind === 'glass' || kind === 'jug'
-  const material = glassy ? (
-    <meshPhysicalMaterial
-      color={glass}
-      roughness={0.05}
-      metalness={0}
-      transparent
-      opacity={0.35}
-      depthWrite={false}
-      side={2}
-    />
-  ) : (
-    <meshStandardMaterial color={glaze} roughness={0.25} side={2} />
-  )
+  const m = useMaterials({
+    body: glassy
+      ? {
+          kind: 'physical',
+          color: glass,
+          roughness: 0.05,
+          metalness: 0,
+          transparent: true,
+          opacity: 0.35,
+          depthWrite: false,
+          side: DoubleSide,
+        }
+      : { color: glaze, roughness: 0.25, side: DoubleSide },
+    drink: { color: drink, roughness: 0.1, transparent: true, opacity: 0.75 },
+  })
   const step = (kind === 'bowl' ? 0.03 : 0.012) * k
   const layers = kind === 'plate' || kind === 'bowl' ? Math.max(1, Math.round(stack)) : 1
 
   return (
     <group>
       {Array.from({ length: layers }, (_, i) => (
-        <mesh key={i} geometry={body} position={[0, i * step, 0]} castShadow>
-          {material}
-        </mesh>
+        <mesh key={i} material={m.body} geometry={body} position={[0, i * step, 0]} castShadow />
       ))}
-      {water && (
-        <mesh geometry={water} renderOrder={-1}>
-          <meshStandardMaterial color={drink} roughness={0.1} transparent opacity={0.75} />
-        </mesh>
-      )}
+      {water && <mesh material={m.drink} geometry={water} renderOrder={-1} />}
       {(kind === 'cup' || kind === 'jug') && (
         // the handle: a half ring on the +X side
         <mesh
+          material={m.body}
           position={[(kind === 'cup' ? 0.04 : 0.06) * k, (kind === 'cup' ? 0.048 : 0.13) * k, 0]}
           rotation={[0, 0, -Math.PI / 2]}
           castShadow
         >
           <torusGeometry args={[(kind === 'cup' ? 0.022 : 0.045) * k, 0.005 * k, 8, 16, Math.PI]} />
-          {material}
         </mesh>
       )}
     </group>
@@ -226,6 +231,7 @@ export function Tableware({
     return { glaze: color ?? pick(r, GLAZES), fill: fill ?? range(r, 0.35, 0.85) }
   }, [seed, color, fill])
 
+  const silver = useMaterial({ color: SILVER, metalness: 0.4, roughness: 0.3 })
   const shared = { k, glaze: look.glaze, glass: glassColor, drink: drinkColor, fill: look.fill }
 
   if (kind !== 'setting') {
@@ -245,29 +251,24 @@ export function Tableware({
       </group>
       {/* knife on the right: the handle toward the diner, the blade away */}
       <group position={[0.165 * k, flat / 2, 0]}>
-        <mesh position={[0, 0, 0.05 * k]} castShadow>
+        <mesh material={silver} position={[0, 0, 0.05 * k]} castShadow>
           <boxGeometry args={[0.014 * k, flat, 0.1 * k]} />
-          <meshStandardMaterial color={SILVER} metalness={0.4} roughness={0.3} />
         </mesh>
-        <mesh position={[-0.002 * k, 0, -0.055 * k]} castShadow>
+        <mesh material={silver} position={[-0.002 * k, 0, -0.055 * k]} castShadow>
           <boxGeometry args={[0.02 * k, flat * 0.6, 0.11 * k]} />
-          <meshStandardMaterial color={SILVER} metalness={0.4} roughness={0.3} />
         </mesh>
       </group>
       {/* fork on the left: a handle, a neck, four tines */}
       <group position={[-0.165 * k, flat / 2, 0]}>
-        <mesh position={[0, 0, 0.055 * k]} castShadow>
+        <mesh material={silver} position={[0, 0, 0.055 * k]} castShadow>
           <boxGeometry args={[0.012 * k, flat, 0.1 * k]} />
-          <meshStandardMaterial color={SILVER} metalness={0.4} roughness={0.3} />
         </mesh>
-        <mesh position={[0, 0, -0.015 * k]}>
+        <mesh material={silver} position={[0, 0, -0.015 * k]}>
           <boxGeometry args={[0.022 * k, flat, 0.04 * k]} />
-          <meshStandardMaterial color={SILVER} metalness={0.4} roughness={0.3} />
         </mesh>
         {[-1.5, -0.5, 0.5, 1.5].map((t) => (
-          <mesh key={t} position={[t * 0.0055 * k, 0, -0.06 * k]}>
+          <mesh key={t} material={silver} position={[t * 0.0055 * k, 0, -0.06 * k]}>
             <boxGeometry args={[0.003 * k, flat, 0.05 * k]} />
-            <meshStandardMaterial color={SILVER} metalness={0.4} roughness={0.3} />
           </mesh>
         ))}
       </group>

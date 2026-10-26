@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterial, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -54,21 +54,25 @@ export function Hedge({
     })
   }, [L, H, D, length, foliage, seed, unit])
 
+  const body = useMaterial({ color: foliage, roughness: 0.95, flatShading: true })
+  const tuftMaterials = useMaterials(
+    tufts.map((t) => ({ color: t.color, flatShading: true, roughness: 0.95 })),
+  )
+
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[L / 2, H / 2, D / 2]} position={[0, H / 2, 0]} />
-      <mesh castShadow receiveShadow position={[0, H / 2, 0]}>
+      <mesh material={body} castShadow receiveShadow position={[0, H / 2, 0]}>
         <boxGeometry args={[L, H, D]} />
-        <meshStandardMaterial color={foliage} roughness={0.95} flatShading />
       </mesh>
-      {tufts.map((t) => (
+      {tufts.map((t, i) => (
         <mesh
           key={`tuft-${t.pos[0].toFixed(3)}:${t.pos[1].toFixed(3)}:${t.pos[2].toFixed(2)}`}
+          material={tuftMaterials[i]}
           castShadow
           position={t.pos}
         >
           <icosahedronGeometry args={[t.r, 0]} />
-          <meshStandardMaterial color={t.color} flatShading roughness={0.95} />
         </mesh>
       ))}
     </RigidBody>

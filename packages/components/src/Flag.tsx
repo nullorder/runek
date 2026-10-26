@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber'
 import { CylinderCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { Dynamic, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo } from 'react'
 import { DoubleSide, PlaneGeometry } from 'three'
 
@@ -36,8 +36,12 @@ export function Flag({
   poleColor,
 }: FlagProps) {
   const { unit, palette } = useWorld()
-  const cloth = color ?? palette.fabric
   const pole = poleColor ?? palette.wood
+  const m = useMaterials({
+    pole: { color: pole, roughness: 0.7 },
+    finial: { color: pole, metalness: 0.2, roughness: 0.5 },
+    cloth: { color: color ?? palette.fabric, side: DoubleSide, roughness: 0.9 },
+  })
   const U = unit
   const poleH = poleHeight * U
   const flyW = fly * U
@@ -64,25 +68,24 @@ export function Flag({
       <CylinderCollider args={[poleH / 2, poleR * 1.5]} position={[0, poleH / 2, 0]} />
 
       {/* pole */}
-      <mesh position={[0, poleH / 2, 0]} castShadow>
+      <mesh material={m.pole} position={[0, poleH / 2, 0]} castShadow>
         <cylinderGeometry args={[poleR, poleR, poleH, 8]} />
-        <meshStandardMaterial color={pole} roughness={0.7} />
       </mesh>
 
       {/* finial */}
-      <mesh position={[0, poleH + 0.06 * U, 0]} castShadow>
+      <mesh material={m.finial} position={[0, poleH + 0.06 * U, 0]} castShadow>
         <sphereGeometry args={[0.12 * U, 10, 8]} />
-        <meshStandardMaterial color={pole} metalness={0.2} roughness={0.5} />
       </mesh>
 
       {/* cloth */}
-      <mesh
-        geometry={geo}
-        position={[poleR + flyW / 2, poleH - dropH / 2 - 0.25 * U, 0]}
-        castShadow
-      >
-        <meshStandardMaterial color={cloth} side={DoubleSide} roughness={0.9} />
-      </mesh>
+      <Dynamic>
+        <mesh
+          geometry={geo}
+          material={m.cloth}
+          position={[poleR + flyW / 2, poleH - dropH / 2 - 0.25 * U, 0]}
+          castShadow
+        />
+      </Dynamic>
     </RigidBody>
   )
 }

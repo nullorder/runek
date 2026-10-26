@@ -1,6 +1,15 @@
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, range, rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type Vec3,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo, useState } from 'react'
 import { Color, ShaderMaterial, type Texture } from 'three'
 import { Sign } from './Sign'
@@ -167,6 +176,17 @@ export function Screen({
     return { kind, tint, shapes }
   }, [seed, content, color, W, H])
 
+  const mat = useMaterials({
+    bezel: { color: frame, roughness: framed ? 0.6 : 0.4, metalness: framed ? 0 : 0.3 },
+    mat: { color: '#f2efe8', roughness: 0.9 },
+    off: { color: OFF, roughness: 0.12, metalness: 0.4 },
+    tint: { kind: 'basic', color: look.tint, toneMapped: false },
+    stand: { color: frame, roughness: 0.5, metalness: 0.3 },
+  })
+  const shapeMaterials = useMaterials(
+    look.shapes.map((s) => ({ kind: 'basic' as const, color: s.color, toneMapped: false })),
+  )
+
   const noise = useMemo(
     () =>
       new ShaderMaterial({
@@ -201,26 +221,19 @@ export function Screen({
         <CuboidCollider args={[W / 2 + bezel, H / 2 + bezel, thick / 2]} position={[0, 0, cz]} />
       )}
 
-      <mesh position={[0, cy, cz]} castShadow>
+      <mesh material={mat.bezel} position={[0, cy, cz]} castShadow>
         <boxGeometry args={[W + bezel * 2, H + bezel * 2, thick]} />
-        <meshStandardMaterial
-          color={frame}
-          roughness={framed ? 0.6 : 0.4}
-          metalness={framed ? 0 : 0.3}
-        />
       </mesh>
       {framed && (
-        <mesh position={[0, cy, cz + thick / 2 + 0.0003 * unit]}>
+        <mesh material={mat.mat} position={[0, cy, cz + thick / 2 + 0.0003 * unit]}>
           <planeGeometry args={[W + bezel * 0.6, H + bezel * 0.6]} />
-          <meshStandardMaterial color="#f2efe8" roughness={0.9} />
         </mesh>
       )}
 
       <group position={[0, cy, cz + glass + (framed ? 0.0005 * unit : 0)]}>
         {!on ? (
-          <mesh>
+          <mesh material={mat.off}>
             <planeGeometry args={[W, H]} />
-            <meshStandardMaterial color={OFF} roughness={0.12} metalness={0.4} />
           </mesh>
         ) : texture ? (
           <mesh>
@@ -233,9 +246,8 @@ export function Screen({
           </mesh>
         ) : look.kind === 'color' || look.kind === 'banner' ? (
           <>
-            <mesh>
+            <mesh material={mat.tint}>
               <planeGeometry args={[W, H]} />
-              <meshBasicMaterial color={look.tint} toneMapped={false} />
             </mesh>
             {look.kind === 'banner' && text && (
               <group position={[0, 0, 0.001 * unit]} scale={fit}>
@@ -250,9 +262,10 @@ export function Screen({
             )}
           </>
         ) : (
-          look.shapes.map((s) => (
+          look.shapes.map((s, i) => (
             <mesh
               key={`${s.pos[0].toFixed(4)}:${s.pos[1].toFixed(4)}:${s.pos[2]}`}
+              material={shapeMaterials[i]}
               position={[s.pos[0], s.pos[1], s.pos[2] * unit]}
             >
               {s.round ? (
@@ -260,7 +273,6 @@ export function Screen({
               ) : (
                 <planeGeometry args={s.size} />
               )}
-              <meshBasicMaterial color={s.color} toneMapped={false} />
             </mesh>
           ))
         )}
@@ -269,25 +281,26 @@ export function Screen({
       {mount === 'stand' &&
         [-1, 1].map((s) => (
           <group key={s} position={[s * W * 0.35, 0, 0]}>
-            <mesh position={[0, (cy - H / 2) / 2, -thick]} castShadow>
+            <mesh material={mat.stand} position={[0, (cy - H / 2) / 2, -thick]} castShadow>
               <boxGeometry args={[0.06 * unit, cy - H / 2, 0.06 * unit]} />
-              <meshStandardMaterial color={frame} roughness={0.5} metalness={0.3} />
             </mesh>
-            <mesh position={[0, 0.015 * unit, -thick]} castShadow receiveShadow>
+            <mesh
+              material={mat.stand}
+              position={[0, 0.015 * unit, -thick]}
+              castShadow
+              receiveShadow
+            >
               <boxGeometry args={[0.12 * unit, 0.03 * unit, 0.4 * unit]} />
-              <meshStandardMaterial color={frame} roughness={0.5} metalness={0.3} />
             </mesh>
           </group>
         ))}
       {mount === 'desk' && (
         <>
-          <mesh position={[0, (lift + H * 0.3) / 2, -thick]} castShadow>
+          <mesh material={mat.stand} position={[0, (lift + H * 0.3) / 2, -thick]} castShadow>
             <boxGeometry args={[0.05 * unit, lift + H * 0.3, 0.025 * unit]} />
-            <meshStandardMaterial color={frame} roughness={0.5} metalness={0.3} />
           </mesh>
-          <mesh position={[0, 0.006 * unit, -thick]} castShadow receiveShadow>
+          <mesh material={mat.stand} position={[0, 0.006 * unit, -thick]} castShadow receiveShadow>
             <cylinderGeometry args={[0.11 * unit, 0.12 * unit, 0.012 * unit, 24]} />
-            <meshStandardMaterial color={frame} roughness={0.5} metalness={0.3} />
           </mesh>
         </>
       )}

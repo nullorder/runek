@@ -1,5 +1,13 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, range, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
 
 export interface TableTennisProps extends WorldComponentProps {
@@ -68,21 +76,34 @@ export function TableTennis({
   const netH = 0.1525 * u
   const netW = (W + 0.3) * u
 
+  const m = useMaterials({
+    top: { color: look.top, roughness: 0.55 },
+    line: { color: lineColor, roughness: 0.5 },
+    tape: { color: lineColor, roughness: 0.6 },
+    frame: { color: frame, metalness: 0.4, roughness: 0.5 },
+    post: { color: frame, metalness: 0.5, roughness: 0.4 },
+    wheel: { color: '#1b1b1e', roughness: 0.8 },
+    net: { color: '#1a1c22', roughness: 0.9, transparent: true, opacity: 0.75 },
+    red: { color: '#c0262d', roughness: 0.7 },
+    black: { color: '#1b1b1e', roughness: 0.7 },
+    handle: { color: '#c9a774', roughness: 0.6 },
+    ball: { color: '#f7f4ee', roughness: 0.4 },
+  })
+
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[(L / 2) * u, top / 2, (W / 2) * u]} position={[0, top / 2, 0]} />
-      <mesh position={[0, top - (T * u) / 2, 0]} castShadow receiveShadow>
+      <mesh material={m.top} position={[0, top - (T * u) / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[L * u, T * u, W * u]} />
-        <meshStandardMaterial color={look.top} roughness={0.55} />
       </mesh>
       {lines.map((l) => (
         <mesh
           key={`${l.pos[0]}:${l.pos[1]}`}
+          material={m.line}
           position={[l.pos[0], top + 0.0005 * u, l.pos[1]]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={l.size} />
-          <meshStandardMaterial color={lineColor} roughness={0.5} />
         </mesh>
       ))}
 
@@ -90,41 +111,48 @@ export function TableTennis({
       {[-1, 1].map((sx) => (
         <group key={sx} position={[sx * legX, 0, 0]}>
           {[-1, 1].map((sz) => (
-            <mesh key={sz} position={[0, (top - T * u) / 2, sz * legZ]} castShadow>
+            <mesh
+              key={sz}
+              material={m.frame}
+              position={[0, (top - T * u) / 2, sz * legZ]}
+              castShadow
+            >
               <boxGeometry args={[0.04 * u, top - T * u, 0.04 * u]} />
-              <meshStandardMaterial color={frame} metalness={0.4} roughness={0.5} />
             </mesh>
           ))}
-          <mesh position={[0, 0.15 * u, 0]}>
+          <mesh material={m.frame} position={[0, 0.15 * u, 0]}>
             <boxGeometry args={[0.03 * u, 0.03 * u, legZ * 2]} />
-            <meshStandardMaterial color={frame} metalness={0.4} roughness={0.5} />
           </mesh>
           {[-1, 1].map((sz) => (
-            <mesh key={`w${sz}`} position={[0, 0.03 * u, sz * legZ]} rotation={[0, 0, Math.PI / 2]}>
+            <mesh
+              key={`w${sz}`}
+              material={m.wheel}
+              position={[0, 0.03 * u, sz * legZ]}
+              rotation={[0, 0, Math.PI / 2]}
+            >
               <cylinderGeometry args={[0.03 * u, 0.03 * u, 0.025 * u, 12]} />
-              <meshStandardMaterial color="#1b1b1e" roughness={0.8} />
             </mesh>
           ))}
         </group>
       ))}
-      <mesh position={[0, top - T * u - 0.04 * u, 0]}>
+      <mesh material={m.frame} position={[0, top - T * u - 0.04 * u, 0]}>
         <boxGeometry args={[legX * 2, 0.05 * u, 0.04 * u]} />
-        <meshStandardMaterial color={frame} metalness={0.4} roughness={0.5} />
       </mesh>
 
       {/* the net: a dark mesh panel with a white tape on top, clamped by two posts */}
-      <mesh position={[0, top + netH / 2, 0]}>
+      <mesh material={m.net} position={[0, top + netH / 2, 0]}>
         <boxGeometry args={[0.004 * u, netH, netW]} />
-        <meshStandardMaterial color="#1a1c22" roughness={0.9} transparent opacity={0.75} />
       </mesh>
-      <mesh position={[0, top + netH - 0.008 * u, 0]}>
+      <mesh material={m.tape} position={[0, top + netH - 0.008 * u, 0]}>
         <boxGeometry args={[0.006 * u, 0.016 * u, netW]} />
-        <meshStandardMaterial color={lineColor} roughness={0.6} />
       </mesh>
       {[-1, 1].map((s) => (
-        <mesh key={`post${s}`} position={[0, top + netH / 2 - 0.01 * u, s * (netW / 2)]}>
+        <mesh
+          key={`post${s}`}
+          material={m.post}
+          position={[0, top + netH / 2 - 0.01 * u, s * (netW / 2)]}
+        >
           <cylinderGeometry args={[0.008 * u, 0.008 * u, netH + 0.02 * u, 8]} />
-          <meshStandardMaterial color={frame} metalness={0.5} roughness={0.4} />
         </mesh>
       ))}
 
@@ -135,20 +163,21 @@ export function TableTennis({
             position={[p.x * u, top + 0.006 * u, p.z * u]}
             rotation={[0, p.turn, 0]}
           >
-            <mesh castShadow>
+            <mesh material={i ? m.black : m.red} castShadow>
               <cylinderGeometry args={[0.075 * u, 0.075 * u, 0.008 * u, 24]} />
-              <meshStandardMaterial color={i ? '#1b1b1e' : '#c0262d'} roughness={0.7} />
             </mesh>
-            <mesh position={[0.1 * u, 0.003 * u, 0]} castShadow>
+            <mesh material={m.handle} position={[0.1 * u, 0.003 * u, 0]} castShadow>
               <boxGeometry args={[0.1 * u, 0.02 * u, 0.028 * u]} />
-              <meshStandardMaterial color="#c9a774" roughness={0.6} />
             </mesh>
           </group>
         ))}
       {ball && (
-        <mesh position={[look.ball.x * u, top + 0.02 * u, look.ball.z * u]} castShadow>
+        <mesh
+          material={m.ball}
+          position={[look.ball.x * u, top + 0.02 * u, look.ball.z * u]}
+          castShadow
+        >
           <sphereGeometry args={[0.02 * u, 14, 10]} />
-          <meshStandardMaterial color="#f7f4ee" roughness={0.4} />
         </mesh>
       )}
     </RigidBody>

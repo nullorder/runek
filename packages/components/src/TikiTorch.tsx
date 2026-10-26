@@ -1,8 +1,18 @@
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { range, rng, sub, useSun, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  Dynamic,
+  range,
+  rng,
+  sub,
+  useLight,
+  useMaterials,
+  useSun,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo, useRef } from 'react'
-import type { Group, PointLight } from 'three'
+import { DoubleSide, type Group } from 'three'
 
 export interface TikiTorchProps extends WorldComponentProps {
   /** Height to the top of the head, in units. */
@@ -42,10 +52,30 @@ export function TikiTorch({
   const sun = useSun()
   const lit = on && (!nightOnly || !sun.day)
   const pole = color ?? '#b89a5e'
-  const head = headColor ?? palette.bark
+  const m = useMaterials({
+    pole: { color: pole, roughness: 0.7 },
+    joint: { color: pole, roughness: 0.8 },
+    cord: { color: pole, roughness: 0.9 },
+    head: { color: headColor ?? palette.bark, roughness: 1, side: DoubleSide, flatShading: true },
+    char: { color: '#1a1410', roughness: 1 },
+    flame: {
+      kind: 'basic',
+      color: flameColor,
+      transparent: true,
+      opacity: 0.85,
+      toneMapped: false,
+    },
+    flameCore: {
+      kind: 'basic',
+      color: '#ffd84d',
+      transparent: true,
+      opacity: 0.9,
+      toneMapped: false,
+    },
+  })
   const H = height * unit
   const flameRef = useRef<Group>(null)
-  const lightRef = useRef<PointLight>(null)
+  const glow = useLight({ color: '#ff9a3c', intensity, distance: 8 * unit, decay: 2 }, lit)
 
   const look = useMemo(() => {
     const r = rng(sub(seed, 0))
@@ -72,7 +102,7 @@ export function TikiTorch({
       flameRef.current.scale.set(1 - n * 0.08, 1 + n * 0.22, 1 - n * 0.08)
       flameRef.current.rotation.z = n * 0.08
     }
-    if (lightRef.current) lightRef.current.intensity = intensity * (1 + n * 0.25)
+    glow.intensity = intensity * (1 + n * 0.25)
   })
 
   const poleR = 0.022 * unit
@@ -82,63 +112,51 @@ export function TikiTorch({
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[poleR * 2, H / 2, poleR * 2]} position={[0, H / 2, 0]} />
       <group rotation={look.lean}>
-        <mesh position={[0, poleH / 2, 0]} castShadow>
+        <mesh material={m.pole} position={[0, poleH / 2, 0]} castShadow>
           <cylinderGeometry args={[poleR, poleR * 1.15, poleH, 10]} />
-          <meshStandardMaterial color={pole} roughness={0.7} />
         </mesh>
         {look.joints.map((y) => (
-          <mesh key={y} position={[0, y, 0]}>
+          <mesh key={y} material={m.joint} position={[0, y, 0]}>
             <torusGeometry args={[poleR * 1.05, poleR * 0.25, 6, 12]} />
-            <meshStandardMaterial color={pole} roughness={0.8} />
           </mesh>
         ))}
         {/* the woven head flares from the pole to its rim, bound with cord */}
-        <mesh position={[0, poleH + headH / 2, 0]} castShadow>
+        <mesh material={m.head} position={[0, poleH + headH / 2, 0]} castShadow>
           <cylinderGeometry args={[headR * look.flare, headR * 0.55, headH, 10, 1, true]} />
-          <meshStandardMaterial color={head} roughness={1} side={2} flatShading />
         </mesh>
         {Array.from({ length: look.bands }, (_, i) => {
           const k = (i + 0.5) / look.bands
           return (
-            <mesh key={k} position={[0, poleH + headH * k, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <mesh
+              key={k}
+              material={m.cord}
+              position={[0, poleH + headH * k, 0]}
+              rotation={[Math.PI / 2, 0, 0]}
+            >
               <torusGeometry
                 args={[headR * (0.55 + (look.flare - 0.55) * k) * 1.02, 0.006 * unit, 5, 14]}
               />
-              <meshStandardMaterial color={pole} roughness={0.9} />
             </mesh>
           )
         })}
-        <mesh position={[0, poleH + headH * 0.92, 0]}>
+        <mesh material={m.char} position={[0, poleH + headH * 0.92, 0]}>
           <cylinderGeometry
             args={[headR * look.flare * 0.92, headR * look.flare * 0.92, 0.01 * unit, 10]}
           />
-          <meshStandardMaterial color="#1a1410" roughness={1} />
         </mesh>
         {lit && (
           <>
-            <group ref={flameRef} position={[0, poleH + headH, 0]}>
-              <mesh position={[0, headR * 1.3, 0]}>
-                <coneGeometry args={[headR * 0.9, headR * 2.8, 9]} />
-                <meshBasicMaterial
-                  color={flameColor}
-                  transparent
-                  opacity={0.85}
-                  toneMapped={false}
-                />
-              </mesh>
-              <mesh position={[0, headR * 0.9, 0]}>
-                <coneGeometry args={[headR * 0.5, headR * 1.8, 9]} />
-                <meshBasicMaterial color="#ffd84d" transparent opacity={0.9} toneMapped={false} />
-              </mesh>
-            </group>
-            <pointLight
-              ref={lightRef}
-              position={[0, poleH + headH + headR * 2, 0]}
-              color="#ff9a3c"
-              intensity={intensity}
-              distance={8 * unit}
-              decay={2}
-            />
+            <Dynamic>
+              <group ref={flameRef} position={[0, poleH + headH, 0]}>
+                <mesh material={m.flame} position={[0, headR * 1.3, 0]}>
+                  <coneGeometry args={[headR * 0.9, headR * 2.8, 9]} />
+                </mesh>
+                <mesh material={m.flameCore} position={[0, headR * 0.9, 0]}>
+                  <coneGeometry args={[headR * 0.5, headR * 1.8, 9]} />
+                </mesh>
+              </group>
+            </Dynamic>
+            <object3D ref={glow.ref} position={[0, poleH + headH + headR * 2, 0]} />
           </>
         )}
       </group>

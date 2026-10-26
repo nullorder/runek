@@ -1,0 +1,47 @@
+# Render-performance budget: build the docs site and run scripts/perf.mjs, which fails when the
+# library world goes over scripts/perf-budget.json. The runner has no GPU, so this enforces the
+# counters (draw calls, scene passes, lights, shadow casters, allocations), not frame rates.
+name: Perf budget
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  perf:
+    runs-on: ubuntu-latest
+    steps:
+      # Full history: the docs build (sync-registry.mjs) reads every release tag's registry/.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Rebuild the registry
+        run: node scripts/build-registry.mjs
+
+      - name: Build the docs site
+        run: pnpm --filter @runek/docs build
+
+      # Chrome ships on the runner image; perf.mjs renders with SwiftShader off macOS.
+      - name: Measure against the budget
+        run: node scripts/perf.mjs --scale 1 --json perf.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf
+          path: perf.json

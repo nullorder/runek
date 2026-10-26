@@ -4882,7 +4882,7 @@
   "Rift": {
     "kind": "component",
     "seeded": true,
-    "doc": "A pair of linked rifts torn in the air: ragged, breathing openings edged in iridescent light\nand shedding glitter. Each shows the other end live and in parallax, exactly as you'd see it\nstanding there, and walking into either carries you through to the other, momentum and all.\nBoth ends are places in the same world, so use it for shortcuts you can walk (across a map,\nup a tower, between rooms); for travel to another world or page, use `Portal`. The look is\nprocedural and asset-free (the seed shapes the edges and the glitter). Each open rift on\nscreen costs a second render of the scene, clipped to the rift's footprint.",
+    "doc": "A pair of linked rifts torn in the air: ragged, breathing openings edged in iridescent light\nand shedding glitter. Each shows the other end live and in parallax, exactly as you'd see it\nstanding there, and walking into either carries you through to the other, momentum and all.\nBoth ends are places in the same world, so use it for shortcuts you can walk (across a map,\nup a tower, between rooms); for travel to another world or page, use `Portal`. The look is\nprocedural and asset-free (the seed shapes the edges and the glitter). Each open rift big\nenough on screen to show the far end live costs a second render of the scene, at half\nresolution and clipped to the rift's footprint; a small or distant one shows a shimmer.",
     "props": {
       "destination": {
         "type": "vec3",

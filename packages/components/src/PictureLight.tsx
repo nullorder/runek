@@ -1,6 +1,5 @@
-import { useSun, useWorld, type WorldComponentProps } from '@runek/core'
-import { useMemo } from 'react'
-import { Object3D } from 'three'
+import { useLight, useMaterials, useSun, useWorld, type WorldComponentProps } from '@runek/core'
+import { DoubleSide } from 'three'
 
 export interface PictureLightProps extends WorldComponentProps {
   /** Length of the hood, in units. */
@@ -51,58 +50,62 @@ export function PictureLight({
   const armLen = Math.hypot(Z, rise)
   const armTilt = Math.atan2(Z, rise)
 
-  const target = useMemo(() => new Object3D(), [])
-  const metal = <meshStandardMaterial color={brass} metalness={0.75} roughness={0.3} />
+  const glow = useLight(
+    {
+      kind: 'spot',
+      color: lightColor,
+      intensity,
+      distance: (fall + 1) * unit,
+      angle: 0.9,
+      penumbra: 0.8,
+      decay: 2,
+    },
+    lit,
+  )
+  const m = useMaterials({
+    metal: { color: brass, metalness: 0.75, roughness: 0.3 },
+    hood: { color: brass, metalness: 0.75, roughness: 0.3, side: DoubleSide },
+    bulb: {
+      color: '#fff6e0',
+      emissive: lightColor,
+      emissiveIntensity: lit ? 2 : 0,
+      toneMapped: !lit,
+    },
+  })
 
   return (
     <group position={position} rotation={rotation}>
       {arms.map((x) => (
         <group key={x} position={[x, 0, 0]}>
-          <mesh position={[0, 0, 0.004 * unit]}>
+          <mesh material={m.metal} position={[0, 0, 0.004 * unit]}>
             <boxGeometry args={[0.05 * unit, 0.07 * unit, 0.008 * unit]} />
-            {metal}
           </mesh>
-          <mesh position={[0, rise / 2, Z / 2]} rotation={[armTilt, 0, 0]}>
+          <mesh material={m.metal} position={[0, rise / 2, Z / 2]} rotation={[armTilt, 0, 0]}>
             <cylinderGeometry args={[0.005 * unit, 0.005 * unit, armLen, 8]} />
-            {metal}
           </mesh>
         </group>
       ))}
       {/* the hood: a half tube along X, opening down and back toward the face it lights */}
       <group position={[0, rise, Z]} rotation={[-0.5, 0, 0]}>
-        <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+        <mesh material={m.hood} rotation={[0, 0, Math.PI / 2]} castShadow>
           <cylinderGeometry args={[hoodR, hoodR, W, 18, 1, true, 0, Math.PI]} />
-          <meshStandardMaterial color={brass} metalness={0.75} roughness={0.3} side={2} />
         </mesh>
         {[-1, 1].map((s) => (
-          <mesh key={s} position={[(s * W) / 2, 0, 0]} rotation={[0, (s * Math.PI) / 2, 0]}>
+          <mesh
+            key={s}
+            material={m.metal}
+            position={[(s * W) / 2, 0, 0]}
+            rotation={[0, (s * Math.PI) / 2, 0]}
+          >
             <circleGeometry args={[hoodR, 18, 0, Math.PI]} />
-            {metal}
           </mesh>
         ))}
-        <mesh position={[0, -hoodR * 0.3, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh material={m.bulb} position={[0, -hoodR * 0.3, 0]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.008 * unit, 0.008 * unit, W * 0.9, 8]} />
-          <meshStandardMaterial
-            color="#fff6e0"
-            emissive={lightColor}
-            emissiveIntensity={lit ? 2 : 0}
-            toneMapped={!lit}
-          />
         </mesh>
       </group>
-      <primitive object={target} position={[0, -fall * unit * 0.6, 0]} />
-      {lit && (
-        <spotLight
-          position={[0, rise - hoodR, Z]}
-          target={target}
-          color={lightColor}
-          intensity={intensity}
-          distance={(fall + 1) * unit}
-          angle={0.9}
-          penumbra={0.8}
-          decay={2}
-        />
-      )}
+      <object3D ref={glow.target} position={[0, -fall * unit * 0.6, 0]} />
+      <object3D ref={glow.ref} position={[0, rise - hoodR, Z]} />
     </group>
   )
 }

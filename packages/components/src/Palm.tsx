@@ -1,5 +1,5 @@
 import { CylinderCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type WorldComponentProps } from '@runek/core'
+import { rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
@@ -163,6 +163,12 @@ export function Palm({
   const { unit, palette } = useWorld()
   const bark = trunkColor ?? palette.bark
   const leaf = frondColor ?? palette.foliage
+  const m = useMaterials({
+    trunk: { color: bark, roughness: 0.95, flatShading: true },
+    crown: { vertexColors: true, roughness: 0.9, side: THREE.DoubleSide, flatShading: true },
+    knot: { color: bark, roughness: 1, flatShading: true },
+    nut: { color: '#6b5233', roughness: 1 },
+  })
   const h = height * unit
   const trunkRef = useRef<THREE.InstancedMesh>(null)
 
@@ -233,27 +239,23 @@ export function Palm({
       <CylinderCollider args={[h / 2, 0.2 * unit]} position={[0, h / 2, 0]} />
       <instancedMesh
         key={`t${rings.length}`}
+        material={m.trunk}
         ref={trunkRef}
         args={[undefined, undefined, rings.length]}
         castShadow
       >
         <cylinderGeometry args={[0.82, 1, 1, 7]} />
-        <meshStandardMaterial color={bark} roughness={0.95} flatShading />
       </instancedMesh>
-      <mesh geometry={crownGeo} position={crown} castShadow>
-        <meshStandardMaterial vertexColors roughness={0.9} side={THREE.DoubleSide} flatShading />
-      </mesh>
+      <mesh material={m.crown} geometry={crownGeo} position={crown} castShadow />
       {/* The knot of frond bases the crown grows from. */}
-      <mesh position={crown} castShadow>
+      <mesh material={m.knot} position={crown} castShadow>
         <sphereGeometry args={[0.17 * unit * (height / 6), 8, 6]} />
-        <meshStandardMaterial color={bark} roughness={1} flatShading />
       </mesh>
       {coconuts && (
         <group position={[crown.x, crown.y, crown.z]} rotation={[0, -crownYaw, 0]}>
           {nuts.map((n, i) => (
-            <mesh key={`${i * 7}`} position={n} castShadow>
+            <mesh key={`${i * 7}`} material={m.nut} position={n} castShadow>
               <sphereGeometry args={[0.11 * unit, 8, 6]} />
-              <meshStandardMaterial color="#6b5233" roughness={1} />
             </mesh>
           ))}
         </group>

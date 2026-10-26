@@ -3,6 +3,7 @@ import {
   type InteractionAction,
   keyLabel,
   useInteraction,
+  useMaterial,
   useWorld,
   type Vec3,
   type WorldComponentProps,
@@ -36,6 +37,7 @@ const INK = '#f6f1e7'
  *  the key the world binds to it (so a remap relabels it). Always faces the camera. */
 export function InteractionPrompt({ actions, position, size = 0.09 }: InteractionPromptProps) {
   const { unit, palette, controls } = useWorld()
+  const capMaterial = useMaterial({ kind: 'basic', color: palette.accent, toneMapped: false })
   const s = size * unit
   const row = s * 2.3
   return (
@@ -47,9 +49,8 @@ export function InteractionPrompt({ actions, position, size = 0.09 }: Interactio
         const y = (actions.length - 1 - i) * row
         return (
           <group key={action.id} position={[0, y, 0]}>
-            <mesh position={[-cap / 2, 0, 0]} renderOrder={1}>
+            <mesh material={capMaterial} position={[-cap / 2, 0, 0]} renderOrder={1}>
               <planeGeometry args={[cap, s * 1.75]} />
-              <meshBasicMaterial color={palette.accent} toneMapped={false} />
             </mesh>
             <Sign
               position={[-cap / 2, 0, 0.002 * unit]}

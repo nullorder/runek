@@ -1,4 +1,4 @@
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -50,18 +50,21 @@ export function Bush({
       }
     })
   }, [R, blobs, foliage, seed])
+  const materials = useMaterials(
+    items.map((b) => ({ color: b.color, flatShading: true, roughness: 0.95 })),
+  )
 
   return (
     <group position={position} rotation={rotation}>
-      {items.map((b) => (
+      {items.map((b, i) => (
         <mesh
           key={`blob-${b.pos[0].toFixed(3)}:${b.pos[1].toFixed(3)}`}
+          material={materials[i]}
           castShadow
           receiveShadow
           position={b.pos}
         >
           <icosahedronGeometry args={[b.r, 0]} />
-          <meshStandardMaterial color={b.color} flatShading roughness={0.95} />
         </mesh>
       ))}
     </group>

@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 
 /** A rectangular hole cut into a wall, for a door or window. */
 export interface WallOpening {
@@ -79,7 +79,7 @@ export function Wall({
   openings,
 }: WallProps) {
   const { unit, palette } = useWorld()
-  const wallColor = color ?? palette.wall
+  const material = useMaterial({ color: color ?? palette.wall })
   const w = width * unit
   const h = height * unit
   const t = thickness * unit
@@ -95,12 +95,12 @@ export function Wall({
       {segments(w, h, scaled).map((s) => (
         <mesh
           key={`${s.x.toFixed(3)}:${s.y.toFixed(3)}`}
+          material={material}
           castShadow
           receiveShadow
           position={[s.x, s.y, 0]}
         >
           <boxGeometry args={[s.w, s.h, t]} />
-          <meshStandardMaterial color={wallColor} />
         </mesh>
       ))}
     </RigidBody>

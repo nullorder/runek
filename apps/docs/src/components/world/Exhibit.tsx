@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber'
 import { RigidBody } from '@react-three/rapier'
 import { Book, registry, Sign } from '@runek/components'
-import { isCompositeDef, WorldNodes } from '@runek/core'
+import { isCompositeDef, useMaterial, WorldNodes } from '@runek/core'
 import { type ComponentType, useRef, useState } from 'react'
 import {
   Box3,
@@ -47,7 +47,11 @@ function Mini({ name, props }: { name: string; props: Record<string, unknown> })
     )
   }
   const Component = entry as ComponentType<Record<string, unknown>>
-  return <Component seed={7} {...props} />
+  return (
+    <group name={`exhibit:${name}`}>
+      <Component seed={7} {...props} />
+    </group>
+  )
 }
 
 /** Scale a measured box down to the pedestal, centered on it and resting on its top. */
@@ -147,12 +151,12 @@ function GuideBook({
   color: string
   onSelect: (doc: DocMeta) => void
 }) {
+  const stand = useMaterial({ color: '#3a2c1d', roughness: 0.8 })
   return (
     <group>
       {/* reading stand */}
-      <mesh castShadow position={[0, 0.3, 0]}>
+      <mesh material={stand} castShadow position={[0, 0.3, 0]}>
         <boxGeometry args={[0.12, 0.6, 0.12]} />
-        <meshStandardMaterial color="#3a2c1d" roughness={0.8} />
       </mesh>
       {/* the guide, opened on the stand and angled toward the visitor (+z); the Book
           component owns the hover pop, cursor, and title label */}
@@ -209,13 +213,13 @@ export function ExhibitStand({
   section?: string
   onSelect: (doc: DocMeta) => void
 }) {
+  const pedestal = useMaterial({ color: '#6b5138', roughness: 0.85 })
   return (
     <group position={position} rotation={[0, rotation, 0]}>
       {/* pedestal */}
       <RigidBody type="fixed" colliders="cuboid">
-        <mesh castShadow receiveShadow position={[0, 0.425, 0]}>
+        <mesh material={pedestal} castShadow receiveShadow position={[0, 0.425, 0]}>
           <boxGeometry args={[1.5, 0.85, 1.5]} />
-          <meshStandardMaterial color="#6b5138" roughness={0.85} />
         </mesh>
       </RigidBody>
 

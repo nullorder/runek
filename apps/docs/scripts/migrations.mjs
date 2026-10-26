@@ -5,7 +5,49 @@
 //
 // Shape: { from, to, summary, before: { lang, code }, after: { lang, code }, notes? }
 
+// 0.17.0: lamps register a `useLight` emitter with the world's light pool instead of mounting
+// their own three.js light. Same migration for every light-emitting component.
+const pooledLight = (title, props = '', extraNotes = []) => ({
+  from: '0.16.0',
+  to: '0.17.0',
+  summary: `\`${title}\` no longer mounts its own three.js light. It registers a \`useLight\` emitter, and the world lends it one of a fixed pool of real lights while it matters to the view. Inside \`<World>\` nothing changes; in your own \`<Canvas>\`, wrap the scene in \`<LightBudget>\` or it gives no light.`,
+  before: {
+    lang: 'tsx',
+    code: `<Canvas>
+  <${title}${props} />
+</Canvas>`,
+  },
+  after: {
+    lang: 'tsx',
+    code: `import { LightBudget } from '@runek/core'
+
+<Canvas>
+  <LightBudget>
+    <${title}${props} />
+  </LightBudget>
+</Canvas>`,
+  },
+  notes: [
+    'A world with more lamps in view than its budget lights the nearest and brightest first (6 point lights and 2 spotlights by default): raise `<World lightBudget>` if a room needs more.',
+    'If you edited your copy to reach its light (a ref to the `<pointLight>`), use the emitter instead: `useLight` returns it, and you can write its `intensity` every frame.',
+    'A copy pulled at 0.17.0 imports `useLight`, `useMaterial` and `Dynamic` from `@runek/core` 0.17.0; `runek add` picks the registry snapshot that matches the core you have.',
+    ...extraNotes,
+  ],
+})
+
 export const MIGRATIONS = {
+  lamp: [pooledLight('Lamp', ' flicker={0.3}')],
+  desklamp: [pooledLight('DeskLamp')],
+  ceilinglight: [pooledLight('CeilingLight', ' kind="spot"')],
+  chandelier: [
+    pooledLight('Chandelier', '', [
+      "The crystal drops are glossy see-through glass rather than refractive (`transmission`), which made three.js draw every solid object in the world a second time each frame. To get refraction back in your copy, swap the drops' look for a `meshPhysicalMaterial` with `transmission`, and expect that cost.",
+    ]),
+  ],
+  picturelight: [pooledLight('PictureLight')],
+  tikitorch: [pooledLight('TikiTorch')],
+  campfire: [pooledLight('Campfire')],
+
   wall: [
     {
       from: '0.11.0',

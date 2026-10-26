@@ -17,9 +17,17 @@ import {
   Sofa,
   Wall,
 } from '@runek/components'
-import { World, type WorldPalette } from '@runek/core'
+import {
+  type LightLook,
+  useLight,
+  useMaterial,
+  useMaterials,
+  World,
+  type WorldPalette,
+} from '@runek/core'
 import { useEffect, useMemo, useState } from 'react'
 import GalleryHall from './GalleryHall'
+import { PerfProbe, perfParams } from './PerfProbe'
 
 export type DocMeta = {
   slug: string
@@ -98,17 +106,27 @@ function RuneStroke({ a, b }: { a: readonly [number, number]; b: readonly [numbe
   const dx = bx - ax
   const dy = by - ay
   const len = Math.hypot(dx, dy) + RUNE_STROKE // overshoot so joints overlap cleanly
+  const glow = useMaterial({
+    color: RUNE_GREEN,
+    emissive: RUNE_GREEN,
+    emissiveIntensity: 0.9,
+    toneMapped: false,
+  })
   return (
-    <mesh position={[(ax + bx) / 2, (ay + by) / 2, 0]} rotation={[0, 0, Math.atan2(dy, dx)]}>
+    <mesh
+      material={glow}
+      position={[(ax + bx) / 2, (ay + by) / 2, 0]}
+      rotation={[0, 0, Math.atan2(dy, dx)]}
+    >
       <boxGeometry args={[len, RUNE_STROKE, RUNE_DEPTH]} />
-      <meshStandardMaterial
-        color={RUNE_GREEN}
-        emissive={RUNE_GREEN}
-        emissiveIntensity={0.9}
-        toneMapped={false}
-      />
     </mesh>
   )
+}
+
+/** A light source with no fixture: one of the world's pooled lights, lent to it when it matters. */
+function Glow({ position, ...look }: LightLook & { position: [number, number, number] }) {
+  const glow = useLight({ decay: 2, ...look })
+  return <object3D ref={glow.ref} position={position} />
 }
 
 /**
@@ -116,22 +134,24 @@ function RuneStroke({ a, b }: { a: readonly [number, number]; b: readonly [numbe
  * stacks toward the player (−z): frame against the wall, rune frontmost.
  */
 function RunekEmblem({ position }: { position: [number, number, number] }) {
+  const m = useMaterials({
+    frame: { color: '#4a3726', roughness: 0.8 },
+    back: { color: '#0a0e14', roughness: 0.6 },
+  })
   return (
     <group position={position}>
-      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+      <mesh material={m.frame} position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[1.55, 2.3, 0.08]} />
-        <meshStandardMaterial color="#4a3726" roughness={0.8} />
       </mesh>
-      <mesh position={[0, 0, -0.04]}>
+      <mesh material={m.back} position={[0, 0, -0.04]}>
         <boxGeometry args={[1.3, 2.05, 0.04]} />
-        <meshStandardMaterial color="#0a0e14" roughness={0.6} />
       </mesh>
       <group position={[0, 0, -0.08]}>
         {RUNE_SEGMENTS.map(([p, q]) => (
           <RuneStroke key={`${p}${q}`} a={RUNE_POINTS[p]} b={RUNE_POINTS[q]} />
         ))}
       </group>
-      <pointLight position={[0, 0, -0.7]} color={RUNE_GREEN} intensity={3} distance={4} decay={2} />
+      <Glow position={[0, 0, -0.7]} color={RUNE_GREEN} intensity={3} distance={4} />
     </group>
   )
 }
@@ -189,6 +209,7 @@ export default function LibraryWorld({
   version?: string
 }) {
   const [selected, setSelected] = useState<DocMeta | null>(null)
+  const nameplate = useMaterial({ color: '#3a2c1d', roughness: 0.6, metalness: 0.2 })
 
   // One clickable spine per doc; ids are slugs so a select maps back to its doc.
   // Books are grouped per shelf by the shelf's category section, in reading
@@ -222,6 +243,14 @@ export default function LibraryWorld({
         palette={LIBRARY_PALETTE}
         fonts={{ display: PIXEL_FONT }}
         time="21:30"
+        dpr={perfParams?.has('dpr') ? Number(perfParams.get('dpr')) : undefined}
+        batching={perfParams?.get('batching') !== '0'}
+        // The reading room and the gallery hall seen through its doorway hold a dozen lamps
+        // within view of each other; 8 real lights keep the ones in this room lit.
+        lightBudget={8}
+        shadowRate={
+          perfParams?.has('shadowRate') ? Number(perfParams.get('shadowRate')) : undefined
+        }
         onPointerMissed={() => setSelected(null)}
       >
         {/* Night over the open-topped room: Sky reads the world's late hour and
@@ -319,9 +348,8 @@ export default function LibraryWorld({
 
         {/* Nameplate beneath the mark, facing the room (−z, toward the player). */}
         <group position={[0, 1.7, 6.72]}>
-          <mesh castShadow receiveShadow>
+          <mesh material={nameplate} castShadow receiveShadow>
             <boxGeometry args={[3.7, 0.46, 0.07]} />
-            <meshStandardMaterial color="#3a2c1d" roughness={0.6} metalness={0.2} />
           </mesh>
           <Sign
             position={[0, 0, -0.05]}
@@ -347,13 +375,7 @@ export default function LibraryWorld({
         >
           {zone}
         </Sign>
-        <pointLight
-          position={[0, 2.7, -5.9]}
-          intensity={4}
-          distance={4.5}
-          decay={2}
-          color="#cfe0ff"
-        />
+        <Glow position={[0, 2.7, -5.9]} intensity={4} distance={4.5} color="#cfe0ff" />
 
         {/* The doc shelves lining the far wall: every book is a clickable doc,
             grouped into labeled category sections. */}
@@ -420,9 +442,10 @@ export default function LibraryWorld({
         <Person position={[1.6, 0, 1]} seed={77} kind="merchant" wander={2.2} speed={1.1} />
 
         {/* The avatar's own body, shown when a world (or a visitor) switches to third person. */}
-        <Player position={[0, 2, -3.5]} yaw={0}>
+        <Player position={[0, 2, -3.5]} yaw={Number(perfParams?.get('yaw') ?? 0)}>
           <Person physics={false} height={1.3} position={[0, -0.65, 0]} seed={7} lookAt={false} />
         </Player>
+        {perfParams?.has('perf') && <PerfProbe />}
       </World>
 
       <div className="world-hud">

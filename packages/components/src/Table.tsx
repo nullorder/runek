@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 import { ExtrudeGeometry, Shape } from 'three'
 
@@ -37,7 +37,7 @@ export function Table({
   color,
 }: TableProps) {
   const { unit, palette } = useWorld()
-  const woodColor = color ?? palette.wood
+  const wood = useMaterial({ color: color ?? palette.wood })
   const w = width * unit
   const d = depth * unit
   const h = height * unit
@@ -74,40 +74,39 @@ export function Table({
       <CuboidCollider args={[w / 2, t / 2, d / 2]} position={[0, h - t / 2, 0]} />
       {roundTop ? (
         <mesh
+          material={wood}
           geometry={roundTop}
           position={[0, h - t, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
           castShadow
           receiveShadow
-        >
-          <meshStandardMaterial color={woodColor} />
-        </mesh>
+        ></mesh>
       ) : (
-        <mesh castShadow receiveShadow position={[0, h - t / 2, 0]}>
+        <mesh material={wood} castShadow receiveShadow position={[0, h - t / 2, 0]}>
           <boxGeometry args={[w, t, d]} />
-          <meshStandardMaterial color={woodColor} />
         </mesh>
       )}
       {base === 'legs'
         ? legs.map((p) => (
-            <mesh key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`} castShadow position={p}>
+            <mesh
+              key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`}
+              material={wood}
+              castShadow
+              position={p}
+            >
               <boxGeometry args={[leg, legH, leg]} />
-              <meshStandardMaterial color={woodColor} />
             </mesh>
           ))
         : pedestals.map((x) => (
             <group key={x} position={[x, 0, 0]}>
-              <mesh castShadow position={[0, legH / 2, 0]}>
+              <mesh material={wood} castShadow position={[0, legH / 2, 0]}>
                 <boxGeometry args={[leg * 2.2, legH, leg * 2.2]} />
-                <meshStandardMaterial color={woodColor} />
               </mesh>
-              <mesh castShadow receiveShadow position={[0, 0.02 * unit, 0]}>
+              <mesh material={wood} castShadow receiveShadow position={[0, 0.02 * unit, 0]}>
                 <boxGeometry args={[Math.min(w * 0.4, 0.8 * unit), 0.04 * unit, leg * 1.4]} />
-                <meshStandardMaterial color={woodColor} />
               </mesh>
-              <mesh castShadow receiveShadow position={[0, 0.02 * unit, 0]}>
+              <mesh material={wood} castShadow receiveShadow position={[0, 0.02 * unit, 0]}>
                 <boxGeometry args={[leg * 1.4, 0.04 * unit, d * 0.75]} />
-                <meshStandardMaterial color={woodColor} />
               </mesh>
             </group>
           ))}

@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 
 export interface ChairProps {
   position?: Vec3
@@ -24,7 +24,7 @@ export function Chair({
   color,
 }: ChairProps) {
   const { unit, palette } = useWorld()
-  const woodColor = color ?? palette.wood
+  const wood = useMaterial({ color: color ?? palette.wood })
   const w = width * unit
   const d = depth * unit
   const seatY = seatHeight * unit
@@ -43,18 +43,25 @@ export function Chair({
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[w / 2, t, d / 2]} position={[0, seatY, 0]} />
-      <mesh castShadow receiveShadow position={[0, seatY, 0]}>
+      <mesh material={wood} castShadow receiveShadow position={[0, seatY, 0]}>
         <boxGeometry args={[w, t, d]} />
-        <meshStandardMaterial color={woodColor} />
       </mesh>
-      <mesh castShadow receiveShadow position={[0, seatY + backH / 2, -d / 2 + t / 2]}>
+      <mesh
+        material={wood}
+        castShadow
+        receiveShadow
+        position={[0, seatY + backH / 2, -d / 2 + t / 2]}
+      >
         <boxGeometry args={[w, backH, t]} />
-        <meshStandardMaterial color={woodColor} />
       </mesh>
       {legs.map((p) => (
-        <mesh key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`} castShadow position={p}>
+        <mesh
+          key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`}
+          material={wood}
+          castShadow
+          position={p}
+        >
           <boxGeometry args={[leg, seatY, leg]} />
-          <meshStandardMaterial color={woodColor} />
         </mesh>
       ))}
     </RigidBody>

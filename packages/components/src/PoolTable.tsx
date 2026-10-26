@@ -1,5 +1,13 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, range, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { Color, type InstancedMesh, Object3D } from 'three'
 
@@ -103,6 +111,14 @@ export function PoolTable({
     return { cloth: color ?? rolled.cloth, at }
   }, [seed, balls, color, bedL, bedW, r])
 
+  const m = useMaterials({
+    wood: { color: wood, roughness: 0.55 },
+    rail: { color: wood, roughness: 0.45 },
+    cloth: { color: look.cloth, roughness: 0.95 },
+    pocket: { color: '#0d0d0e', roughness: 0.9 },
+    ball: { kind: 'physical', roughness: 0.15, clearcoat: 1 },
+  })
+
   const ballMesh = useRef<InstancedMesh>(null)
   useLayoutEffect(() => {
     const mesh = ballMesh.current
@@ -132,47 +148,55 @@ export function PoolTable({
         position={[0, (H + 0.04 * u) / 2, 0]}
       />
       {/* bed and cloth */}
-      <mesh position={[0, H - apron / 2, 0]} castShadow receiveShadow>
+      <mesh material={m.wood} position={[0, H - apron / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[L - 0.04 * u, apron, Wd - 0.04 * u]} />
-        <meshStandardMaterial color={wood} roughness={0.55} />
       </mesh>
-      <mesh position={[0, H + 0.001 * u, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <mesh
+        material={m.cloth}
+        position={[0, H + 0.001 * u, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
         <planeGeometry args={[bedL, bedW]} />
-        <meshStandardMaterial color={look.cloth} roughness={0.95} />
       </mesh>
       {/* cushions, then the wooden rails around them */}
       {[-1, 1].map((s) => (
         <group key={s}>
-          <mesh position={[0, H + 0.02 * u, s * (bedW / 2 + 0.02 * u)]} castShadow>
+          <mesh
+            material={m.cloth}
+            position={[0, H + 0.02 * u, s * (bedW / 2 + 0.02 * u)]}
+            castShadow
+          >
             <boxGeometry args={[bedL - 0.1 * u, 0.04 * u, 0.04 * u]} />
-            <meshStandardMaterial color={look.cloth} roughness={0.95} />
-          </mesh>
-          <mesh position={[s * (bedL / 2 + 0.02 * u), H + 0.02 * u, 0]} castShadow>
-            <boxGeometry args={[0.04 * u, 0.04 * u, bedW - 0.1 * u]} />
-            <meshStandardMaterial color={look.cloth} roughness={0.95} />
           </mesh>
           <mesh
+            material={m.cloth}
+            position={[s * (bedL / 2 + 0.02 * u), H + 0.02 * u, 0]}
+            castShadow
+          >
+            <boxGeometry args={[0.04 * u, 0.04 * u, bedW - 0.1 * u]} />
+          </mesh>
+          <mesh
+            material={m.rail}
             position={[0, H + 0.025 * u, s * (Wd / 2 - (rail - 0.04 * u) / 2)]}
             castShadow
             receiveShadow
           >
             <boxGeometry args={[L, 0.05 * u, rail - 0.04 * u]} />
-            <meshStandardMaterial color={wood} roughness={0.45} />
           </mesh>
           <mesh
+            material={m.rail}
             position={[s * (L / 2 - (rail - 0.04 * u) / 2), H + 0.025 * u, 0]}
             castShadow
             receiveShadow
           >
             <boxGeometry args={[rail - 0.04 * u, 0.05 * u, Wd]} />
-            <meshStandardMaterial color={wood} roughness={0.45} />
           </mesh>
         </group>
       ))}
       {pockets.map(([x, z]) => (
-        <mesh key={`${x}:${z}`} position={[x, H + 0.03 * u, z]}>
+        <mesh key={`${x}:${z}`} material={m.pocket} position={[x, H + 0.03 * u, z]}>
           <cylinderGeometry args={[0.055 * u, 0.05 * u, 0.062 * u, 16]} />
-          <meshStandardMaterial color="#0d0d0e" roughness={0.9} />
         </mesh>
       ))}
       {/* legs */}
@@ -180,23 +204,23 @@ export function PoolTable({
         [-1, 1].map((sz) => (
           <mesh
             key={`${sx}${sz}`}
+            material={m.wood}
             position={[sx * (L / 2 - 0.2 * u), (H - apron) / 2, sz * (Wd / 2 - 0.16 * u)]}
             castShadow
           >
             <boxGeometry args={[0.14 * u, H - apron, 0.14 * u]} />
-            <meshStandardMaterial color={wood} roughness={0.55} />
           </mesh>
         )),
       )}
       {look.at.length > 0 && (
         <instancedMesh
+          material={m.ball}
           key={look.at.length}
           ref={ballMesh}
           args={[undefined, undefined, look.at.length]}
           castShadow
         >
           <sphereGeometry args={[r, 16, 12]} />
-          <meshPhysicalMaterial roughness={0.15} clearcoat={1} />
         </instancedMesh>
       )}
     </RigidBody>

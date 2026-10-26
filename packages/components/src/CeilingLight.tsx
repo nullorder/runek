@@ -1,6 +1,16 @@
-import { pick, range, rng, sub, useSun, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useLight,
+  useMaterials,
+  useSun,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
-import { Object3D } from 'three'
+import { DoubleSide } from 'three'
 
 /** Close to the ceiling (`flush`), hanging on a cord (`pendant`), or an aimed can (`spot`). */
 export type CeilingLightKind = 'flush' | 'pendant' | 'spot'
@@ -70,42 +80,59 @@ export function CeilingLight({
     }
   }, [seed, kind, shade, shadeColor])
 
-  const target = useMemo(() => new Object3D(), [])
-  const bulb = (
-    <meshStandardMaterial
-      color="#fff6e0"
-      emissive={lightColor}
-      emissiveIntensity={lit ? 2 : 0}
-      toneMapped={!lit}
-    />
+  const m = useMaterials({
+    metal: { color: metal, metalness: 0.5, roughness: 0.4 },
+    can: { color: metal, metalness: 0.5, roughness: 0.4, side: DoubleSide },
+    cord: { color: metal },
+    bulb: {
+      color: '#fff6e0',
+      emissive: lightColor,
+      emissiveIntensity: lit ? 2 : 0,
+      toneMapped: !lit,
+    },
+    globe: {
+      color: look.shadeColor,
+      emissive: lightColor,
+      emissiveIntensity: lit ? 0.9 : 0,
+      transparent: true,
+      opacity: 0.92,
+    },
+    shade: { color: look.shadeColor, roughness: 0.5, metalness: 0.2, side: DoubleSide },
+  })
+  const spot = look.kind === 'spot'
+  const glow = useLight(
+    {
+      kind: spot ? 'spot' : 'point',
+      color: lightColor,
+      intensity: spot ? intensity * 2 : intensity,
+      distance: (spot ? 12 : 10) * unit,
+      decay: 2,
+      angle: 0.5,
+      penumbra: 0.6,
+    },
+    lit,
   )
   const canopy = (
-    <mesh position={[0, -0.015 * unit, 0]}>
+    <mesh material={m.metal} position={[0, -0.015 * unit, 0]}>
       <cylinderGeometry args={[0.06 * unit, 0.07 * unit, 0.03 * unit, 16]} />
-      <meshStandardMaterial color={metal} metalness={0.5} roughness={0.4} />
     </mesh>
   )
 
   if (look.kind === 'flush') {
     return (
       <group position={position} rotation={rotation}>
-        <mesh position={[0, -0.01 * unit, 0]}>
+        <mesh material={m.metal} position={[0, -0.01 * unit, 0]}>
           <cylinderGeometry args={[R * 1.05, R * 1.05, 0.02 * unit, 28]} />
-          <meshStandardMaterial color={metal} metalness={0.5} roughness={0.4} />
         </mesh>
-        <mesh position={[0, -0.02 * unit, 0]} scale={[1, 0.45, 1]} rotation={[Math.PI, 0, 0]}>
+        <mesh
+          material={m.bulb}
+          position={[0, -0.02 * unit, 0]}
+          scale={[1, 0.45, 1]}
+          rotation={[Math.PI, 0, 0]}
+        >
           <sphereGeometry args={[R, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          {bulb}
         </mesh>
-        {lit && (
-          <pointLight
-            position={[0, -R * 0.6, 0]}
-            color={lightColor}
-            intensity={intensity}
-            distance={10 * unit}
-            decay={2}
-          />
-        )}
+        <object3D ref={glow.ref} position={[0, -R * 0.6, 0]} />
       </group>
     )
   }
@@ -116,27 +143,18 @@ export function CeilingLight({
       <group position={position} rotation={rotation}>
         {canopy}
         <group position={[0, -0.04 * unit, 0]} rotation={[look.tilt, 0, 0]}>
-          <mesh position={[0, -canL / 2, 0]} castShadow>
+          <mesh material={m.can} position={[0, -canL / 2, 0]} castShadow>
             <cylinderGeometry args={[0.05 * unit, 0.045 * unit, canL, 18, 1, true]} />
-            <meshStandardMaterial color={metal} metalness={0.5} roughness={0.4} side={2} />
           </mesh>
-          <mesh position={[0, -canL + 0.01 * unit, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <mesh
+            material={m.bulb}
+            position={[0, -canL + 0.01 * unit, 0]}
+            rotation={[Math.PI / 2, 0, 0]}
+          >
             <circleGeometry args={[0.04 * unit, 18]} />
-            {bulb}
           </mesh>
-          <primitive object={target} position={[0, -3 * unit, 0]} />
-          {lit && (
-            <spotLight
-              position={[0, -canL, 0]}
-              target={target}
-              color={lightColor}
-              intensity={intensity * 2}
-              distance={12 * unit}
-              angle={0.5}
-              penumbra={0.6}
-              decay={2}
-            />
-          )}
+          <object3D ref={glow.target} position={[0, -3 * unit, 0]} />
+          <object3D ref={glow.ref} position={[0, -canL, 0]} />
         </group>
       </group>
     )
@@ -148,24 +166,16 @@ export function CeilingLight({
   return (
     <group position={position} rotation={rotation}>
       {canopy}
-      <mesh position={[0, -D / 2, 0]}>
+      <mesh material={m.cord} position={[0, -D / 2, 0]}>
         <cylinderGeometry args={[0.003 * unit, 0.003 * unit, D, 5]} />
-        <meshStandardMaterial color={metal} />
       </mesh>
       <group position={[0, -D, 0]}>
         {look.shade === 'globe' ? (
-          <mesh position={[0, -R, 0]}>
+          <mesh material={m.globe} position={[0, -R, 0]}>
             <sphereGeometry args={[R, 24, 16]} />
-            <meshStandardMaterial
-              color={look.shadeColor}
-              emissive={lightColor}
-              emissiveIntensity={lit ? 0.9 : 0}
-              transparent
-              opacity={0.92}
-            />
           </mesh>
         ) : (
-          <mesh position={[0, dome ? -R : -shadeH / 2, 0]} castShadow>
+          <mesh material={m.shade} position={[0, dome ? -R : -shadeH / 2, 0]} castShadow>
             {dome ? (
               <sphereGeometry args={[R, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
             ) : look.shade === 'cone' ? (
@@ -173,29 +183,14 @@ export function CeilingLight({
             ) : (
               <cylinderGeometry args={[R, R, shadeH, 24, 1, true]} />
             )}
-            <meshStandardMaterial
-              color={look.shadeColor}
-              roughness={0.5}
-              metalness={0.2}
-              side={2}
-            />
           </mesh>
         )}
         {look.shade !== 'globe' && (
-          <mesh position={[0, -shadeH * 0.8, 0]}>
+          <mesh material={m.bulb} position={[0, -shadeH * 0.8, 0]}>
             <sphereGeometry args={[0.035 * unit, 12, 8]} />
-            {bulb}
           </mesh>
         )}
-        {lit && (
-          <pointLight
-            position={[0, -shadeH, 0]}
-            color={lightColor}
-            intensity={intensity}
-            distance={10 * unit}
-            decay={2}
-          />
-        )}
+        <object3D ref={glow.ref} position={[0, -shadeH, 0]} />
       </group>
     </group>
   )

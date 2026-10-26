@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type WorldComponentProps } from '@runek/core'
+import { Dynamic, rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo, useRef } from 'react'
 import { BufferAttribute, BufferGeometry, DoubleSide, type Group } from 'three'
 
@@ -102,8 +102,11 @@ export function Sailboat({
   sailColor = '#eee6d0',
 }: SailboatProps) {
   const { unit, palette } = useWorld()
-  const hullColor = color ?? palette.wood
-  const trim = trimColor ?? palette.woodDark
+  const m = useMaterials({
+    hull: { color: color ?? palette.wood, side: DoubleSide, flatShading: true, roughness: 0.8 },
+    trim: { color: trimColor ?? palette.woodDark, roughness: 0.7 },
+    sail: { color: sailColor, side: DoubleSide, roughness: 0.9 },
+  })
   const boat = useRef<Group>(null)
 
   const U = unit
@@ -135,31 +138,30 @@ export function Sailboat({
   // The hull, mast, boom, and sail. `boat` is the group the bob animates, so any placement
   // (the RigidBody, or the bare-visual wrapper) goes on a parent, never on this group.
   const rig = (
-    <group ref={boat}>
-      {/* hull */}
-      <mesh geometry={hull} castShadow receiveShadow>
-        <meshStandardMaterial color={hullColor} side={DoubleSide} flatShading roughness={0.8} />
-      </mesh>
+    <Dynamic>
+      <group ref={boat}>
+        {/* hull */}
+        <mesh material={m.hull} geometry={hull} castShadow receiveShadow></mesh>
 
-      {/* mast */}
-      <mesh position={[0, fb + mastH / 2, mastZ]} castShadow>
-        <cylinderGeometry args={[0.05 * U, 0.06 * U, mastH, 8]} />
-        <meshStandardMaterial color={trim} roughness={0.7} />
-      </mesh>
-
-      {/* boom + mainsail, swung out a touch and pivoting at the mast */}
-      <group position={[0, fb, mastZ]} rotation={[0, boomAngle, 0]}>
-        <mesh position={[0, goose, -boomL / 2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <cylinderGeometry args={[0.04 * U, 0.04 * U, boomL, 6]} />
-          <meshStandardMaterial color={trim} roughness={0.7} />
+        {/* mast */}
+        <mesh material={m.trim} position={[0, fb + mastH / 2, mastZ]} castShadow>
+          <cylinderGeometry args={[0.05 * U, 0.06 * U, mastH, 8]} />
         </mesh>
-        {sail && (
-          <mesh geometry={main} castShadow>
-            <meshStandardMaterial color={sailColor} side={DoubleSide} roughness={0.9} />
+
+        {/* boom + mainsail, swung out a touch and pivoting at the mast */}
+        <group position={[0, fb, mastZ]} rotation={[0, boomAngle, 0]}>
+          <mesh
+            material={m.trim}
+            position={[0, goose, -boomL / 2]}
+            rotation={[Math.PI / 2, 0, 0]}
+            castShadow
+          >
+            <cylinderGeometry args={[0.04 * U, 0.04 * U, boomL, 6]} />
           </mesh>
-        )}
+          {sail && <mesh material={m.sail} geometry={main} castShadow></mesh>}
+        </group>
       </group>
-    </group>
+    </Dynamic>
   )
 
   // Bare visual: a parent controller owns the physics body and places this.

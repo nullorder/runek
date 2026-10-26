@@ -1,6 +1,6 @@
 import { Billboard } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo, useRef, useState } from 'react'
 import { type Group, type Mesh, Shape, ShapeGeometry } from 'three'
 import { Sign } from '../Sign'
@@ -54,6 +54,7 @@ export function SpeechBubble({
   onHeight,
 }: SpeechBubbleProps) {
   const { unit } = useWorld()
+  const paper = useMaterial({ kind: 'basic', color: PAPER, toneMapped: false })
   const [box, setBox] = useState<[number, number] | null>(null)
   const line = text.length > MAX_CHARS ? `${text.slice(0, MAX_CHARS - 1)}…` : text
   const pad = size * unit * 0.9
@@ -66,11 +67,7 @@ export function SpeechBubble({
   )
   return (
     <Billboard position={position}>
-      {geo && (
-        <mesh geometry={geo} renderOrder={1}>
-          <meshBasicMaterial color={PAPER} toneMapped={false} />
-        </mesh>
-      )}
+      {geo && <mesh material={paper} geometry={geo} renderOrder={1} />}
       <Sign
         position={[0, tail + h / 2, 0.002 * unit]}
         variant="body"
@@ -115,6 +112,13 @@ export function Emote({ kind, position, size = 0.17 }: EmoteProps) {
   const s = size * unit
   const parts = useRef<(Group | Mesh | null)[]>([])
   const heart = useMemo(() => (kind === 'happy' ? heartGeometry(s * 0.5) : null), [kind, s])
+  const m = useMaterials({
+    dot: { kind: 'basic', color: THINK, toneMapped: false },
+    heart: { kind: 'basic', color: '#e2566f', toneMapped: false },
+    paper: { kind: 'basic', color: PAPER, toneMapped: false },
+    coffee: { kind: 'basic', color: palette.woodDark, toneMapped: false },
+    steam: { kind: 'basic', color: '#e9eef2', transparent: true, opacity: 0.75, toneMapped: false },
+  })
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
@@ -170,36 +174,27 @@ export function Emote({ kind, position, size = 0.17 }: EmoteProps) {
       )}
       {kind === 'think' &&
         [-1, 0, 1].map((x, i) => (
-          <mesh key={x} ref={set(i)} position={[x * s * 0.42, 0, 0]}>
+          <mesh key={x} material={m.dot} ref={set(i)} position={[x * s * 0.42, 0, 0]}>
             <sphereGeometry args={[s * 0.13, 12, 8]} />
-            <meshBasicMaterial color={THINK} toneMapped={false} />
           </mesh>
         ))}
-      {kind === 'happy' && heart && (
-        <mesh ref={set(0)} geometry={heart}>
-          <meshBasicMaterial color="#e2566f" toneMapped={false} />
-        </mesh>
-      )}
+      {kind === 'happy' && heart && <mesh material={m.heart} ref={set(0)} geometry={heart} />}
       {kind === 'coffee' && (
         <>
           <group ref={set(0)}>
-            <mesh position={[0, s * 0.12, 0]}>
+            <mesh material={m.paper} position={[0, s * 0.12, 0]}>
               <cylinderGeometry args={[s * 0.24, s * 0.2, s * 0.32, 16]} />
-              <meshBasicMaterial color={PAPER} toneMapped={false} />
             </mesh>
-            <mesh position={[s * 0.27, s * 0.13, 0]}>
+            <mesh material={m.paper} position={[s * 0.27, s * 0.13, 0]}>
               <torusGeometry args={[s * 0.09, s * 0.03, 6, 12]} />
-              <meshBasicMaterial color={PAPER} toneMapped={false} />
             </mesh>
-            <mesh position={[0, s * 0.27, 0.001 * unit]}>
+            <mesh material={m.coffee} position={[0, s * 0.27, 0.001 * unit]}>
               <planeGeometry args={[s * 0.44, s * 0.05]} />
-              <meshBasicMaterial color={palette.woodDark} toneMapped={false} />
             </mesh>
           </group>
           {[1, 2, 3].map((i) => (
-            <mesh key={i} ref={set(i)}>
+            <mesh key={i} material={m.steam} ref={set(i)}>
               <sphereGeometry args={[s * 0.07, 8, 6]} />
-              <meshBasicMaterial color="#e9eef2" transparent opacity={0.75} toneMapped={false} />
             </mesh>
           ))}
         </>

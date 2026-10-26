@@ -16,13 +16,16 @@ Runek components all follow the same small contract. Honor it and a component is
 5. **No assets.** Geometry and color come from code; no `.glb`, no textures.
 6. **Default colors from the palette.** Read `palette` from `useWorld()` and use its slots (`wood`, `wall`, `foliage`, …) as your color defaults; an explicit color prop always wins. One palette swap then re-themes the whole world.
 7. **Instance repeated geometry.** Books, branches, blades — render them as one `InstancedMesh`, not one mesh per piece, so worlds stay cheap at scale.
-8. **Publish your surface.** If people can stand on your component, attach `Component.surface` (its walkable top, as a pure function in a `surfaces/<name>.ts` module). If it stands on the ground, set `Component.groundSitting = true`. That's what lets worlds anchor to it and `runek check-world` catch buried or floating props.
+8. **Share static materials.** Get a part's material from `useMaterial({ color, roughness, … })` (or `useMaterials` for several) instead of an inline `<meshStandardMaterial>`. Every part in the world with the same look then draws with one material. Keep a material of your own only when something changes it after mount (a flicker, a texture you draw into).
+9. **Lend, don't light.** If your component gives off light, register it with `useLight({ color, intensity, distance })` and put the returned emitter's `ref` where the light sits. Don't mount a `<pointLight>` yourself: the world keeps a small fixed pool of real lights and lends them to the lamps that matter most to the view.
+10. **Mark what moves.** The world merges static parts that share a material into a few big meshes. Wrap the parts you move, scale, hide or reshape after mount in `<Dynamic>` (from `@runek/core`) so they stay separate.
+11. **Publish your surface.** If people can stand on your component, attach `Component.surface` (its walkable top, as a pure function in a `surfaces/<name>.ts` module). If it stands on the ground, set `Component.groundSitting = true`. That's what lets worlds anchor to it and `runek check-world` catch buried or floating props.
 
 ## A minimal compliant component
 
 ```tsx
 import { RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 
 export interface CrateProps {
@@ -37,12 +40,12 @@ export function Crate({ position = [0, 0, 0], rotation = [0, 0, 0], size = 1, se
   const s = size * unit
 
   const hue = useMemo(() => rng(seed)() * 0.1 + 0.05, [seed])
+  const wood = useMaterial({ color: `hsl(30, 40%, ${40 + hue * 100}%)` })
 
   return (
     <RigidBody type="fixed" colliders="cuboid" position={position} rotation={rotation}>
-      <mesh castShadow receiveShadow>
+      <mesh material={wood} castShadow receiveShadow>
         <boxGeometry args={[s, s, s]} />
-        <meshStandardMaterial color={`hsl(30, 40%, ${40 + hue * 100}%)`} />
       </mesh>
     </RigidBody>
   )

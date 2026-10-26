@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { Sign } from './Sign'
 
 export interface SignpostProps extends WorldComponentProps {
@@ -37,7 +37,10 @@ export function Signpost({
   size = 0.5,
 }: SignpostProps) {
   const { unit, palette } = useWorld()
-  const wood = color ?? palette.wood
+  const m = useMaterials({
+    post: { color: palette.woodDark, roughness: 0.85 },
+    plank: { color: color ?? palette.wood, roughness: 0.8 },
+  })
   const ink = textColor ?? palette.sand
   const H = height * unit
   const W = width * unit
@@ -55,15 +58,13 @@ export function Signpost({
       <CuboidCollider args={[postR, H / 2, postR]} position={[0, H / 2, postZ]} />
 
       {/* post — behind the plank, clear of the text */}
-      <mesh position={[0, H / 2, postZ]} castShadow>
+      <mesh material={m.post} position={[0, H / 2, postZ]} castShadow>
         <cylinderGeometry args={[postR, postR, H, 8]} />
-        <meshStandardMaterial color={palette.woodDark} roughness={0.85} />
       </mesh>
 
       {/* plank */}
-      <mesh position={[0, boardY, 0]} castShadow receiveShadow>
+      <mesh material={m.plank} position={[0, boardY, 0]} castShadow receiveShadow>
         <boxGeometry args={[W, boardH, boardD]} />
-        <meshStandardMaterial color={wood} roughness={0.8} />
       </mesh>
 
       {/* the name, on the clear front face */}

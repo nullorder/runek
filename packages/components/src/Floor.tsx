@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { floorSurface } from './surfaces/floor'
 
 /** A rectangular hole in the slab, e.g. a stairwell. */
@@ -68,7 +68,7 @@ export function Floor({
   color,
 }: FloorProps) {
   const { unit, palette, ground } = useWorld()
-  const floorColor = color ?? palette.floor
+  const material = useMaterial({ color: color ?? palette.floor })
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit
@@ -86,11 +86,11 @@ export function Floor({
       {slabs(w, d, scaled).map((s) => (
         <mesh
           key={`${s.x.toFixed(3)}:${s.z.toFixed(3)}`}
+          material={material}
           receiveShadow
           position={[s.x, -t / 2, s.z]}
         >
           <boxGeometry args={[s.w, t, s.d]} />
-          <meshStandardMaterial color={floorColor} />
         </mesh>
       ))}
     </RigidBody>

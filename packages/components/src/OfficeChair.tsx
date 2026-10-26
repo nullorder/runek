@@ -1,6 +1,6 @@
 import { RoundedBox } from '@react-three/drei'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import { pick, rng, sub, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo } from 'react'
 
 /** A `low` back that stops at the shoulder blades, or a `high` one up to the head. */
@@ -37,8 +37,14 @@ export function OfficeChair({
   frameColor,
 }: OfficeChairProps) {
   const { unit, palette } = useWorld()
-  const cloth = color ?? palette.fabric
   const frame = frameColor ?? palette.metal
+  const m = useMaterials({
+    cloth: { color: color ?? palette.fabric, roughness: 0.9 },
+    frame: { color: frame, roughness: 0.4, metalness: 0.5 },
+    column: { color: frame, roughness: 0.3, metalness: 0.7 },
+    caster: { color: '#1c1c1e', roughness: 0.6 },
+    armPad: { color: '#232326', roughness: 0.7 },
+  })
   const u = unit
 
   const look = useMemo(() => {
@@ -60,20 +66,22 @@ export function OfficeChair({
       {/* five-star base on casters */}
       {legs.map((a) => (
         <group key={a} rotation={[0, a, 0]}>
-          <mesh position={[0, base, 0.17 * u]} rotation={[0.12, 0, 0]} castShadow>
+          <mesh
+            material={m.frame}
+            position={[0, base, 0.17 * u]}
+            rotation={[0.12, 0, 0]}
+            castShadow
+          >
             <boxGeometry args={[0.04 * u, 0.03 * u, 0.32 * u]} />
-            <meshStandardMaterial color={frame} roughness={0.4} metalness={0.5} />
           </mesh>
-          <mesh position={[0, 0.03 * u, 0.31 * u]} castShadow>
+          <mesh material={m.caster} position={[0, 0.03 * u, 0.31 * u]} castShadow>
             <sphereGeometry args={[0.03 * u, 10, 8]} />
-            <meshStandardMaterial color="#1c1c1e" roughness={0.6} />
           </mesh>
         </group>
       ))}
       {/* gas column */}
-      <mesh position={[0, (base + seatY - cushion) / 2, 0]} castShadow>
+      <mesh material={m.column} position={[0, (base + seatY - cushion) / 2, 0]} castShadow>
         <cylinderGeometry args={[0.028 * u, 0.034 * u, seatY - cushion - base, 12]} />
-        <meshStandardMaterial color={frame} roughness={0.3} metalness={0.7} />
       </mesh>
       {/* seat */}
       <RoundedBox
@@ -81,15 +89,13 @@ export function OfficeChair({
         radius={0.03 * u}
         smoothness={3}
         position={[0, seatY - cushion / 2, 0.01 * u]}
+        material={m.cloth}
         castShadow
         receiveShadow
-      >
-        <meshStandardMaterial color={cloth} roughness={0.9} />
-      </RoundedBox>
+      />
       {/* back, on a spine up from under the seat, reclined a touch */}
-      <mesh position={[0, seatY + 0.06 * u, -0.25 * u]} castShadow>
+      <mesh material={m.frame} position={[0, seatY + 0.06 * u, -0.25 * u]} castShadow>
         <boxGeometry args={[0.05 * u, 0.22 * u, 0.025 * u]} />
-        <meshStandardMaterial color={frame} roughness={0.4} metalness={0.5} />
       </mesh>
       <RoundedBox
         args={[0.46 * u, backH, 0.07 * u]}
@@ -97,21 +103,18 @@ export function OfficeChair({
         smoothness={3}
         position={[0, seatY + 0.1 * u + backH / 2, -0.28 * u]}
         rotation={[-0.12, 0, 0]}
+        material={m.cloth}
         castShadow
         receiveShadow
-      >
-        <meshStandardMaterial color={cloth} roughness={0.9} />
-      </RoundedBox>
+      />
       {look.arms &&
         [-1, 1].map((s) => (
           <group key={s} position={[s * 0.27 * u, seatY, -0.02 * u]}>
-            <mesh position={[0, 0.1 * u, 0]} castShadow>
+            <mesh material={m.frame} position={[0, 0.1 * u, 0]} castShadow>
               <boxGeometry args={[0.03 * u, 0.2 * u, 0.03 * u]} />
-              <meshStandardMaterial color={frame} roughness={0.4} metalness={0.5} />
             </mesh>
-            <mesh position={[0, 0.21 * u, 0.02 * u]} castShadow>
+            <mesh material={m.armPad} position={[0, 0.21 * u, 0.02 * u]} castShadow>
               <boxGeometry args={[0.06 * u, 0.03 * u, 0.26 * u]} />
-              <meshStandardMaterial color="#232326" roughness={0.7} />
             </mesh>
           </group>
         ))}

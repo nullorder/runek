@@ -1,5 +1,5 @@
 import { RigidBody, TrimeshCollider } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import {
@@ -65,6 +65,10 @@ export function Terrain({
 }: TerrainProps) {
   const { unit, palette } = useWorld()
   const groundColor = color ?? palette.ground
+  const m = useMaterials({
+    displaced: { color: groundColor, flatShading: true },
+    flat: { color: groundColor },
+  })
   const width = size[0] * unit
   const depth = size[1] * unit
   const t = thickness * unit
@@ -83,11 +87,7 @@ export function Terrain({
   useEffect(() => () => displaced?.dispose(), [displaced])
 
   if (displaced) {
-    const mesh = (
-      <mesh geometry={displaced} receiveShadow castShadow>
-        <meshStandardMaterial color={groundColor} flatShading />
-      </mesh>
-    )
+    const mesh = <mesh geometry={displaced} material={m.displaced} receiveShadow castShadow />
     // The trimesh is built here rather than with colliders="trimesh", which derives it in an
     // effect one commit after mount: a dynamic body spawned over the terrain could fall through.
     return collider ? (
@@ -108,9 +108,8 @@ export function Terrain({
   }
 
   const flat = (
-    <mesh receiveShadow position={[0, -t / 2, 0]}>
+    <mesh material={m.flat} receiveShadow position={[0, -t / 2, 0]}>
       <boxGeometry args={[width, t, depth]} />
-      <meshStandardMaterial color={groundColor} />
     </mesh>
   )
   return collider ? (

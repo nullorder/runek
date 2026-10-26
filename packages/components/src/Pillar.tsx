@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterials, useWorld, type Vec3 } from '@runek/core'
 
 export interface PillarProps {
   position?: Vec3
@@ -28,6 +28,10 @@ export function Pillar({
 }: PillarProps) {
   const { unit, palette } = useWorld()
   const stone = color ?? palette.stone
+  const m = useMaterials({
+    stone: { color: stone, roughness: 0.92 },
+    shaft: { color: stone, roughness: 0.92, flatShading: flutes > 0 },
+  })
   const r = radius * unit
   const h = height * unit
   const plinthH = 0.08 * h
@@ -39,23 +43,19 @@ export function Pillar({
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[r, h / 2, r]} position={[0, h / 2, 0]} />
 
-      <mesh castShadow receiveShadow position={[0, plinthH / 2, 0]}>
+      <mesh material={m.stone} castShadow receiveShadow position={[0, plinthH / 2, 0]}>
         <boxGeometry args={[r * 2.4, plinthH, r * 2.4]} />
-        <meshStandardMaterial color={stone} roughness={0.92} />
       </mesh>
 
-      <mesh castShadow receiveShadow position={[0, plinthH + shaftH / 2, 0]}>
+      <mesh material={m.shaft} castShadow receiveShadow position={[0, plinthH + shaftH / 2, 0]}>
         <cylinderGeometry args={[r * 0.85, r, shaftH, seg]} />
-        <meshStandardMaterial color={stone} roughness={0.92} flatShading={flutes > 0} />
       </mesh>
 
-      <mesh castShadow receiveShadow position={[0, h - capH, 0]}>
+      <mesh material={m.stone} castShadow receiveShadow position={[0, h - capH, 0]}>
         <cylinderGeometry args={[r * 1.05, r * 0.85, capH * 0.5, 24]} />
-        <meshStandardMaterial color={stone} roughness={0.92} />
       </mesh>
-      <mesh castShadow receiveShadow position={[0, h - capH * 0.25, 0]}>
+      <mesh material={m.stone} castShadow receiveShadow position={[0, h - capH * 0.25, 0]}>
         <boxGeometry args={[r * 2.3, capH * 0.5, r * 2.3]} />
-        <meshStandardMaterial color={stone} roughness={0.92} />
       </mesh>
     </RigidBody>
   )

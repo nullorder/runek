@@ -1,3 +1,4 @@
+export { BATCHED_LAYER, DYNAMIC_KEY, isBatchable, StaticBatcher } from './batching'
 export { GroundContext, PlayerMotionContext, WorldContext } from './context'
 export type { GitHubSource } from './contribute'
 export { editFileUrl, forkUrl, parseGitHubSource } from './contribute'
@@ -36,8 +37,21 @@ export {
   keyLabel,
   resolveControls,
 } from './keyboard'
+export { LightBudget } from './LightBudget'
 export type { Lens } from './lens'
 export { useLensPosition } from './lens'
+export type { LightEmitter, LightKind, LightLook } from './light'
+export { LightPool, LightPoolContext, useLight } from './light'
+export type { MaterialKind, MaterialLook } from './material'
+export {
+  materialKey,
+  releaseMaterial,
+  retainMaterial,
+  sharedMaterial,
+  sharedMaterialCount,
+  useMaterial,
+  useMaterials,
+} from './material'
 export type { OrbitKeysOptions } from './orbitKeys'
 export { groundForward, MOVE_KEYS, useOrbitKeys } from './orbitKeys'
 export type { WorldPalette } from './palette'
@@ -52,6 +66,8 @@ export type {
 export { describeType, isCodeOnly, matches } from './prop-schema'
 export type { Rng } from './rng'
 export { int, pick, range, rng, sub } from './rng'
+export { ShadowRate } from './ShadowRate'
+export { Dynamic, StaticBatching } from './StaticBatching'
 export type { SunState, WorldTime } from './time'
 export {
   clockHours,

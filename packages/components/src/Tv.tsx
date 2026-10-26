@@ -1,5 +1,14 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, range, rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type Vec3,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
 import { Color, type Texture } from 'three'
 
@@ -100,6 +109,20 @@ export function Tv({
   const cz = wall ? thick / 2 + 0.01 * unit : 0
   const top = cy + Hs / 2 + bezel
 
+  const m = useMaterials({
+    bezel: { color: frame, roughness: 0.4, metalness: 0.3 },
+    stand: { color: frame, roughness: 0.5, metalness: 0.3 },
+    foot: { color: frame, roughness: 0.5 },
+    off: { color: OFF, roughness: 0.12, metalness: 0.4 },
+    sky: { kind: 'basic', color: look.sky, toneMapped: false },
+    ground: { kind: 'basic', color: look.ground, toneMapped: false },
+    console: { color: consoleColor ?? palette.woodDark, roughness: 0.7 },
+    door: { color: consoleColor ?? palette.wood, roughness: 0.6 },
+  })
+  const blobMaterials = useMaterials(
+    look.blobs.map((b) => ({ kind: 'basic' as const, color: b.color, toneMapped: false })),
+  )
+
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       {wall ? (
@@ -113,31 +136,29 @@ export function Tv({
         <CuboidCollider args={[0.25 * unit, top / 2, 0.15 * unit]} position={[0, top / 2, 0]} />
       )}
 
-      <mesh position={[0, cy, cz]} castShadow>
+      <mesh material={m.bezel} position={[0, cy, cz]} castShadow>
         <boxGeometry args={[W + bezel * 2, Hs + bezel * 2, thick]} />
-        <meshStandardMaterial color={frame} roughness={0.4} metalness={0.3} />
       </mesh>
       <group position={[0, cy, cz + thick / 2 + 0.0005 * unit]}>
         {on && texture ? (
-          <mesh>
+          <mesh key="texture">
             <planeGeometry args={[W, Hs]} />
             <meshBasicMaterial map={texture} toneMapped={false} />
           </mesh>
         ) : on ? (
           <>
-            <mesh position={[0, (Hs / 2 + look.horizon) / 2, 0]}>
+            <mesh material={m.sky} position={[0, (Hs / 2 + look.horizon) / 2, 0]}>
               <planeGeometry args={[W, Hs / 2 - look.horizon]} />
-              <meshBasicMaterial color={look.sky} toneMapped={false} />
             </mesh>
-            <mesh position={[0, (look.horizon - Hs / 2) / 2, 0]}>
+            <mesh material={m.ground} position={[0, (look.horizon - Hs / 2) / 2, 0]}>
               <planeGeometry args={[W, Hs / 2 + look.horizon]} />
-              <meshBasicMaterial color={look.ground} toneMapped={false} />
             </mesh>
             {/* shapes are clipped to the screen by keeping them inside it: circles are scaled
                 down where they would spill over the edge */}
-            {look.blobs.map((b) => (
+            {look.blobs.map((b, i) => (
               <mesh
                 key={`${b.pos[0].toFixed(4)}:${b.pos[1].toFixed(4)}`}
+                material={blobMaterials[i]}
                 position={[
                   Math.max(-W / 2 + b.r, Math.min(W / 2 - b.r, b.pos[0])),
                   Math.max(-Hs / 2 + Math.min(b.r, Hs / 2), b.pos[1]),
@@ -145,51 +166,56 @@ export function Tv({
                 ]}
               >
                 <circleGeometry args={[Math.min(b.r, Hs / 2), 24]} />
-                <meshBasicMaterial color={b.color} toneMapped={false} />
               </mesh>
             ))}
           </>
         ) : (
-          <mesh>
+          <mesh material={m.off}>
             <planeGeometry args={[W, Hs]} />
-            <meshStandardMaterial color={OFF} roughness={0.12} metalness={0.4} />
           </mesh>
         )}
       </group>
 
       {look.mount === 'stand' && (
         <>
-          <mesh position={[0, (cy - Hs / 2) / 2, -thick * 0.2]} castShadow>
+          <mesh material={m.stand} position={[0, (cy - Hs / 2) / 2, -thick * 0.2]} castShadow>
             <boxGeometry args={[0.07 * unit, cy - Hs / 2, 0.04 * unit]} />
-            <meshStandardMaterial color={frame} roughness={0.5} metalness={0.3} />
           </mesh>
-          <mesh position={[0, 0.01 * unit, 0]} castShadow receiveShadow>
+          <mesh material={m.stand} position={[0, 0.01 * unit, 0]} castShadow receiveShadow>
             <boxGeometry args={[0.45 * unit, 0.02 * unit, 0.26 * unit]} />
-            <meshStandardMaterial color={frame} roughness={0.5} metalness={0.3} />
           </mesh>
         </>
       )}
       {look.mount === 'console' && (
         <>
-          <mesh position={[0, consoleH + standLift / 2, 0]} castShadow>
+          <mesh material={m.stand} position={[0, consoleH + standLift / 2, 0]} castShadow>
             <boxGeometry args={[0.3 * unit, standLift, 0.18 * unit]} />
-            <meshStandardMaterial color={frame} roughness={0.5} metalness={0.3} />
           </mesh>
-          <mesh position={[0, consoleH / 2 + 0.04 * unit, 0]} castShadow receiveShadow>
+          <mesh
+            material={m.console}
+            position={[0, consoleH / 2 + 0.04 * unit, 0]}
+            castShadow
+            receiveShadow
+          >
             <boxGeometry args={[W * 1.24, consoleH - 0.08 * unit, 0.44 * unit]} />
-            <meshStandardMaterial color={consoleColor ?? palette.woodDark} roughness={0.7} />
           </mesh>
           {[-1, 1].map((s) => (
-            <mesh key={s} position={[s * W * 0.31, consoleH / 2 + 0.04 * unit, 0.222 * unit]}>
+            <mesh
+              key={s}
+              material={m.door}
+              position={[s * W * 0.31, consoleH / 2 + 0.04 * unit, 0.222 * unit]}
+            >
               <planeGeometry args={[W * 0.58, consoleH - 0.14 * unit]} />
-              <meshStandardMaterial color={consoleColor ?? palette.wood} roughness={0.6} />
             </mesh>
           ))}
           {[-1, 1].flatMap((sx) =>
             [-1, 1].map((sz) => (
-              <mesh key={`${sx}${sz}`} position={[sx * W * 0.58, 0.02 * unit, sz * 0.18 * unit]}>
+              <mesh
+                key={`${sx}${sz}`}
+                material={m.foot}
+                position={[sx * W * 0.58, 0.02 * unit, sz * 0.18 * unit]}
+              >
                 <boxGeometry args={[0.04 * unit, 0.04 * unit, 0.04 * unit]} />
-                <meshStandardMaterial color={frame} roughness={0.5} />
               </mesh>
             )),
           )}

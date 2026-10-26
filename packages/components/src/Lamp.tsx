@@ -1,8 +1,7 @@
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
-import { useRef } from 'react'
-import type { PointLight } from 'three'
+import { useLight, useMaterials, useWorld, type Vec3 } from '@runek/core'
+import { DoubleSide } from 'three'
 
 export interface LampProps {
   position?: Vec3
@@ -37,46 +36,35 @@ export function Lamp({
   const shadeR = 0.19 * unit
   const shadeH = 0.26 * unit
   const poleH = h - shadeH
-  const lightRef = useRef<PointLight>(null)
+  const glow = useLight({ color: lightColor, intensity, distance: 12 * unit, decay: 2 })
+  const m = useMaterials({
+    metal: { color: metalColor, metalness: 0.4, roughness: 0.5 },
+    shade: { color: shadeColor, emissive: shadeColor, emissiveIntensity: 0.4, side: DoubleSide },
+  })
 
   useFrame(({ clock }) => {
-    if (!lightRef.current || flicker <= 0) return
+    if (flicker <= 0) return
     const t = clock.elapsedTime
     // layered sines read as a candle without any per-frame randomness
     const n = Math.sin(t * 9.3) * 0.5 + Math.sin(t * 23.7) * 0.3 + Math.sin(t * 41.1) * 0.2
-    lightRef.current.intensity = intensity * (1 + n * flicker)
+    glow.intensity = intensity * (1 + n * flicker)
   })
 
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[baseR, h / 2, baseR]} position={[0, h / 2, 0]} />
 
-      <mesh castShadow position={[0, 0.025 * unit, 0]}>
+      <mesh material={m.metal} castShadow position={[0, 0.025 * unit, 0]}>
         <cylinderGeometry args={[baseR, baseR, 0.05 * unit, 24]} />
-        <meshStandardMaterial color={metalColor} metalness={0.4} roughness={0.5} />
       </mesh>
-      <mesh castShadow position={[0, poleH / 2, 0]}>
+      <mesh material={m.metal} castShadow position={[0, poleH / 2, 0]}>
         <cylinderGeometry args={[poleR, poleR, poleH, 12]} />
-        <meshStandardMaterial color={metalColor} metalness={0.4} roughness={0.5} />
       </mesh>
-      <mesh castShadow position={[0, h - shadeH / 2, 0]}>
+      <mesh material={m.shade} castShadow position={[0, h - shadeH / 2, 0]}>
         <coneGeometry args={[shadeR, shadeH, 24, 1, true]} />
-        <meshStandardMaterial
-          color={shadeColor}
-          emissive={shadeColor}
-          emissiveIntensity={0.4}
-          side={2}
-        />
       </mesh>
 
-      <pointLight
-        ref={lightRef}
-        position={[0, h - shadeH, 0]}
-        color={lightColor}
-        intensity={intensity}
-        distance={12 * unit}
-        decay={2}
-      />
+      <object3D ref={glow.ref} position={[0, h - shadeH, 0]} />
     </RigidBody>
   )
 }

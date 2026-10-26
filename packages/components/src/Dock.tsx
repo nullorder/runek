@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type WorldComponentProps } from '@runek/core'
+import { rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo } from 'react'
 import { dockSurface } from './surfaces/dock'
 
@@ -28,8 +28,11 @@ export function Dock({
   color,
 }: DockProps) {
   const { unit, palette } = useWorld()
-  const deckColor = color ?? palette.wood
-  const postColor = palette.woodDark
+  const m = useMaterials({
+    deck: { color: color ?? palette.wood, roughness: 0.85 },
+    stringer: { color: palette.woodDark, roughness: 0.85 },
+    post: { color: palette.woodDark, roughness: 0.9 },
+  })
   const L = length * unit
   const W = width * unit
   const D = depth * unit
@@ -70,35 +73,51 @@ export function Dock({
 
       {/* cross planks */}
       {planks.map((p) => (
-        <mesh key={`plank-${p.z.toFixed(3)}`} castShadow receiveShadow position={[0, deckY, p.z]}>
+        <mesh
+          key={`plank-${p.z.toFixed(3)}`}
+          material={m.deck}
+          castShadow
+          receiveShadow
+          position={[0, deckY, p.z]}
+        >
           <boxGeometry args={[W, deckT, p.d]} />
-          <meshStandardMaterial color={deckColor} roughness={0.85} />
         </mesh>
       ))}
 
       {/* side stringers under the deck */}
       {[-1, 1].map((s) => (
-        <mesh key={`stringer-${s}`} position={[s * (W / 2 - 0.1 * unit), deckY - deckT, L / 2]}>
+        <mesh
+          key={`stringer-${s}`}
+          material={m.stringer}
+          position={[s * (W / 2 - 0.1 * unit), deckY - deckT, L / 2]}
+        >
           <boxGeometry args={[0.12 * unit, 0.2 * unit, L]} />
-          <meshStandardMaterial color={postColor} roughness={0.85} />
         </mesh>
       ))}
 
       {/* pilings, sunk into the water */}
       {bents.map((z) =>
         [-1, 1].map((s) => (
-          <mesh key={`pile-${z.toFixed(3)}-${s}`} castShadow position={[s * postX, -D / 2, z]}>
+          <mesh
+            key={`pile-${z.toFixed(3)}-${s}`}
+            material={m.post}
+            castShadow
+            position={[s * postX, -D / 2, z]}
+          >
             <cylinderGeometry args={[postR, postR, D, 8]} />
-            <meshStandardMaterial color={postColor} roughness={0.9} />
           </mesh>
         )),
       )}
 
       {/* seaward mooring posts */}
       {[-1, 1].map((s) => (
-        <mesh key={`bollard-${s}`} castShadow position={[s * postX, 0.25 * unit, L - 0.3 * unit]}>
+        <mesh
+          key={`bollard-${s}`}
+          material={m.post}
+          castShadow
+          position={[s * postX, 0.25 * unit, L - 0.3 * unit]}
+        >
           <cylinderGeometry args={[0.18 * unit, 0.2 * unit, 0.8 * unit, 8]} />
-          <meshStandardMaterial color={postColor} roughness={0.9} />
         </mesh>
       ))}
     </RigidBody>

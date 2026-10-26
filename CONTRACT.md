@@ -50,7 +50,12 @@ The keywords **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are
 ## 7. Palette & performance
 
 - Color props **SHOULD** default to a slot of the world palette (`useWorld().palette`) so one palette swap re-themes a whole world. An explicit color prop **MUST** still override the palette. Fixed colors are acceptable only where no slot fits (e.g. seeded book spines).
+- A static part's material **SHOULD** come from `useMaterial(look)` / `useMaterials(looks)` in `@runek/core`, not an inline `<meshStandardMaterial>`: parts with the same look anywhere in the world then share one material instance (fewer state changes, and what lets the renderer batch them). Shared materials are read-only; a material whose properties change after mount (a flicker, a hover highlight, a texture drawn into) **MUST** stay the component's own.
+- `<World>` merges static parts that share a material into one mesh per material per cell (static batching). Parts a component moves, scales, hides or reshapes after mount (a clock's hands, a flag's cloth, a bobbing hull) **SHOULD** sit inside `<Dynamic>` from `@runek/core`, so they never join a batch. The batcher also leaves out parts it sees moving, but marking them avoids the churn.
 - Repeated geometry (books, branches, blades, …) **SHOULD** render as an `InstancedMesh` — draw calls scale with *kinds* of geometry, not instance counts. See `Bookshelf`, `Trees`, and `Grass` for the pattern.
+- A component that gives off light **MUST** register it with `useLight(look)` from `@runek/core` and place the returned emitter's `ref` (and a spot's `target`), never mount a three.js light itself. The world lends a fixed pool of real lights (`<World lightBudget>`) to the emitters that matter most to the view, so a world full of lamps costs what a handful does. A flicker writes the emitter's `intensity` each frame.
+- Shadow casters **SHOULD** follow the collider rule: gameplay-sized parts cast, small detail doesn't (a shadow narrower than a few centimetres falls inside one texel of a world-sized sun shadow map). It matters most for parts that move or don't batch: each one is a draw in every shadow update. Static detail on shared materials is merged by the batcher and costs little either way.
+- Anything that makes the renderer draw the whole world again (a material with `transmission`, a render-to-texture view like `Rift`'s, a reflection) multiplies the cost of every other component. A component **MUST NOT** use `transmission`; fake glass with opacity and gloss. A component that renders the scene itself **MUST** skip that render when it is culled or too small on screen to matter, and **SHOULD** render it below full resolution. See `Rift`.
 
 ## 8. Dependencies & boundaries
 
@@ -115,6 +120,10 @@ The ground is queryable: `groundAt(x, z)` (and `useGround()` inside a world) ret
 - [ ] Respects `unit` from `useWorld()` (meters, Y-up, radians)
 - [ ] Color props default to world-palette slots; explicit colors still win
 - [ ] Repeated geometry is instanced, not one mesh per piece
+- [ ] Static materials come from `useMaterial` / `useMaterials`; only materials that change after mount are the component's own
+- [ ] Parts animated after mount sit inside `<Dynamic>`
+- [ ] Light comes from `useLight` emitters, never a `<pointLight>` / `<spotLight>` of its own
+- [ ] No `transmission`; any extra scene render is skipped when culled or small, and runs below full resolution
 - [ ] Imports shared code from `@runek/core`; sibling deps declared; no app imports
 - [ ] Open water sits at/below ground (surface origin); contained water is in its vessel
 - [ ] A walkable top publishes `Component.surface` (pure, from `surfaces/<name>.ts`, within 1 cm of the collider); a ground-standing component sets `Component.groundSitting = true`

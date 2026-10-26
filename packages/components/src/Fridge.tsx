@@ -1,6 +1,6 @@
 import { RoundedBox } from '@react-three/drei'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import { pick, rng, sub, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo } from 'react'
 
 /** Freezer drawer on `top` or `bottom`, or a `single` full-height door. */
@@ -57,6 +57,13 @@ export function Fridge({
     }
   }, [seed, layout, color])
 
+  const m = useMaterials({
+    body: { color: look.body, roughness: 0.35, metalness: 0.15 },
+    door: { color: look.body, roughness: 0.3, metalness: 0.15 },
+    kick: { color: '#2a2a2c', roughness: 0.8 },
+    handle: { color: metal, roughness: 0.25, metalness: 0.8 },
+  })
+
   const kick = 0.06 * unit
   const gap = 0.008 * unit
   const doorT = 0.04 * unit
@@ -84,14 +91,12 @@ export function Fridge({
         radius={0.02 * unit}
         smoothness={2}
         position={[0, kick + (H - kick) / 2, -doorT / 2]}
+        material={m.body}
         castShadow
         receiveShadow
-      >
-        <meshStandardMaterial color={look.body} roughness={0.35} metalness={0.15} />
-      </RoundedBox>
-      <mesh position={[0, kick / 2, -0.03 * unit]}>
+      />
+      <mesh material={m.kick} position={[0, kick / 2, -0.03 * unit]}>
         <boxGeometry args={[W - 0.04 * unit, kick, D - 0.08 * unit]} />
-        <meshStandardMaterial color="#2a2a2c" roughness={0.8} />
       </mesh>
       {doors.map(([y0, y1]) => {
         const h = y1 - y0
@@ -103,10 +108,9 @@ export function Fridge({
               args={[W - 0.01 * unit, h, doorT]}
               radius={0.015 * unit}
               smoothness={2}
+              material={m.door}
               castShadow
-            >
-              <meshStandardMaterial color={look.body} roughness={0.3} metalness={0.15} />
-            </RoundedBox>
+            />
             {(short
               ? [-1, 1].map((k) => [
                   k * W * 0.28,
@@ -114,13 +118,17 @@ export function Fridge({
                 ])
               : [-1, 1].map((k) => [hx, ((k * Math.min(h * 0.55, 0.6 * unit)) / 2) * 0.9])
             ).map(([px, py]) => (
-              <mesh key={`${px}:${py}`} position={[px, py, doorT / 2 + 0.0125 * unit]}>
+              <mesh
+                key={`${px}:${py}`}
+                material={m.handle}
+                position={[px, py, doorT / 2 + 0.0125 * unit]}
+              >
                 <boxGeometry args={[0.014 * unit, 0.014 * unit, 0.025 * unit]} />
-                <meshStandardMaterial color={metal} roughness={0.25} metalness={0.8} />
               </mesh>
             ))}
             {short ? (
               <mesh
+                material={m.handle}
                 position={[
                   0,
                   (look.layout === 'bottom' ? 1 : -1) * (h / 2 - 0.06 * unit),
@@ -130,14 +138,12 @@ export function Fridge({
                 castShadow
               >
                 <cylinderGeometry args={[0.012 * unit, 0.012 * unit, W * 0.6, 10]} />
-                <meshStandardMaterial color={metal} roughness={0.25} metalness={0.8} />
               </mesh>
             ) : (
-              <mesh position={[hx, 0, doorT / 2 + 0.025 * unit]} castShadow>
+              <mesh material={m.handle} position={[hx, 0, doorT / 2 + 0.025 * unit]} castShadow>
                 <cylinderGeometry
                   args={[0.012 * unit, 0.012 * unit, Math.min(h * 0.55, 0.6 * unit), 10]}
                 />
-                <meshStandardMaterial color={metal} roughness={0.25} metalness={0.8} />
               </mesh>
             )}
           </group>

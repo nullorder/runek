@@ -1,4 +1,4 @@
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 
 export interface RugProps {
@@ -30,8 +30,11 @@ export function Rug({
   seed = 1,
 }: RugProps) {
   const { unit, palette } = useWorld()
-  const baseCol = baseColor ?? palette.fabric
-  const borderCol = borderColor ?? palette.accent
+  const m = useMaterials({
+    border: { color: borderColor ?? palette.accent },
+    base: { color: baseColor ?? palette.fabric },
+    stripe: { color: accentColor },
+  })
   const w = size[0] * unit
   const d = size[1] * unit
   const t = 0.02 * unit
@@ -49,22 +52,20 @@ export function Rug({
 
   return (
     <group position={position} rotation={rotation}>
-      <mesh receiveShadow position={[0, t / 2, 0]}>
+      <mesh material={m.border} receiveShadow position={[0, t / 2, 0]}>
         <boxGeometry args={[w, t, d]} />
-        <meshStandardMaterial color={borderCol} />
       </mesh>
-      <mesh position={[0, t + 0.001 * unit, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh material={m.base} position={[0, t + 0.001 * unit, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[w - border * 2, d - border * 2]} />
-        <meshStandardMaterial color={baseCol} />
       </mesh>
       {stripes.map((s) => (
         <mesh
           key={`stripe-${s.x.toFixed(3)}`}
+          material={m.stripe}
           position={[s.x, t + 0.002 * unit, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={[s.width, d - border * 2]} />
-          <meshStandardMaterial color={accentColor} />
         </mesh>
       ))}
     </group>

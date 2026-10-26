@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { Dynamic, rng, useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { useMemo, useRef } from 'react'
 import type { Group } from 'three'
 
@@ -39,6 +39,7 @@ export function Birds({
   seed = 1,
 }: BirdsProps) {
   const { unit } = useWorld()
+  const material = useMaterial({ color })
   const A = area * unit
   const hy = height * unit
   const bodyRefs = useRef<(Group | null)[]>([])
@@ -83,40 +84,39 @@ export function Birds({
 
   const wingL = 0.35 * unit
   return (
-    <group position={position} rotation={rotation}>
-      {birds.map((b, i) => (
-        <group
-          key={`bird-${b.phase.toFixed(4)}`}
-          ref={(el) => {
-            bodyRefs.current[i] = el
-          }}
-        >
-          <mesh castShadow>
-            <sphereGeometry args={[0.06 * unit, 6, 6]} />
-            <meshStandardMaterial color={color} />
-          </mesh>
+    <Dynamic>
+      <group position={position} rotation={rotation}>
+        {birds.map((b, i) => (
           <group
+            key={`bird-${b.phase.toFixed(4)}`}
             ref={(el) => {
-              leftRefs.current[i] = el
+              bodyRefs.current[i] = el
             }}
           >
-            <mesh position={[wingL / 2, 0, 0]} castShadow>
-              <boxGeometry args={[wingL, 0.01 * unit, 0.12 * unit]} />
-              <meshStandardMaterial color={color} />
+            <mesh material={material}>
+              <sphereGeometry args={[0.06 * unit, 6, 6]} />
             </mesh>
+            <group
+              ref={(el) => {
+                leftRefs.current[i] = el
+              }}
+            >
+              <mesh material={material} position={[wingL / 2, 0, 0]}>
+                <boxGeometry args={[wingL, 0.01 * unit, 0.12 * unit]} />
+              </mesh>
+            </group>
+            <group
+              ref={(el) => {
+                rightRefs.current[i] = el
+              }}
+            >
+              <mesh material={material} position={[-wingL / 2, 0, 0]}>
+                <boxGeometry args={[wingL, 0.01 * unit, 0.12 * unit]} />
+              </mesh>
+            </group>
           </group>
-          <group
-            ref={(el) => {
-              rightRefs.current[i] = el
-            }}
-          >
-            <mesh position={[-wingL / 2, 0, 0]} castShadow>
-              <boxGeometry args={[wingL, 0.01 * unit, 0.12 * unit]} />
-              <meshStandardMaterial color={color} />
-            </mesh>
-          </group>
-        </group>
-      ))}
-    </group>
+        ))}
+      </group>
+    </Dynamic>
   )
 }

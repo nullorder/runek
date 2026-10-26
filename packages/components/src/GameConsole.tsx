@@ -1,4 +1,13 @@
-import { pick, range, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterial,
+  useMaterials,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
 
 /** Standing upright (`tower`), lying flat (`slab`), or a small `cube`. */
@@ -30,28 +39,33 @@ const SIZES: Record<GameConsoleStyle, [number, number, number]> = {
 }
 
 function Controller({ color, accent, u }: { color: string; accent: string; u: number }) {
+  const m = useMaterials({
+    shell: { color, roughness: 0.5 },
+    stick: { color: '#2a2a2e', roughness: 0.8 },
+    select: { color: '#2a2a2e' },
+    light: { kind: 'basic', color: accent, toneMapped: false },
+  })
+  const buttons = useMaterials(BUTTONS.map((c) => ({ color: c, roughness: 0.3 })))
   return (
     <group>
-      <mesh position={[0, 0.02 * u, 0]} castShadow>
+      <mesh material={m.shell} position={[0, 0.02 * u, 0]} castShadow>
         <boxGeometry args={[0.1 * u, 0.025 * u, 0.055 * u]} />
-        <meshStandardMaterial color={color} roughness={0.5} />
       </mesh>
       {/* grips: two rounded handles swept back toward the player */}
       {[-1, 1].map((s) => (
         <mesh
           key={s}
+          material={m.shell}
           position={[s * 0.052 * u, 0.018 * u, 0.025 * u]}
           rotation={[Math.PI / 2 - 0.3, 0, s * 0.35]}
           castShadow
         >
           <capsuleGeometry args={[0.017 * u, 0.04 * u, 4, 10]} />
-          <meshStandardMaterial color={color} roughness={0.5} />
         </mesh>
       ))}
       {[-1, 1].map((s) => (
-        <mesh key={`stick${s}`} position={[s * 0.022 * u, 0.04 * u, 0.012 * u]}>
+        <mesh key={`stick${s}`} material={m.stick} position={[s * 0.022 * u, 0.04 * u, 0.012 * u]}>
           <cylinderGeometry args={[0.008 * u, 0.007 * u, 0.012 * u, 12]} />
-          <meshStandardMaterial color="#2a2a2e" roughness={0.8} />
         </mesh>
       ))}
       {BUTTONS.map((c, i) => {
@@ -59,6 +73,7 @@ function Controller({ color, accent, u }: { color: string; accent: string; u: nu
         return (
           <mesh
             key={c}
+            material={buttons[i]}
             position={[
               0.042 * u + Math.cos(a) * 0.008 * u,
               0.034 * u,
@@ -66,17 +81,14 @@ function Controller({ color, accent, u }: { color: string; accent: string; u: nu
             ]}
           >
             <sphereGeometry args={[0.004 * u, 8, 6]} />
-            <meshStandardMaterial color={c} roughness={0.3} />
           </mesh>
         )
       })}
-      <mesh position={[-0.042 * u, 0.034 * u, -0.008 * u]}>
+      <mesh material={m.select} position={[-0.042 * u, 0.034 * u, -0.008 * u]}>
         <boxGeometry args={[0.018 * u, 0.004 * u, 0.006 * u]} />
-        <meshStandardMaterial color="#2a2a2e" />
       </mesh>
-      <mesh position={[0, 0.0331 * u, -0.02 * u]}>
+      <mesh material={m.light} position={[0, 0.0331 * u, -0.02 * u]}>
         <boxGeometry args={[0.012 * u, 0.001 * u, 0.004 * u]} />
-        <meshBasicMaterial color={accent} toneMapped={false} />
       </mesh>
     </group>
   )
@@ -125,26 +137,35 @@ export function GameConsole({
 
   const [w, h, d] = SIZES[look.style].map((v) => v * u)
   const trim = look.body === '#eceef0' ? '#18191c' : '#3a3d44'
+  const m = useMaterials({
+    base: { color: trim, roughness: 0.6 },
+    body: { color: look.body, roughness: 0.35, metalness: 0.1 },
+    vent: { color: trim, roughness: 0.8 },
+  })
+  const power = useMaterial(
+    on ? { kind: 'basic', color: look.light, toneMapped: false } : { color: '#333' },
+  )
 
   return (
     <group position={position} rotation={rotation}>
       {look.style === 'tower' && (
-        <mesh position={[0, 0.006 * u, 0]} receiveShadow>
+        <mesh material={m.base} position={[0, 0.006 * u, 0]} receiveShadow>
           <boxGeometry args={[w * 1.6, 0.012 * u, d * 0.7]} />
-          <meshStandardMaterial color={trim} roughness={0.6} />
         </mesh>
       )}
       <group position={[0, (look.style === 'tower' ? 0.012 * u : 0) + h / 2, 0]}>
-        <mesh castShadow receiveShadow>
+        <mesh material={m.body} castShadow receiveShadow>
           <boxGeometry args={[w, h, d]} />
-          <meshStandardMaterial color={look.body} roughness={0.35} metalness={0.1} />
         </mesh>
         {/* a dark vent band across the front, and the power light */}
-        <mesh position={[0, look.style === 'slab' ? 0 : h * 0.3, d / 2 + 0.0005 * u]}>
+        <mesh
+          material={m.vent}
+          position={[0, look.style === 'slab' ? 0 : h * 0.3, d / 2 + 0.0005 * u]}
+        >
           <planeGeometry args={[w * 0.92, look.style === 'slab' ? h * 0.3 : h * 0.08]} />
-          <meshStandardMaterial color={trim} roughness={0.8} />
         </mesh>
         <mesh
+          material={power}
           position={[
             look.style === 'slab' ? w * 0.4 : 0,
             look.style === 'slab' ? 0 : -h * 0.35,
@@ -152,11 +173,6 @@ export function GameConsole({
           ]}
         >
           <circleGeometry args={[0.006 * u, 12]} />
-          {on ? (
-            <meshBasicMaterial color={look.light} toneMapped={false} />
-          ) : (
-            <meshStandardMaterial color="#333" />
-          )}
         </mesh>
       </group>
       {look.pads.map((p) => (

@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 
 export interface ArchProps {
@@ -34,7 +34,7 @@ export function Arch({
   color,
 }: ArchProps) {
   const { unit, palette } = useWorld()
-  const stone = color ?? palette.stone
+  const stone = useMaterial({ color: color ?? palette.stone, roughness: 0.9 })
   const w = width * unit
   const h = height * unit
   const d = depth * unit
@@ -56,22 +56,27 @@ export function Arch({
       <CuboidCollider args={[th / 2, h / 2, d / 2]} position={[pierX, h / 2, 0]} />
 
       {[-1, 1].map((s) => (
-        <mesh key={`pier-${s}`} castShadow receiveShadow position={[s * pierX, h / 2, 0]}>
+        <mesh
+          key={`pier-${s}`}
+          material={stone}
+          castShadow
+          receiveShadow
+          position={[s * pierX, h / 2, 0]}
+        >
           <boxGeometry args={[th, h, d]} />
-          <meshStandardMaterial color={stone} roughness={0.9} />
         </mesh>
       ))}
 
       {voussoirs.map((v) => (
         <mesh
           key={`v-${v.x.toFixed(3)}:${v.y.toFixed(3)}`}
+          material={stone}
           castShadow
           receiveShadow
           position={[v.x, v.y, 0]}
           rotation={[0, 0, v.rot]}
         >
           <boxGeometry args={[th, v.arc, d]} />
-          <meshStandardMaterial color={stone} roughness={0.9} />
         </mesh>
       ))}
     </RigidBody>

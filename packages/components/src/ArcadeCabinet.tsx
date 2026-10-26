@@ -1,5 +1,14 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { int, pick, type Rng, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  int,
+  pick,
+  type Rng,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { Color, ExtrudeGeometry, type InstancedMesh, Object3D, Shape } from 'three'
 
@@ -349,6 +358,26 @@ export function ArcadeCabinet({
 
   const controls = look.players === 1 ? [0] : [-W * 0.22, W * 0.22]
 
+  const m = useMaterials({
+    body: { color: look.body, roughness: 0.6 },
+    neon: { kind: 'basic', color: look.neon, toneMapped: false },
+    kick: { color: '#141416', roughness: 0.7 },
+    panel: { color: '#1b1b1e', roughness: 0.5 },
+    stick: { color: '#222' },
+    ball: { color: '#d23b3b', roughness: 0.3 },
+    bezel: { color: '#0b0b0d', roughness: 0.3 },
+    screenOn: { kind: 'basic', color: '#05060c', toneMapped: false },
+    screenOff: { color: '#101214', roughness: 0.1, metalness: 0.4 },
+    pixel: { kind: 'basic', toneMapped: false },
+  })
+  const buttons = useMaterials(
+    [0, 1, 2].map((b) => ({
+      kind: 'basic' as const,
+      color: NEON[(b + look.players) % NEON.length],
+      toneMapped: false,
+    })),
+  )
+
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[W / 2, 0.91 * u, 0.38 * u]} position={[0, 0.91 * u, 0.02 * u]} />
@@ -357,67 +386,56 @@ export function ArcadeCabinet({
         <mesh
           key={s}
           geometry={side}
+          material={m.body}
           position={[s > 0 ? W / 2 : -W / 2 + 0.03 * u, 0, 0]}
           rotation={[0, -Math.PI / 2, 0]}
           castShadow
           receiveShadow
-        >
-          <meshStandardMaterial color={look.body} roughness={0.6} />
-        </mesh>
+        />
       ))}
       {[-1, 1].map((s) => (
         <mesh
           key={`art${s}`}
+          material={m.neon}
           position={[s * (W / 2 + 0.001 * u), 1.1 * u, -0.1 * u]}
           rotation={[0, (s * Math.PI) / 2, 0]}
         >
           <planeGeometry args={[0.5 * u, 0.06 * u]} />
-          <meshBasicMaterial color={look.neon} toneMapped={false} />
         </mesh>
       ))}
       {/* the inner body between the panels: a back block behind the screen, the lower front
           under the panel, and the marquee box */}
-      <mesh position={[0, 0.91 * u, -0.16 * u]} castShadow>
+      <mesh material={m.body} position={[0, 0.91 * u, -0.16 * u]} castShadow>
         <boxGeometry args={[W - 0.06 * u, 1.82 * u, 0.4 * u]} />
-        <meshStandardMaterial color={look.body} roughness={0.6} />
       </mesh>
-      <mesh position={[0, 0.41 * u, 0.14 * u]} castShadow>
+      <mesh material={m.body} position={[0, 0.41 * u, 0.14 * u]} castShadow>
         <boxGeometry args={[W - 0.06 * u, 0.82 * u, 0.2 * u]} />
-        <meshStandardMaterial color={look.body} roughness={0.6} />
       </mesh>
-      <mesh position={[0, 1.66 * u, 0.1 * u]} castShadow>
+      <mesh material={m.body} position={[0, 1.66 * u, 0.1 * u]} castShadow>
         <boxGeometry args={[W - 0.06 * u, 0.32 * u, 0.12 * u]} />
-        <meshStandardMaterial color={look.body} roughness={0.6} />
       </mesh>
-      <mesh position={[0, 0.41 * u, 0.245 * u]}>
+      <mesh material={m.kick} position={[0, 0.41 * u, 0.245 * u]}>
         <planeGeometry args={[W - 0.06 * u, 0.82 * u]} />
-        <meshStandardMaterial color="#141416" roughness={0.7} />
       </mesh>
       {/* control panel */}
-      <mesh position={[0, 0.94 * u, 0.3 * u]} rotation={[0.35, 0, 0]} castShadow>
+      <mesh material={m.panel} position={[0, 0.94 * u, 0.3 * u]} rotation={[0.35, 0, 0]} castShadow>
         <boxGeometry args={[W - 0.06 * u, 0.03 * u, 0.24 * u]} />
-        <meshStandardMaterial color="#1b1b1e" roughness={0.5} />
       </mesh>
       {controls.map((x) => (
         <group key={x} position={[x, 0.97 * u, 0.3 * u]} rotation={[0.35, 0, 0]}>
-          <mesh position={[-0.06 * u, 0.03 * u, 0]}>
+          <mesh material={m.stick} position={[-0.06 * u, 0.03 * u, 0]}>
             <cylinderGeometry args={[0.006 * u, 0.006 * u, 0.06 * u, 8]} />
-            <meshStandardMaterial color="#222" />
           </mesh>
-          <mesh position={[-0.06 * u, 0.065 * u, 0]}>
+          <mesh material={m.ball} position={[-0.06 * u, 0.065 * u, 0]}>
             <sphereGeometry args={[0.018 * u, 12, 10]} />
-            <meshStandardMaterial color="#d23b3b" roughness={0.3} />
           </mesh>
           {[0, 1, 2].map((b) => (
             <mesh
               key={b}
+              material={buttons[b]}
               position={[0.02 * u + b * 0.035 * u, 0.008 * u, (b === 1 ? -0.015 : 0.01) * u]}
             >
               <cylinderGeometry args={[0.012 * u, 0.012 * u, 0.012 * u, 12]} />
-              <meshBasicMaterial
-                color={NEON[(b + look.players) % NEON.length]}
-                toneMapped={false}
-              />
             </mesh>
           ))}
         </group>
@@ -427,34 +445,27 @@ export function ArcadeCabinet({
         position={[0, ((y0 + y1) / 2) * u, ((z0 + z1) / 2) * u + 0.002 * u]}
         rotation={[tilt, 0, 0]}
       >
-        <mesh>
+        <mesh material={m.bezel}>
           <planeGeometry args={[W - 0.06 * u, slope]} />
-          <meshStandardMaterial color="#0b0b0d" roughness={0.3} />
         </mesh>
-        <mesh position={[0, 0, 0.001 * u]}>
+        <mesh material={on ? m.screenOn : m.screenOff} position={[0, 0, 0.001 * u]}>
           <planeGeometry args={[screenW, screenH]} />
-          {on ? (
-            <meshBasicMaterial color="#05060c" toneMapped={false} />
-          ) : (
-            <meshStandardMaterial color="#101214" roughness={0.1} metalness={0.4} />
-          )}
         </mesh>
         {on && (
           <instancedMesh
             key={cells.list.length}
             ref={pixels}
             args={[undefined, undefined, cells.list.length]}
+            material={m.pixel}
             position={[0, 0, 0.002 * u]}
           >
             <planeGeometry args={[1, 1]} />
-            <meshBasicMaterial toneMapped={false} />
           </instancedMesh>
         )}
       </group>
       {/* marquee */}
-      <mesh position={[0, 1.68 * u, 0.161 * u]}>
+      <mesh material={m.neon} position={[0, 1.68 * u, 0.161 * u]}>
         <planeGeometry args={[W - 0.06 * u, 0.22 * u]} />
-        <meshBasicMaterial color={look.neon} toneMapped={false} />
       </mesh>
     </RigidBody>
   )

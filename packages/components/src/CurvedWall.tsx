@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
@@ -52,13 +52,17 @@ export function CurvedWall({
   frameColor,
 }: CurvedWallProps) {
   const { unit, palette } = useWorld()
-  const wallColor = color ?? palette.wall
-  const frame = frameColor ?? palette.metal
   const R = radius * unit
   const h = height * unit
   const t = thickness * unit
   const count = segments ?? Math.min(32, Math.max(4, Math.round((R * arc) / (0.9 * unit))))
   const glass = style === 'glass'
+  const m = useMaterials({
+    chord: glass
+      ? { color: glassColor, transparent: true, opacity: 0.28, roughness: 0.08 }
+      : { color: color ?? palette.wall },
+    frame: { color: frameColor ?? palette.metal, roughness: 0.6 },
+  })
   const chordsRef = useRef<THREE.InstancedMesh>(null)
   const mullionsRef = useRef<THREE.InstancedMesh>(null)
   const railsRef = useRef<THREE.InstancedMesh>(null)
@@ -141,15 +145,11 @@ export function CurvedWall({
         key={`c${count}${style}`}
         ref={chordsRef}
         args={[undefined, undefined, count]}
+        material={m.chord}
         castShadow={!glass}
         receiveShadow
       >
         <boxGeometry />
-        {glass ? (
-          <meshStandardMaterial color={glassColor} transparent opacity={0.28} roughness={0.08} />
-        ) : (
-          <meshStandardMaterial color={wallColor} />
-        )}
       </instancedMesh>
       {glass && (
         <>
@@ -157,19 +157,19 @@ export function CurvedWall({
             key={`m${count}`}
             ref={mullionsRef}
             args={[undefined, undefined, count + 1]}
+            material={m.frame}
             castShadow
           >
             <boxGeometry />
-            <meshStandardMaterial color={frame} roughness={0.6} />
           </instancedMesh>
           <instancedMesh
             key={`r${count}`}
             ref={railsRef}
             args={[undefined, undefined, count * 2]}
+            material={m.frame}
             castShadow
           >
             <boxGeometry />
-            <meshStandardMaterial color={frame} roughness={0.6} />
           </instancedMesh>
         </>
       )}

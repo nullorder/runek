@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
@@ -43,6 +43,13 @@ export function Clouds({
   const total = count * PER
   const ref = useRef<THREE.InstancedMesh>(null)
   const groupRef = useRef<THREE.Group>(null)
+  const material = useMaterial({
+    color,
+    roughness: 1,
+    transparent: true,
+    opacity: 0.92,
+    flatShading: true,
+  })
 
   const puffs = useMemo<Puff[]>(() => {
     const next = rng(seed)
@@ -89,15 +96,8 @@ export function Clouds({
   return (
     <group position={position} rotation={rotation}>
       <group ref={groupRef}>
-        <instancedMesh ref={ref} args={[undefined, undefined, total]}>
+        <instancedMesh ref={ref} args={[undefined, undefined, total]} material={material}>
           <icosahedronGeometry args={[1, 1]} />
-          <meshStandardMaterial
-            color={color}
-            roughness={1}
-            transparent
-            opacity={0.92}
-            flatShading
-          />
         </instancedMesh>
       </group>
     </group>

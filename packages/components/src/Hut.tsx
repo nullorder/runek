@@ -1,5 +1,5 @@
 import { CylinderCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type WorldComponentProps } from '@runek/core'
+import { rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useEffect, useMemo } from 'react'
 import { ConeGeometry, DoubleSide } from 'three'
 
@@ -40,6 +40,16 @@ export function Hut({
   const wall = wallColor ?? palette.wall
   const roof = roofColor ?? palette.roof
   const post = palette.woodDark
+  const m = useMaterials({
+    stone: { color: palette.stone, roughness: 1, flatShading: true },
+    floor: { color: palette.bark, roughness: 1 },
+    wall: { color: wall, side: DoubleSide, roughness: 0.9 },
+    rib: { color: palette.wood, roughness: 0.9 },
+    post: { color: post, roughness: 0.8 },
+    rafter: { color: post, roughness: 0.9 },
+    thatch: { color: roof, roughness: 1, flatShading: true, side: DoubleSide },
+    knot: { color: roof, roughness: 1, flatShading: true },
+  })
   const R = radius * unit
   const H = wallHeight * unit
   const roofH = roofHeight * unit
@@ -91,94 +101,81 @@ export function Hut({
       <CylinderCollider args={[H / 2, R]} position={[0, H / 2, 0]} />
 
       {/* low stone base the wall sits on */}
-      <mesh position={[0, 0.15 * unit, 0]} castShadow receiveShadow>
+      <mesh material={m.stone} position={[0, 0.15 * unit, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[R * 1.05, R * 1.1, 0.3 * unit, 24]} />
-        <meshStandardMaterial color={palette.stone} roughness={1} flatShading />
       </mesh>
 
       {/* a dark interior floor, so the doorway reads as an opening into the hut */}
-      <mesh position={[0, 0.31 * unit, 0]} receiveShadow>
+      <mesh material={m.floor} position={[0, 0.31 * unit, 0]} receiveShadow>
         <cylinderGeometry args={[R * 0.94, R * 0.94, 0.06 * unit, 24]} />
-        <meshStandardMaterial color={palette.bark} roughness={1} />
       </mesh>
 
       {/* wall: a cylindrical shell with the doorway arc omitted */}
-      <mesh position={[0, H / 2, 0]} castShadow receiveShadow>
+      <mesh material={m.wall} position={[0, H / 2, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[R, R, H, 32, 1, true, half, Math.PI * 2 - half * 2]} />
-        <meshStandardMaterial color={wall} side={DoubleSide} roughness={0.9} />
       </mesh>
 
       {/* wall filling above the doorway — the opening stops at the lintel */}
-      <mesh position={[0, (doorH + H) / 2, 0]} castShadow receiveShadow>
+      <mesh material={m.wall} position={[0, (doorH + H) / 2, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[R, R, H - doorH, 8, 1, true, -half, half * 2]} />
-        <meshStandardMaterial color={wall} side={DoubleSide} roughness={0.9} />
       </mesh>
 
       {/* post ribs around the wall, so it reads as timber-and-daub rather than smooth plaster */}
       {ribs.map((a) => (
         <mesh
           key={a}
+          material={m.rib}
           position={[Math.sin(a) * (R + 0.02 * unit), H / 2, Math.cos(a) * (R + 0.02 * unit)]}
           castShadow
         >
           <cylinderGeometry args={[0.055 * unit, 0.07 * unit, H * 0.97, 6]} />
-          <meshStandardMaterial color={palette.wood} roughness={0.9} />
         </mesh>
       ))}
 
       {/* lintel + door posts framing the opening */}
-      <mesh position={[0, doorH, postZ]} castShadow>
+      <mesh material={m.post} position={[0, doorH, postZ]} castShadow>
         <boxGeometry args={[postX * 2 + postR * 2, 0.14 * unit, postR * 2]} />
-        <meshStandardMaterial color={post} roughness={0.8} />
       </mesh>
-      <mesh position={[postX, doorH / 2, postZ]} castShadow>
+      <mesh material={m.post} position={[postX, doorH / 2, postZ]} castShadow>
         <cylinderGeometry args={[postR, postR, doorH, 8]} />
-        <meshStandardMaterial color={post} roughness={0.8} />
       </mesh>
-      <mesh position={[-postX, doorH / 2, postZ]} castShadow>
+      <mesh material={m.post} position={[-postX, doorH / 2, postZ]} castShadow>
         <cylinderGeometry args={[postR, postR, doorH, 8]} />
-        <meshStandardMaterial color={post} roughness={0.8} />
       </mesh>
 
       {/* a small framed window at the back */}
       <group rotation={[0, Math.PI, 0]}>
-        <mesh position={[0, H * 0.55, R]} castShadow>
+        <mesh material={m.post} position={[0, H * 0.55, R]} castShadow>
           <boxGeometry args={[0.7 * unit, 0.8 * unit, 0.06 * unit]} />
-          <meshStandardMaterial color={post} roughness={0.8} />
         </mesh>
-        <mesh position={[0, H * 0.55, R + 0.03 * unit]}>
+        <mesh material={m.floor} position={[0, H * 0.55, R + 0.03 * unit]}>
           <boxGeometry args={[0.52 * unit, 0.62 * unit, 0.06 * unit]} />
-          <meshStandardMaterial color={palette.bark} roughness={1} />
         </mesh>
       </group>
 
       {/* shaggy thatch cone, overhanging the eaves */}
-      <mesh geometry={thatch} position={[0, H, 0]} castShadow>
-        <meshStandardMaterial color={roof} roughness={1} flatShading side={DoubleSide} />
-      </mesh>
+      <mesh material={m.thatch} geometry={thatch} position={[0, H, 0]} castShadow />
 
       {/* rafter tips poking out under the fringe */}
       {rafters.map((a) => (
         <group key={a} rotation={[0, a, 0]}>
           <mesh
+            material={m.rafter}
             position={[coneR * 0.65, H + roofH * 0.35, 0]}
             rotation={[0, 0, rafterTilt]}
             castShadow
           >
             <cylinderGeometry args={[0.04 * unit, 0.05 * unit, slant * 0.85, 6]} />
-            <meshStandardMaterial color={post} roughness={0.9} />
           </mesh>
         </group>
       ))}
 
       {/* topknot finial where the thatch is bound off */}
-      <mesh position={[0, H + roofH + 0.12 * unit, 0]} castShadow>
+      <mesh material={m.rafter} position={[0, H + roofH + 0.12 * unit, 0]} castShadow>
         <cylinderGeometry args={[0.05 * unit, 0.05 * unit, 0.55 * unit, 6]} />
-        <meshStandardMaterial color={post} roughness={0.9} />
       </mesh>
-      <mesh position={[0, H + roofH + 0.1 * unit, 0]} castShadow>
+      <mesh material={m.knot} position={[0, H + roofH + 0.1 * unit, 0]} castShadow>
         <coneGeometry args={[0.2 * unit, 0.3 * unit, 8]} />
-        <meshStandardMaterial color={roof} roughness={1} flatShading />
       </mesh>
     </RigidBody>
   )
