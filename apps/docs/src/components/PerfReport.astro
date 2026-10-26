@@ -1,0 +1,7 @@
+---
+// Every measured machine's frame rates, rendered from src/data/perf/ at build time.
+import { marked } from 'marked'
+import { perfMarkdown } from '../lib/perf'
+---
+
+<div class="perf-report" set:html={marked.parse(perfMarkdown(), { async: false })} />
