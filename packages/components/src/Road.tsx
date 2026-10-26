@@ -1,4 +1,4 @@
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 
 export interface RoadProps extends WorldComponentProps {
   /** Length along local Z, in units. */
@@ -25,8 +25,10 @@ export function Road({
   kerbColor,
 }: RoadProps) {
   const { unit, palette } = useWorld()
-  const deck = color ?? palette.stone
-  const kerb = kerbColor ?? palette.woodDark
+  const m = useMaterials({
+    deck: { color: color ?? palette.stone, roughness: 1 },
+    kerb: { color: kerbColor ?? palette.woodDark, roughness: 1 },
+  })
   const L = length * unit
   const W = width * unit
   const kerbW = 0.18 * unit
@@ -35,17 +37,14 @@ export function Road({
 
   return (
     <group position={[position[0], position[1] + 0.03 * unit, position[2]]} rotation={rotation}>
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh material={m.deck} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[W, L]} />
-        <meshStandardMaterial color={deck} roughness={1} />
       </mesh>
-      <mesh receiveShadow castShadow position={[edge, kerbH / 2, 0]}>
+      <mesh material={m.kerb} receiveShadow castShadow position={[edge, kerbH / 2, 0]}>
         <boxGeometry args={[kerbW, kerbH, L]} />
-        <meshStandardMaterial color={kerb} roughness={1} />
       </mesh>
-      <mesh receiveShadow castShadow position={[-edge, kerbH / 2, 0]}>
+      <mesh material={m.kerb} receiveShadow castShadow position={[-edge, kerbH / 2, 0]}>
         <boxGeometry args={[kerbW, kerbH, L]} />
-        <meshStandardMaterial color={kerb} roughness={1} />
       </mesh>
     </group>
   )

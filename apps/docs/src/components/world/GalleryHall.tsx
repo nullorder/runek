@@ -16,7 +16,7 @@ import {
   Trees,
   Wall,
 } from '@runek/components'
-import { type Vec3, WorldNodes } from '@runek/core'
+import { useMaterials, type Vec3, WorldNodes } from '@runek/core'
 import { useMemo } from 'react'
 import { CATEGORY_ORDER } from '../../lib/categories'
 import { PREVIEW } from '../../lib/preview'
@@ -164,17 +164,19 @@ function RingRug({ y, accent, seed }: { y: number; accent: string; seed: number 
 /** The plaza board: the hall's name and what each floor holds, facing the entrance (+x). */
 function Directory({ position }: { position: Vec3 }) {
   const lines = [...FLOORS.keys()].reverse()
+  const m = useMaterials({
+    post: { color: '#3a2c1d', roughness: 0.8 },
+    board: { color: '#2c2118', roughness: 0.7 },
+  })
   return (
     <group position={position} rotation={[0, Math.PI / 2, 0]}>
       {[-0.95, 0.95].map((x) => (
-        <mesh key={x} castShadow position={[x, 0.9, -0.04]}>
+        <mesh key={x} material={m.post} castShadow position={[x, 0.9, -0.04]}>
           <boxGeometry args={[0.08, 1.8, 0.08]} />
-          <meshStandardMaterial color="#3a2c1d" roughness={0.8} />
         </mesh>
       ))}
-      <mesh castShadow receiveShadow position={[0, 1.55, 0]}>
+      <mesh material={m.board} castShadow receiveShadow position={[0, 1.55, 0]}>
         <boxGeometry args={[2.2, 1.2, 0.06]} />
-        <meshStandardMaterial color="#2c2118" roughness={0.7} />
       </mesh>
       <Sign position={[0, 1.96, 0.04]} size={0.15} letterSpacing={0.04} color="#3df58a" glow>
         The Gallery

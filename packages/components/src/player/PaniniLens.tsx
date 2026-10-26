@@ -2,6 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { type Lens, useWorld } from '@runek/core'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
 import {
+  LinearMipmapLinearFilter,
   Matrix4,
   Mesh,
   OrthographicCamera,
@@ -18,9 +19,11 @@ import {
 // A Panini projection: the view is wrapped onto a cylinder around the eye and seen from a point
 // `CURVE` radii behind it. Straight ahead it matches a flat camera, verticals stay vertical,
 // and the sides squeeze in instead of stretching, so it can show 140° to 200° across without
-// the tunnel a flat camera gives. A flat camera can't see that wide, so the scene is drawn
-// through three: ahead, left and right, each covering only the slice of the screen it serves,
-// then stitched into the curve in one full-screen pass, which also blurs the periphery.
+// the tunnel a flat camera gives. Up to 150° across (a 16:9 screen at the default 140°) the scene
+// is drawn once, by a flat camera wide enough to cover it, and warped into the curve in one
+// full-screen pass that also blurs the periphery. Wider than that (an ultrawide) a flat render
+// would stretch its edges too far, so three cameras draw it, ahead, left and right, each covering
+// only the slice of the screen it serves, and the same pass stitches them.
 
 // How far behind the eye the cylinder is seen from: 0 is a flat camera (straight lines, stretched
 // sides), 1 squeezes the sides most but bows horizontal lines. Halfway keeps lines gently curved.
@@ -41,10 +44,11 @@ const MAX_VERTICAL_FOV = 120
 const FOCUS = { across: (70 * Math.PI) / 180, up: (45 * Math.PI) / 180, from: 0.5, to: 1.3 }
 // Where the side cameras take over from the forward one, either side of straight ahead.
 const SEAM = Math.PI / 4
+// The widest view (half-angle across) one flat camera draws; past it, three cameras do. Past
+// 75° a flat render stretches its edges so far that drawing the scene three times is cheaper.
+const SINGLE_MAX = (75 * Math.PI) / 180
 // Slack around each camera's slice (in tangent units), so sampling at a seam never runs off it.
 const PAD = 0.02
-// Samples in the periphery blur, spread over a disc two standard deviations wide.
-const TAPS = 32
 
 /** How far across the projection plane a direction `phi` radians off straight ahead lands. */
 const across = (phi: number) => ((CURVE + 1) * Math.sin(phi)) / (CURVE + Math.cos(phi))
@@ -101,6 +105,11 @@ function makeView(yaw: number): View {
   // then copies pixels rather than redoing the color pipeline.
   target.texture.colorSpace = SRGBColorSpace
   target.texture.internalFormat = 'RGBA8'
+  // Mipmapped and anisotropically filtered, so the periphery blur reads a pre-shrunk footprint in
+  // a few taps however stretched the view is there.
+  target.texture.generateMipmaps = true
+  target.texture.minFilter = LinearMipmapLinearFilter
+  target.texture.anisotropy = 16
   ;(target as { isXRRenderTarget?: boolean }).isXRRenderTarget = true
   const camera = new PerspectiveCamera()
   camera.matrixAutoUpdate = false
@@ -132,13 +141,14 @@ uniform mat4 uRightM;
 uniform vec2 uExtent;
 uniform vec2 uResolution;
 uniform float uBlur;
+uniform float uSeam;
 varying vec2 vUv;
 
 const float CURVE = ${CURVE.toFixed(4)};
 
-vec4 look(sampler2D view, mat4 m, vec3 dir) {
+vec2 project(mat4 m, vec3 dir) {
   vec4 c = m * vec4(dir, 1.0);
-  return texture2D(view, c.xy / c.w * 0.5 + 0.5);
+  return c.xy / c.w * 0.5 + 0.5;
 }
 
 // The direction seen at a point on the screen, one unit out from the eye's vertical axis.
@@ -149,34 +159,33 @@ vec3 ray(vec2 uv) {
   return vec3(sin(phi), p.y * (CURVE + cos(phi)) / (CURVE + 1.0), -cos(phi));
 }
 
-vec4 seen(vec2 uv) {
-  vec3 dir = ray(uv);
-  float phi = atan(dir.x, -dir.z);
-  if (phi > ${SEAM.toFixed(6)}) return look(uRight, uRightM, dir);
-  if (phi < -${SEAM.toFixed(6)}) return look(uLeft, uLeftM, dir);
-  return look(uAhead, uAheadM, dir);
+// One view's pixel for dir, blurred by sigma screen pixels. nextX and nextY (the directions one
+// screen pixel across and up) give how this view's texels map onto the screen here, which a flat
+// render stretches more across than up toward its edges; the four taps and their filter footprint
+// follow that map, so the blur stays round on screen whichever view it reads.
+vec4 look(sampler2D view, mat4 m, vec3 dir, vec3 nextX, vec3 nextY, float sigma) {
+  vec2 uv = project(m, dir);
+  if (sigma < 0.35) return textureLod(view, uv, 0.0);
+  vec2 gx = (project(m, nextX) - uv) * sigma;
+  vec2 gy = (project(m, nextY) - uv) * sigma;
+  return 0.25 * (textureGrad(view, uv + 0.7 * gx + 0.28 * gy, gx, gy)
+               + textureGrad(view, uv - 0.28 * gx + 0.7 * gy, gx, gy)
+               + textureGrad(view, uv - 0.7 * gx - 0.28 * gy, gx, gy)
+               + textureGrad(view, uv + 0.28 * gx - 0.7 * gy, gx, gy));
 }
 
 void main() {
   // Focus falls off smoothly with the angle off straight ahead, so a wider screen shows more
   // periphery rather than a wider sharp patch.
   vec3 dir = ray(vUv);
-  vec2 off = vec2(atan(dir.x, -dir.z) / ${FOCUS.across.toFixed(6)}, atan(dir.y) / ${FOCUS.up.toFixed(6)});
+  float phi = atan(dir.x, -dir.z);
+  vec2 off = vec2(phi / ${FOCUS.across.toFixed(6)}, atan(dir.y) / ${FOCUS.up.toFixed(6)});
   float sigma = uBlur * smoothstep(${FOCUS.from.toFixed(2)}, ${FOCUS.to.toFixed(2)}, length(off));
-  if (sigma < 0.35) {
-    gl_FragColor = seen(vUv);
-    return;
-  }
-  vec4 sum = vec4(0.0);
-  float total = 0.0;
-  for (int i = 0; i < ${TAPS}; i++) {
-    float r = sqrt((float(i) + 0.5) / ${TAPS}.0) * 2.0 * sigma;
-    float a = float(i) * 2.39996;
-    float w = exp(-0.5 * r * r / (sigma * sigma));
-    sum += seen(vUv + vec2(cos(a), sin(a)) * r / uResolution) * w;
-    total += w;
-  }
-  gl_FragColor = sum / total;
+  vec3 nx = sigma < 0.35 ? dir : ray(vUv + vec2(1.0 / uResolution.x, 0.0));
+  vec3 ny = sigma < 0.35 ? dir : ray(vUv + vec2(0.0, 1.0 / uResolution.y));
+  if (phi > uSeam) gl_FragColor = look(uRight, uRightM, dir, nx, ny, sigma);
+  else if (phi < -uSeam) gl_FragColor = look(uLeft, uLeftM, dir, nx, ny, sigma);
+  else gl_FragColor = look(uAhead, uAheadM, dir, nx, ny, sigma);
 }
 `
 
@@ -216,6 +225,7 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
         uExtent: { value: new Vector2() },
         uResolution: { value: new Vector2() },
         uBlur: { value: 0 },
+        uSeam: { value: SEAM },
       },
       depthTest: false,
       depthWrite: false,
@@ -242,7 +252,9 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
   useLayoutEffect(() => {
     const { near, far } = camera as PerspectiveCamera
     const widest = angle(extent.x)
-    const ahead = Math.min(widest, SEAM)
+    // Up to `SINGLE_MAX` the forward camera covers the whole view and the sides rest.
+    const single = widest <= SINGLE_MAX
+    const ahead = single ? widest : Math.min(widest, SEAM)
     // Each view's vertical reach is greatest along the screen's top edge; walk it.
     const reach = (from: number, to: number, depth: (phi: number) => number) => {
       let up = 0
@@ -253,7 +265,7 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
       }
       return up
     }
-    const sides = widest > SEAM
+    const sides = !single && widest > SEAM
     const edge = 1 / Math.tan(widest)
     const spans = [
       {
@@ -310,6 +322,7 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
     uniforms.uExtent.value.copy(extent)
     uniforms.uResolution.value.set(size.width * dpr, size.height * dpr)
     uniforms.uBlur.value = blur * dpr
+    uniforms.uSeam.value = single ? Math.PI : SEAM
   }, [views, pass, extent, size, dpr, camera, gl, blur])
 
   // Publish the lens, and aim pointer rays through it rather than the flat camera.

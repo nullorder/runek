@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { shoreSurface } from './surfaces/shore'
 
 export interface ShoreProps {
@@ -22,16 +22,15 @@ export function Shore({
   color,
 }: ShoreProps) {
   const { unit, palette } = useWorld()
-  const sandColor = color ?? palette.sand
+  const sand = useMaterial({ color: color ?? palette.sand, roughness: 1 })
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit
 
   return (
     <RigidBody type="fixed" colliders="cuboid" position={position} rotation={rotation}>
-      <mesh receiveShadow position={[0, -t / 2, 0]}>
+      <mesh material={sand} receiveShadow position={[0, -t / 2, 0]}>
         <boxGeometry args={[w, t, d]} />
-        <meshStandardMaterial color={sandColor} roughness={1} />
       </mesh>
     </RigidBody>
   )

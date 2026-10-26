@@ -1,7 +1,14 @@
 import { useKeyboardControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useRapier } from '@react-three/rapier'
-import { type AvatarView, PlayerMotionContext, useWorld, type Vec3 } from '@runek/core'
+import {
+  type AvatarView,
+  Dynamic,
+  PlayerMotionContext,
+  useMaterial,
+  useWorld,
+  type Vec3,
+} from '@runek/core'
 import Ecctrl, { type CustomEcctrlRigidBody } from 'ecctrl'
 import { type ReactNode, type RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Group, Object3D, Scene } from 'three'
@@ -263,6 +270,7 @@ export function Player({
   const [grounded, setGrounded] = useState(false)
   const motion = useRef({ speed: 0 })
   const lift = useRef<Group>(null)
+  const capsule = useMaterial({ color: '#4a90d9' })
 
   // ecctrl reads its camera setup once, at mount, so a new view remounts it: from where the
   // avatar stands now, facing the way the camera faced. The old camera pivot is taken out of the
@@ -339,16 +347,17 @@ export function Player({
       camFollowMult={cam.follow}
       camLerpMult={cam.lerp}
     >
-      <group ref={lift} visible={!firstPerson} position={[0, -FLOAT_HEIGHT, 0]}>
-        <PlayerMotionContext.Provider value={motion}>
-          {children ?? (
-            <mesh castShadow>
-              <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />
-              <meshStandardMaterial color="#4a90d9" />
-            </mesh>
-          )}
-        </PlayerMotionContext.Provider>
-      </group>
+      <Dynamic>
+        <group ref={lift} visible={!firstPerson} position={[0, -FLOAT_HEIGHT, 0]}>
+          <PlayerMotionContext.Provider value={motion}>
+            {children ?? (
+              <mesh material={capsule} castShadow>
+                <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />
+              </mesh>
+            )}
+          </PlayerMotionContext.Provider>
+        </group>
+      </Dynamic>
       <object3D ref={eyes} position={[0, EYE_HEIGHT, 0]} />
       <CameraKeyLook pitchable={!cam.locked} />
       {firstPerson && <PaniniLens fov={fov} blur={peripheralBlur} />}

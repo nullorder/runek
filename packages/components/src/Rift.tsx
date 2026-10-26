@@ -14,6 +14,7 @@ import {
   PerspectiveCamera,
   Plane,
   ShaderMaterial,
+  type Texture,
   Vector3,
   Vector4,
   WebGLRenderTarget,
@@ -51,6 +52,14 @@ const EXTENT = 1.7
 // How far open the rifts sit while inactive: small bubbles, in multiples of `radius`.
 const CLOSED = 0.18
 const MOTES = 700
+// The far view renders at this fraction of the viewer's resolution: the soap-film rim and the
+// lensing hide the softness, and it quarters the fill.
+const VIEW_SCALE = 0.5
+// How big an opening must be on screen (its radius, in CSS pixels) to show the far end live.
+// Smaller or more distant rifts show a shimmer instead, so they cost no second render.
+const LIVE_SIZE = 40
+// Far-view targets kept per rift end, one per viewer size (the screen, or each lens view).
+const MAX_TARGETS = 4
 
 // The edge of a rift, shared by the window and the glitter so sparks are born right on it.
 const EDGE = /* glsl */ `
@@ -101,6 +110,7 @@ const WINDOW_FRAGMENT = /* glsl */ `
 ${EDGE}
 uniform sampler2D uView;
 uniform vec4 uViewport;
+uniform float uLive;
 uniform vec3 uTint;
 uniform float uTintMix;
 varying vec2 vP;
@@ -115,14 +125,19 @@ void main() {
   // The far end is sampled in screen space, so it moves with the viewer like a real opening;
   // near the rim it bends outward a touch, like light through a soap film.
   float lens = exp(min(d, 0.0) / (0.05 * s));
-  vec2 uv = (gl_FragCoord.xy - uViewport.xy) / uViewport.zw - dir * lens * 0.012;
-  vec3 far = texture2D(uView, uv).rgb;
-#ifdef TONE_MAPPING
-  far = toneMapping(far);
-#endif
-
   float a = atan(vP.y, vP.x);
   vec3 tint = mix(film(a * 0.32 + d * 1.2 + uTime * 0.08), uTint, uTintMix);
+
+  // Too small on screen to be worth a second render: a slow shimmer stands in for the far end.
+  vec3 far = tint * (0.12 + 0.18 * fbm(vP * 2.5 + uSeed + uTime * 0.15));
+  if (uLive > 0.0) {
+    vec2 uv = (gl_FragCoord.xy - uViewport.xy) / uViewport.zw - dir * lens * 0.012;
+    vec3 view = texture2D(uView, uv).rgb;
+#ifdef TONE_MAPPING
+    view = toneMapping(view);
+#endif
+    far = mix(far, view, uLive);
+  }
   far = mix(far, tint * 0.5, lens * 0.25);
 
   // The rim flickers along its length like plasma rather than glowing as one even line.
@@ -225,8 +240,9 @@ const isCameraRig = (o: Object3D) =>
  * standing there, and walking into either carries you through to the other, momentum and all.
  * Both ends are places in the same world, so use it for shortcuts you can walk (across a map,
  * up a tower, between rooms); for travel to another world or page, use `Portal`. The look is
- * procedural and asset-free (the seed shapes the edges and the glitter). Each open rift on
- * screen costs a second render of the scene, clipped to the rift's footprint.
+ * procedural and asset-free (the seed shapes the edges and the glitter). Each open rift big
+ * enough on screen to show the far end live costs a second render of the scene, at half
+ * resolution and clipped to the rift's footprint; a small or distant one shows a shimmer.
  */
 export function Rift({
   position = [0, 0, 0],
@@ -327,6 +343,34 @@ export function Rift({
   )
 }
 
+const smoothstep = (x: number, from: number, to: number) => {
+  const t = Math.min(Math.max((x - from) / (to - from), 0), 1)
+  return t * t * (3 - 2 * t)
+}
+
+/** This end's far-view target for a viewer `w` x `h` pixels, kept per size so a lens's views
+ *  of different sizes never resize one target back and forth. */
+function viewTarget(targets: Map<string, WebGLRenderTarget>, w: number, h: number) {
+  const key = `${w}x${h}`
+  let target = targets.get(key)
+  if (target) {
+    targets.delete(key)
+  } else {
+    target = new WebGLRenderTarget(
+      Math.max(1, Math.round(w * VIEW_SCALE)),
+      Math.max(1, Math.round(h * VIEW_SCALE)),
+      { type: HalfFloatType, samples: 4 },
+    )
+    const oldest = targets.size >= MAX_TARGETS ? targets.keys().next().value : undefined
+    if (oldest !== undefined) {
+      targets.get(oldest)?.dispose()
+      targets.delete(oldest)
+    }
+  }
+  targets.set(key, target)
+  return target
+}
+
 interface RiftEndProps {
   end: RefObject<Group | null>
   /** The center of this rift and of the other one; the view and travel follow their world positions. */
@@ -371,7 +415,9 @@ function RiftEnd({
     camera.matrixWorldAutoUpdate = false
     return {
       camera,
-      target: new WebGLRenderTarget(1, 1, { type: HalfFloatType, samples: 4 }),
+      targets: new Map<string, WebGLRenderTarget>(),
+      uView: { value: null as Texture | null },
+      uLive: { value: 0 },
       viewport: new Vector4(),
       clip: new Plane(),
       forward: new Vector3(),
@@ -380,7 +426,13 @@ function RiftEnd({
       there: new Vector3(),
     }
   }, [])
-  useEffect(() => () => view.target.dispose(), [view])
+  useEffect(
+    () => () => {
+      for (const target of view.targets.values()) target.dispose()
+      view.targets.clear()
+    },
+    [view],
+  )
 
   const tint = useMemo(() => new Color(color ?? '#ffffff'), [color])
   const tintMix = color ? 0.65 : 0
@@ -395,8 +447,9 @@ function RiftEnd({
           ...shared,
           ...own,
           uR: { value: R },
-          uView: { value: view.target.texture },
+          uView: view.uView,
           uViewport: { value: view.viewport },
+          uLive: view.uLive,
           uTint: { value: tint },
           uTintMix: { value: tintMix },
         },
@@ -462,24 +515,36 @@ function RiftEnd({
   })
 
   // Draw the other end just before this window draws, with whatever camera is drawing it, so
-  // the view never lags the viewer by a frame and is skipped whenever the rift is culled.
+  // the view never lags the viewer by a frame and is skipped whenever the rift is culled or too
+  // small on screen to matter.
   useEffect(() => {
     const mesh = pane.current
     if (!mesh) return
     mesh.onBeforeRender = (renderer, scene, camera) => {
       if (drawingView || !core.current || !otherCore.current) return
-      drawingView = true
       core.current.getWorldPosition(view.here)
-      otherCore.current.getWorldPosition(view.there)
       const scale = core.current.getWorldScale(view.point).x
-      const target = renderer.getRenderTarget()
-      const xr = renderer.xr.enabled
-      const shadows = renderer.shadowMap.autoUpdate
-      const planes = renderer.clippingPlanes
       renderer.getCurrentViewport(view.viewport)
       const w = view.viewport.z
       const h = view.viewport.w
-      view.target.setSize(w, h)
+
+      // The opening's radius on screen, in CSS pixels; fade the live view in as it grows.
+      const c = view.point.copy(view.here).applyMatrix4(camera.matrixWorldInverse)
+      const p = camera.projectionMatrix.elements
+      const radius = R * scale
+      const px =
+        -c.z > radius ? (((radius * p[5]) / -c.z) * (h / 2)) / renderer.getPixelRatio() : Infinity
+      view.uLive.value = smoothstep(px, LIVE_SIZE * 0.7, LIVE_SIZE)
+      if (view.uLive.value === 0) return
+
+      drawingView = true
+      otherCore.current.getWorldPosition(view.there)
+      const target = viewTarget(view.targets, w, h)
+      view.uView.value = target.texture
+      const previous = renderer.getRenderTarget()
+      const xr = renderer.xr.enabled
+      const shadows = renderer.shadowMap.autoUpdate
+      const planes = renderer.clippingPlanes
 
       // The viewer's camera, carried to the other end.
       const eye = view.camera
@@ -492,40 +557,39 @@ function RiftEnd({
       m[14] += view.there.z - view.here.z
       eye.matrixWorldInverse.copy(eye.matrixWorld).invert()
 
+      // Only shade the pixels this rift covers on screen.
+      const extent = R * EXTENT * scale
+      if (-c.z > extent) {
+        const k = target.width / w
+        const rx = ((extent * p[0]) / -c.z) * (w / 2)
+        const ry = ((extent * p[5]) / -c.z) * (h / 2)
+        c.applyMatrix4(camera.projectionMatrix)
+        const x = Math.max(0, Math.floor(((c.x * 0.5 + 0.5) * w - rx) * k))
+        const y = Math.max(0, Math.floor(((c.y * 0.5 + 0.5) * h - ry) * k))
+        target.scissor.set(x, y, Math.ceil(2 * rx * k), Math.ceil(2 * ry * k))
+        target.scissorTest = true
+      } else {
+        target.scissorTest = false
+      }
+
       // Cut away whatever stands between the carried camera and the far rift (a wall the viewer
       // isn't actually behind), keeping a rift's radius of what's just in front of it.
       view.forward.set(-m[8], -m[9], -m[10]).normalize()
       view.point.copy(view.there).addScaledVector(view.forward, -R * scale)
       view.clip.setFromNormalAndCoplanarPoint(view.forward, view.point)
 
-      // Only shade the pixels this rift covers on screen.
-      const c = view.point.copy(view.here).applyMatrix4(camera.matrixWorldInverse)
-      const extent = R * EXTENT * scale
-      if (-c.z > extent) {
-        const p = camera.projectionMatrix.elements
-        const rx = ((extent * p[0]) / -c.z) * (w / 2)
-        const ry = ((extent * p[5]) / -c.z) * (h / 2)
-        c.applyMatrix4(camera.projectionMatrix)
-        const x = Math.max(0, Math.floor((c.x * 0.5 + 0.5) * w - rx))
-        const y = Math.max(0, Math.floor((c.y * 0.5 + 0.5) * h - ry))
-        view.target.scissor.set(x, y, Math.ceil(2 * rx), Math.ceil(2 * ry))
-        view.target.scissorTest = true
-      } else {
-        view.target.scissorTest = false
-      }
-
       for (const e of ends) if (e.current) e.current.visible = false
       renderer.xr.enabled = false
       renderer.shadowMap.autoUpdate = false
       renderer.clippingPlanes = [view.clip]
-      renderer.setRenderTarget(view.target)
+      renderer.setRenderTarget(target)
       renderer.state.buffers.depth.setMask(true)
       if (!renderer.autoClear) renderer.clear()
       renderer.render(scene, eye)
       renderer.clippingPlanes = planes
       renderer.shadowMap.autoUpdate = shadows
       renderer.xr.enabled = xr
-      renderer.setRenderTarget(target)
+      renderer.setRenderTarget(previous)
       renderer.state.viewport(view.viewport)
       for (const e of ends) if (e.current) e.current.visible = true
       drawingView = false

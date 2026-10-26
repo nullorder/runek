@@ -1,8 +1,8 @@
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { Dynamic, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useRef } from 'react'
-import type { Mesh } from 'three'
+import { DoubleSide, type Mesh } from 'three'
 
 export interface FountainProps {
   position?: Vec3
@@ -28,6 +28,13 @@ export function Fountain({
   const { unit, palette } = useWorld()
   const stone = color ?? palette.stone
   const water = waterColor ?? palette.waterShallow
+  const m = useMaterials({
+    rim: { color: stone, roughness: 0.92, side: DoubleSide },
+    stone: { color: stone, roughness: 0.92 },
+    finial: { color: stone, roughness: 0.9 },
+    lowWater: { color: water, transparent: true, opacity: 0.8, roughness: 0.2, metalness: 0.1 },
+    topWater: { color: water, transparent: true, opacity: 0.85, roughness: 0.2 },
+  })
   const R = radius * unit
   const basinH = 0.5 * unit
   const topY = basinH + 1.0 * unit
@@ -45,40 +52,41 @@ export function Fountain({
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[R, basinH / 2, R]} position={[0, basinH / 2, 0]} />
 
-      <mesh castShadow receiveShadow position={[0, basinH / 2, 0]}>
+      <mesh material={m.rim} castShadow receiveShadow position={[0, basinH / 2, 0]}>
         <cylinderGeometry args={[R, R * 1.05, basinH, 28, 1, true]} />
-        <meshStandardMaterial color={stone} roughness={0.92} side={2} />
       </mesh>
-      <mesh receiveShadow position={[0, 0.05 * unit, 0]}>
+      <mesh material={m.stone} receiveShadow position={[0, 0.05 * unit, 0]}>
         <cylinderGeometry args={[R, R, 0.1 * unit, 28]} />
-        <meshStandardMaterial color={stone} roughness={0.92} />
       </mesh>
-      <mesh ref={lowWater} position={[0, basinH * 0.7, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[R * 0.92, 28]} />
-        <meshStandardMaterial
-          color={water}
-          transparent
-          opacity={0.8}
-          roughness={0.2}
-          metalness={0.1}
-        />
-      </mesh>
+      <Dynamic>
+        <mesh
+          ref={lowWater}
+          material={m.lowWater}
+          position={[0, basinH * 0.7, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <circleGeometry args={[R * 0.92, 28]} />
+        </mesh>
+      </Dynamic>
 
-      <mesh castShadow position={[0, basinH + 0.5 * unit, 0]}>
+      <mesh material={m.stone} castShadow position={[0, basinH + 0.5 * unit, 0]}>
         <cylinderGeometry args={[0.16 * unit, 0.22 * unit, 1.0 * unit, 16]} />
-        <meshStandardMaterial color={stone} roughness={0.92} />
       </mesh>
-      <mesh castShadow position={[0, topY, 0]}>
+      <mesh material={m.rim} castShadow position={[0, topY, 0]}>
         <cylinderGeometry args={[R * 0.5, R * 0.35, 0.18 * unit, 24, 1, true]} />
-        <meshStandardMaterial color={stone} roughness={0.92} side={2} />
       </mesh>
-      <mesh ref={topWater} position={[0, topY, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[R * 0.46, 24]} />
-        <meshStandardMaterial color={water} transparent opacity={0.85} roughness={0.2} />
-      </mesh>
-      <mesh castShadow position={[0, topY + 0.2 * unit, 0]}>
+      <Dynamic>
+        <mesh
+          ref={topWater}
+          material={m.topWater}
+          position={[0, topY, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <circleGeometry args={[R * 0.46, 24]} />
+        </mesh>
+      </Dynamic>
+      <mesh material={m.finial} castShadow position={[0, topY + 0.2 * unit, 0]}>
         <sphereGeometry args={[0.1 * unit, 12, 12]} />
-        <meshStandardMaterial color={stone} roughness={0.9} />
       </mesh>
     </RigidBody>
   )

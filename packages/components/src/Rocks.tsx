@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 
 export interface RocksProps {
@@ -47,11 +47,20 @@ export function Rocks({
     })
   }, [count, spread, size, seed, unit])
 
+  const materials = useMaterials(
+    rocks.map((r) => ({
+      color: `hsl(${hue}, 8%, ${r.lightness}%)`,
+      flatShading: true,
+      roughness: 1,
+    })),
+  )
+
   return (
     <RigidBody type="fixed" colliders="hull" position={position} rotation={rotation}>
-      {rocks.map((r) => (
+      {rocks.map((r, i) => (
         <mesh
           key={`rock-${r.pos[0].toFixed(3)}:${r.pos[2].toFixed(3)}`}
+          material={materials[i]}
           castShadow
           receiveShadow
           position={r.pos}
@@ -59,11 +68,6 @@ export function Rocks({
           scale={r.scale}
         >
           <icosahedronGeometry args={[r.radius, 0]} />
-          <meshStandardMaterial
-            color={`hsl(${hue}, 8%, ${r.lightness}%)`}
-            flatShading
-            roughness={1}
-          />
         </mesh>
       ))}
     </RigidBody>

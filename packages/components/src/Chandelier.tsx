@@ -1,9 +1,19 @@
-import { int, rng, sub, useSun, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  int,
+  rng,
+  sub,
+  useLight,
+  useMaterials,
+  useSun,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { type ReactNode, useLayoutEffect, useMemo, useRef } from 'react'
 import {
   CubicBezierCurve3,
   type InstancedMesh,
   LatheGeometry,
+  type Material,
   Matrix4,
   Quaternion,
   TubeGeometry,
@@ -44,10 +54,12 @@ interface Tier {
 /** One draw call for every copy of a part: the matrices are set once per layout. */
 function Instanced({
   matrices,
+  material,
   children,
   castShadow,
 }: {
   matrices: Matrix4[]
+  material: Material
   children: ReactNode
   castShadow?: boolean
 }) {
@@ -65,6 +77,7 @@ function Instanced({
       key={matrices.length}
       ref={ref}
       args={[undefined, undefined, matrices.length]}
+      material={material}
       castShadow={castShadow}
     >
       {children}
@@ -178,60 +191,52 @@ export function Chandelier({
   }, [bodyH])
 
   const cupR = 0.035 * unit
-  const metal = <meshStandardMaterial color={brass} metalness={0.75} roughness={0.3} />
+  const glow = useLight({ color: lightColor, intensity, distance: 14 * unit, decay: 2 }, lit)
+  const m = useMaterials({
+    metal: { color: brass, metalness: 0.75, roughness: 0.3 },
+    bulb: {
+      color: '#fff3d6',
+      emissive: lightColor,
+      emissiveIntensity: lit ? 2.2 : 0,
+      toneMapped: !lit,
+    },
+    // Faceted, glossy, see-through glass. Real refraction (`transmission`) would make three draw
+    // every solid object in the world once more each frame.
+    glass: {
+      color: '#e8f2ff',
+      roughness: 0.05,
+      metalness: 0.4,
+      transparent: true,
+      opacity: 0.75,
+      emissive: lightColor,
+      emissiveIntensity: lit ? 0.35 : 0,
+    },
+  })
 
   return (
     <group position={position} rotation={rotation}>
-      <mesh position={[0, -0.015 * unit, 0]}>
+      <mesh material={m.metal} position={[0, -0.015 * unit, 0]}>
         <cylinderGeometry args={[0.05 * unit, 0.08 * unit, 0.03 * unit, 20]} />
-        {metal}
       </mesh>
-      <mesh position={[0, -D / 2, 0]}>
+      <mesh material={m.metal} position={[0, -D / 2, 0]}>
         <cylinderGeometry args={[0.006 * unit, 0.006 * unit, D, 6]} />
-        {metal}
       </mesh>
-      <mesh position={[0, -D, 0]} geometry={bodyGeometry} castShadow>
-        {metal}
-      </mesh>
-      <Instanced matrices={parts.arm} castShadow>
+      <mesh material={m.metal} position={[0, -D, 0]} geometry={bodyGeometry} castShadow />
+      <Instanced matrices={parts.arm} material={m.metal} castShadow>
         <primitive object={armGeometry} attach="geometry" />
-        {metal}
       </Instanced>
-      <Instanced matrices={parts.cup}>
+      <Instanced matrices={parts.cup} material={m.metal}>
         <cylinderGeometry args={[cupR, cupR * 0.4, 0.04 * unit, 12]} />
-        {metal}
       </Instanced>
-      <Instanced matrices={parts.bulb}>
+      <Instanced matrices={parts.bulb} material={m.bulb}>
         <sphereGeometry args={[0.022 * unit, 10, 8]} />
-        <meshStandardMaterial
-          color="#fff3d6"
-          emissive={lightColor}
-          emissiveIntensity={lit ? 2.2 : 0}
-          toneMapped={!lit}
-        />
       </Instanced>
       {parts.drops.length > 0 && (
-        <Instanced matrices={parts.drops}>
+        <Instanced matrices={parts.drops} material={m.glass}>
           <octahedronGeometry args={[0.03 * unit, 0]} />
-          <meshPhysicalMaterial
-            color="#e8f2ff"
-            roughness={0.05}
-            transmission={0.6}
-            thickness={0.02 * unit}
-            emissive={lightColor}
-            emissiveIntensity={lit ? 0.25 : 0}
-          />
         </Instanced>
       )}
-      {lit && (
-        <pointLight
-          position={[0, look.tiers[0].y + 0.1 * R, 0]}
-          color={lightColor}
-          intensity={intensity}
-          distance={14 * unit}
-          decay={2}
-        />
-      )}
+      <object3D ref={glow.ref} position={[0, look.tiers[0].y + 0.1 * R, 0]} />
     </group>
   )
 }

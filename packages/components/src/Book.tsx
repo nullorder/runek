@@ -1,6 +1,14 @@
 import { Html } from '@react-three/drei'
 import { type ThreeEvent, useFrame } from '@react-three/fiber'
-import { DEFAULT_REACH, rng, useLensPosition, useReach, useWorld, type Vec3 } from '@runek/core'
+import {
+  DEFAULT_REACH,
+  rng,
+  useLensPosition,
+  useMaterials,
+  useReach,
+  useWorld,
+  type Vec3,
+} from '@runek/core'
 import { useMemo, useRef, useState } from 'react'
 import type { Vector3 } from 'three'
 
@@ -83,6 +91,10 @@ export function Book({
       35 + next() * 15,
     )}%)`
   }, [color, seed])
+  const m = useMaterials({
+    cover: { color: coverColor, roughness: 0.75 },
+    pages: { color: pageColor, roughness: 0.9 },
+  })
 
   const interactive = onSelect != null || href != null
   const handlers = interactive
@@ -107,21 +119,17 @@ export function Book({
   // z = spine length; resting on y = 0 with the spine along the -x edge.
   const closed = (
     <group>
-      <mesh castShadow position={[0.01 * unit, t / 2, 0]}>
+      <mesh material={m.pages} castShadow position={[0.01 * unit, t / 2, 0]}>
         <boxGeometry args={[w * 0.94, Math.max(t - board * 2, t * 0.5), h * 0.95]} />
-        <meshStandardMaterial color={pageColor} roughness={0.9} />
       </mesh>
-      <mesh castShadow position={[0, board / 2, 0]}>
+      <mesh material={m.cover} castShadow position={[0, board / 2, 0]}>
         <boxGeometry args={[w, board, h]} />
-        <meshStandardMaterial color={coverColor} roughness={0.75} />
       </mesh>
-      <mesh castShadow position={[0, t - board / 2, 0]}>
+      <mesh material={m.cover} castShadow position={[0, t - board / 2, 0]}>
         <boxGeometry args={[w, board, h]} />
-        <meshStandardMaterial color={coverColor} roughness={0.75} />
       </mesh>
-      <mesh castShadow position={[-w / 2 + board / 2, t / 2, 0]}>
+      <mesh material={m.cover} castShadow position={[-w / 2 + board / 2, t / 2, 0]}>
         <boxGeometry args={[board, t, h]} />
-        <meshStandardMaterial color={coverColor} roughness={0.75} />
       </mesh>
     </group>
   )
@@ -131,13 +139,11 @@ export function Book({
   const halfPages = Math.max((t - board * 2) / 2, t * 0.25)
   const openHalf = (side: 1 | -1) => (
     <group key={side} scale={[side, 1, 1]} rotation={[0, 0, -openTilt]}>
-      <mesh castShadow position={[w / 2, board / 2, 0]}>
+      <mesh material={m.cover} castShadow position={[w / 2, board / 2, 0]}>
         <boxGeometry args={[w, board, h]} />
-        <meshStandardMaterial color={coverColor} roughness={0.75} />
       </mesh>
-      <mesh castShadow position={[(w / 2) * 0.98, board + halfPages / 2, 0]}>
+      <mesh material={m.pages} castShadow position={[(w / 2) * 0.98, board + halfPages / 2, 0]}>
         <boxGeometry args={[w * 0.92, halfPages, h * 0.94]} />
-        <meshStandardMaterial color={pageColor} roughness={0.9} />
       </mesh>
     </group>
   )

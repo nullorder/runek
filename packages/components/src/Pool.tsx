@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 
 export interface PoolProps extends WorldComponentProps {
   /** Water surface `[width, depth]`, in units. */
@@ -36,8 +36,16 @@ export function Pool({
   waterColor,
 }: PoolProps) {
   const { unit, palette } = useWorld()
-  const rim = copingColor ?? palette.wall
-  const water = waterColor ?? palette.waterShallow
+  const m = useMaterials({
+    rim: { color: copingColor ?? palette.wall },
+    basin: { color: basinColor },
+    water: {
+      color: waterColor ?? palette.waterShallow,
+      transparent: true,
+      opacity: 0.55,
+      roughness: 0.05,
+    },
+  })
   const w = size[0] * unit
   const d = size[1] * unit
   const dep = depth * unit
@@ -60,12 +68,12 @@ export function Pool({
       {copingRun.map((s) => (
         <mesh
           key={`${s.x.toFixed(3)}:${s.z.toFixed(3)}`}
+          material={m.rim}
           castShadow
           receiveShadow
           position={[s.x, 0, s.z]}
         >
           <boxGeometry args={[s.w, lip * 2, s.d]} />
-          <meshStandardMaterial color={rim} />
         </mesh>
       ))}
       {/* basin walls */}
@@ -77,22 +85,20 @@ export function Pool({
       ].map((s) => (
         <mesh
           key={`b${s.x.toFixed(3)}:${s.z.toFixed(3)}`}
+          material={m.basin}
           receiveShadow
           position={[s.x, -dep / 2, s.z]}
         >
           <boxGeometry args={[s.w, dep, s.d]} />
-          <meshStandardMaterial color={basinColor} />
         </mesh>
       ))}
       {/* basin floor */}
-      <mesh receiveShadow position={[0, -dep + wallT / 2, 0]}>
+      <mesh material={m.basin} receiveShadow position={[0, -dep + wallT / 2, 0]}>
         <boxGeometry args={[w, wallT, d]} />
-        <meshStandardMaterial color={basinColor} />
       </mesh>
       {/* water, just under the lip */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.14 * unit, 0]}>
+      <mesh material={m.water} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.14 * unit, 0]}>
         <planeGeometry args={[w - wallT * 2, d - wallT * 2]} />
-        <meshStandardMaterial color={water} transparent opacity={0.55} roughness={0.05} />
       </mesh>
       {steps &&
         [0, 1, 2].map((i) => {
@@ -106,9 +112,8 @@ export function Pool({
           const z = halfD - wallT - run
           return (
             <group key={`s${i}`}>
-              <mesh receiveShadow position={[x, top - boxH / 2, z]}>
+              <mesh material={m.basin} receiveShadow position={[x, top - boxH / 2, z]}>
                 <boxGeometry args={[run, boxH, run * 2]} />
-                <meshStandardMaterial color={basinColor} />
               </mesh>
               <CuboidCollider args={[run / 2, boxH / 2, run]} position={[x, top - boxH / 2, z]} />
             </group>

@@ -1,0 +1,37 @@
+{
+  "$comment": "Per-frame ceilings for the docs library world, checked by scripts/perf.mjs (`just perf`, and CI on pull requests). Counts are about 15% over what main measures, so a regression shows up before it ships. Lower them when cost comes down; raise one only with a reason in the PR. minFps is enforced only with --timing (a real GPU).",
+  "scenarios": {
+    "spawn": {
+      "draws": 790,
+      "scenePasses": 2,
+      "shadowPasses": 1,
+      "lights": 10,
+      "casters": 500,
+      "materials": 480,
+      "allocs": 10
+    },
+    "gallery": {
+      "draws": 1050,
+      "scenePasses": 2,
+      "shadowPasses": 1,
+      "lights": 10,
+      "casters": 500,
+      "materials": 480,
+      "allocs": 10
+    },
+    "turn": {
+      "draws": 980,
+      "scenePasses": 2,
+      "shadowPasses": 1,
+      "lights": 10,
+      "casters": 500,
+      "materials": 480,
+      "allocs": 10
+    }
+  },
+  "timing": {
+    "spawn": { "minFps": 60 },
+    "gallery": { "minFps": 60 },
+    "turn": { "minFps": 60 }
+  }
+}

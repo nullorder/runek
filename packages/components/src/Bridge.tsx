@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 
 export interface BridgeProps {
@@ -33,8 +33,10 @@ export function Bridge({
   seed = 1,
 }: BridgeProps) {
   const { unit, palette } = useWorld()
-  const deckColor = color ?? palette.wood
-  const railColor = palette.woodDark
+  const m = useMaterials({
+    deck: { color: color ?? palette.wood, roughness: 0.85 },
+    rail: { color: palette.woodDark, roughness: 0.85 },
+  })
   const L = length * unit
   const W = width * unit
   const rise = arch * unit
@@ -81,9 +83,14 @@ export function Bridge({
       ))}
 
       {planks.map((p) => (
-        <mesh key={`plank-${p.x.toFixed(3)}`} castShadow receiveShadow position={[p.x, p.y, 0]}>
+        <mesh
+          key={`plank-${p.x.toFixed(3)}`}
+          material={m.deck}
+          castShadow
+          receiveShadow
+          position={[p.x, p.y, 0]}
+        >
           <boxGeometry args={[p.w, deckT, W]} />
-          <meshStandardMaterial color={deckColor} roughness={0.85} />
         </mesh>
       ))}
 
@@ -91,20 +98,24 @@ export function Bridge({
         [-1, 1].map((s) => (
           <mesh
             key={`post-${p.x.toFixed(3)}-${s}`}
+            material={m.rail}
             castShadow
             position={[p.x, p.y + railH / 2, (s * W) / 2]}
           >
             <boxGeometry args={[0.08 * unit, railH, 0.08 * unit]} />
-            <meshStandardMaterial color={railColor} roughness={0.85} />
           </mesh>
         )),
       )}
 
       {rails &&
         [-1, 1].map((s) => (
-          <mesh key={`toprail-${s}`} castShadow position={[0, rise * 0.5 + railH, (s * W) / 2]}>
+          <mesh
+            key={`toprail-${s}`}
+            material={m.rail}
+            castShadow
+            position={[0, rise * 0.5 + railH, (s * W) / 2]}
+          >
             <boxGeometry args={[L, 0.07 * unit, 0.07 * unit]} />
-            <meshStandardMaterial color={railColor} roughness={0.85} />
           </mesh>
         ))}
     </RigidBody>

@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber'
-import { useWorld, type Vec3 } from '@runek/core'
+import { Dynamic, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo, useRef } from 'react'
 import type { Group } from 'three'
 
@@ -68,8 +68,15 @@ export function Clock({
   accentColor,
 }: ClockProps) {
   const { unit, palette, time } = useWorld()
-  const rim = frameColor ?? palette.metal
   const accent = accentColor ?? palette.accent
+  const mat = useMaterials({
+    rim: { color: frameColor ?? palette.metal, metalness: 0.4, roughness: 0.6 },
+    face: { color: faceColor, roughness: 0.5 },
+    tick: { color: handColor, emissive: handColor, emissiveIntensity: 0.2 },
+    hand: { color: handColor, emissive: handColor, emissiveIntensity: 0.12 },
+    second: { color: accent, emissive: accent, emissiveIntensity: 0.6, toneMapped: false },
+    hub: { color: accent, emissive: accent, emissiveIntensity: 0.5, toneMapped: false },
+  })
   const R = radius * unit
   const zone = timezone ?? time.timezone
 
@@ -111,58 +118,43 @@ export function Clock({
   return (
     <group position={position} rotation={rotation}>
       {/* rim + dial, circular faces turned to point +z */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
+      <mesh material={mat.rim} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[R + 0.05 * unit, R + 0.05 * unit, 0.06 * unit, 48]} />
-        <meshStandardMaterial color={rim} metalness={0.4} roughness={0.6} />
       </mesh>
-      <mesh position={[0, 0, 0.031 * unit]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh material={mat.face} position={[0, 0, 0.031 * unit]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[R, R, 0.02 * unit, 48]} />
-        <meshStandardMaterial color={faceColor} roughness={0.5} />
       </mesh>
 
       {ticks.map(({ a, big, x, y }) => (
-        <mesh key={a} position={[x, y, 0.045 * unit]} rotation={[0, 0, -a]}>
+        <mesh key={a} material={mat.tick} position={[x, y, 0.045 * unit]} rotation={[0, 0, -a]}>
           <boxGeometry
             args={[(big ? 0.03 : 0.015) * unit, (big ? 0.1 : 0.06) * unit, 0.01 * unit]}
           />
-          <meshStandardMaterial color={handColor} emissive={handColor} emissiveIntensity={0.2} />
         </mesh>
       ))}
 
       {/* hands: anchored at center, extending up; group rotation sweeps them */}
-      <group ref={hour}>
-        <mesh position={[0, R * 0.28, 0.05 * unit]}>
-          <boxGeometry args={[0.035 * unit, R * 0.55, 0.012 * unit]} />
-          <meshStandardMaterial color={handColor} emissive={handColor} emissiveIntensity={0.12} />
-        </mesh>
-      </group>
-      <group ref={minute}>
-        <mesh position={[0, R * 0.38, 0.055 * unit]}>
-          <boxGeometry args={[0.022 * unit, R * 0.78, 0.012 * unit]} />
-          <meshStandardMaterial color={handColor} emissive={handColor} emissiveIntensity={0.12} />
-        </mesh>
-      </group>
-      <group ref={second}>
-        <mesh position={[0, R * 0.42, 0.06 * unit]}>
-          <boxGeometry args={[0.008 * unit, R * 0.86, 0.01 * unit]} />
-          <meshStandardMaterial
-            color={accent}
-            emissive={accent}
-            emissiveIntensity={0.6}
-            toneMapped={false}
-          />
-        </mesh>
-      </group>
+      <Dynamic>
+        <group ref={hour}>
+          <mesh material={mat.hand} position={[0, R * 0.28, 0.05 * unit]}>
+            <boxGeometry args={[0.035 * unit, R * 0.55, 0.012 * unit]} />
+          </mesh>
+        </group>
+        <group ref={minute}>
+          <mesh material={mat.hand} position={[0, R * 0.38, 0.055 * unit]}>
+            <boxGeometry args={[0.022 * unit, R * 0.78, 0.012 * unit]} />
+          </mesh>
+        </group>
+        <group ref={second}>
+          <mesh material={mat.second} position={[0, R * 0.42, 0.06 * unit]}>
+            <boxGeometry args={[0.008 * unit, R * 0.86, 0.01 * unit]} />
+          </mesh>
+        </group>
+      </Dynamic>
 
       {/* center hub */}
-      <mesh position={[0, 0, 0.066 * unit]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh material={mat.hub} position={[0, 0, 0.066 * unit]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.03 * unit, 0.03 * unit, 0.03 * unit, 16]} />
-        <meshStandardMaterial
-          color={accent}
-          emissive={accent}
-          emissiveIntensity={0.5}
-          toneMapped={false}
-        />
       </mesh>
     </group>
   )

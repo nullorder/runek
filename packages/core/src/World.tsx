@@ -1,14 +1,17 @@
-import { KeyboardControls, type KeyboardControlsEntry } from '@react-three/drei'
+import { KeyboardControls, type KeyboardControlsEntry, PerformanceMonitor } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Physics, useRapier } from '@react-three/rapier'
-import { type ReactNode, useMemo, useRef } from 'react'
+import { type ReactNode, useMemo, useRef, useState } from 'react'
 import type { Object3D } from 'three'
 import { WorldContext } from './context'
 import { DEFAULT_FONTS, type WorldFonts } from './font'
 import { useKeySource } from './input'
 import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
+import { LightBudget } from './LightBudget'
 import type { Lens } from './lens'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
+import { ShadowRate } from './ShadowRate'
+import { StaticBatching } from './StaticBatching'
 import { resolveWorldTime } from './time'
 import type { AvatarView, Interactor, Vec3, Walker, WorldFog } from './types'
 
@@ -56,6 +59,24 @@ export interface WorldProps {
    *  (the editor enables this for the "suggest changes" PNG). Off by default — it can
    *  cost a little performance. */
   preserveDrawingBuffer?: boolean
+  /** Pixel ratio to render at. A number pins it. A `[min, max]` range follows the display's own
+   *  ratio up to `max`, and steps down toward `min` while frames run slow (back up when they
+   *  recover). Default `[1, 1.5]`: sharp on a high-density screen at about half the cost of 2x. */
+  dpr?: number | [number, number]
+  /** Merge static parts that share a material into one mesh per material per cell, so draw
+   *  calls follow the number of looks, not the number of parts. Moving parts, interactive ones
+   *  and anything under `<Dynamic>` stay as they are. `true` uses 20 m cells; pass `{ cell }` to
+   *  size them; `false` turns it off. Default `true`. */
+  batching?: boolean | { cell?: number }
+  /** Real lights the world lends to its lamps (`useLight` emitters): a number of point lights,
+   *  or `{ point, spot }`. Each frame they go to the emitters that matter most to the view,
+   *  fading as they hand off; the count never changes, so nothing recompiles. Default 6 point
+   *  lights and 2 spotlights. */
+  lightBudget?: number | { point?: number; spot?: number }
+  /** How many times a second shadow maps are redrawn. Redrawing walks the whole scene for the
+   *  light, so a big world saves a millisecond or two by not doing it every frame; moving
+   *  shadows still read as smooth at the default 30. `Infinity` redraws every frame. */
+  shadowRate?: number
   debug?: boolean
   children?: ReactNode
 }
@@ -77,6 +98,10 @@ export function World({
   avatar,
   onPointerMissed,
   preserveDrawingBuffer = false,
+  dpr = DEFAULT_DPR,
+  batching = true,
+  lightBudget = DEFAULT_LIGHT_BUDGET,
+  shadowRate = 30,
   debug = false,
   children,
 }: WorldProps) {
@@ -134,18 +159,37 @@ export function World({
     ],
   )
 
+  const [minDpr, maxDpr] = typeof dpr === 'number' ? [dpr, dpr] : dpr
+  const [dprCeiling, setDprCeiling] = useState(maxDpr)
+  const ceiling = Math.min(Math.max(dprCeiling, minDpr), maxDpr)
+
   return (
     // drei types `domElement` as an element but only listens on it, so any EventTarget works.
     <KeyboardControls map={inputMap} domElement={keySource as HTMLElement}>
       <Canvas
         frameloop={paused ? 'never' : 'always'}
         shadows
+        dpr={[minDpr, ceiling]}
         camera={{ position: [6, 4, 6], fov: 60 }}
         gl={{ preserveDrawingBuffer }}
         onPointerMissed={onPointerMissed}
       >
         <WorldContext.Provider value={context}>
           <KeepClock />
+          <ShadowRate rate={shadowRate} />
+          {batching && (
+            <StaticBatching cell={(typeof batching === 'object' && batching.cell) || 20} />
+          )}
+          {minDpr < maxDpr && (
+            <PerformanceMonitor
+              factor={1}
+              flipflops={4}
+              onChange={({ factor }) =>
+                setDprCeiling(Math.round((minDpr + (maxDpr - minDpr) * factor) * 20) / 20)
+              }
+              onFallback={() => setDprCeiling(minDpr)}
+            />
+          )}
           {fog && <fog attach="fog" args={[fog.color, fog.near * unit, fog.far * unit]} />}
           {lights && (
             <>
@@ -164,16 +208,24 @@ export function World({
               />
             </>
           )}
-          {/* Stepped by <FrameStep> below, never by rapier's own loop. */}
-          <Physics gravity={gravity} paused debug={debug} timeStep="vary">
-            <FrameStep />
-            {children}
-          </Physics>
+          <LightBudget
+            point={typeof lightBudget === 'number' ? lightBudget : lightBudget.point}
+            spot={typeof lightBudget === 'number' ? undefined : lightBudget.spot}
+          >
+            {/* Stepped by <FrameStep> below, never by rapier's own loop. */}
+            <Physics gravity={gravity} paused debug={debug} timeStep="vary">
+              <FrameStep />
+              {children}
+            </Physics>
+          </LightBudget>
         </WorldContext.Provider>
       </Canvas>
     </KeyboardControls>
   )
 }
+
+const DEFAULT_DPR: [number, number] = [1, 1.5]
+const DEFAULT_LIGHT_BUDGET = { point: 6, spot: 2 }
 
 // The longest single physics step. A longer frame (a hitch, a tab coming back into view) is split
 // into sub-steps so nothing moves far enough in one step to pass through a thin collider.

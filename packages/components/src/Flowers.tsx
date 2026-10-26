@@ -1,4 +1,4 @@
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
@@ -35,7 +35,10 @@ export function Flowers({
   seed = 1,
 }: FlowersProps) {
   const { unit, palette } = useWorld()
-  const stem = stemColor ?? palette.foliage
+  const m = useMaterials({
+    stem: { color: stemColor ?? palette.foliage },
+    head: { flatShading: true, roughness: 0.8 },
+  })
   const w = area[0] * unit
   const d = area[1] * unit
   const h = height * unit
@@ -77,13 +80,21 @@ export function Flowers({
 
   return (
     <group position={position} rotation={rotation}>
-      <instancedMesh ref={stemRef} args={[undefined, undefined, count]} castShadow>
+      <instancedMesh
+        ref={stemRef}
+        args={[undefined, undefined, count]}
+        material={m.stem}
+        castShadow
+      >
         <cylinderGeometry args={[0.01 * unit, 0.012 * unit, h, 5]} />
-        <meshStandardMaterial color={stem} />
       </instancedMesh>
-      <instancedMesh ref={headRef} args={[undefined, undefined, count]} castShadow>
+      <instancedMesh
+        ref={headRef}
+        args={[undefined, undefined, count]}
+        material={m.head}
+        castShadow
+      >
         <icosahedronGeometry args={[0.05 * unit, 0]} />
-        <meshStandardMaterial flatShading roughness={0.8} />
       </instancedMesh>
     </group>
   )

@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { Dynamic, rng, useLight, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo, useRef } from 'react'
-import type { Group, PointLight } from 'three'
+import type { Group } from 'three'
 
 export interface CampfireProps {
   position?: Vec3
@@ -27,11 +27,21 @@ export function Campfire({
   seed = 1,
 }: CampfireProps) {
   const { unit, palette } = useWorld()
-  const wood = logColor ?? palette.wood
-  const stone = palette.stone
+  const m = useMaterials({
+    stone: { color: palette.stone, flatShading: true, roughness: 1 },
+    log: { color: logColor ?? palette.wood, roughness: 0.9 },
+    flame: {
+      kind: 'basic',
+      color: flameColor,
+      transparent: true,
+      opacity: 0.85,
+      toneMapped: false,
+    },
+    core: { kind: 'basic', color: '#ffd84d', transparent: true, opacity: 0.9, toneMapped: false },
+  })
   const R = radius * unit
   const flameRef = useRef<Group>(null)
-  const lightRef = useRef<PointLight>(null)
+  const glow = useLight({ color: '#ff9a3c', intensity, distance: 10 * unit, decay: 2 })
 
   const stones = useMemo(() => {
     const next = rng(seed)
@@ -56,7 +66,7 @@ export function Campfire({
       flameRef.current.scale.y = 1 + n * 0.18
       flameRef.current.position.x = n * 0.02 * unit
     }
-    if (lightRef.current) lightRef.current.intensity = intensity * (1 + n * 0.25)
+    glow.intensity = intensity * (1 + n * 0.25)
   })
 
   return (
@@ -64,46 +74,39 @@ export function Campfire({
       {stones.map((s) => (
         <mesh
           key={`stone-${s.x.toFixed(3)}:${s.z.toFixed(3)}`}
+          material={m.stone}
           castShadow
           position={[s.x, s.r * 0.6, s.z]}
           rotation={[s.rot, s.rot, 0]}
         >
           <icosahedronGeometry args={[s.r, 0]} />
-          <meshStandardMaterial color={stone} flatShading roughness={1} />
         </mesh>
       ))}
 
       {logs.map((a) => (
         <mesh
           key={`log-${a.toFixed(3)}`}
+          material={m.log}
           castShadow
           position={[Math.cos(a) * R * 0.4, logLen * 0.4, Math.sin(a) * R * 0.4]}
           rotation={[Math.cos(a) * 0.5, 0, -Math.sin(a) * 0.5]}
         >
           <cylinderGeometry args={[0.05 * unit, 0.06 * unit, logLen, 7]} />
-          <meshStandardMaterial color={wood} roughness={0.9} />
         </mesh>
       ))}
 
-      <group ref={flameRef} position={[0, R * 0.5, 0]}>
-        <mesh position={[0, R * 0.5, 0]}>
-          <coneGeometry args={[R * 0.5, R * 1.6, 10]} />
-          <meshBasicMaterial color={flameColor} transparent opacity={0.85} toneMapped={false} />
-        </mesh>
-        <mesh position={[0, R * 0.45, 0]}>
-          <coneGeometry args={[R * 0.28, R * 1.1, 10]} />
-          <meshBasicMaterial color="#ffd84d" transparent opacity={0.9} toneMapped={false} />
-        </mesh>
-      </group>
+      <Dynamic>
+        <group ref={flameRef} position={[0, R * 0.5, 0]}>
+          <mesh material={m.flame} position={[0, R * 0.5, 0]}>
+            <coneGeometry args={[R * 0.5, R * 1.6, 10]} />
+          </mesh>
+          <mesh material={m.core} position={[0, R * 0.45, 0]}>
+            <coneGeometry args={[R * 0.28, R * 1.1, 10]} />
+          </mesh>
+        </group>
+      </Dynamic>
 
-      <pointLight
-        ref={lightRef}
-        position={[0, R * 0.9, 0]}
-        color="#ff9a3c"
-        intensity={intensity}
-        distance={10 * unit}
-        decay={2}
-      />
+      <object3D ref={glow.ref} position={[0, R * 0.9, 0]} />
     </group>
   )
 }

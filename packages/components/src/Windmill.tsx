@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber'
 import { CylinderCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type WorldComponentProps } from '@runek/core'
+import { Dynamic, rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo, useRef } from 'react'
 import type { Group } from 'three'
 
@@ -38,7 +38,12 @@ export function Windmill({
   const { unit, palette } = useWorld()
   const wall = color ?? palette.wall
   const wood = trimColor ?? palette.wood
-  const roof = palette.roof
+  const m = useMaterials({
+    tower: { color: wall, flatShading: true },
+    cap: { color: palette.roof, flatShading: true },
+    wood: { color: wood },
+    canvas: { color: wall },
+  })
   const sails = useRef<Group>(null)
 
   const H = height * unit
@@ -60,46 +65,47 @@ export function Windmill({
       <CylinderCollider args={[H / 2, R]} position={[0, H / 2, 0]} />
 
       {/* tapered tower */}
-      <mesh position={[0, H / 2, 0]} castShadow receiveShadow>
+      <mesh material={m.tower} position={[0, H / 2, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[topR, R, H, 16]} />
-        <meshStandardMaterial color={wall} flatShading />
       </mesh>
 
       {/* conical cap */}
-      <mesh position={[0, H + capH / 2, 0]} castShadow>
+      <mesh material={m.cap} position={[0, H + capH / 2, 0]} castShadow>
         <coneGeometry args={[topR * 1.15, capH, 16]} />
-        <meshStandardMaterial color={roof} flatShading />
       </mesh>
 
       {/* door on the front */}
-      <mesh position={[0, 1 * unit, R * 0.98]} castShadow>
+      <mesh material={m.wood} position={[0, 1 * unit, R * 0.98]} castShadow>
         <boxGeometry args={[0.9 * unit, 1.8 * unit, 0.12 * unit]} />
-        <meshStandardMaterial color={wood} />
       </mesh>
 
       {/* axle from the cap front out to the sails */}
-      <mesh position={[0, sailY, axleZ / 2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+      <mesh
+        material={m.wood}
+        position={[0, sailY, axleZ / 2]}
+        rotation={[Math.PI / 2, 0, 0]}
+        castShadow
+      >
         <cylinderGeometry args={[0.15 * unit, 0.15 * unit, axleZ, 8]} />
-        <meshStandardMaterial color={wood} />
       </mesh>
 
       {/* four turning sails */}
-      <group ref={sails} position={[0, sailY, axleZ]} rotation={[0, 0, phase]}>
-        {BLADES.map((a) => (
-          <group key={a} rotation={[0, 0, a]}>
-            {/* spar */}
-            <mesh position={[0, sailL / 2, 0]} castShadow>
-              <boxGeometry args={[0.14 * unit, sailL, 0.14 * unit]} />
-              <meshStandardMaterial color={wood} />
-            </mesh>
-            {/* canvas, offset to one side of the spar */}
-            <mesh position={[0.5 * unit, sailL * 0.52, 0]} castShadow>
-              <boxGeometry args={[0.8 * unit, sailL * 0.82, 0.05 * unit]} />
-              <meshStandardMaterial color={wall} />
-            </mesh>
-          </group>
-        ))}
-      </group>
+      <Dynamic>
+        <group ref={sails} position={[0, sailY, axleZ]} rotation={[0, 0, phase]}>
+          {BLADES.map((a) => (
+            <group key={a} rotation={[0, 0, a]}>
+              {/* spar */}
+              <mesh material={m.wood} position={[0, sailL / 2, 0]} castShadow>
+                <boxGeometry args={[0.14 * unit, sailL, 0.14 * unit]} />
+              </mesh>
+              {/* canvas, offset to one side of the spar */}
+              <mesh material={m.canvas} position={[0.5 * unit, sailL * 0.52, 0]} castShadow>
+                <boxGeometry args={[0.8 * unit, sailL * 0.82, 0.05 * unit]} />
+              </mesh>
+            </group>
+          ))}
+        </group>
+      </Dynamic>
     </RigidBody>
   )
 }

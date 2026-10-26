@@ -38,7 +38,10 @@ Dependency direction is one-way: `app → components → core`.
 
 ## Adding a component
 
-1. **Write it.** Create `packages/components/src/<Name>.tsx` following the [component contract](./CONTRACT.md) — typed `<Name>Props`, deterministic from `seed`, geometry in `useMemo`, colliders proportional to gameplay surface, no assets, respects `unit` from `useWorld()`. Default colors to world-palette slots (`useWorld().palette`) and render repeated geometry as an `InstancedMesh` (see `Bookshelf`, `Trees`, `Grass`).
+1. **Write it.** Create `packages/components/src/<Name>.tsx` following the [component contract](./CONTRACT.md) — typed `<Name>Props`, deterministic from `seed`, geometry in `useMemo`, colliders proportional to gameplay surface, no assets, respects `unit` from `useWorld()`. Default colors to world-palette slots (`useWorld().palette`) and render repeated geometry as an `InstancedMesh` (see `Bookshelf`, `Trees`, `Grass`). Three render rules keep worlds fast as they grow (see CONTRACT §7):
+   - **Materials:** take static ones from `useMaterial` / `useMaterials` (see `Bench`, `Lamp`); they're shared and read-only, so a material you change after mount (a flicker, a texture you draw into) stays your own.
+   - **Motion:** wrap parts you move, scale, hide or reshape after mount in `<Dynamic>` (see `Clock`'s hands, `Windmill`'s sails), so the world's static batching leaves them alone.
+   - **Light:** register light with `useLight(look)` and put the emitter's `ref` where it shines from (see `Lamp`, `CeilingLight` for a spot); never mount a `<pointLight>` yourself. Flicker by writing the emitter's `intensity`.
 
 2. **Export it.** Add to `packages/components/src/index.ts` (the type and the component, kept alphabetical):
 
@@ -85,7 +88,12 @@ Dependency direction is one-way: `app → components → core`.
    ```sh
    just check       # lint + typecheck + test + build (must pass)
    just docs        # eyeball it at /gallery and /docs
+   just perf        # render cost of the library world against scripts/perf-budget.json
    ```
+
+   Every component lands in the library's gallery hall, so `just perf` shows what it adds
+   per frame. CI runs it on pull requests. If it goes over, cut the cost (instancing, fewer
+   shadow casters, no extra scene passes) before raising the budget, and say why in the PR.
 
 ## Conventions
 
@@ -98,7 +106,7 @@ Dependency direction is one-way: `app → components → core`.
 ## Pull requests
 
 - Keep PRs focused; one component or one concern per PR.
-- `just check` must be green.
+- `just check` must be green, and `just perf` within budget.
 - Log user-facing changes in [`CHANGELOG.md`](./CHANGELOG.md) under **[Unreleased]**, in the matching [Keep a Changelog](https://keepachangelog.com) category (Added / Changed / Fixed / Removed). A new component is one **Added** line; internal-only chores can skip this.
 - Write self-contained commit messages and PR descriptions — assume the reader has no internal context.
 - By contributing, you agree your work is licensed under the project's [MIT license](./LICENSE).

@@ -1,5 +1,13 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type Vec3,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
 
 /** What holds the top up: four slim `legs`, a drawer `pedestal` on one side, or solid side
@@ -116,19 +124,20 @@ export function Desk({
     }
     return out
   }, [seed, base, drawers, color, baseColor, palette, unit, W, D, H])
+  const materials = useMaterials(boxes.map((b) => ({ color: b.color, roughness: b.rough })))
 
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[W / 2, H / 2, D / 2]} position={[0, H / 2, 0]} />
-      {boxes.map((b) => (
+      {boxes.map((b, i) => (
         <mesh
           key={`${b.pos[0].toFixed(3)}:${b.pos[1].toFixed(3)}:${b.pos[2].toFixed(3)}`}
+          material={materials[i]}
           position={b.pos}
           castShadow
           receiveShadow
         >
           <boxGeometry args={b.size} />
-          <meshStandardMaterial color={b.color} roughness={b.rough} />
         </mesh>
       ))}
     </RigidBody>

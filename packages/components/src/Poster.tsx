@@ -1,4 +1,12 @@
-import { pick, range, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
 import type { Texture } from 'three'
 import { Sign } from './Sign'
@@ -197,20 +205,24 @@ export function Poster({
   const depth = look.frame === 'none' ? 0.002 * unit : 0.025 * unit
   const face = depth + 0.0005 * unit
   const artY = caption / 2
-  const wood = frameColor ?? palette.woodDark
+  const mats = useMaterials({
+    frame: { color: frameColor ?? palette.woodDark, roughness: 0.6 },
+    paper: { color: paper, roughness: 0.9 },
+  })
+  const shapeMaterials = useMaterials(
+    texture ? [] : look.shapes.map((s) => ({ color: s.color, roughness: 0.85 })),
+  )
   const layer = 0.0003 * unit
 
   return (
     <group position={position} rotation={rotation}>
       {look.frame !== 'none' && (
-        <mesh position={[0, 0, depth / 2]} castShadow>
+        <mesh material={mats.frame} position={[0, 0, depth / 2]} castShadow>
           <boxGeometry args={[W + edge * 2, H + edge * 2, depth]} />
-          <meshStandardMaterial color={wood} roughness={0.6} />
         </mesh>
       )}
-      <mesh position={[0, 0, face]}>
+      <mesh material={mats.paper} position={[0, 0, face]}>
         <planeGeometry args={[W, H]} />
-        <meshStandardMaterial color={paper} roughness={0.9} />
       </mesh>
       <group position={[0, artY, face + layer]}>
         {texture ? (
@@ -222,6 +234,7 @@ export function Poster({
           look.shapes.map((s, i) => (
             <mesh
               key={i}
+              material={shapeMaterials[i]}
               position={[s.x, s.y, i * layer]}
               rotation={s.kind === 'tri' ? [0, 0, Math.PI / 2] : [0, 0, 0]}
               scale={s.kind === 'tri' ? [s.h / 1.5, s.w / Math.sqrt(3), 1] : [1, 1, 1]}
@@ -233,7 +246,6 @@ export function Poster({
               ) : (
                 <circleGeometry args={[1, 3]} />
               )}
-              <meshStandardMaterial color={s.color} roughness={0.85} />
             </mesh>
           ))
         )}

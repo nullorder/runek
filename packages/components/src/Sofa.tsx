@@ -1,6 +1,15 @@
 import { RoundedBox } from '@react-three/drei'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { pick, range, rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  range,
+  rng,
+  sub,
+  useMaterials,
+  useWorld,
+  type Vec3,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
 import { Color } from 'three'
 
@@ -169,6 +178,12 @@ export function Sofa({
   const { style, W, D, legH, frameTop, backT, backH, armW, armH, parts } = build
   const frameH = frameTop - legH
   const u = unit
+  const m = useMaterials({
+    fabric: { color: fabric, roughness: 0.95 },
+    peg: { color: legTone, roughness: 0.6 },
+    plinth: { color: legTone, roughness: 0.8 },
+  })
+  const cushionLooks = useMaterials(parts.map((c) => ({ color: c.color, roughness: 0.95 })))
 
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
@@ -183,29 +198,28 @@ export function Sofa({
 
       {/* frame: the base under the seat, and the back */}
       <RoundedBox
+        material={m.fabric}
         args={[W, frameH, D]}
         radius={0.03 * u}
         smoothness={2}
         position={[0, legH + frameH / 2, 0]}
         castShadow
         receiveShadow
-      >
-        <meshStandardMaterial color={fabric} roughness={0.95} />
-      </RoundedBox>
+      />
       <RoundedBox
+        material={m.fabric}
         args={[W, backH - legH, backT]}
         radius={0.04 * u}
         smoothness={2}
         position={[0, legH + (backH - legH) / 2, -D / 2 + backT / 2]}
         castShadow
         receiveShadow
-      >
-        <meshStandardMaterial color={fabric} roughness={0.95} />
-      </RoundedBox>
+      />
 
-      {parts.map((c) => (
+      {parts.map((c, i) => (
         <RoundedBox
           key={`${c.pos[0].toFixed(3)}:${c.pos[1].toFixed(3)}:${c.pos[2].toFixed(3)}`}
+          material={cushionLooks[i]}
           args={c.size}
           radius={Math.min(c.size[1], c.size[2]) * 0.3}
           smoothness={3}
@@ -213,32 +227,29 @@ export function Sofa({
           rotation={[c.tilt, 0, 0]}
           castShadow
           receiveShadow
-        >
-          <meshStandardMaterial color={c.color} roughness={0.95} />
-        </RoundedBox>
+        />
       ))}
 
       {style.arms !== 'none' &&
         [-1, 1].map((s) => (
           <group key={`arm${s}`} position={[s * (W / 2 - armW / 2), 0, 0]}>
             <RoundedBox
+              material={m.fabric}
               args={[armW, armH - legH, D]}
               radius={Math.min(0.04 * u, armW * 0.45)}
               smoothness={2}
               position={[0, legH + (armH - legH) / 2, 0]}
               castShadow
               receiveShadow
-            >
-              <meshStandardMaterial color={fabric} roughness={0.95} />
-            </RoundedBox>
+            />
             {style.arms === 'rolled' && (
               <mesh
+                material={m.fabric}
                 position={[s * 0.02 * u, armH, 0.01 * u]}
                 rotation={[Math.PI / 2, 0, 0]}
                 castShadow
               >
                 <cylinderGeometry args={[armW * 0.62, armW * 0.62, D, 18]} />
-                <meshStandardMaterial color={fabric} roughness={0.95} />
               </mesh>
             )}
           </group>
@@ -249,18 +260,17 @@ export function Sofa({
           [-1, 1].map((sz) => (
             <mesh
               key={`leg${sx}${sz}`}
+              material={m.peg}
               position={[sx * (W / 2 - 0.06 * u), legH / 2, sz * (D / 2 - 0.06 * u)]}
               castShadow
             >
               <cylinderGeometry args={[0.022 * u, 0.016 * u, legH, 10]} />
-              <meshStandardMaterial color={legTone} roughness={0.6} />
             </mesh>
           )),
         )
       ) : (
-        <mesh position={[0, legH / 2, 0]} receiveShadow>
+        <mesh material={m.plinth} position={[0, legH / 2, 0]} receiveShadow>
           <boxGeometry args={[W - 0.08 * u, legH, D - 0.08 * u]} />
-          <meshStandardMaterial color={legTone} roughness={0.8} />
         </mesh>
       )}
     </RigidBody>

@@ -7,6 +7,106 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.16.0...HEAD)
 
+### Added
+
+- `useMaterial(look)` and `useMaterials(looks)` in `@runek/core`: one shared,
+  read-only material per distinct look (color, roughness, metalness,
+  emissive, …), so every part in the world that looks the same draws
+  with the same material. Pass a record or an array of looks to
+  `useMaterials` to get the same shape back. A material nothing uses any
+  more is disposed a moment later.
+- Static batching. `<World>` merges parts that share a material and don't
+  move into one mesh per material per 20 m cell, so draw calls follow the
+  number of looks instead of the number of parts. Facing the gallery hall
+  the library draws 1,170 times a frame instead of 3,700. Parts that move
+  after mount, interactive parts and anything inside the new `<Dynamic>`
+  are handled: a part that moves leaves its batch and renders itself, and
+  rejoins once it's still; hover and click still reach batched parts.
+  `batching={false}` turns it off, `batching={{ cell }}` sizes the cells.
+- `useLight(look)` and `<World lightBudget>`: lamps register light
+  emitters instead of mounting their own lights, and the world lends a
+  fixed pool of real lights (6 point and 2 spot by default) to the ones
+  that matter most to the view, fading as they hand off. The light count
+  never changes, so materials never recompile as lamps come and go. In
+  your own `<Canvas>`, wrap the scene in `<LightBudget>`.
+- `<World shadowRate>`: shadow maps redraw 30 times a second by default
+  instead of every frame. Redrawing walks the whole scene for the sun's
+  camera, about 1.5 ms a frame in the docs library; moving shadows still
+  read as smooth. `Infinity` restores every frame.
+- `<Dynamic>` in `@runek/core` keeps a subtree out of static batching:
+  wrap the parts a component animates.
+- `<World dpr>` sets the pixel ratio the world renders at. The default,
+  `[1, 1.5]`, follows the screen's own ratio up to 1.5 and steps down
+  toward 1 while frames run slow, climbing back when they recover. Pass
+  a number to pin it, or `[1, 2]` for the old full-density look.
+- `just perf` builds the docs and measures the library world: standing
+  at the spawn, facing the gallery hall, and turning. It counts draw
+  calls, full-scene passes, shadow passes, lights, shadow casters and
+  render-target allocations per frame against `scripts/perf-budget.json`,
+  and CI fails a pull request that goes over. `--timing` also enforces
+  the fps floor on a machine with a real GPU.
+
+### Changed
+
+- **Breaking:** materials are shared. Every component takes its static
+  materials from `useMaterial`, so parts with the same look anywhere in
+  the world draw with one material (the docs library: 2,088 instances to
+  421). Code that reached into a Runek part and changed its material
+  (`mesh.material.color.set(…)`) now changes every part with that look:
+  give the part its own first (`mesh.material = mesh.material.clone()`).
+  Materials that change after mount (screens drawn into, `Grass` sway,
+  `Person` skin) were already their own and still are.
+- **Breaking:** static batching is on by default. A batched part stays in
+  the scene but moves to `BATCHED_LAYER`, which no camera draws, so a
+  raycaster of your own misses it unless it enables that layer
+  (`raycaster.layers.enable(BATCHED_LAYER)`); pointer events already do.
+  A part you move from your own code leaves its batch on its own, and
+  wrapping it in `<Dynamic>` skips the churn. `<World batching={false}>`
+  restores the old behavior.
+- **Breaking:** lamps light through the world's light pool. `Lamp`,
+  `DeskLamp`, `CeilingLight`, `Chandelier`, `PictureLight`, `TikiTorch`
+  and `Campfire` no longer mount three.js lights: inside `<World>` they
+  light as before up to its `lightBudget`, the nearest and brightest
+  first; raise it if a room needs more. In your own `<Canvas>` they give
+  no light unless the scene is wrapped in `<LightBudget>`. The docs world
+  (budget 8) goes from 23 real lights to 10 and from 25 to 69 fps at the
+  spawn.
+- **Breaking:** worlds render at up to 1.5x pixel density by default
+  instead of 2x on high-density screens (see `dpr` above), which cuts the
+  pixels drawn by almost half. Pass `dpr={[1, 2]}` for the old look.
+- Copied components now import `useMaterial`, `useLight` and `Dynamic`
+  from `@runek/core`, so pull them with the matching core (`runek add`
+  does by default).
+- `Birds` no longer cast shadows: at their height the shadows were too
+  small to see, and each bird cost a draw in every shadow update.
+- A `Rift` shows the other end live only once its opening is big enough
+  on screen (a radius of about 40 px); a smaller or more distant one
+  shows a slow shimmer and costs no second render. The live view renders
+  at half resolution.
+- `Chandelier`'s crystal drops are glossy see-through glass instead of
+  refractive (`transmission`), which made three.js draw every solid
+  object in the world a second time each frame.
+- The first-person lens draws the world once on screens up to 150° across
+  (every common shape up to 16:9 at the default 140°): one wide render,
+  warped into the curve. It used to draw it three times (ahead, left and
+  right), which ultrawides still do. About 2 ms a frame in the docs
+  library.
+- The lens blurs its periphery with a few filtered taps that follow how
+  the view maps onto the screen, instead of 32 taps that each re-traced
+  the lens. It looks the same and costs a fraction of the time.
+
+### Fixed
+
+- The docs library world holds 60 fps in first person: 11 to 82 fps at
+  the spawn and 4.6 to 71 facing the gallery hall (headless Chrome on an
+  Apple GPU; before at 2x pixel density, after at the new 1.5x default).
+  It had slowed down because every part was its own draw call, all 23
+  lamps lit every pixel, the Rift exhibit and the chandelier's glass each
+  re-rendered the whole world, and the lens drew it three times.
+- Turning in first person near a `Rift` no longer reallocates its
+  render target each time it crosses between the lens's views; each end
+  keeps one target per view size.
+
 ## [0.16.0](https://github.com/nullorder/runek/compare/v0.15.0...v0.16.0) - 2026-10-24
 
 ### Added

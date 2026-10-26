@@ -45,6 +45,8 @@ Docs index: https://runek.nullorder.org/llms.txt (every page is also Markdown: a
 - Leave colors unset to follow the world `palette`; set a CSS color string to override.
 - Callbacks, React children, and live three.js objects (a `Screen`'s `texture`) are code only; they cannot appear in JSON.
 - Components are owned source: edit them in `src/runek/` when a prop is not enough. Keep them deterministic (geometry from props and `seed` only, no `Math.random`, no binary assets).
+- When editing or writing a component, follow the world's render rules (`@runek/core`): static materials come from `useMaterial({ color, roughness })` and are shared, so never change one in place; parts moved or reshaped after mount go inside `<Dynamic>`; light comes from `useLight({ color, intensity, distance })` with its `ref` placed where it shines, never a `<pointLight>`. Outside `<World>` (your own `<Canvas>`), wrap the scene in `<LightBudget>` or lamps give no light.
+- `<World>` batches static parts onto `BATCHED_LAYER`: a raycaster of your own must `raycaster.layers.enable(BATCHED_LAYER)` to hit them (pointer events already do).
 
 ## Reference
 

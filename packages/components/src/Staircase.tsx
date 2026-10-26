@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 
 export type StaircaseForm = 'solid' | 'floating'
@@ -78,7 +78,7 @@ export function Staircase({
   color,
 }: StaircaseProps) {
   const { unit, palette } = useWorld()
-  const stoneColor = color ?? palette.stone
+  const stone = useMaterial({ color: color ?? palette.stone })
 
   const parts = useMemo(() => {
     const w = width * unit
@@ -94,13 +94,13 @@ export function Staircase({
       {parts.map((part) => (
         <mesh
           key={part.key}
+          material={stone}
           castShadow
           receiveShadow
           position={part.position}
           rotation={part.rotation}
         >
           <boxGeometry args={part.size} />
-          <meshStandardMaterial color={stoneColor} />
         </mesh>
       ))}
     </RigidBody>

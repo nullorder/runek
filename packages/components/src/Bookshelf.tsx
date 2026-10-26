@@ -1,7 +1,15 @@
 import { Html } from '@react-three/drei'
 import { type ThreeEvent, useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { DEFAULT_REACH, rng, useLensPosition, useReach, useWorld, type Vec3 } from '@runek/core'
+import {
+  DEFAULT_REACH,
+  rng,
+  useLensPosition,
+  useMaterials,
+  useReach,
+  useWorld,
+  type Vec3,
+} from '@runek/core'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Sign } from './Sign'
@@ -106,8 +114,11 @@ export function Bookshelf({
 }: BookshelfProps) {
   const { unit, palette } = useWorld()
   const labelAt = useLensPosition()
-  const frameColor = color ?? palette.wood
-  const panelColor = backColor ?? palette.woodDark
+  const m = useMaterials({
+    frame: { color: color ?? palette.wood },
+    panel: { color: backColor ?? palette.woodDark },
+    books: { roughness: 0.85 },
+  })
   const w = width * unit
   const h = height * unit
   const d = depth * unit
@@ -285,23 +296,25 @@ export function Bookshelf({
       {/* one collider for the whole footprint — books stay visual-only */}
       <CuboidCollider args={[w / 2, h / 2, d / 2]} />
 
-      <mesh castShadow receiveShadow position={[-w / 2 + plank / 2, 0, 0]}>
+      <mesh material={m.frame} castShadow receiveShadow position={[-w / 2 + plank / 2, 0, 0]}>
         <boxGeometry args={[plank, h, d]} />
-        <meshStandardMaterial color={frameColor} />
       </mesh>
-      <mesh castShadow receiveShadow position={[w / 2 - plank / 2, 0, 0]}>
+      <mesh material={m.frame} castShadow receiveShadow position={[w / 2 - plank / 2, 0, 0]}>
         <boxGeometry args={[plank, h, d]} />
-        <meshStandardMaterial color={frameColor} />
       </mesh>
-      <mesh castShadow receiveShadow position={[0, 0, -d / 2 + plank / 2]}>
+      <mesh material={m.panel} castShadow receiveShadow position={[0, 0, -d / 2 + plank / 2]}>
         <boxGeometry args={[w, h, plank]} />
-        <meshStandardMaterial color={panelColor} />
       </mesh>
 
       {plankYs.map((y) => (
-        <mesh key={`plank-${y.toFixed(4)}`} castShadow receiveShadow position={[0, y, 0]}>
+        <mesh
+          key={`plank-${y.toFixed(4)}`}
+          material={m.frame}
+          castShadow
+          receiveShadow
+          position={[0, y, 0]}
+        >
           <boxGeometry args={[inner, plank, d]} />
-          <meshStandardMaterial color={frameColor} />
         </mesh>
       ))}
 
@@ -323,13 +336,13 @@ export function Bookshelf({
           key={books.length}
           ref={booksRef}
           args={[undefined, undefined, books.length]}
+          material={m.books}
           castShadow
           onClick={interactive ? handleClick : undefined}
           onPointerMove={interactive ? handleMove : undefined}
           onPointerOut={interactive ? handleOut : undefined}
         >
           <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial roughness={0.85} />
         </instancedMesh>
       )}
 

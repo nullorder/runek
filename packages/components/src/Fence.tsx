@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 
 export interface FenceProps {
@@ -36,6 +36,7 @@ export function Fence({
 }: FenceProps) {
   const { unit, palette } = useWorld()
   const woodColor = color ?? palette.wood
+  const wood = useMaterial({ color: woodColor, roughness: 0.85 })
   const L = length * unit
   const h = height * unit
   const postW = 0.1 * unit
@@ -64,19 +65,24 @@ export function Fence({
       {posts.map((p) => (
         <mesh
           key={`post-${p.x.toFixed(3)}`}
+          material={wood}
           castShadow
           receiveShadow
           position={[p.x, h / 2, 0]}
           rotation={[0, 0, p.lean]}
         >
           <boxGeometry args={[postW, h, depth]} />
-          <meshStandardMaterial color={woodColor} roughness={0.85} />
         </mesh>
       ))}
       {railYs.map((y) => (
-        <mesh key={`rail-${y.toFixed(3)}`} castShadow receiveShadow position={[0, y, 0]}>
+        <mesh
+          key={`rail-${y.toFixed(3)}`}
+          material={wood}
+          castShadow
+          receiveShadow
+          position={[0, y, 0]}
+        >
           <boxGeometry args={[L, railT, railT]} />
-          <meshStandardMaterial color={woodColor} roughness={0.85} />
         </mesh>
       ))}
     </RigidBody>

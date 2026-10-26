@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterial, useWorld, type WorldComponentProps } from '@runek/core'
 import { useEffect, useMemo } from 'react'
 import { CylinderGeometry } from 'three'
 
@@ -36,7 +36,7 @@ export function Cliff({
   color,
 }: CliffProps) {
   const { unit, palette } = useWorld()
-  const rock = color ?? palette.stone
+  const rock = useMaterial({ color: color ?? palette.stone, roughness: 1, flatShading: true })
   const R = radius * unit
   const Rt = topRadius * unit
   const Hgt = height * unit
@@ -77,9 +77,7 @@ export function Cliff({
 
   return (
     <RigidBody type="fixed" colliders="hull" position={position} rotation={rotation}>
-      <mesh geometry={geometry} castShadow receiveShadow>
-        <meshStandardMaterial color={rock} roughness={1} flatShading />
-      </mesh>
+      <mesh geometry={geometry} material={rock} castShadow receiveShadow />
     </RigidBody>
   )
 }

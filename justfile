@@ -50,6 +50,11 @@ gen-docs:
 cli *ARGS:
     @node packages/cli/src/index.ts {{ARGS}}
 
+# Build the docs, then measure the library world's render cost against scripts/perf-budget.json.
+# Pass --timing to also enforce the fps floor (needs a real GPU), e.g. `just perf --timing`
+perf *ARGS: build-docs
+    node scripts/perf.mjs {{ARGS}}
+
 # Lint + format check (no writes)
 lint:
     pnpm exec biome check .

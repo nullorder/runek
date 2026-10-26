@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterial, useWorld, type WorldComponentProps } from '@runek/core'
 import { useEffect, useMemo } from 'react'
 import { ExtrudeGeometry, Shape } from 'three'
 import { slabSurface } from './surfaces/slab'
@@ -37,7 +37,7 @@ export function Slab({
   color,
 }: SlabProps) {
   const { unit, palette } = useWorld()
-  const slabColor = color ?? palette.wall
+  const material = useMaterial({ color: color ?? palette.wall })
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit
@@ -70,9 +70,7 @@ export function Slab({
 
   return (
     <RigidBody type="fixed" colliders="hull" position={position} rotation={rotation}>
-      <mesh geometry={geometry} castShadow receiveShadow>
-        <meshStandardMaterial color={slabColor} />
-      </mesh>
+      <mesh geometry={geometry} material={material} castShadow receiveShadow />
     </RigidBody>
   )
 }

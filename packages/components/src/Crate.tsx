@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterial, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -57,23 +57,25 @@ export function Crate({
     return out
   }, [s, b, c, wood, seed])
 
+  const core = useMaterial({ color: palette.woodDark, roughness: 0.9 })
+  const beamMaterials = useMaterials(beams.map((bm) => ({ color: bm.color, roughness: 0.85 })))
+
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[s / 2, s / 2, s / 2]} position={[0, s / 2, 0]} />
       <group position={[0, s / 2, 0]}>
-        <mesh castShadow receiveShadow>
+        <mesh material={core} castShadow receiveShadow>
           <boxGeometry args={[s * 0.9, s * 0.9, s * 0.9]} />
-          <meshStandardMaterial color={palette.woodDark} roughness={0.9} />
         </mesh>
-        {beams.map((bm) => (
+        {beams.map((bm, i) => (
           <mesh
             key={`beam-${bm.pos[0].toFixed(2)}:${bm.pos[1].toFixed(2)}:${bm.pos[2].toFixed(2)}`}
+            material={beamMaterials[i]}
             castShadow
             receiveShadow
             position={bm.pos}
           >
             <boxGeometry args={bm.size} />
-            <meshStandardMaterial color={bm.color} roughness={0.85} />
           </mesh>
         ))}
       </group>

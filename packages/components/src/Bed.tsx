@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterials, useWorld, type Vec3 } from '@runek/core'
 
 export interface BedProps {
   position?: Vec3
@@ -27,6 +27,11 @@ export function Bed({
   const { unit, palette } = useWorld()
   const wood = color ?? palette.wood
   const bedding = beddingColor ?? palette.fabric
+  const m = useMaterials({
+    wood: { color: wood, roughness: 0.85 },
+    bedding: { color: bedding, roughness: 0.9 },
+    pillow: { color: '#f2ede2', roughness: 0.95 },
+  })
   const W = width * unit
   const L = length * unit
   const frameH = 0.3 * unit
@@ -38,27 +43,29 @@ export function Bed({
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[W / 2, topY / 2, L / 2]} position={[0, topY / 2, 0]} />
 
-      <mesh castShadow receiveShadow position={[0, frameH / 2, 0]}>
+      <mesh material={m.wood} castShadow receiveShadow position={[0, frameH / 2, 0]}>
         <boxGeometry args={[W, frameH, L]} />
-        <meshStandardMaterial color={wood} roughness={0.85} />
       </mesh>
-      <mesh castShadow receiveShadow position={[0, frameH + mattH / 2, 0]}>
+      <mesh material={m.bedding} castShadow receiveShadow position={[0, frameH + mattH / 2, 0]}>
         <boxGeometry args={[W * 0.96, mattH, L * 0.94]} />
-        <meshStandardMaterial color={bedding} roughness={0.9} />
       </mesh>
       {[-1, 1].map((s) => (
         <mesh
           key={`pillow-${s}`}
+          material={m.pillow}
           castShadow
           position={[s * W * 0.24, topY + 0.04 * unit, -L / 2 + 0.28 * unit]}
         >
           <boxGeometry args={[W * 0.4, 0.1 * unit, 0.32 * unit]} />
-          <meshStandardMaterial color="#f2ede2" roughness={0.95} />
         </mesh>
       ))}
-      <mesh castShadow receiveShadow position={[0, headH / 2, -L / 2 - 0.04 * unit]}>
+      <mesh
+        material={m.wood}
+        castShadow
+        receiveShadow
+        position={[0, headH / 2, -L / 2 - 0.04 * unit]}
+      >
         <boxGeometry args={[W, headH, 0.1 * unit]} />
-        <meshStandardMaterial color={wood} roughness={0.85} />
       </mesh>
     </RigidBody>
   )

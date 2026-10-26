@@ -8,6 +8,7 @@ import {
   DEFAULT_PALETTE,
   DEFAULT_WORLD_TIME,
   isCompositeDef,
+  LightBudget,
   WorldContext,
   WorldNodes,
 } from '@runek/core'
@@ -93,11 +94,13 @@ export default function ComponentPreview({ title, detail = false }: Props) {
           >
             <ambientLight intensity={0.7} />
             <directionalLight position={[6, 10, 6]} intensity={1.5} castShadow />
-            <Physics paused>
-              <Spin enabled={!detail}>
-                <PreviewSubject title={title} seed={seed} props={cfg.props} />
-              </Spin>
-            </Physics>
+            <LightBudget>
+              <Physics paused>
+                <Spin enabled={!detail}>
+                  <PreviewSubject title={title} seed={seed} props={cfg.props} />
+                </Spin>
+              </Physics>
+            </LightBudget>
             <OrbitControls
               makeDefault
               target={cfg.target ?? DEFAULT_TARGET}

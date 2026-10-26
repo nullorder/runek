@@ -1,5 +1,5 @@
 import { CylinderCollider, RigidBody } from '@react-three/rapier'
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
@@ -125,6 +125,10 @@ export function Trees({
   const { unit, palette } = useWorld()
   const bark = trunkColor ?? palette.bark
   const foliage = leafColor ?? palette.foliage
+  const m = useMaterials({
+    bark: { color: bark, roughness: 0.95 },
+    leaves: { flatShading: true },
+  })
   const segLen = segmentLength * unit
   const branchesRef = useRef<THREE.InstancedMesh>(null)
   const leavesRef = useRef<THREE.InstancedMesh>(null)
@@ -173,22 +177,22 @@ export function Trees({
       <CylinderCollider args={[segLen, segLen * 0.2]} position={[0, segLen, 0]} />
       <instancedMesh
         key={`b${branches.length}`}
+        material={m.bark}
         ref={branchesRef}
         args={[undefined, undefined, branches.length]}
         castShadow
       >
         {/* unit cylinder, tapered; instances scale x/z by radius and y by length */}
         <cylinderGeometry args={[0.7, 1, 1, 5]} />
-        <meshStandardMaterial color={bark} roughness={0.95} />
       </instancedMesh>
       <instancedMesh
         key={`l${leaves.length}`}
+        material={m.leaves}
         ref={leavesRef}
         args={[undefined, undefined, leaves.length]}
         castShadow
       >
         <icosahedronGeometry args={[1, 0]} />
-        <meshStandardMaterial flatShading />
       </instancedMesh>
     </RigidBody>
   )

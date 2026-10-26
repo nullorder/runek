@@ -1,4 +1,4 @@
-import { rng, useWorld, type Vec3 } from '@runek/core'
+import { rng, useMaterial, useWorld, type Vec3 } from '@runek/core'
 import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -38,7 +38,11 @@ export function Path({
   seed = 1,
 }: PathProps) {
   const { unit, palette } = useWorld()
-  const pathColor = color ?? palette.ground
+  const material = useMaterial({
+    color: color ?? palette.ground,
+    roughness: 1,
+    side: THREE.DoubleSide,
+  })
   const L = length * unit
   const W = width * unit
   const amp = meander * unit
@@ -92,11 +96,10 @@ export function Path({
   return (
     <mesh
       geometry={geometry}
+      material={material}
       position={[position[0], position[1] + 0.02 * unit, position[2]]}
       rotation={rotation}
       receiveShadow
-    >
-      <meshStandardMaterial color={pathColor} roughness={1} side={THREE.DoubleSide} />
-    </mesh>
+    />
   )
 }

@@ -50,6 +50,7 @@ just typecheck  # tsc --noEmit across all packages
 just build-docs # production build of the docs site
 just test       # run the vitest suites across packages
 just registry   # regenerate the served registry (registry/components/*.json)
+just perf       # build the docs, measure the library world's render cost against scripts/perf-budget.json
 just cli ...    # run the runek CLI from source, e.g. `just cli add bookshelf --registry ./registry`
 just clean      # remove build output + node_modules
 ```

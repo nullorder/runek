@@ -37,6 +37,10 @@ import { Player } from './runek/Player'
 | `fog` | `{ color, near, far }` | off | Linear distance fog; pair the color with the sky's horizon. |
 | `input` | `boolean` | `true` | Read the keyboard. Set `false` to ignore it, e.g. while a modal is open. |
 | `paused` | `boolean` | `false` | Stop rendering and physics until set back to `false`. |
+| `lightBudget` | `number \| { point, spot }` | `{ point: 6, spot: 2 }` | Real lights the world lends to its lamps (`useLight` emitters), each frame to the ones that matter most to the view. |
+| `shadowRate` | `number` | `30` | How many times a second shadow maps are redrawn. `Infinity` redraws every frame. |
+| `batching` | `boolean \| { cell }` | `true` | Merge static parts that share a material into one mesh per material per 20 m cell (or `cell` m). Moving parts and anything inside `<Dynamic>` stay as they are. |
+| `dpr` | `number \| [min, max]` | `[1, 1.5]` | Pixel ratio to render at. A range follows the screen's own up to `max` and steps toward `min` while frames run slow. |
 | `debug` | `boolean` | `false` | Draw Rapier collider wireframes. |
 
 ## Controls

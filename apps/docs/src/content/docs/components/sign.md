@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sign
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.15.0`.
+Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.16.0`.
 
 ## Use it
 

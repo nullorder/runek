@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 
 export interface CounterProps extends WorldComponentProps {
   /** Length along local X, in units. */
@@ -32,8 +32,15 @@ export function Counter({
   hob = false,
 }: CounterProps) {
   const { unit, palette } = useWorld()
-  const body = color ?? palette.wood
-  const top = topColor ?? palette.woodDark
+  const m = useMaterials({
+    body: { color: color ?? palette.wood, roughness: 0.8 },
+    top: { color: topColor ?? palette.woodDark, roughness: 0.55 },
+    hob: { color: '#141416', roughness: 0.12, metalness: 0.3 },
+    burner: { color: '#4a4a4f', roughness: 0.4 },
+    ovenDoor: { color: '#2a2a2d', roughness: 0.35, metalness: 0.4 },
+    ovenWindow: { color: '#0c0c0e', roughness: 0.1, metalness: 0.5 },
+    handle: { color: '#b9bdc1', roughness: 0.25, metalness: 0.8 },
+  })
   const L = length * unit
   const H = height * unit
   const D = depth * unit
@@ -53,52 +60,47 @@ export function Counter({
       <CuboidCollider args={[L / 2, H / 2, D / 2]} position={[0, H / 2, 0]} />
 
       {/* body */}
-      <mesh position={[0, (H - topT) / 2, 0]} castShadow receiveShadow>
+      <mesh material={m.body} position={[0, (H - topT) / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[L, H - topT, D]} />
-        <meshStandardMaterial color={body} roughness={0.8} />
       </mesh>
 
       {/* worktop, overhanging the front (+Z) for knee room */}
-      <mesh position={[0, H - topT / 2, overhang / 2]} castShadow receiveShadow>
+      <mesh material={m.top} position={[0, H - topT / 2, overhang / 2]} castShadow receiveShadow>
         <boxGeometry args={[L + 0.06 * unit, topT, D + overhang]} />
-        <meshStandardMaterial color={top} roughness={0.55} />
       </mesh>
 
       {hob && (
         <>
           <group position={[hobX, H + 0.003 * unit, overhang / 2]}>
-            <mesh receiveShadow>
+            <mesh material={m.hob} receiveShadow>
               <boxGeometry args={[hobW, 0.006 * unit, Math.min(0.52 * unit, D)]} />
-              <meshStandardMaterial color="#141416" roughness={0.12} metalness={0.3} />
             </mesh>
             {burners.map(([sx, sz, r]) => (
               <mesh
                 key={`${sx}${sz}`}
+                material={m.burner}
                 position={[sx * hobW * 0.24, 0.004 * unit, sz * 0.12 * unit]}
                 rotation={[-Math.PI / 2, 0, 0]}
               >
                 <ringGeometry args={[r * unit * 0.8, r * unit, 32]} />
-                <meshStandardMaterial color="#4a4a4f" roughness={0.4} />
               </mesh>
             ))}
           </group>
           {/* the oven: a door with a dark window and a bar handle, on the front face */}
           <group position={[hobX, (H - topT) * 0.48, D / 2 + 0.006 * unit]}>
-            <mesh castShadow>
+            <mesh material={m.ovenDoor} castShadow>
               <boxGeometry args={[hobW, (H - topT) * 0.62, 0.012 * unit]} />
-              <meshStandardMaterial color="#2a2a2d" roughness={0.35} metalness={0.4} />
             </mesh>
-            <mesh position={[0, -0.03 * unit, 0.0065 * unit]}>
+            <mesh material={m.ovenWindow} position={[0, -0.03 * unit, 0.0065 * unit]}>
               <planeGeometry args={[hobW * 0.7, (H - topT) * 0.3]} />
-              <meshStandardMaterial color="#0c0c0e" roughness={0.1} metalness={0.5} />
             </mesh>
             <mesh
+              material={m.handle}
               position={[0, (H - topT) * 0.25, 0.03 * unit]}
               rotation={[0, 0, Math.PI / 2]}
               castShadow
             >
               <cylinderGeometry args={[0.011 * unit, 0.011 * unit, hobW * 0.75, 10]} />
-              <meshStandardMaterial color="#b9bdc1" roughness={0.25} metalness={0.8} />
             </mesh>
           </group>
         </>

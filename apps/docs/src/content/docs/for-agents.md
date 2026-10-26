@@ -99,6 +99,7 @@ prints a link to the [workshop](/docs/the-workshop) with your world loaded: walk
 - **`anchor: "ground"`** makes `position[1]` a height above the terrain at that spot, so nothing ends up buried. Use `"surface"` to stand on the highest thing there (a dock, a floor). See [Placing things on uneven ground](/docs/placing-things-on-uneven-ground).
 - **Colors** are CSS color strings. Leave them unset to follow the world `palette`, which re-themes every component at once.
 - **Callbacks, React children, and live three.js objects** (`onEnter`, `onSelect`, a `Screen`'s `texture`, ...) can't live in JSON. The props tables mark them "code only"; use them from TSX.
+- **Editing a copied component:** static materials come from `useMaterial(look)` and are shared, so never change one in place; parts moved or reshaped after mount go inside `<Dynamic>`; light comes from `useLight(look)` with its `ref` placed where it shines, never a `<pointLight>`. See [The component contract](/docs/the-component-contract).
 - Only ever use props listed in the component's props table or in `props.json`. Defaults are listed too, so leave out anything you don't need to change.
 
 ## Common mistakes
@@ -111,6 +112,9 @@ prints a link to the [workshop](/docs/the-workshop) with your world loaded: walk
 | Props float or sink on hilly terrain | Add `"anchor": "ground"` and set `position[1]` to `0`, or run `check-world --fix`. |
 | A component renders but isn't in your app | It needs `npx @runek/cli add <name>` and an entry in your registry map. |
 | No `"version": 1` | Every world file starts with it. |
+| Recoloring one part in code recolors others | Materials are shared by look: give the part its own first (`mesh.material = mesh.material.clone()`). |
+| Lamps give no light in your own `<Canvas>` | Wrap the scene in `<LightBudget>` from `@runek/core` (`<World>` runs one for you). |
+| Your own raycast misses static parts | They're batched: `raycaster.layers.enable(BATCHED_LAYER)` (pointer events already do). |
 
 ## The agent skill
 

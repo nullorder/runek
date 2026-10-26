@@ -1,5 +1,15 @@
-import { pick, rng, sub, useSun, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  pick,
+  rng,
+  sub,
+  useLight,
+  useMaterials,
+  useSun,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { useMemo } from 'react'
+import { DoubleSide } from 'three'
 
 export interface DeskLampProps extends WorldComponentProps {
   /** Shade width, in units. */
@@ -40,77 +50,76 @@ export function DeskLamp({
   const { unit, palette } = useWorld()
   const sun = useSun()
   const lit = on && (!nightOnly || !sun.day)
-  const brass = color ?? palette.accent
+  const glow = useLight({ color: lightColor, intensity, distance: 3 * unit, decay: 2 }, lit)
   const W = width * unit
   const shadeR = W * 0.3
   const stemH = W * 1.05
 
   const shade = useMemo(() => shadeColor ?? pick(rng(sub(seed, 0)), SHADES), [seed, shadeColor])
 
-  const metal = <meshStandardMaterial color={brass} metalness={0.75} roughness={0.3} />
+  const m = useMaterials({
+    metal: { color: color ?? palette.accent, metalness: 0.75, roughness: 0.3 },
+    shade: {
+      color: shade,
+      roughness: 0.15,
+      metalness: 0.1,
+      emissive: shade,
+      emissiveIntensity: lit ? 0.25 : 0,
+      side: DoubleSide,
+    },
+    bulb: {
+      color: '#fff6e0',
+      emissive: lightColor,
+      emissiveIntensity: lit ? 2 : 0,
+      toneMapped: !lit,
+    },
+  })
   const baseH = 0.025 * unit
 
   return (
     <group position={position} rotation={rotation}>
       {/* an oval base: a cylinder squashed front to back */}
-      <mesh position={[0, baseH / 2, 0]} scale={[1, 1, 0.62]} castShadow receiveShadow>
+      <mesh
+        material={m.metal}
+        position={[0, baseH / 2, 0]}
+        scale={[1, 1, 0.62]}
+        castShadow
+        receiveShadow
+      >
         <cylinderGeometry args={[W * 0.36, W * 0.4, baseH, 28]} />
-        {metal}
       </mesh>
-      <mesh position={[0, stemH / 2, -W * 0.06]} castShadow>
+      <mesh material={m.metal} position={[0, stemH / 2, -W * 0.06]} castShadow>
         <cylinderGeometry args={[0.008 * unit, 0.01 * unit, stemH, 10]} />
-        {metal}
       </mesh>
       {/* the harp: a bar across under the shade, a short arm forward to it */}
-      <mesh position={[0, stemH, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh material={m.metal} position={[0, stemH, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.006 * unit, 0.006 * unit, W * 0.14, 8]} />
-        {metal}
       </mesh>
       <group position={[0, stemH + shadeR * 0.2, W * 0.08]} rotation={[-0.18, 0, 0]}>
         {/* cased glass: a half tube lying along X, opening downward, with end caps */}
-        <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+        <mesh material={m.shade} rotation={[0, 0, Math.PI / 2]} castShadow>
           <cylinderGeometry args={[shadeR, shadeR, W, 24, 1, true, 0, Math.PI]} />
-          <meshStandardMaterial
-            color={shade}
-            roughness={0.15}
-            metalness={0.1}
-            emissive={shade}
-            emissiveIntensity={lit ? 0.25 : 0}
-            side={2}
-          />
         </mesh>
         {[-1, 1].map((s) => (
-          <mesh key={s} position={[(s * W) / 2, 0, 0]} rotation={[0, (s * Math.PI) / 2, 0]}>
+          <mesh
+            key={s}
+            material={m.metal}
+            position={[(s * W) / 2, 0, 0]}
+            rotation={[0, (s * Math.PI) / 2, 0]}
+          >
             <circleGeometry args={[shadeR, 24, 0, Math.PI]} />
-            {metal}
           </mesh>
         ))}
-        <mesh position={[0, -shadeR * 0.35, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh material={m.bulb} position={[0, -shadeR * 0.35, 0]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.012 * unit, 0.012 * unit, W * 0.7, 10]} />
-          <meshStandardMaterial
-            color="#fff6e0"
-            emissive={lightColor}
-            emissiveIntensity={lit ? 2 : 0}
-            toneMapped={!lit}
-          />
         </mesh>
-        <mesh position={[W * 0.2, -shadeR * 0.6, shadeR * 0.95]}>
+        <mesh material={m.metal} position={[W * 0.2, -shadeR * 0.6, shadeR * 0.95]}>
           <cylinderGeometry args={[0.002 * unit, 0.002 * unit, shadeR * 1.2, 4]} />
-          {metal}
         </mesh>
-        <mesh position={[W * 0.2, -shadeR * 1.22, shadeR * 0.95]}>
+        <mesh material={m.metal} position={[W * 0.2, -shadeR * 1.22, shadeR * 0.95]}>
           <sphereGeometry args={[0.007 * unit, 8, 6]} />
-          {metal}
         </mesh>
-        {lit && (
-          <pointLight
-            position={[0, -shadeR * 0.8, 0]}
-            color={lightColor}
-            intensity={intensity}
-            distance={3 * unit}
-            decay={2}
-          />
-        )}
+        <object3D ref={glow.ref} position={[0, -shadeR * 0.8, 0]} />
       </group>
     </group>
   )

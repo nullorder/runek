@@ -1,11 +1,12 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { int, rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
+import { int, rng, sub, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import {
   BoxGeometry,
   type BufferGeometry,
   type InstancedMesh,
   LatheGeometry,
+  type Material,
   Matrix4,
   Quaternion,
   Vector2,
@@ -225,11 +226,11 @@ function pieceParts(): Record<PieceType, Part[]> {
 function Instanced({
   geometry,
   matrices,
-  color,
+  material,
 }: {
   geometry: BufferGeometry
   matrices: Matrix4[]
-  color: string
+  material: Material
 }) {
   const ref = useRef<InstancedMesh>(null)
   useLayoutEffect(() => {
@@ -245,11 +246,10 @@ function Instanced({
       key={matrices.length}
       ref={ref}
       args={[geometry, undefined, matrices.length]}
+      material={material}
       castShadow
       receiveShadow
-    >
-      <meshStandardMaterial color={color} roughness={0.35} />
-    </instancedMesh>
+    />
   )
 }
 
@@ -282,6 +282,14 @@ export function ChessBoard({
   const thick = 0.022 * unit
   const tableH = 0.72 * unit
   const base = table ? tableH : 0
+  const m = useMaterials({
+    light: { color: lightSquare, roughness: 0.35 },
+    dark: { color: darkSquare, roughness: 0.35 },
+    white: { color: whiteColor, roughness: 0.35 },
+    black: { color: blackColor, roughness: 0.35 },
+    board: { color: wood, roughness: 0.5 },
+    table: { color: wood, roughness: 0.55 },
+  })
 
   const pieces = useMemo(() => chessPieces(fen, seed), [fen, seed])
 
@@ -302,7 +310,7 @@ export function ChessBoard({
   }, [sq])
 
   const sets = useMemo(() => {
-    const out: { key: string; geometry: BufferGeometry; matrices: Matrix4[]; color: string }[] = []
+    const out: { key: string; geometry: BufferGeometry; matrices: Matrix4[]; white: boolean }[] = []
     const scale = new Vector3(sq, sq, sq)
     for (const t of TYPES) {
       for (const white of [true, false]) {
@@ -320,31 +328,35 @@ export function ChessBoard({
             key: `${t}${white ? 'w' : 'b'}${i}`,
             geometry: part.geometry,
             matrices: placed.map((m) => m.clone().multiply(part.local)),
-            color: white ? whiteColor : blackColor,
+            white,
           })
         })
       }
     }
     return out
-  }, [pieces, parts, sq, whiteColor, blackColor])
+  }, [pieces, parts, sq])
 
   const board = (
     <group position={[0, base, 0]}>
-      <mesh position={[0, thick / 2, 0]} castShadow receiveShadow>
+      <mesh material={m.board} position={[0, thick / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[B, thick, B]} />
-        <meshStandardMaterial color={wood} roughness={0.5} />
       </mesh>
       <group position={[0, thick + 0.0005 * unit, 0]}>
         {[
-          { list: squares.light, color: lightSquare },
-          { list: squares.dark, color: darkSquare },
-        ].map(({ list, color }) => (
-          <Instanced key={color} geometry={squareGeometry} matrices={list} color={color} />
+          { list: squares.light, color: lightSquare, material: m.light },
+          { list: squares.dark, color: darkSquare, material: m.dark },
+        ].map(({ list, color, material }) => (
+          <Instanced key={color} geometry={squareGeometry} matrices={list} material={material} />
         ))}
       </group>
       <group position={[0, thick + 0.001 * unit, 0]}>
         {sets.map((s) => (
-          <Instanced key={s.key} geometry={s.geometry} matrices={s.matrices} color={s.color} />
+          <Instanced
+            key={s.key}
+            geometry={s.geometry}
+            matrices={s.matrices}
+            material={s.white ? m.white : m.black}
+          />
         ))}
       </group>
     </group>
@@ -361,23 +373,21 @@ export function ChessBoard({
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       <CuboidCollider args={[B * 0.6, tableH / 2, B * 0.6]} position={[0, tableH / 2, 0]} />
-      <mesh position={[0, tableH - 0.015 * unit, 0]} castShadow receiveShadow>
+      <mesh material={m.table} position={[0, tableH - 0.015 * unit, 0]} castShadow receiveShadow>
         <boxGeometry args={[B * 1.2, 0.03 * unit, B * 1.2]} />
-        <meshStandardMaterial color={wood} roughness={0.55} />
       </mesh>
-      <mesh position={[0, tableH / 2, 0]} castShadow>
+      <mesh material={m.table} position={[0, tableH / 2, 0]} castShadow>
         <cylinderGeometry args={[0.04 * unit, 0.05 * unit, tableH - 0.03 * unit, 14]} />
-        <meshStandardMaterial color={wood} roughness={0.55} />
       </mesh>
       {[0, 1, 2].map((i) => (
         <mesh
           key={i}
+          material={m.table}
           position={[0, 0.03 * unit, 0]}
           rotation={[0, (i * Math.PI * 2) / 3, 0]}
           castShadow
         >
           <boxGeometry args={[0.05 * unit, 0.05 * unit, B * 0.85]} />
-          <meshStandardMaterial color={wood} roughness={0.55} />
         </mesh>
       ))}
       {board}

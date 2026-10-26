@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
 import { useEffect, useMemo } from 'react'
 import { BufferAttribute, BufferGeometry, DoubleSide, Quaternion, Vector3 } from 'three'
 
@@ -53,9 +53,14 @@ export function Tent({
   collider = true,
 }: TentProps) {
   const { unit, palette } = useWorld()
-  const fabric = color ?? palette.fabric
-  const stripe = stripeColor ?? palette.wall
   const pole = poleColor ?? palette.woodDark
+  const m = useMaterials({
+    fabric: { color: color ?? palette.fabric, side: DoubleSide, roughness: 0.95 },
+    stripe: { color: stripeColor ?? palette.wall, side: DoubleSide, roughness: 0.95 },
+    pole: { color: pole, roughness: 0.8 },
+    rope: { color: palette.sand, roughness: 1 },
+    stake: { color: pole, roughness: 0.9 },
+  })
   const W = width * unit
   const H = height * unit
   const D = depth * unit
@@ -206,47 +211,29 @@ export function Tent({
         </>
       )}
 
-      <mesh geometry={geometry} castShadow receiveShadow>
-        <meshStandardMaterial
-          attach="material-0"
-          color={fabric}
-          side={DoubleSide}
-          roughness={0.95}
-        />
-        <meshStandardMaterial
-          attach="material-1"
-          color={stripe}
-          side={DoubleSide}
-          roughness={0.95}
-        />
-      </mesh>
+      <mesh geometry={geometry} material={[m.fabric, m.stripe]} castShadow receiveShadow />
 
       {/* ridge pole, poking out past the fabric at both ends */}
-      <mesh position={[0, H, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+      <mesh material={m.pole} position={[0, H, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
         <cylinderGeometry args={[poleR, poleR, D + ridgeOver * 2, 8]} />
-        <meshStandardMaterial color={pole} roughness={0.8} />
       </mesh>
 
       {/* two door poles framing the entrance (+Z) */}
-      <mesh position={[hw / 2, H / 2, hd]} rotation={[0, 0, lean]} castShadow>
+      <mesh material={m.pole} position={[hw / 2, H / 2, hd]} rotation={[0, 0, lean]} castShadow>
         <cylinderGeometry args={[poleR, poleR, slant, 8]} />
-        <meshStandardMaterial color={pole} roughness={0.8} />
       </mesh>
-      <mesh position={[-hw / 2, H / 2, hd]} rotation={[0, 0, -lean]} castShadow>
+      <mesh material={m.pole} position={[-hw / 2, H / 2, hd]} rotation={[0, 0, -lean]} castShadow>
         <cylinderGeometry args={[poleR, poleR, slant, 8]} />
-        <meshStandardMaterial color={pole} roughness={0.8} />
       </mesh>
 
       {/* guy ropes + stakes */}
       {ropes.map((r, i) => (
         <group key={i}>
-          <mesh position={r.mid} quaternion={r.quat}>
+          <mesh material={m.rope} position={r.mid} quaternion={r.quat}>
             <cylinderGeometry args={[0.018 * unit, 0.018 * unit, r.len, 5]} />
-            <meshStandardMaterial color={palette.sand} roughness={1} />
           </mesh>
-          <mesh position={[r.stake.x, 0.12 * unit, r.stake.z]} castShadow>
+          <mesh material={m.stake} position={[r.stake.x, 0.12 * unit, r.stake.z]} castShadow>
             <cylinderGeometry args={[0.035 * unit, 0.05 * unit, 0.3 * unit, 6]} />
-            <meshStandardMaterial color={pole} roughness={0.9} />
           </mesh>
         </group>
       ))}

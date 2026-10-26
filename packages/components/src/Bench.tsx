@@ -1,5 +1,5 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useWorld, type Vec3 } from '@runek/core'
+import { useMaterial, useWorld, type Vec3 } from '@runek/core'
 
 export interface BenchProps {
   position?: Vec3
@@ -26,7 +26,7 @@ export function Bench({
   color,
 }: BenchProps) {
   const { unit, palette } = useWorld()
-  const wood = color ?? palette.wood
+  const wood = useMaterial({ color: color ?? palette.wood, roughness: 0.85 })
   const L = length * unit
   const D = depth * unit
   const sh = seatHeight * unit
@@ -52,17 +52,20 @@ export function Bench({
       {Array.from({ length: SEAT_SLATS }, (_, i) => {
         const z = -D / 2 + (i + 0.5) * (D / SEAT_SLATS)
         return (
-          <mesh key={`slat-${i}`} castShadow receiveShadow position={[0, sh, z]}>
+          <mesh key={`slat-${i}`} material={wood} castShadow receiveShadow position={[0, sh, z]}>
             <boxGeometry args={[L, slatT, slatD]} />
-            <meshStandardMaterial color={wood} roughness={0.85} />
           </mesh>
         )
       })}
 
       {legs.map((p) => (
-        <mesh key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`} castShadow position={p}>
+        <mesh
+          key={`leg-${p[0].toFixed(3)}:${p[2].toFixed(3)}`}
+          material={wood}
+          castShadow
+          position={p}
+        >
           <boxGeometry args={[legW, sh, legW]} />
-          <meshStandardMaterial color={wood} roughness={0.85} />
         </mesh>
       ))}
 
@@ -71,17 +74,21 @@ export function Bench({
           {[-1, 1].map((s) => (
             <mesh
               key={`support-${s}`}
+              material={wood}
               castShadow
               position={[s * lx, sh + backH / 2, -D / 2 + legW]}
             >
               <boxGeometry args={[legW, backH, legW]} />
-              <meshStandardMaterial color={wood} roughness={0.85} />
             </mesh>
           ))}
           {[0.55, 0.9].map((f) => (
-            <mesh key={`backslat-${f}`} castShadow position={[0, sh + backH * f, -D / 2 + legW]}>
+            <mesh
+              key={`backslat-${f}`}
+              material={wood}
+              castShadow
+              position={[0, sh + backH * f, -D / 2 + legW]}
+            >
               <boxGeometry args={[L, slatT, slatD * 0.8]} />
-              <meshStandardMaterial color={wood} roughness={0.85} />
             </mesh>
           ))}
         </>
