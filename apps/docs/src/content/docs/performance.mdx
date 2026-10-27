@@ -1,0 +1,42 @@
+---
+title: Performance
+summary: Measured frame rates for the library world on real machines, how they're measured, and how to add yours.
+category: reference
+order: 80
+---
+
+import PerfReport from '../../components/PerfReport.astro'
+
+Runek's own docs world, the library, is the benchmark: a reading room of guides and a gallery hall that displays every component in the registry, lit by lamps and a chandelier, with people wandering through. Every number below was measured by `just perf update` on a contributor's machine, then sent in as a pull request.
+
+## What is measured
+
+The built docs site runs in headless Chrome on the machine's GPU, in first person, in three views:
+
+- **At the spawn**: standing where you arrive in the library
+- **Facing the gallery hall**: looking through the west doorway at the busiest view
+- **Turning a full circle**: everything comes into view, so batches and lights keep changing
+
+Each view runs at pixel densities 1, 1.5 and 2. Vsync and the frame-rate cap are off, so the frame rate shows headroom instead of stopping at the screen's refresh rate, and p95 is the frame time 95% of frames beat. Runek renders at up to 1.5x by default (`<World dpr>`), so 1.5x is the number to compare. Each number is one run, and runs on the same machine differ by 5 to 10%, so treat small gaps as noise.
+
+## Results
+
+<PerfReport />
+
+## What CI checks
+
+A GitHub runner has no GPU, so pull requests don't check frame rates. Instead, `.github/workflows/perf.yml` renders the same three views in software and fails when a count goes over its budget in `scripts/perf-budget.json`: draw calls, full-scene passes, shadow passes, real lights, shadow casters, material instances and render-target allocations. These don't depend on the machine, and each one going up is what made earlier versions slow.
+
+## Add your machine
+
+Different GPUs, operating systems and browsers behave differently, and the table above only knows the machines someone measured. Weaker GPUs are the most useful: an integrated laptop GPU or an older card says more about where Runek struggles than another fast one. From a clone of the repo, with Chrome installed:
+
+```bash
+just perf update
+```
+
+It builds the docs site, measures the three views at each pixel density (about 10 minutes), checks the budget, and saves `apps/docs/src/data/perf/<date>-<os>-<cpu>.json`. Open a pull request with that file. On Linux, pass `--gpu` to render on the GPU, since the default there is software rendering as in CI. Set `CHROME_PATH` if Chrome isn't found.
+
+The file holds what explains a difference and nothing that identifies you: the date and Runek build, the OS name and version, CPU model and architecture, core count, memory rounded to GB, the GPU name Chrome reports, the browser version, and the results. No hostname, username or paths.
+
+Beyond adding a machine, the measurement itself is open to improvement: new views (a crowd, a large outdoor world), other Chromium browsers, phones, or new counters. The script is `scripts/perf.mjs`.

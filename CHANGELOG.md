@@ -45,6 +45,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   render-target allocations per frame against `scripts/perf-budget.json`,
   and CI fails a pull request that goes over. `--timing` also enforces
   the fps floor on a machine with a real GPU.
+- `just perf update` also measures at pixel densities 1, 1.5 and 2 and
+  saves the machine's results (OS, CPU, GPU, browser, no personal
+  details) for the docs site's new Performance page, which lists every
+  measured machine. The landing page shows the newest one. `--gpu`
+  measures on the GPU on Linux.
 
 ### Changed
 

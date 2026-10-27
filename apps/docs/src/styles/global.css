@@ -319,6 +319,30 @@ h1,
   display: none;
 }
 
+/* The performance page's per-machine fps tables; they scroll sideways on narrow screens. */
+.perf-report table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1rem 0 2rem;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+}
+.perf-report :is(th, td) {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.perf-report th {
+  color: var(--blue);
+  font-weight: 400;
+  text-align: right;
+}
+.perf-report :is(th, td):first-child {
+  text-align: left;
+  padding-left: 0;
+}
+
 /* Prev/next pager at the foot of a doc */
 .doc-pager {
   clear: both;

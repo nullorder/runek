@@ -1,12 +1,14 @@
 ---
 import { Code } from 'astro:components'
 import BaseLayout from '../layouts/BaseLayout.astro'
+import { getLatestPerf } from '../lib/perf'
 import { getComponents } from '../lib/registry'
 
 const description =
   'Runek is a source registry of procedural, seeded React Three Fiber components. shadcn for 3D worlds.'
 
 const components = getComponents()
+const perf = getLatestPerf()
 const categories = [...new Set(components.map((c) => c.category))]
 const tickerNames = components.map((c) => c.name)
 const bootText = `runek registry :: ${components.length} artifacts :: 0 assets`
@@ -192,6 +194,27 @@ const manifest = `{
         </p>
       </article>
     </section>
+
+    <!-- ::: measured fps ::: -->
+    {perf && (
+      <section class="perf">
+        <p class="eyebrow">measured, not promised</p>
+        <h2>The library world, in frames per second</h2>
+        <ul class="perf-stats">
+          {perf.stats.map((stat) => (
+            <li>
+              <span class="perf-fps">{stat.fps}</span>
+              <span class="perf-unit">fps</span>
+              <span class="perf-label">{stat.label}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="perf-note">
+          First person in {perf.viewport}, on an {perf.device} in {perf.browser}. Measured {perf.date} on {perf.build}.
+          <a href="/library">Walk it yourself →</a>
+        </p>
+      </section>
+    )}
 
     <!-- ::: worlds-as-data ::: -->
     <section class="manifest">
@@ -659,6 +682,64 @@ const manifest = `{
     line-height: 1.65;
   }
 
+  /* ── measured fps ───────────────────────────────────── */
+  .perf {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 4.5rem) 1.5rem 0;
+  }
+  .perf h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    color: var(--green);
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+    margin: 0.4rem 0 1.4rem;
+  }
+  .perf-stats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .perf-stats li {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem 1.3rem;
+  }
+  .perf-fps {
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 6vw, 3.2rem);
+    line-height: 1;
+    color: var(--green);
+    text-shadow: 0 0 32px var(--green-soft);
+  }
+  .perf-unit {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--blue);
+    margin-left: 0.4rem;
+  }
+  .perf-label {
+    display: block;
+    margin-top: 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .perf-note {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.65;
+    margin: 1rem 0 0;
+  }
+  .perf-note a {
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+
   /* ── manifest ───────────────────────────────────────── */
   .manifest {
     max-width: 1100px;
@@ -778,6 +859,7 @@ const manifest = `{
       font-size: 0.7rem;
     }
     .plates,
+    .perf,
     .manifest,
     .index {
       padding-inline: 1.1rem;

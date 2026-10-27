@@ -2,6 +2,7 @@
 // /llms-full.txt. Server-only.
 import { type CollectionEntry, getCollection } from 'astro:content'
 import changelog from '../../../../CHANGELOG.md?raw'
+import { expandPerfReport } from './perf'
 import { isReleased, UNRELEASED_NOTE } from './registry'
 
 export const SITE = 'https://runek.nullorder.org'
@@ -25,7 +26,12 @@ export const markdownUrl = (id: string) => `${SITE}/docs/${id}.md`
 /** The page's Markdown, with site-only HTML turned back into plain Markdown and every
  *  link made absolute (doc links point at their `.md` twin). */
 export function docBody(doc: Doc): string {
-  const raw = doc.id === 'changelog' ? changelog.replace(/^# .*\n+/, '') : (doc.body ?? '')
+  const raw =
+    doc.id === 'changelog'
+      ? changelog.replace(/^# .*\n+/, '')
+      : doc.id === 'performance'
+        ? expandPerfReport(doc.body ?? '')
+        : (doc.body ?? '')
   return raw
     .replace(
       /<a class="manifest-card" href="([^"]+)">[\s\S]*?<span class="manifest-card__hint">([\s\S]*?)<\/span>\s*<\/a>/g,
