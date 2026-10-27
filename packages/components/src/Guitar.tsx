@@ -36,12 +36,9 @@ export function Guitar({
   const finish = color ?? pick(next, FINISHES[type])
   const acoustic = type === 'acoustic'
   const m = useMaterials({
-    stand: { color: '#1d1d1f', roughness: 0.5 },
+    dark: { color: '#1d1d1f', roughness: 0.5 },
     body: { color: finish, roughness: 0.25 },
-    hole: { color: '#120c08', roughness: 1 },
-    pickup: { color: '#202020', roughness: 0.4 },
     neck: { color: '#3a2414', roughness: 0.6 },
-    head: { color: acoustic ? '#3a2414' : finish, roughness: 0.4 },
     peg: { color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
   })
   const depth = acoustic ? 0.1 : 0.045
@@ -54,8 +51,7 @@ export function Guitar({
       {[-1, 1].map((s) => (
         <mesh
           key={s}
-          material={m.stand}
-          castShadow
+          material={m.dark}
           position={[s * 0.13 * u, 0.04 * u, 0.06 * u]}
           rotation={[0, s * 0.4, 0]}
         >
@@ -63,7 +59,7 @@ export function Guitar({
         </mesh>
       ))}
       <mesh
-        material={m.stand}
+        material={m.dark}
         castShadow
         position={[0, 0.45 * u, -0.12 * u]}
         rotation={[-0.25, 0, 0]}
@@ -90,14 +86,14 @@ export function Guitar({
         </mesh>
         {acoustic ? (
           <mesh
-            material={m.hole}
+            material={m.dark}
             position={[0, (BODY_TOP - upper * 0.95) * u, (depth / 2 + 0.002) * u]}
           >
             <circleGeometry args={[0.045 * u, 24]} />
           </mesh>
         ) : (
           [0.25, 0.4].map((y) => (
-            <mesh key={y} material={m.pickup} position={[0, y * u, (depth / 2 + 0.004) * u]}>
+            <mesh key={y} material={m.dark} position={[0, y * u, (depth / 2 + 0.004) * u]}>
               <boxGeometry args={[0.08 * u, 0.025 * u, 0.008 * u]} />
             </mesh>
           ))
@@ -110,7 +106,7 @@ export function Guitar({
           <boxGeometry args={[0.05 * u, neck * u, 0.025 * u]} />
         </mesh>
         <mesh
-          material={m.head}
+          material={acoustic ? m.neck : m.body}
           castShadow
           position={[0, (BODY_TOP - 0.08 + neck + 0.08) * u, 0.005 * u]}
           rotation={[0.12, 0, 0]}

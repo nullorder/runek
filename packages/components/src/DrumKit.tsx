@@ -45,7 +45,7 @@ export function DrumKit({
   )
   const stand = (key: string, x: number, z: number, h: number) => (
     <group key={`stand-${key}`} position={[x * u, 0, z * u]}>
-      <mesh material={m.chrome} castShadow position={[0, (h / 2) * u, 0]}>
+      <mesh material={m.chrome} position={[0, (h / 2) * u, 0]}>
         <cylinderGeometry args={[0.012 * u, 0.012 * u, h * u, 8]} />
       </mesh>
       {LEG_ANGLES.map((a) => (

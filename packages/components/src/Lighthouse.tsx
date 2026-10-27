@@ -56,9 +56,7 @@ export function Lighthouse({
     plinth: { color: '#8d8a83', roughness: 1 },
     tower: { color, roughness: 0.8 },
     band: { color: bandColor, roughness: 0.8 },
-    cap: { color: bandColor, roughness: 0.7 },
     door: { color: '#3a2a1e', roughness: 0.8 },
-    window: { color: '#1a1d22', roughness: 0.3 },
     iron: { color: IRON, roughness: 0.6, metalness: 0.4 },
     glass: { color: '#cfe6ee', transparent: true, opacity: 0.3, roughness: 0.05, side: DoubleSide },
     bulb: lit
@@ -116,7 +114,7 @@ export function Lighthouse({
         <boxGeometry args={[0.8 * unit, 1.9 * unit, 0.1 * unit]} />
       </mesh>
       {[0.35, 0.6, 0.82].map((f) => (
-        <mesh key={f} material={m.window} position={[0, H * f, rAt(H * f) - 0.03 * unit]}>
+        <mesh key={f} material={m.iron} position={[0, H * f, rAt(H * f) - 0.03 * unit]}>
           <boxGeometry args={[0.35 * unit, 0.55 * unit, 0.1 * unit]} />
         </mesh>
       ))}
@@ -159,7 +157,7 @@ export function Lighthouse({
             </mesh>
           )
         })}
-        <mesh material={m.cap} castShadow position={[0, 0.16 * unit + lanternH + 0.45 * unit, 0]}>
+        <mesh material={m.band} castShadow position={[0, 0.16 * unit + lanternH + 0.45 * unit, 0]}>
           <coneGeometry args={[lanternR * 1.25, 0.9 * unit, 16]} />
         </mesh>
         <mesh material={m.iron} position={[0, 0.16 * unit + lanternH + 0.98 * unit, 0]}>

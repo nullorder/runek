@@ -73,17 +73,11 @@ export function KitchenUnits({
   const finish = color ?? pick(rng(seed), FINISHES)
   const m = useMaterials({
     kick: { color: '#3a3a3c', roughness: 0.8 },
-    carcass: { color: finish, roughness: 0.6 },
-    front: { color: finish, roughness: 0.5 },
+    finish: { color: finish, roughness: 0.55 },
     top: { color: topColor, roughness: 0.35 },
-    handle: { color: metalColor, roughness: 0.25, metalness: 0.8 },
-    tap: { color: metalColor, roughness: 0.2, metalness: 0.9 },
-    hood: { color: metalColor, roughness: 0.3, metalness: 0.75 },
-    bowl: { color: '#5d6166', roughness: 0.3, metalness: 0.7 },
-    oven: { color: '#2a2a2d', roughness: 0.35, metalness: 0.4 },
-    ovenGlass: { color: '#0c0c0e', roughness: 0.1, metalness: 0.5 },
-    hob: { color: '#141416', roughness: 0.12, metalness: 0.3 },
-    burner: { color: '#4a4a4f', roughness: 0.4 },
+    steel: { color: metalColor, roughness: 0.25, metalness: 0.8 },
+    glass: { color: '#141416', roughness: 0.12, metalness: 0.3 },
+    iron: { color: '#3a3a3e', roughness: 0.4, metalness: 0.4 },
   })
   const count = Math.max(1, Math.round(length / unitWidth))
   const U = unitWidth * unit
@@ -104,7 +98,7 @@ export function KitchenUnits({
   }, [seed, count, sink, hob])
 
   const xOf = (i: number) => -L / 2 + U * (i + 0.5)
-  const panel = { face: m.front, metal: m.handle, unit }
+  const panel = { face: m.finish, metal: m.steel, unit }
 
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
@@ -114,7 +108,7 @@ export function KitchenUnits({
       </mesh>
       {/* The carcass in the finish too, so an island's back is panelled like its front. */}
       <mesh
-        material={m.carcass}
+        material={m.finish}
         castShadow
         receiveShadow
         position={[0, kick + body / 2, -0.01 * unit]}
@@ -148,15 +142,14 @@ export function KitchenUnits({
                 h={drawer - gap * 2}
               />
               <group position={[x, kick + ovenH / 2, z + 0.006 * unit]}>
-                <mesh material={m.oven} castShadow>
+                <mesh material={m.iron}>
                   <boxGeometry args={[w, ovenH - gap * 2, 0.012 * unit]} />
                 </mesh>
-                <mesh material={m.ovenGlass} position={[0, -0.02 * unit, 0.007 * unit]}>
+                <mesh material={m.glass} position={[0, -0.02 * unit, 0.007 * unit]}>
                   <planeGeometry args={[w * 0.72, ovenH * 0.45]} />
                 </mesh>
                 <mesh
-                  material={m.handle}
-                  castShadow
+                  material={m.steel}
                   position={[0, ovenH * 0.36, 0.03 * unit]}
                   rotation={[0, 0, Math.PI / 2]}
                 >
@@ -214,19 +207,18 @@ export function KitchenUnits({
 
       {sink !== undefined && sink < count && (
         <group position={[xOf(sink), H, 0.02 * unit]}>
-          <mesh material={m.handle} receiveShadow position={[0, 0.002 * unit, 0]}>
+          <mesh material={m.steel} receiveShadow position={[0, 0.002 * unit, 0]}>
             <boxGeometry args={[U * 0.82, 0.004 * unit, D * 0.66]} />
           </mesh>
-          <mesh material={m.bowl} position={[0, 0.0045 * unit, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <mesh material={m.iron} position={[0, 0.0045 * unit, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[U * 0.7, D * 0.52]} />
           </mesh>
           <group position={[0, 0, -D * 0.4]}>
-            <mesh material={m.tap} castShadow position={[0, 0.15 * unit, 0]}>
+            <mesh material={m.steel} position={[0, 0.15 * unit, 0]}>
               <cylinderGeometry args={[0.015 * unit, 0.02 * unit, 0.3 * unit, 12]} />
             </mesh>
             <mesh
-              material={m.tap}
-              castShadow
+              material={m.steel}
               position={[0, 0.3 * unit, 0.09 * unit]}
               rotation={[Math.PI / 2, 0, 0]}
             >
@@ -238,13 +230,13 @@ export function KitchenUnits({
 
       {hob !== undefined && hob < count && (
         <group position={[xOf(hob), H + 0.003 * unit, 0.02 * unit]}>
-          <mesh material={m.hob} receiveShadow>
+          <mesh material={m.glass} receiveShadow>
             <boxGeometry args={[U * 0.9, 0.006 * unit, D * 0.84]} />
           </mesh>
           {BURNERS.map(([sx, sz, r]) => (
             <mesh
               key={`${sx}${sz}`}
-              material={m.burner}
+              material={m.iron}
               position={[sx * U * 0.22, 0.004 * unit, sz * 0.12 * unit]}
               rotation={[-Math.PI / 2, 0, 0]}
             >
@@ -261,11 +253,11 @@ export function KitchenUnits({
           if (i === hob) {
             return (
               <group key={`wall${x}`} position={[x, WALL_FROM * unit, z]}>
-                <mesh material={m.hood} castShadow position={[0, 0.06 * unit, 0.04 * unit]}>
+                <mesh material={m.steel} castShadow position={[0, 0.06 * unit, 0.04 * unit]}>
                   <boxGeometry args={[U * 0.98, 0.12 * unit, WALL_D * 1.25 * unit]} />
                 </mesh>
                 <mesh
-                  material={m.hood}
+                  material={m.steel}
                   castShadow
                   position={[0, wallH / 2 + 0.06 * unit, -0.02 * unit]}
                 >
@@ -277,7 +269,7 @@ export function KitchenUnits({
           return (
             <group key={`wall${x}`}>
               <mesh
-                material={m.carcass}
+                material={m.finish}
                 castShadow
                 receiveShadow
                 position={[x, WALL_FROM * unit + wallH / 2, z - 0.01 * unit]}
@@ -332,15 +324,10 @@ function FrontPanel({
     : [0, (handle === 'top' ? 1 : -1) * (h / 2 - 0.04 * unit), 0.015 * unit]
   return (
     <group position={[x, y, z]}>
-      <mesh material={face} castShadow receiveShadow>
+      <mesh material={face} receiveShadow>
         <boxGeometry args={[w, h, 0.018 * unit]} />
       </mesh>
-      <mesh
-        material={metal}
-        castShadow
-        position={at}
-        rotation={vertical ? [0, 0, 0] : [0, 0, Math.PI / 2]}
-      >
+      <mesh material={metal} position={at} rotation={vertical ? [0, 0, 0] : [0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[bar, bar, length, 8]} />
       </mesh>
     </group>
