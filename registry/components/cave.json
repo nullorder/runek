@@ -1,0 +1,18 @@
+{
+  "name": "cave",
+  "title": "Cave",
+  "type": "registry:component",
+  "description": "The mouth of a sea cave: a seeded, faceted stone vault opening toward +Z, dark inside, with boulders fallen either side. Set it into a Cliff at the waterline. No collider, so a boat can go in.",
+  "dependencies": [
+    "@runek/core@^0.16.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Cave.tsx",
+      "content": "import { range, rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'\nimport { useEffect, useMemo } from 'react'\nimport { BackSide, SphereGeometry } from 'three'\n\nexport interface CaveProps extends WorldComponentProps {\n  /** Radius of the hollow, in units. */\n  radius?: number\n  /** Height of the vault over the origin, in units. */\n  height?: number\n  /** How wide the mouth is, in radians round the vault. */\n  mouth?: number\n  /** Rock. Defaults to the world palette's `stone` slot, as `Cliff` does. */\n  color?: string\n}\n\n/**\n * A hollow in rock opening toward local +Z: a vault of faceted stone, roughened from the seed,\n * dark inside, with its mouth cut from the floor up and a few boulders fallen either side. Set\n * it into the foot of a `Cliff` at the waterline and the sea runs in. Decorative: no collider,\n * so a boat or a swimmer can go in.\n */\nexport function Cave({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  seed = 1,\n  radius = 3.5,\n  height = 3.2,\n  mouth = 1.1,\n  color,\n}: CaveProps) {\n  const { unit, palette } = useWorld()\n  const m = useMaterials({\n    rock: { color: color ?? palette.stone, roughness: 1, flatShading: true },\n    inside: { color: '#14161a', roughness: 1, side: BackSide },\n  })\n  const R = radius * unit\n  const H = height * unit\n\n  const { shell, boulders } = useMemo(() => {\n    const next = rng(seed)\n    const geometry = new SphereGeometry(\n      R,\n      20,\n      10,\n      Math.PI / 2 + mouth / 2,\n      Math.PI * 2 - mouth,\n      0,\n      Math.PI / 2,\n    )\n    const p = geometry.attributes.position\n    // One seeded push per position, shared by the vertices that meet there, so seams stay closed.\n    const bumps = new Map<string, number>()\n    for (let i = 0; i < p.count; i++) {\n      const key = `${p.getX(i).toFixed(3)},${p.getY(i).toFixed(3)},${p.getZ(i).toFixed(3)}`\n      let k = bumps.get(key)\n      if (k === undefined) {\n        k = 1 + range(next, -0.12, 0.14)\n        bumps.set(key, k)\n      }\n      p.setXYZ(i, p.getX(i) * k, (p.getY(i) / R) * H * k, p.getZ(i) * k)\n    }\n    geometry.computeVertexNormals()\n    const stones = Array.from({ length: 6 }, (_, i) => {\n      const side = i % 2 === 0 ? 1 : -1\n      const a = mouth / 2 + range(next, 0.05, 0.35)\n      const r = R * range(next, 0.95, 1.2)\n      return {\n        x: side * Math.sin(a) * r,\n        z: Math.cos(a) * r,\n        size: range(next, 0.35, 0.8) * unit,\n        spin: range(next, 0, Math.PI),\n      }\n    })\n    return { shell: geometry, boulders: stones }\n  }, [seed, R, H, mouth, unit])\n\n  useEffect(() => () => shell.dispose(), [shell])\n\n  return (\n    <group position={position} rotation={rotation}>\n      <mesh geometry={shell} material={m.rock} castShadow receiveShadow />\n      <mesh geometry={shell} material={m.inside} scale={0.97} />\n      {boulders.map((b) => (\n        <mesh\n          key={`${b.x},${b.z}`}\n          material={m.rock}\n          castShadow\n          position={[b.x, b.size * 0.4, b.z]}\n          rotation={[b.spin, b.spin * 0.7, 0]}\n        >\n          <dodecahedronGeometry args={[b.size, 0]} />\n        </mesh>\n      ))}\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}

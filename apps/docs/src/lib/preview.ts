@@ -55,6 +55,11 @@ export const SEEDED = new Set([
   'Sofa',
   'Terrain',
   'Trees',
+  'Cave',
+  'Diffuser',
+  'DrumKit',
+  'Guitar',
+  'KitchenUnits',
 ])
 
 export const PREVIEW: Record<string, PreviewConfig> = {
@@ -148,4 +153,22 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     background: '#8ea6c8',
     props: { count: 8, area: 5, height: 3.5, speed: 1.5 },
   },
+  NeonStrip: {
+    camera: [0.6, 1.4, 2.2],
+    target: [0, 1, 0],
+    background: '#15131c',
+    props: { position: [0, 1, 0], length: 1.6, light: true },
+  },
+  Lighthouse: { camera: [12, 9, 16], target: [0, 6.5, 0], props: { nightOnly: false } },
+  Cave: { camera: [5, 3.5, 7.5], target: [0, 1.4, 0] },
+  GlassWall: { camera: [3.4, 2.4, 4.4], target: [0, 1.3, 0], props: { door: { offset: 0.8 } } },
+  KitchenUnits: {
+    camera: [2.4, 2.2, 3.4],
+    target: [0, 1, 0],
+    props: { length: 3, sink: 1, hob: 3, wall: true },
+  },
+  Piano: { camera: [2.4, 2, 2.8], target: [0, 0.7, -0.6] },
+  DrumKit: { camera: [1.6, 1.5, 2.4], target: [0, 0.7, 0] },
+  Guitar: { camera: [0.9, 1, 1.6], target: [0, 0.6, 0] },
+  Diffuser: { camera: [1, 1.4, 2.2], target: [0, 1, 0], props: { position: [0, 1, 0] } },
 }

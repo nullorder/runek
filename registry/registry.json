@@ -1166,6 +1166,161 @@
           "target": "person"
         }
       ]
+    },
+    {
+      "name": "neon-strip",
+      "title": "NeonStrip",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, glowing at any hour. Decorative; light washes nearby walls in its colour through the world's light pool.",
+      "files": [
+        {
+          "path": "packages/components/src/NeonStrip.tsx",
+          "target": "NeonStrip.tsx"
+        }
+      ],
+      "example": {
+        "length": 2,
+        "color": "#2fd8ff",
+        "light": true
+      }
+    },
+    {
+      "name": "lighthouse",
+      "title": "Lighthouse",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A banded lighthouse with a gallery, a glazed lantern and a lamp whose two beams sweep round after dusk; the lamp lights its surroundings through the world's light pool. One cylinder collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Lighthouse.tsx",
+          "target": "Lighthouse.tsx"
+        }
+      ],
+      "example": {
+        "height": 12,
+        "nightOnly": false
+      }
+    },
+    {
+      "name": "cave",
+      "title": "Cave",
+      "type": "registry:component",
+      "category": "terrain",
+      "description": "The mouth of a sea cave: a seeded, faceted stone vault opening toward +Z, dark inside, with boulders fallen either side. Set it into a Cliff at the waterline. No collider, so a boat can go in.",
+      "files": [
+        {
+          "path": "packages/components/src/Cave.tsx",
+          "target": "Cave.tsx"
+        }
+      ],
+      "example": {
+        "radius": 3.5,
+        "height": 3.2
+      }
+    },
+    {
+      "name": "glass-wall",
+      "title": "GlassWall",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A floor-to-ceiling glass partition: panes between slim mullions in a frame, with an optional doorway and a pane over it. A cuboid collider either side of the doorway.",
+      "files": [
+        {
+          "path": "packages/components/src/GlassWall.tsx",
+          "target": "GlassWall.tsx"
+        }
+      ],
+      "example": {
+        "width": 4,
+        "door": {
+          "offset": 0.8,
+          "width": 1
+        }
+      }
+    },
+    {
+      "name": "kitchen-units",
+      "title": "KitchenUnits",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A fitted kitchen run: seeded door and drawer fronts under one worktop, an optional sink and a hob over an oven, wall units with a hood, and an overhang for an island. One cuboid collider.",
+      "files": [
+        {
+          "path": "packages/components/src/KitchenUnits.tsx",
+          "target": "KitchenUnits.tsx"
+        }
+      ],
+      "example": {
+        "length": 3,
+        "sink": 1,
+        "hob": 3,
+        "wall": true
+      }
+    },
+    {
+      "name": "piano",
+      "title": "Piano",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A grand piano: a lacquered case on three legs, the lid propped open, eighty-eight keys, a pedal lyre and a bench a Person can sit on. One cuboid collider round the case.",
+      "files": [
+        {
+          "path": "packages/components/src/Piano.tsx",
+          "target": "Piano.tsx"
+        }
+      ],
+      "example": {
+        "lid": 0.6
+      }
+    },
+    {
+      "name": "drum-kit",
+      "title": "DrumKit",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A five-piece drum kit with hi-hat, crash and ride cymbals on stands and a throne behind it; seeded shell finish. One cuboid collider round the drums.",
+      "files": [
+        {
+          "path": "packages/components/src/DrumKit.tsx",
+          "target": "DrumKit.tsx"
+        }
+      ],
+      "example": {
+        "seed": 3
+      }
+    },
+    {
+      "name": "guitar",
+      "title": "Guitar",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "An acoustic, electric or bass guitar leaning on a floor stand; the kind and finish are seeded. Decorative.",
+      "files": [
+        {
+          "path": "packages/components/src/Guitar.tsx",
+          "target": "Guitar.tsx"
+        }
+      ],
+      "example": {
+        "kind": "electric"
+      }
+    },
+    {
+      "name": "diffuser",
+      "title": "Diffuser",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A skyline acoustic diffuser: wooden blocks on a backboard, their depths from a quadratic-residue sequence, instanced. Wall-mounted, decorative.",
+      "files": [
+        {
+          "path": "packages/components/src/Diffuser.tsx",
+          "target": "Diffuser.tsx"
+        }
+      ],
+      "example": {
+        "cells": 11
+      }
     }
   ]
 }

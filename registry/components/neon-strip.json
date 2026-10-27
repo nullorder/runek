@@ -1,0 +1,17 @@
+{
+  "name": "neon-strip",
+  "title": "NeonStrip",
+  "type": "registry:component",
+  "description": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, glowing at any hour. Decorative; light washes nearby walls in its colour through the world's light pool.",
+  "dependencies": [
+    "@runek/core@^0.16.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "NeonStrip.tsx",
+      "content": "import { useLight, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'\n\nexport interface NeonStripProps extends WorldComponentProps {\n  /** Length along local X, in units, centred on the origin. */\n  length?: number\n  /** The glow. */\n  color?: string\n  /** Tube diameter, in units. */\n  thickness?: number\n  /** Cast real light as well as glowing, from the middle of the tube. Leave it off on most\n   *  strips: the world lends real lights to only a few emitters at a time. */\n  light?: boolean\n  intensity?: number\n}\n\n/**\n * A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, unlit by\n * the scene so it reads as light at any hour, for cove lighting, a desk's edge or a line round\n * a room. `light` also washes nearby walls in its colour. Decorative: no collider.\n */\nexport function NeonStrip({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  length = 2,\n  color = '#ff2fb3',\n  thickness = 0.03,\n  light = false,\n  intensity = 3,\n}: NeonStripProps) {\n  const { unit } = useWorld()\n  const L = length * unit\n  const r = (thickness / 2) * unit\n  const glow = useLight({ color, intensity, distance: (length + 3) * unit, decay: 1.6 }, light)\n  const m = useMaterials({\n    core: { kind: 'basic', color: '#ffffff', toneMapped: false },\n    sleeve: { kind: 'basic', color, transparent: true, opacity: 0.85, toneMapped: false },\n    halo: {\n      kind: 'basic',\n      color,\n      transparent: true,\n      opacity: 0.12,\n      depthWrite: false,\n      toneMapped: false,\n    },\n  })\n\n  return (\n    <group position={position} rotation={rotation}>\n      <group rotation={[0, 0, Math.PI / 2]}>\n        <mesh material={m.core}>\n          <cylinderGeometry args={[r * 0.55, r * 0.55, L, 8]} />\n        </mesh>\n        <mesh material={m.sleeve}>\n          <cylinderGeometry args={[r, r, L, 12]} />\n        </mesh>\n        <mesh material={m.halo}>\n          <cylinderGeometry args={[r * 2.6, r * 2.6, L, 12]} />\n        </mesh>\n      </group>\n      <object3D ref={glow.ref} />\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}
