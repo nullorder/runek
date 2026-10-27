@@ -98,7 +98,7 @@ interface View {
   used: boolean
 }
 
-function makeView(yaw: number): View {
+function makeView(): View {
   const target = new WebGLRenderTarget(1, 1)
   // Marked as XR so three tone-maps and encodes each material into it exactly as it would onto
   // the screen (respecting `toneMapped: false`), stored as plain 8-bit sRGB: the stitching pass
@@ -116,7 +116,7 @@ function makeView(yaw: number): View {
   camera.matrixWorldAutoUpdate = false
   return {
     camera,
-    turn: new Matrix4().makeRotationY(yaw),
+    turn: new Matrix4(),
     target,
     sample: new Matrix4(),
     used: true,
@@ -207,10 +207,7 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
   const extent = useMemo(() => bounds(fov, size.width / size.height), [fov, size])
   const optics = useMemo(() => panini(extent), [extent])
 
-  const views = useMemo(
-    () => ({ ahead: makeView(0), left: makeView(SEAM * 2), right: makeView(-SEAM * 2) }),
-    [],
-  )
+  const views = useMemo(() => ({ ahead: makeView(), left: makeView(), right: makeView() }), [])
   const pass = useMemo(() => {
     const material = new ShaderMaterial({
       vertexShader: VERTEX,
@@ -256,39 +253,32 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
     const single = widest <= SINGLE_MAX
     const ahead = single ? widest : Math.min(widest, SEAM)
     // Each view's vertical reach is greatest along the screen's top edge; walk it.
-    const reach = (from: number, to: number, depth: (phi: number) => number) => {
+    const reach = (from: number, to: number, yaw: number) => {
       let up = 0
       for (let i = 0; i <= 64; i++) {
         const phi = from + ((to - from) * i) / 64
         const t = (extent.y * (CURVE + Math.cos(phi))) / (CURVE + 1)
-        up = Math.max(up, t / depth(phi))
+        up = Math.max(up, t / Math.cos(phi - yaw))
       }
       return up
     }
     const sides = !single && widest > SEAM
-    const edge = 1 / Math.tan(widest)
+    // Each side camera faces the middle of its slice, so its frustum is symmetric. Facing away
+    // from the slice left a lopsided frustum through which some rasterizers (SwiftShader) drop
+    // parts of large triangles, showing what lies under the ground.
+    const side = (SEAM + widest) / 2
+    const sideHalf = Math.tan((widest - SEAM) / 2)
+    const sideUp = sides ? reach(SEAM, widest, side) : 0
     const spans = [
       {
         view: views.ahead,
         used: true,
-        left: -Math.tan(ahead),
-        right: Math.tan(ahead),
-        up: reach(0, ahead, Math.cos),
+        yaw: 0,
+        half: Math.tan(ahead),
+        up: reach(0, ahead, 0),
       },
-      {
-        view: views.left,
-        used: sides,
-        left: edge,
-        right: 1,
-        up: sides ? reach(SEAM, widest, Math.sin) : 0,
-      },
-      {
-        view: views.right,
-        used: sides,
-        left: -1,
-        right: -edge,
-        up: sides ? reach(SEAM, widest, Math.sin) : 0,
-      },
+      { view: views.left, used: sides, yaw: side, half: sideHalf, up: sideUp },
+      { view: views.right, used: sides, yaw: -side, half: sideHalf, up: sideUp },
     ]
 
     const density = (size.width * dpr) / (2 * extent.x)
@@ -298,8 +288,9 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
       const { view } = span
       view.used = span.used
       if (!span.used) continue
-      const left = span.left - PAD
-      const right = span.right + PAD
+      view.turn.makeRotationY(span.yaw)
+      const right = span.half + PAD
+      const left = -right
       const up = span.up + PAD
       view.target.setSize(
         Math.min(limit, Math.max(1, Math.ceil((right - left) * density))),
