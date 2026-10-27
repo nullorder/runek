@@ -111,6 +111,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Turning in first person near a `Rift` no longer reallocates its
   render target each time it crosses between the lens's views; each end
   keeps one target per view size.
+- The first-person lens no longer shows an `Ocean` (or anything else
+  under walkable ground) through that ground at the sides of a wide
+  view. Its side views faced away from the slice of the screen they
+  draw, and some renderers (Chrome's software fallback, SwiftShader)
+  dropped parts of large ground triangles through that lopsided view;
+  each side view now faces the middle of its slice. At 16:9 and narrower
+  the lens no longer uses side views at all.
+  ([#45](https://github.com/nullorder/runek/issues/45))
 
 ## [0.16.0](https://github.com/nullorder/runek/compare/v0.15.0...v0.16.0) - 2026-10-24
 
