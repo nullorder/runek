@@ -51,7 +51,9 @@ cli *ARGS:
     @node packages/cli/src/index.ts {{ARGS}}
 
 # Build the docs, then measure the library world's render cost against scripts/perf-budget.json.
-# Pass --timing to also enforce the fps floor (needs a real GPU), e.g. `just perf --timing`
+# Pass --timing to also enforce the fps floor (needs a real GPU), e.g. `just perf --timing`;
+# `just perf update` also measures pixel densities 1, 1.5 and 2 and saves this machine's results to
+# apps/docs/src/data/perf/ for the docs Performance page and the landing page.
 perf *ARGS: build-docs
     node scripts/perf.mjs {{ARGS}}
 

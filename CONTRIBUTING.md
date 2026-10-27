@@ -103,6 +103,18 @@ Dependency direction is one-way: `app → components → core`.
 - **Source-first.** Packages ship TypeScript source; no build step for libraries.
 - Centralized versions: dependency versions live in the `catalog:` block of `pnpm-workspace.yaml`; package versions move in lockstep via `just version X.Y.Z`. Don't hand-edit either.
 
+## Performance
+
+Runek has to stay fast as the catalog grows, and how fast depends on the machine: GPU, operating system and browser all change the picture. The [Performance](https://runek.nullorder.org/docs/performance) page lists measured frame rates per machine, and it only knows the machines someone measured. Adding yours takes one command:
+
+```sh
+just perf update   # measures the library world at pixel densities 1, 1.5 and 2 (about 10 minutes)
+```
+
+It saves `apps/docs/src/data/perf/<date>-<os>-<cpu>.json`: the OS and version, CPU, core count, memory, GPU, browser and the results, with no hostname, username or paths. Send it as a pull request. Weaker GPUs, Windows, and Linux with a GPU (`--gpu`) are the most useful, since they're the gaps.
+
+Improving the measurement is just as welcome: a new view (a crowd, a large outdoor world), another browser, phones, or a counter that catches a kind of slowdown the budget misses today. It all lives in `scripts/perf.mjs` and `scripts/perf-budget.json`; if you find a slow spot, an issue with your numbers is a good start too.
+
 ## Pull requests
 
 - Keep PRs focused; one component or one concern per PR.

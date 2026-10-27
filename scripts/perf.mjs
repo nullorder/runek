@@ -10,16 +10,20 @@
 // These counts don't depend on the machine, so CI enforces them. Frame times are reported
 // always but only enforced with --timing (a real GPU, not CI's software renderer).
 //
-// Usage: node scripts/perf.mjs [--timing] [--scale N] [--software] [--json out.json] [--url …]
+// Usage: node scripts/perf.mjs [update] [--timing] [--scale N] [--software | --gpu] [--json out.json] [--url …]
+//   update      also measure at pixel densities 1, 1.5 and 2 and save this machine's results to
+//               apps/docs/src/data/perf/ for the docs performance page and the landing page
 //   --timing    also fail on the budget's minimum fps
 //   --scale     device pixel ratio to emulate (default 2, a Retina laptop; CI uses 1)
-//   --software  render on the CPU (SwiftShader) as CI does; the default off macOS
+//   --software  render on the CPU (SwiftShader) as CI does; the default on Linux
+//   --gpu       render on the GPU on Linux
 //   --url       measure a running site instead of serving apps/docs/dist
 //   --json      write the measurements to a file
-import { spawn } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
 import {
   createReadStream,
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -27,7 +31,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { createServer } from 'node:http'
-import { tmpdir } from 'node:os'
+import { cpus, release, tmpdir, totalmem } from 'node:os'
 import { dirname, extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -41,12 +45,22 @@ const option = (name, fallback) => {
   return i >= 0 ? args[i + 1] : fallback
 }
 const timing = flag('timing')
+const update = args.includes('update')
 const scale = Number(option('scale', 2))
-const software = flag('software') || process.platform !== 'darwin'
+const software = flag('software') || (process.platform === 'linux' && !flag('gpu'))
 // Pinned at what `<World>`'s default range would pick, so adaptive resolution can't move timings.
 const dpr = Math.min(scale, 1.5)
 const WIDTH = 1600
 const HEIGHT = 900
+// The pixel densities `update` measures; the budget is checked at `dpr` only.
+const UPDATE_DPRS = [1, 1.5, 2]
+
+if (update && software) {
+  console.error(
+    '✗ update needs a real GPU: software-rendered fps would mislead (Linux: pass --gpu)',
+  )
+  process.exit(1)
+}
 
 // Facing -x, through the library's west doorway into the gallery hall.
 const SCENARIOS = [
@@ -94,16 +108,22 @@ function chromePath() {
     '/usr/bin/google-chrome-stable',
     '/usr/bin/chromium',
     '/usr/bin/chromium-browser',
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
   ]
   const found = candidates.find((p) => p && existsSync(p))
   if (!found) throw new Error('Chrome not found: set CHROME_PATH')
   return found
 }
 
-// A real GPU on macOS; software rendering elsewhere (CI runners have no GPU).
+// A real GPU unless --software (CI runners have no GPU); Metal on macOS, Chrome's default backend elsewhere.
 const GPU_FLAGS = software
   ? ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']
-  : ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist']
+  : [
+      ...(process.platform === 'darwin' ? ['--use-angle=metal'] : []),
+      '--enable-gpu',
+      '--ignore-gpu-blocklist',
+    ]
 
 // Each run's throwaway Chrome profile, removed when its Chrome closes (a few dozen MB apiece).
 const profiles = new Set()
@@ -252,9 +272,16 @@ const WINDOW_STATS = (from) => `(() => {
     shadowPasses: max('shadows'), allocs: P.allocs, firstDraw: P.firstDraw }
 })()`
 
-async function measure(base, scenario, port) {
+const GPU_NAME = `(() => {
+  const gl = document.createElement('canvas').getContext('webgl2')
+  const info = gl?.getExtension('WEBGL_debug_renderer_info')
+  return gl ? gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER) : null
+})()`
+
+async function measure(base, scenario, port, dpr) {
   const b = await launch(port)
   try {
+    const browser = (await b.send('Browser.getVersion')).result?.product
     await b.send('Page.enable')
     await b.send('Page.addScriptToEvaluateOnNewDocument', { source: INSTRUMENT })
     await b.send('Page.navigate', { url: `${base}/library?perf&dpr=${dpr}${scenario.query}` })
@@ -294,7 +321,8 @@ async function measure(base, scenario, port) {
     }
     if (scenario.turn) await b.key('keyUp')
     const w = await b.evaluate(WINDOW_STATS(from))
-    return { ...w, allocs: w.allocs - allocsBefore, ...scene }
+    const gpu = await b.evaluate(GPU_NAME)
+    return { ...w, allocs: w.allocs - allocsBefore, ...scene, browser, gpu }
   } finally {
     await b.close()
   }
@@ -322,36 +350,123 @@ if (!base) {
   base = `http://127.0.0.1:${served.port}`
 }
 
-const results = {}
 const failures = []
 let port = 9450
-for (const scenario of SCENARIOS) {
-  const r = await measure(base, scenario, port++)
-  results[scenario.name] = r
-  const limits = budget.scenarios[scenario.name] ?? {}
-  const cells = COUNTERS.map(([key, label, read]) => {
-    const value = read(r)
-    const limit = limits[key]
-    const over = limit !== undefined && value > limit
-    if (over) failures.push(`${scenario.name}: ${label} ${value} > ${limit}`)
-    return `${label} ${value}${limit !== undefined ? `/${limit}` : ''}${over ? ' ✗' : ''}`
-  })
-  const minFps = budget.timing?.[scenario.name]?.minFps
-  const slow = minFps !== undefined && r.fps < minFps
-  if (timing && slow) failures.push(`${scenario.name}: ${r.fps.toFixed(1)} fps < ${minFps}`)
-  console.log(
-    `${scenario.name.padEnd(8)} ${r.fps.toFixed(1).padStart(6)} fps  p95 ${r.p95.toFixed(1)} ms  js ${r.jsMs.toFixed(1)} ms` +
-      `${minFps !== undefined ? `  (min ${minFps}${slow ? (timing ? ' ✗' : ', not enforced') : ''})` : ''}`,
-  )
-  console.log(`         ${cells.join('  ')}`)
+
+// Measures every scenario at one pixel density; budgets apply only at the default one.
+async function measureAll(at) {
+  const checked = at === dpr
+  const results = {}
+  if (update) console.log(`\npixel density ${at}${checked ? ' (budget)' : ''}`)
+  for (const scenario of SCENARIOS) {
+    const r = await measure(base, scenario, port++, at)
+    results[scenario.name] = r
+    const limits = checked ? (budget.scenarios[scenario.name] ?? {}) : {}
+    const cells = COUNTERS.map(([key, label, read]) => {
+      const value = read(r)
+      const limit = limits[key]
+      const over = limit !== undefined && value > limit
+      if (over) failures.push(`${scenario.name}: ${label} ${value} > ${limit}`)
+      return `${label} ${value}${limit !== undefined ? `/${limit}` : ''}${over ? ' ✗' : ''}`
+    })
+    const minFps = checked ? budget.timing?.[scenario.name]?.minFps : undefined
+    const slow = minFps !== undefined && r.fps < minFps
+    if (timing && slow) failures.push(`${scenario.name}: ${r.fps.toFixed(1)} fps < ${minFps}`)
+    console.log(
+      `${scenario.name.padEnd(8)} ${r.fps.toFixed(1).padStart(6)} fps  p95 ${r.p95.toFixed(1)} ms  js ${r.jsMs.toFixed(1)} ms` +
+        `${minFps !== undefined ? `  (min ${minFps}${slow ? (timing ? ' ✗' : ', not enforced') : ''})` : ''}`,
+    )
+    console.log(`         ${cells.join('  ')}`)
+  }
+  return results
 }
+
+const results = await measureAll(dpr)
+const matrix = { [dpr]: results }
+if (update) for (const at of UPDATE_DPRS.filter((d) => d !== dpr)) matrix[at] = await measureAll(at)
 
 served?.server.close()
 const out = option('json')
 if (out) writeFileSync(out, `${JSON.stringify({ scale, results }, null, 2)}\n`)
+if (update) {
+  const gpu = results.spawn.gpu ?? 'unknown'
+  if (/swiftshader|llvmpipe|software/i.test(gpu)) {
+    console.error(`✗ not saved: Chrome fell back to software rendering (${gpu})`)
+    process.exit(1)
+  }
+  const file = saveMachine(gpu, results.spawn.browser, matrix)
+  console.log(`\nsaved ${file.slice(root.length + 1)}`)
+}
 if (failures.length) {
   console.error(`\n✗ over budget (scripts/perf-budget.json):\n  ${failures.join('\n  ')}`)
   process.exit(1)
 }
 console.log('\n✓ within budget')
 process.exit(0)
+
+// What describes this machine's results without identifying anyone: no hostname, user or paths.
+function saveMachine(gpu, browser, matrix) {
+  const git = (...a) =>
+    execFileSync('git', a, {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
+  const tag = (() => {
+    try {
+      return git('describe', '--tags', '--exact-match')
+    } catch {
+      return null
+    }
+  })()
+  const os = osName()
+  const cpu = cpus()[0]?.model.trim() ?? 'unknown'
+  const measured = new Date().toLocaleDateString('sv')
+  const data = {
+    measured,
+    // The release this build is, or the last one before it when measured between releases.
+    release: tag ?? git('describe', '--tags', '--abbrev=0'),
+    released: tag !== null,
+    commit: git('rev-parse', '--short', 'HEAD'),
+    machine: {
+      os,
+      arch: process.arch,
+      cpu,
+      cores: cpus().length,
+      memoryGB: Math.round(totalmem() / 2 ** 30),
+      gpu,
+    },
+    browser: browser?.replace('HeadlessChrome', 'Chrome') ?? 'unknown',
+    window: { width: WIDTH, height: HEIGHT },
+    runs: Object.entries(matrix)
+      .map(([at, res]) => ({
+        dpr: Number(at),
+        fps: Object.fromEntries(
+          Object.entries(res).map(([name, r]) => [name, Math.round(r.fps * 10) / 10]),
+        ),
+        p95: Object.fromEntries(
+          Object.entries(res).map(([name, r]) => [name, Math.round(r.p95 * 10) / 10]),
+        ),
+      }))
+      .sort((a, b) => a.dpr - b.dpr),
+  }
+  const slug = `${measured}-${os}-${cpu}`
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, '-')
+    .replace(/^-|-$/g, '')
+  const file = join(root, 'apps/docs/src/data/perf', `${slug}.json`)
+  mkdirSync(dirname(file), { recursive: true })
+  writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`)
+  return file
+}
+
+function osName() {
+  if (process.platform === 'darwin')
+    return `macOS ${execFileSync('sw_vers', ['-productVersion'], { encoding: 'utf8' }).trim()}`
+  if (process.platform === 'win32') return `Windows ${release()}`
+  try {
+    const pretty = readFileSync('/etc/os-release', 'utf8').match(/^PRETTY_NAME="?([^"\n]+)/m)
+    if (pretty) return pretty[1]
+  } catch {}
+  return `${process.platform} ${release()}`
+}

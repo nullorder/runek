@@ -4,6 +4,7 @@ import { marked } from 'marked'
 import changelogRaw from '../../../../CHANGELOG.md?raw'
 import core from '../../../../packages/core/package.json'
 import LibraryWorld from '../components/world/LibraryWorld.tsx'
+import { expandPerfReport } from '../lib/perf'
 import { getComponents } from '../lib/registry'
 import '../styles/global.css'
 
@@ -14,9 +15,13 @@ import '../styles/global.css'
 const all = await getCollection('docs')
 // The changelog entry is an MDX shim that imports the root CHANGELOG.md; the
 // in-world reader needs real markdown, so substitute the source file (minus its
-// own H1 — the reader already shows the title).
+// own H1 — the reader already shows the title). Performance likewise expands its results table.
 const rawBody = (d: { id: string; body?: string }) =>
-  d.id === 'changelog' ? changelogRaw.replace(/^# .*\n/, '') : (d.body ?? '')
+  d.id === 'changelog'
+    ? changelogRaw.replace(/^# .*\n/, '')
+    : d.id === 'performance'
+      ? expandPerfReport(d.body ?? '')
+      : (d.body ?? '')
 const toMeta = (d: (typeof all)[number]) => ({
   slug: d.id,
   title: d.data.title,
