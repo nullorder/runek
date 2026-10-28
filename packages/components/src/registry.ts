@@ -10,6 +10,7 @@ import { Bookshelf } from './Bookshelf'
 import { Bridge } from './Bridge'
 import { Bush } from './Bush'
 import { Campfire } from './Campfire'
+import { Cave } from './Cave'
 import { CeilingLight } from './CeilingLight'
 import { Chair } from './Chair'
 import { Chandelier } from './Chandelier'
@@ -26,8 +27,10 @@ import houseComposite from './composites/house.json'
 import roomComposite from './composites/room.json'
 import { Desk } from './Desk'
 import { DeskLamp } from './DeskLamp'
+import { Diffuser } from './Diffuser'
 import { Dock } from './Dock'
 import { Door } from './Door'
+import { DrumKit } from './DrumKit'
 import { Fence } from './Fence'
 import { Flag } from './Flag'
 import { Floor } from './Floor'
@@ -35,20 +38,26 @@ import { Flowers } from './Flowers'
 import { Fountain } from './Fountain'
 import { Fridge } from './Fridge'
 import { GameConsole } from './GameConsole'
+import { GlassWall } from './GlassWall'
 import { Grass } from './Grass'
+import { Guitar } from './Guitar'
 import { Hedge } from './Hedge'
 import { Hut } from './Hut'
 import { Interactable } from './Interactable'
+import { KitchenUnits } from './KitchenUnits'
 import { Lake } from './Lake'
 import { Lamp } from './Lamp'
 import { Level } from './Level'
+import { Lighthouse } from './Lighthouse'
 import { LightRig } from './LightRig'
 import { Monitor } from './Monitor'
+import { NeonStrip } from './NeonStrip'
 import { Ocean } from './Ocean'
 import { OfficeChair } from './OfficeChair'
 import { Palm } from './Palm'
 import { Path } from './Path'
 import { Person } from './Person'
+import { Piano } from './Piano'
 import { PictureLight } from './PictureLight'
 import { Pillar } from './Pillar'
 import { Plant } from './Plant'
@@ -100,6 +109,7 @@ export const registry: ComponentRegistry = {
   Bridge,
   Bush,
   Campfire,
+  Cave,
   CeilingLight,
   Chair,
   Chandelier,
@@ -114,8 +124,10 @@ export const registry: ComponentRegistry = {
   CurvedWall,
   Desk,
   DeskLamp,
+  Diffuser,
   Dock,
   Door,
+  DrumKit,
   Fence,
   Flag,
   Floor,
@@ -123,23 +135,29 @@ export const registry: ComponentRegistry = {
   Fountain,
   Fridge,
   GameConsole,
+  GlassWall,
   Grass,
+  Guitar,
   Hedge,
   // Composites: data-only arrangements of the parts below, expanded by the renderer.
   // (JSON imports infer wide types — number[] vs the bounds tuple — hence the two-step cast.)
   House: houseComposite as unknown as CompositeDef,
   Hut,
   Interactable,
+  KitchenUnits,
   Lake,
   Lamp,
   Level,
   LightRig,
+  Lighthouse,
   Monitor,
+  NeonStrip,
   Ocean,
   OfficeChair,
   Palm,
   Path,
   Person,
+  Piano,
   PictureLight,
   Pillar,
   Plant,

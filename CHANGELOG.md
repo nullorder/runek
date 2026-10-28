@@ -50,6 +50,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   details) for the docs site's new Performance page, which lists every
   measured machine. The landing page shows the newest one. `--gpu`
   measures on the GPU on Linux.
+- `NeonStrip`: a neon tube that glows at any hour, for cove lighting or
+  a line round a room; `light` also washes nearby walls in its colour.
+  ([#34](https://github.com/nullorder/runek/issues/34))
+- `Lighthouse`: a banded tower with a gallery and a glazed lantern whose
+  two beams sweep round after dusk (`nightOnly`).
+  ([#35](https://github.com/nullorder/runek/issues/35))
+- `Cave`: the mouth of a sea cave, a seeded vault of faceted stone to
+  set into a `Cliff` at the waterline. No collider, so a boat can go in.
+  ([#36](https://github.com/nullorder/runek/issues/36))
+- `GlassWall`: a floor-to-ceiling glass partition with an optional
+  doorway, for meeting rooms; a dark tint makes it a smoked partition.
+  ([#33](https://github.com/nullorder/runek/issues/33))
+- `KitchenUnits`: a fitted kitchen run with seeded door and drawer
+  fronts, a sink, a hob over an oven, wall units with a hood, and an
+  `overhang` to make an island. ([#31](https://github.com/nullorder/runek/issues/31))
+- Music room: `Piano` (a grand with its lid propped and a bench),
+  `DrumKit` (five pieces and cymbals, seeded finish), `Guitar` (acoustic,
+  electric or bass on a stand) and `Diffuser` (a skyline acoustic
+  diffuser cut to a quadratic-residue pattern).
+  ([#37](https://github.com/nullorder/runek/issues/37),
+  [#38](https://github.com/nullorder/runek/issues/38),
+  [#39](https://github.com/nullorder/runek/issues/39),
+  [#43](https://github.com/nullorder/runek/issues/43))
 
 ### Changed
 

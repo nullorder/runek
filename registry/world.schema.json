@@ -1234,6 +1234,84 @@
       },
       "additionalProperties": false
     },
+    "props.Cave": {
+      "description": "The mouth of a sea cave: a seeded, faceted stone vault opening toward +Z, dark inside, with boulders fallen either side. Set it into a Cliff at the waterline. No collider, so a boat can go in.",
+      "type": "object",
+      "properties": {
+        "radius": {
+          "type": "number",
+          "description": "Radius of the hollow, in units.",
+          "default": 3.5
+        },
+        "height": {
+          "type": "number",
+          "description": "Height of the vault over the origin, in units.",
+          "default": 3.2
+        },
+        "mouth": {
+          "type": "number",
+          "description": "How wide the mouth is, in radians round the vault.",
+          "default": 1.1
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Rock. Defaults to the world palette's `stone` slot, as `Cliff` does."
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "props.CeilingLight": {
       "description": "A ceiling fitting hanging from its origin: a flush dome, a pendant shade on a cord, or an aimed spot can. Can light only after dusk.",
       "type": "object",
@@ -2564,6 +2642,89 @@
       },
       "additionalProperties": false
     },
+    "props.Diffuser": {
+      "description": "A skyline acoustic diffuser: wooden blocks on a backboard, their depths from a quadratic-residue sequence, instanced. Wall-mounted, decorative.",
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "number",
+          "description": "Width, in units.",
+          "default": 1.2
+        },
+        "height": {
+          "type": "number",
+          "description": "Height, in units.",
+          "default": 1.2
+        },
+        "cells": {
+          "type": "number",
+          "description": "Blocks across; the rows follow from the height.",
+          "default": 11
+        },
+        "depth": {
+          "type": "number",
+          "description": "The deepest block, in units.",
+          "default": 0.2
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Defaults to the world palette's `wood` slot."
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Dock": {
       "description": "A plank jetty on pilings reaching out over water; walkable deck colliders, side stringers, and seaward mooring posts.",
       "type": "object",
@@ -2720,6 +2881,69 @@
             "#7a5a40"
           ],
           "description": "Defaults to the world palette's `wood` slot."
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.DrumKit": {
+      "description": "A five-piece drum kit with hi-hat, crash and ride cymbals on stands and a throne behind it; seeded shell finish. One cuboid collider round the drums.",
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The shells. Seeded from a few finishes when unset."
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
         }
       },
       "additionalProperties": false
@@ -3353,6 +3577,116 @@
       },
       "additionalProperties": false
     },
+    "props.GlassWall": {
+      "description": "A floor-to-ceiling glass partition: panes between slim mullions in a frame, with an optional doorway and a pane over it. A cuboid collider either side of the doorway.",
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "number",
+          "description": "Length along local X, in units, centred on the origin.",
+          "default": 4
+        },
+        "height": {
+          "type": "number",
+          "description": "Height, in units.",
+          "default": 3
+        },
+        "door": {
+          "$ref": "#/$defs/GlassWall.GlassWallDoor",
+          "description": "A doorway left open in it, with a pane over it to the top."
+        },
+        "pane": {
+          "type": "number",
+          "description": "Widest a pane runs before a mullion, in units.",
+          "default": 1.2
+        },
+        "glassColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Glass tint.",
+          "default": "#b7d8e8"
+        },
+        "opacity": {
+          "type": "number",
+          "description": "How much the glass hides, 0 clear to 1 opaque. Dark and high makes a smoked partition.",
+          "default": 0.22
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Frame and mullions. Defaults to the world palette's `metal` slot."
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract; this component has no seeded variation yet."
+        }
+      },
+      "additionalProperties": false
+    },
+    "GlassWall.GlassWallDoor": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "number",
+          "description": "From the middle of the wall along X."
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Grass": {
       "description": "Instanced grass blades (seeded scatter).",
       "type": "object",
@@ -3451,6 +3785,77 @@
           "type": "number",
           "description": "Wind sway strength; 0 disables the animation.",
           "default": 1
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.Guitar": {
+      "description": "An acoustic, electric or bass guitar leaning on a floor stand; the kind and finish are seeded. Decorative.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "acoustic",
+            "electric",
+            "bass"
+          ],
+          "description": "Seeded when unset."
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The body. Seeded from a few finishes for its kind when unset."
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
         },
         "seed": {
           "type": "number",
@@ -3765,6 +4170,123 @@
         "label",
         "control"
       ],
+      "additionalProperties": false
+    },
+    "props.KitchenUnits": {
+      "description": "A fitted kitchen run: seeded door and drawer fronts under one worktop, an optional sink and a hob over an oven, wall units with a hood, and an overhang for an island. One cuboid collider.",
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "number",
+          "description": "Length along local X, in units, rounded to whole units.",
+          "default": 3
+        },
+        "unitWidth": {
+          "type": "number",
+          "description": "One unit's width, in units.",
+          "default": 0.6
+        },
+        "height": {
+          "type": "number",
+          "description": "Worktop height, in units.",
+          "default": 0.9
+        },
+        "depth": {
+          "type": "number",
+          "description": "Depth along local Z, in units. The fronts face +Z.",
+          "default": 0.6
+        },
+        "sink": {
+          "type": "number",
+          "description": "Which unit, counted from the -X end, holds the sink."
+        },
+        "hob": {
+          "type": "number",
+          "description": "Which unit holds the hob, with the oven under it and the hood over it."
+        },
+        "wall": {
+          "type": "boolean",
+          "description": "Wall units over the run, with a hood over the hob.",
+          "default": false
+        },
+        "overhang": {
+          "type": "number",
+          "description": "How far the worktop reaches past the back, in units: knee room for stools along an\nisland.",
+          "default": 0
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Fronts. Seeded from a few kitchen finishes when unset."
+        },
+        "topColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The worktop.",
+          "default": "#d9d5cc"
+        },
+        "metalColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Handles, sink, tap and hood.",
+          "default": "#b9bdc1"
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
       "additionalProperties": false
     },
     "props.Lake": {
@@ -4249,6 +4771,108 @@
       },
       "additionalProperties": false
     },
+    "props.Lighthouse": {
+      "description": "A banded lighthouse with a gallery, a glazed lantern and a lamp whose two beams sweep round after dusk; the lamp lights its surroundings through the world's light pool. One cylinder collider.",
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": "number",
+          "description": "Height of the tower to the gallery, in units.",
+          "default": 12
+        },
+        "radius": {
+          "type": "number",
+          "description": "Radius at the foot, in units; it tapers to two thirds of this at the top.",
+          "default": 1.6
+        },
+        "bands": {
+          "type": "number",
+          "description": "Bands of colour up the tower.",
+          "default": 5
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "default": "#f4f1ea"
+        },
+        "bandColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "default": "#c0392b"
+        },
+        "lightColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The lamp and its beams.",
+          "default": "#fff2c4"
+        },
+        "speed": {
+          "type": "number",
+          "description": "How fast the beams sweep round, in radians a second.",
+          "default": 0.6
+        },
+        "nightOnly": {
+          "type": "boolean",
+          "description": "Shine only while the world's sun is down.",
+          "default": true
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract; this component has no seeded variation yet."
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Monitor": {
       "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry, or shows a texture the app hands it.",
       "type": "object",
@@ -4338,6 +4962,88 @@
           "type": "number",
           "description": "Seed for the deterministic variation: same seed, same result.",
           "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.NeonStrip": {
+      "description": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, glowing at any hour. Decorative; light washes nearby walls in its colour through the world's light pool.",
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "number",
+          "description": "Length along local X, in units, centred on the origin.",
+          "default": 2
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The glow.",
+          "default": "#ff2fb3"
+        },
+        "thickness": {
+          "type": "number",
+          "description": "Tube diameter, in units.",
+          "default": 0.03
+        },
+        "light": {
+          "type": "boolean",
+          "description": "Cast real light as well as glowing, from the middle of the tube. Leave it off on most\nstrips: the world lends real lights to only a few emitters at a time.",
+          "default": false
+        },
+        "intensity": {
+          "type": "number",
+          "default": 3
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract; this component has no seeded variation yet."
         }
       },
       "additionalProperties": false
@@ -5424,6 +6130,79 @@
         "label",
         "control"
       ],
+      "additionalProperties": false
+    },
+    "props.Piano": {
+      "description": "A grand piano: a lacquered case on three legs, the lid propped open, eighty-eight keys, a pedal lyre and a bench a Person can sit on. One cuboid collider round the case.",
+      "type": "object",
+      "properties": {
+        "lid": {
+          "type": "number",
+          "description": "How far the lid is propped open, in radians; 0 shuts it.",
+          "default": 0.6
+        },
+        "bench": {
+          "type": "boolean",
+          "description": "A bench in front of the keys.",
+          "default": true
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The case. Black lacquer unless given.",
+          "default": "#0e0e10"
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract; this component has no seeded variation yet."
+        }
+      },
       "additionalProperties": false
     },
     "props.PictureLight": {
@@ -8984,6 +9763,7 @@
                 "Bridge",
                 "Bush",
                 "Campfire",
+                "Cave",
                 "CeilingLight",
                 "Chair",
                 "Chandelier",
@@ -8998,8 +9778,10 @@
                 "CurvedWall",
                 "Desk",
                 "DeskLamp",
+                "Diffuser",
                 "Dock",
                 "Door",
+                "DrumKit",
                 "Fence",
                 "Flag",
                 "Floor",
@@ -9007,21 +9789,27 @@
                 "Fountain",
                 "Fridge",
                 "GameConsole",
+                "GlassWall",
                 "Grass",
+                "Guitar",
                 "Hedge",
                 "House",
                 "Hut",
                 "Interactable",
+                "KitchenUnits",
                 "Lake",
                 "Lamp",
                 "Level",
                 "LightRig",
+                "Lighthouse",
                 "Monitor",
+                "NeonStrip",
                 "Ocean",
                 "OfficeChair",
                 "Palm",
                 "Path",
                 "Person",
+                "Piano",
                 "PictureLight",
                 "Pillar",
                 "Plant",
@@ -9303,6 +10091,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "Cave"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Cave"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "CeilingLight"
               }
             },
@@ -9569,6 +10376,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "Diffuser"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Diffuser"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Dock"
               }
             },
@@ -9599,6 +10425,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Door"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "DrumKit"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.DrumKit"
               }
             }
           }
@@ -9740,6 +10585,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "GlassWall"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.GlassWall"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Grass"
               }
             },
@@ -9751,6 +10615,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Grass"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Guitar"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Guitar"
               }
             }
           }
@@ -9835,6 +10718,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "KitchenUnits"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.KitchenUnits"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Lake"
               }
             },
@@ -9911,6 +10813,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "Lighthouse"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Lighthouse"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Monitor"
               }
             },
@@ -9922,6 +10843,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Monitor"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "NeonStrip"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.NeonStrip"
               }
             }
           }
@@ -10017,6 +10957,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Person"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Piano"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Piano"
               }
             }
           }

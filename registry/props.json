@@ -813,6 +813,66 @@
     "category": "environment",
     "description": "Stone ring, a tepee of logs, and an animated flame with a warm flickering light."
   },
+  "Cave": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A hollow in rock opening toward local +Z: a vault of faceted stone, roughened from the seed,\ndark inside, with its mouth cut from the floor up and a few boulders fallen either side. Set\nit into the foot of a `Cliff` at the waterline and the sea runs in. Decorative: no collider,\nso a boat or a swimmer can go in.",
+    "props": {
+      "radius": {
+        "type": "number",
+        "doc": "Radius of the hollow, in units.",
+        "optional": true,
+        "default": 3.5
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height of the vault over the origin, in units.",
+        "optional": true,
+        "default": 3.2
+      },
+      "mouth": {
+        "type": "number",
+        "doc": "How wide the mouth is, in radians round the vault.",
+        "optional": true,
+        "default": 1.1
+      },
+      "color": {
+        "type": "color",
+        "doc": "Rock. Defaults to the world palette's `stone` slot, as `Cliff` does.",
+        "optional": true,
+        "palette": "stone"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "cave",
+    "category": "terrain",
+    "description": "The mouth of a sea cave: a seeded, faceted stone vault opening toward +Z, dark inside, with boulders fallen either side. Set it into a Cliff at the waterline. No collider, so a boat can go in."
+  },
   "CeilingLight": {
     "kind": "component",
     "seeded": true,
@@ -1871,6 +1931,72 @@
     "category": "interiors",
     "description": "A banker's desk lamp: a brass base and stem under a cased glass shade with a pull chain, pooling light on the desk. Can light only after dusk."
   },
+  "Diffuser": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A skyline acoustic diffuser: a grid of square wooden blocks standing out from a backboard to\ndepths laid out by a quadratic-residue sequence, so a wall of them breaks up reflections\ninstead of returning them. Its origin is the middle of its back, against the wall (local\n-Z). The seed shifts where each row starts in the sequence. Decorative: no collider.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "cells": {
+        "type": "number",
+        "doc": "Blocks across; the rows follow from the height.",
+        "optional": true,
+        "default": 11
+      },
+      "depth": {
+        "type": "number",
+        "doc": "The deepest block, in units.",
+        "optional": true,
+        "default": 0.2
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `wood` slot.",
+        "optional": true,
+        "palette": "wood"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "diffuser",
+    "category": "interiors",
+    "description": "A skyline acoustic diffuser: wooden blocks on a backboard, their depths from a quadratic-residue sequence, instanced. Wall-mounted, decorative."
+  },
   "Dock": {
     "kind": "component",
     "seeded": true,
@@ -1993,6 +2119,47 @@
     "name": "door",
     "category": "structures",
     "description": "Door panel within a frame."
+  },
+  "DrumKit": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A five-piece kit facing local +Z with the throne behind it: a bass drum on its side, a\nsnare, two toms on the bass drum and a floor tom, a hi-hat, and crash and ride cymbals on\nstands, laid out for a right-handed player sitting at the throne. Seeded: the shell finish.\nOne cuboid collider round the drums; the throne has none, so a `Person` can sit on it.",
+    "props": {
+      "color": {
+        "type": "color",
+        "doc": "The shells. Seeded from a few finishes when unset.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "drum-kit",
+    "category": "interiors",
+    "description": "A five-piece drum kit with hi-hat, crash and ride cymbals on stands and a throne behind it; seeded shell finish. One cuboid collider round the drums."
   },
   "Fence": {
     "kind": "component",
@@ -2485,6 +2652,102 @@
     "category": "interiors",
     "description": "A games console (tower, slab, or cube) with up to four controllers laid out in front, to sit under a TV."
   },
+  "GlassWall": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A floor-to-ceiling glass wall for an office or a meeting room: panes between slim mullions in\na frame along local X, with a doorway left open where `door` says. The straight, indoor\nsibling of `CurvedWall`'s glass. A cuboid collider either side of the doorway.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Length along local X, in units, centred on the origin.",
+        "optional": true,
+        "default": 4
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "door": {
+        "type": "object",
+        "ref": "GlassWallDoor",
+        "doc": "A doorway left open in it, with a pane over it to the top.",
+        "optional": true
+      },
+      "pane": {
+        "type": "number",
+        "doc": "Widest a pane runs before a mullion, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "glassColor": {
+        "type": "color",
+        "doc": "Glass tint.",
+        "optional": true,
+        "default": "#b7d8e8"
+      },
+      "opacity": {
+        "type": "number",
+        "doc": "How much the glass hides, 0 clear to 1 opaque. Dark and high makes a smoked partition.",
+        "optional": true,
+        "default": 0.22
+      },
+      "color": {
+        "type": "color",
+        "doc": "Frame and mullions. Defaults to the world palette's `metal` slot.",
+        "optional": true,
+        "palette": "metal"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "defs": {
+      "GlassWallDoor": {
+        "props": {
+          "offset": {
+            "type": "number",
+            "doc": "From the middle of the wall along X.",
+            "optional": true
+          },
+          "width": {
+            "type": "number",
+            "optional": true
+          },
+          "height": {
+            "type": "number",
+            "optional": true
+          }
+        }
+      }
+    },
+    "name": "glass-wall",
+    "category": "structures",
+    "description": "A floor-to-ceiling glass partition: panes between slim mullions in a frame, with an optional doorway and a pane over it. A cuboid collider either side of the doorway."
+  },
   "Grass": {
     "kind": "component",
     "seeded": true,
@@ -2574,6 +2837,57 @@
     "name": "grass",
     "category": "environment",
     "description": "Instanced grass blades (seeded scatter)."
+  },
+  "Guitar": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A guitar leaning back on a floor stand, its front toward local +Z: an acoustic with a round\nsound hole, an electric with pickups, or a bass with its longer neck, each with a\nfretboard, a headstock and tuning pegs. Seeded: the kind and the finish. Decorative: no\ncollider.",
+    "props": {
+      "kind": {
+        "type": "enum",
+        "options": [
+          "acoustic",
+          "electric",
+          "bass"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "The body. Seeded from a few finishes for its kind when unset.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "guitar",
+    "category": "interiors",
+    "description": "An acoustic, electric or bass guitar leaning on a floor stand; the kind and finish are seeded. Decorative."
   },
   "Hedge": {
     "kind": "component",
@@ -2810,6 +3124,105 @@
     "name": "interactable",
     "category": "systems",
     "description": "Wrap anything to make it something the player can act on: walk within range and a prompt shows its actions with the keys the world binds to them; press one and onAction gets its id. Only the nearest in range takes the key, and keys yield to text fields."
+  },
+  "KitchenUnits": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A fitted kitchen run: base units on a kickboard under one worktop, lying along local X on\ntheir origin and fronted toward +Z, each a door, a pair of doors or a stack of drawers with\nbar handles. One unit can hold a sink with a tap, and one a hob over an oven. With `wall`,\nunits hang over the run and a steel hood takes their place over the hob. An `overhang` past\nthe back makes an island to sit at. Seeded: the finish and which fronts are drawers. One\ncuboid collider round the base.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Length along local X, in units, rounded to whole units.",
+        "optional": true,
+        "default": 3
+      },
+      "unitWidth": {
+        "type": "number",
+        "doc": "One unit's width, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "height": {
+        "type": "number",
+        "doc": "Worktop height, in units.",
+        "optional": true,
+        "default": 0.9
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Depth along local Z, in units. The fronts face +Z.",
+        "optional": true,
+        "default": 0.6
+      },
+      "sink": {
+        "type": "number",
+        "doc": "Which unit, counted from the -X end, holds the sink.",
+        "optional": true
+      },
+      "hob": {
+        "type": "number",
+        "doc": "Which unit holds the hob, with the oven under it and the hood over it.",
+        "optional": true
+      },
+      "wall": {
+        "type": "boolean",
+        "doc": "Wall units over the run, with a hood over the hob.",
+        "optional": true,
+        "default": false
+      },
+      "overhang": {
+        "type": "number",
+        "doc": "How far the worktop reaches past the back, in units: knee room for stools along an\nisland.",
+        "optional": true,
+        "default": 0
+      },
+      "color": {
+        "type": "color",
+        "doc": "Fronts. Seeded from a few kitchen finishes when unset.",
+        "optional": true
+      },
+      "topColor": {
+        "type": "color",
+        "doc": "The worktop.",
+        "optional": true,
+        "default": "#d9d5cc"
+      },
+      "metalColor": {
+        "type": "color",
+        "doc": "Handles, sink, tap and hood.",
+        "optional": true,
+        "default": "#b9bdc1"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "kitchen-units",
+    "category": "interiors",
+    "description": "A fitted kitchen run: seeded door and drawer fronts under one worktop, an optional sink and a hob over an oven, wall units with a hood, and an overhang for an island. One cuboid collider."
   },
   "Lake": {
     "kind": "component",
@@ -3213,6 +3626,87 @@
     "category": "systems",
     "description": "Sun + hemisphere/ground fill with shadow configuration."
   },
+  "Lighthouse": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A lighthouse standing on its origin: a tapered tower in bands, with a door and a few small\nwindows, a gallery with a rail, a glazed lantern under a cap, and a lamp whose two beams\nsweep round after dusk. The beams are glowing cones rather than lights; the lamp itself\nlights its surroundings. One cylinder collider round the tower.",
+    "props": {
+      "height": {
+        "type": "number",
+        "doc": "Height of the tower to the gallery, in units.",
+        "optional": true,
+        "default": 12
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Radius at the foot, in units; it tapers to two thirds of this at the top.",
+        "optional": true,
+        "default": 1.6
+      },
+      "bands": {
+        "type": "number",
+        "doc": "Bands of colour up the tower.",
+        "optional": true,
+        "default": 5
+      },
+      "color": {
+        "type": "color",
+        "optional": true,
+        "default": "#f4f1ea"
+      },
+      "bandColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#c0392b"
+      },
+      "lightColor": {
+        "type": "color",
+        "doc": "The lamp and its beams.",
+        "optional": true,
+        "default": "#fff2c4"
+      },
+      "speed": {
+        "type": "number",
+        "doc": "How fast the beams sweep round, in radians a second.",
+        "optional": true,
+        "default": 0.6
+      },
+      "nightOnly": {
+        "type": "boolean",
+        "doc": "Shine only while the world's sun is down.",
+        "optional": true,
+        "default": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "lighthouse",
+    "category": "structures",
+    "description": "A banded lighthouse with a gallery, a glazed lantern and a lamp whose two beams sweep round after dusk; the lamp lights its surroundings through the world's light pool. One cylinder collider."
+  },
   "Monitor": {
     "kind": "component",
     "seeded": true,
@@ -3292,6 +3786,70 @@
     "name": "monitor",
     "category": "interiors",
     "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry, or shows a texture the app hands it."
+  },
+  "NeonStrip": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, unlit by\nthe scene so it reads as light at any hour, for cove lighting, a desk's edge or a line round\na room. `light` also washes nearby walls in its colour. Decorative: no collider.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Length along local X, in units, centred on the origin.",
+        "optional": true,
+        "default": 2
+      },
+      "color": {
+        "type": "color",
+        "doc": "The glow.",
+        "optional": true,
+        "default": "#ff2fb3"
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Tube diameter, in units.",
+        "optional": true,
+        "default": 0.03
+      },
+      "light": {
+        "type": "boolean",
+        "doc": "Cast real light as well as glowing, from the middle of the tube. Leave it off on most\nstrips: the world lends real lights to only a few emitters at a time.",
+        "optional": true,
+        "default": false
+      },
+      "intensity": {
+        "type": "number",
+        "optional": true,
+        "default": 3
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "neon-strip",
+    "category": "interiors",
+    "description": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, glowing at any hour. Decorative; light washes nearby walls in its colour through the world's light pool."
   },
   "Ocean": {
     "kind": "component",
@@ -4293,6 +4851,59 @@
     "name": "person",
     "category": "character",
     "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Place one at a spawn point, or use it as the Player's third-person body."
+  },
+  "Piano": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A grand piano standing on its origin with the keyboard toward local +Z: a lacquered case on\nthree legs, the lid propped open on the bass side's hinge, a music desk, eighty-eight keys\nand a pedal lyre, and a bench in front where a player sits facing -Z. One cuboid collider\nround the case; the bench has none, so a `Person` can sit on it.",
+    "props": {
+      "lid": {
+        "type": "number",
+        "doc": "How far the lid is propped open, in radians; 0 shuts it.",
+        "optional": true,
+        "default": 0.6
+      },
+      "bench": {
+        "type": "boolean",
+        "doc": "A bench in front of the keys.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "The case. Black lacquer unless given.",
+        "optional": true,
+        "default": "#0e0e10"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "piano",
+    "category": "interiors",
+    "description": "A grand piano: a lacquered case on three legs, the lid propped open, eighty-eight keys, a pedal lyre and a bench a Person can sit on. One cuboid collider round the case."
   },
   "PictureLight": {
     "kind": "component",

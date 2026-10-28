@@ -1,0 +1,18 @@
+{
+  "name": "diffuser",
+  "title": "Diffuser",
+  "type": "registry:component",
+  "description": "A skyline acoustic diffuser: wooden blocks on a backboard, their depths from a quadratic-residue sequence, instanced. Wall-mounted, decorative.",
+  "dependencies": [
+    "@runek/core@^0.16.0",
+    "three@^0.184.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "Diffuser.tsx",
+      "content": "import { rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'\nimport { useLayoutEffect, useMemo, useRef } from 'react'\nimport { type InstancedMesh, Object3D } from 'three'\n\nexport interface DiffuserProps extends WorldComponentProps {\n  width?: number\n  height?: number\n  /** Blocks across; the rows follow from the height. */\n  cells?: number\n  /** The deepest block, in units. */\n  depth?: number\n  /** Defaults to the world palette's `wood` slot. */\n  color?: string\n}\n\nconst PRIME = 11\n\n/** Block depths, in steps, from a quadratic-residue sequence: n² mod p for a prime p, the\n *  pattern a QRD diffuser is cut to so it scatters sound evenly. */\nfunction residues(offset: number): number[] {\n  return Array.from({ length: PRIME }, (_, n) => ((n + offset) * (n + offset)) % PRIME)\n}\n\n/**\n * A skyline acoustic diffuser: a grid of square wooden blocks standing out from a backboard to\n * depths laid out by a quadratic-residue sequence, so a wall of them breaks up reflections\n * instead of returning them. Its origin is the middle of its back, against the wall (local\n * -Z). The seed shifts where each row starts in the sequence. Decorative: no collider.\n */\nexport function Diffuser({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  seed = 1,\n  width = 1.2,\n  height = 1.2,\n  cells = 11,\n  depth = 0.2,\n  color,\n}: DiffuserProps) {\n  const { unit, palette } = useWorld()\n  const m = useMaterials({\n    back: { color: palette.woodDark, roughness: 0.9 },\n    block: { color: color ?? palette.wood, roughness: 0.75 },\n  })\n  const W = width * unit\n  const cell = W / cells\n  const rows = Math.max(1, Math.round((height * unit) / cell))\n  const H = rows * cell\n  const back = 0.02 * unit\n  const ref = useRef<InstancedMesh>(null)\n\n  const blocks = useMemo(() => {\n    const next = rng(seed)\n    const out: { x: number; y: number; d: number }[] = []\n    for (let r = 0; r < rows; r++) {\n      const seq = residues(Math.floor(next() * PRIME) + r)\n      for (let c = 0; c < cells; c++) {\n        out.push({\n          x: -W / 2 + cell * (c + 0.5),\n          y: -H / 2 + cell * (r + 0.5),\n          d: ((seq[c % PRIME] + 1) / PRIME) * depth * unit,\n        })\n      }\n    }\n    return out\n  }, [seed, rows, cells, cell, W, H, depth, unit])\n\n  useLayoutEffect(() => {\n    const mesh = ref.current\n    if (!mesh) return\n    const dummy = new Object3D()\n    blocks.forEach((b, i) => {\n      dummy.position.set(b.x, b.y, back + b.d / 2)\n      dummy.scale.set(cell * 0.94, cell * 0.94, b.d)\n      dummy.updateMatrix()\n      mesh.setMatrixAt(i, dummy.matrix)\n    })\n    mesh.instanceMatrix.needsUpdate = true\n  }, [blocks, cell, back])\n\n  return (\n    <group position={position} rotation={rotation}>\n      <mesh material={m.back} receiveShadow position={[0, 0, back / 2]}>\n        <boxGeometry args={[W, H, back]} />\n      </mesh>\n      <instancedMesh\n        key={blocks.length}\n        ref={ref}\n        args={[undefined, undefined, blocks.length]}\n        material={m.block}\n        castShadow\n        receiveShadow\n      >\n        <boxGeometry args={[1, 1, 1]} />\n      </instancedMesh>\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}
