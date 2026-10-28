@@ -6157,6 +6157,144 @@
     "category": "interiors",
     "description": "Wall shelf with planks."
   },
+  "Ship": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A big three-masted sailing ship you can board and walk through. A plank runs up from the dock\nto the waist; hatches drop to the gun deck (a cannon at every port, hammocks slung forward, a\nmess table) and on down to the cargo hold. Stairs climb to the quarterdeck (the wheel) and\nthe forecastle (the bell, the bowsprit), and doors at each break open into the captain's\ncabin under the stern windows and the crew quarters in the bow. Lanterns light the decks\nbelow. The hull is lofted from one shape that the decks, the colliders and the deck surface\nall share; the seed varies the planking, the sails, the open gunport lids and the cargo.\nMoored and steady: the origin is the waterline at midships, the bow at +Z.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Hull length from stern to stem, in units (30 to 60). Deck heights, stairs and doors keep\nhuman scale; the length spreads the layout.",
+        "optional": true,
+        "default": 36
+      },
+      "beam": {
+        "type": "number",
+        "doc": "Hull breadth at its widest, in units (8 to 16).",
+        "optional": true,
+        "default": 10
+      },
+      "masts": {
+        "type": "number",
+        "doc": "3 for fore, main and mizzen; 2 drops the mizzen; 1 keeps only the main.",
+        "optional": true,
+        "default": 3
+      },
+      "sails": {
+        "type": "enum",
+        "options": [
+          "none",
+          "set",
+          "furled"
+        ],
+        "doc": "Sails set and drawing, furled on their yards, or bare spars.",
+        "optional": true,
+        "default": "set"
+      },
+      "guns": {
+        "type": "number",
+        "doc": "Cannons a side on the gun deck (0 for none); the waist carries a few more.",
+        "optional": true,
+        "default": 8
+      },
+      "gangway": {
+        "type": "enum",
+        "options": [
+          "none",
+          "starboard",
+          "port"
+        ],
+        "doc": "Which side the boarding plank runs out from, or none.",
+        "optional": true,
+        "default": "starboard"
+      },
+      "gangwayDrop": {
+        "type": "number",
+        "doc": "How far below the main deck the plank's shore end sits, in units: a dock deck's height\nunder the main deck (which stands 4.8 above the waterline).",
+        "optional": true,
+        "default": 3.8
+      },
+      "furnish": {
+        "type": "boolean",
+        "doc": "Fit out the cabin, crew quarters, mess and hold with furniture and cargo.",
+        "optional": true,
+        "default": true
+      },
+      "lanterns": {
+        "type": "boolean",
+        "doc": "Hang lit lanterns below decks and on the stern.",
+        "optional": true,
+        "default": true
+      },
+      "flag": {
+        "type": "boolean",
+        "doc": "Fly a flag from the main truck.",
+        "optional": true,
+        "default": true
+      },
+      "collider": {
+        "type": "boolean",
+        "doc": "The hull, decks and fittings are solid (board it and walk the decks). Off, they are a bare\nvisual; the stairs and furniture it is fitted out with keep their own colliders.",
+        "optional": true,
+        "default": true
+      },
+      "hullColor": {
+        "type": "color",
+        "doc": "Topsides colour; defaults to the world palette's `woodDark`.",
+        "optional": true
+      },
+      "bandColor": {
+        "type": "color",
+        "doc": "The painted band along the gunports.",
+        "optional": true,
+        "default": "#a8742c"
+      },
+      "deckColor": {
+        "type": "color",
+        "doc": "Deck planking; defaults to the palette's `floor`.",
+        "optional": true
+      },
+      "sailColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#e9e0c8"
+      },
+      "flagColor": {
+        "type": "color",
+        "optional": true,
+        "default": "#1b1b1b"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "ship",
+    "category": "water",
+    "description": "A big three-masted sailing ship you can board and walk through: a plank up from the dock, the waist, the quarterdeck with its wheel, the forecastle with its bell and bowsprit, a gun deck with a cannon at every port and hammocks slung forward, a cargo hold, and the captain's cabin under the stern windows. Lanterns light the decks below. Seeded planking, sails, gunport lids and cargo; moored and steady."
+  },
   "Shore": {
     "kind": "component",
     "seeded": false,

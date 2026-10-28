@@ -535,6 +535,28 @@
       ]
     },
     {
+      "name": "ship",
+      "title": "Ship",
+      "type": "registry:component",
+      "category": "water",
+      "description": "A big three-masted sailing ship you can board and walk through: a plank up from the dock, the waist, the quarterdeck with its wheel, the forecastle with its bell and bowsprit, a gun deck with a cannon at every port and hammocks slung forward, a cargo hold, and the captain's cabin under the stern windows. Lanterns light the decks below. Seeded planking, sails, gunport lids and cargo; moored and steady.",
+      "example": { "sails": "set", "guns": 8, "gangway": "starboard" },
+      "files": [
+        {
+          "path": "packages/components/src/Ship.tsx",
+          "target": "Ship.tsx"
+        },
+        {
+          "path": "packages/components/src/ship",
+          "target": "ship"
+        },
+        {
+          "path": "packages/components/src/surfaces/ship.ts",
+          "target": "surfaces/ship.ts"
+        }
+      ]
+    },
+    {
       "name": "rocks",
       "title": "Rocks",
       "type": "registry:component",

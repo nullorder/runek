@@ -50,6 +50,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   details) for the docs site's new Performance page, which lists every
   measured machine. The landing page shows the newest one. `--gpu`
   measures on the GPU on Linux.
+- `Ship`: a big three-masted sailing ship you can board and walk
+  through. A plank runs up from a dock to the waist; hatches drop to a
+  gun deck (a cannon at every port, hammocks slung forward, a mess table)
+  and on to the cargo hold; stairs climb to the quarterdeck and its wheel
+  and the forecastle and its bell; doors open into the captain's cabin
+  under the stern windows and the crew quarters in the bow. Lanterns
+  light the decks below. `length`, `beam`, `masts`, `sails` (`set`,
+  `furled`, `none`), `guns`, `gangway` and colours; the seed varies the
+  planking, sails, gunport lids and cargo. Publishes its decks as a
+  surface, so `anchor: "surface"` nodes stand on deck. Furnished from
+  the catalog's `Barrel`, `Crate`, `Table`, `Chair`, `Bed`, `Staircase`
+  and `Flag`.
 - `NeonStrip`: a neon tube that glows at any hour, for cove lighting or
   a line round a room; `light` also washes nearby walls in its colour.
   ([#34](https://github.com/nullorder/runek/issues/34))
