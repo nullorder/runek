@@ -74,6 +74,7 @@ import { Rug } from './Rug'
 import { Sailboat } from './Sailboat'
 import { Screen } from './Screen'
 import { Shelf } from './Shelf'
+import { Ship } from './Ship'
 import { Shore } from './Shore'
 import { Sign } from './Sign'
 import { Signpost } from './Signpost'
@@ -175,6 +176,7 @@ export const registry: ComponentRegistry = {
   Sailboat,
   Screen,
   Shelf,
+  Ship,
   Shore,
   Sign,
   Signpost,

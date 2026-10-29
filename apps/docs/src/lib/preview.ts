@@ -60,6 +60,7 @@ export const SEEDED = new Set([
   'DrumKit',
   'Guitar',
   'KitchenUnits',
+  'Ship',
 ])
 
 export const PREVIEW: Record<string, PreviewConfig> = {
@@ -160,6 +161,7 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     props: { position: [0, 1, 0], length: 1.6, light: true },
   },
   Lighthouse: { camera: [12, 9, 16], target: [0, 6.5, 0], props: { nightOnly: false } },
+  Ship: { camera: [44, 20, 36], target: [0, 9, 0], props: { furnish: false, lanterns: false } },
   Cave: { camera: [5, 3.5, 7.5], target: [0, 1.4, 0] },
   GlassWall: { camera: [3.4, 2.4, 4.4], target: [0, 1.3, 0], props: { door: { offset: 0.8 } } },
   KitchenUnits: {

@@ -7769,6 +7769,161 @@
       },
       "additionalProperties": false
     },
+    "props.Ship": {
+      "description": "A big three-masted sailing ship you can board and walk through: a plank up from the dock, the waist, the quarterdeck with its wheel, the forecastle with its bell and bowsprit, a gun deck with a cannon at every port and hammocks slung forward, a cargo hold, and the captain's cabin under the stern windows. Lanterns light the decks below. Seeded planking, sails, gunport lids and cargo; moored and steady.",
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "number",
+          "description": "Hull length from stern to stem, in units (30 to 60). Deck heights, stairs and doors keep\nhuman scale; the length spreads the layout.",
+          "default": 36
+        },
+        "beam": {
+          "type": "number",
+          "description": "Hull breadth at its widest, in units (8 to 16).",
+          "default": 10
+        },
+        "masts": {
+          "type": "number",
+          "description": "3 for fore, main and mizzen; 2 drops the mizzen; 1 keeps only the main.",
+          "default": 3
+        },
+        "sails": {
+          "enum": [
+            "none",
+            "set",
+            "furled"
+          ],
+          "description": "Sails set and drawing, furled on their yards, or bare spars.",
+          "default": "set"
+        },
+        "guns": {
+          "type": "number",
+          "description": "Cannons a side on the gun deck (0 for none); the waist carries a few more.",
+          "default": 8
+        },
+        "gangway": {
+          "enum": [
+            "none",
+            "starboard",
+            "port"
+          ],
+          "description": "Which side the boarding plank runs out from, or none.",
+          "default": "starboard"
+        },
+        "gangwayDrop": {
+          "type": "number",
+          "description": "How far below the main deck the plank's shore end sits, in units: a dock deck's height\nunder the main deck (which stands 4.8 above the waterline).",
+          "default": 3.8
+        },
+        "furnish": {
+          "type": "boolean",
+          "description": "Fit out the cabin, crew quarters, mess and hold with furniture and cargo.",
+          "default": true
+        },
+        "lanterns": {
+          "type": "boolean",
+          "description": "Hang lit lanterns below decks and on the stern.",
+          "default": true
+        },
+        "flag": {
+          "type": "boolean",
+          "description": "Fly a flag from the main truck.",
+          "default": true
+        },
+        "collider": {
+          "type": "boolean",
+          "description": "The hull, decks and fittings are solid (board it and walk the decks). Off, they are a bare\nvisual; the stairs and furniture it is fitted out with keep their own colliders.",
+          "default": true
+        },
+        "hullColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Topsides colour; defaults to the world palette's `woodDark`."
+        },
+        "bandColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The painted band along the gunports.",
+          "default": "#a8742c"
+        },
+        "deckColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Deck planking; defaults to the palette's `floor`."
+        },
+        "sailColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "default": "#e9e0c8"
+        },
+        "flagColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "default": "#1b1b1b"
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Shore": {
       "description": "Sloped beach/shore strip to meet a Lake.",
       "type": "object",
@@ -9827,6 +9982,7 @@
                 "Sailboat",
                 "Screen",
                 "Shelf",
+                "Ship",
                 "Shore",
                 "Sign",
                 "Signpost",
@@ -11299,6 +11455,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Shelf"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Ship"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Ship"
               }
             }
           }

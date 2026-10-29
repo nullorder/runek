@@ -41,6 +41,8 @@ const TUNE: Record<string, Record<string, unknown>> = {
   Ocean: { size: [7, 7], follow: false },
   // Bare visual — a dynamic body would roll off the pedestal.
   Sailboat: { physics: false },
+  // A model under glass: the hull and rig, without the fit-out, lights or deck colliders.
+  Ship: { furnish: false, lanterns: false, collider: false },
   // A live portal navigates on contact; in the gallery it's display-only.
   Portal: { onEnter: () => {} },
 }
