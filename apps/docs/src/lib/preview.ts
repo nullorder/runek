@@ -61,6 +61,13 @@ export const SEEDED = new Set([
   'Guitar',
   'KitchenUnits',
   'Ship',
+  'AcousticPanel',
+  'BassTrap',
+  'BeachChair',
+  'MagazineRack',
+  'Newspapers',
+  'Speaker',
+  'Umbrella',
 ])
 
 export const PREVIEW: Record<string, PreviewConfig> = {
@@ -173,4 +180,13 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   DrumKit: { camera: [1.6, 1.5, 2.4], target: [0, 0.7, 0] },
   Guitar: { camera: [0.9, 1, 1.6], target: [0, 0.6, 0] },
   Diffuser: { camera: [1, 1.4, 2.2], target: [0, 1, 0], props: { position: [0, 1, 0] } },
+  BeachChair: { camera: [2.2, 1.6, 2.6], target: [0, 0.35, 0] },
+  Umbrella: { camera: [3.6, 2.4, 4.6], target: [0, 1.3, 0], props: { tilt: 0.15 } },
+  Newspapers: { camera: [0.5, 0.6, 0.7], target: [0, 0, 0] },
+  MagazineRack: { camera: [1.3, 1.3, 1.9], target: [0, 0.6, 0] },
+  GlassRail: { camera: [2.4, 1.6, 3], target: [0, 0.6, 0] },
+  MicStand: { camera: [1.6, 1.5, 2], target: [0, 0.9, 0.2], props: { boom: true } },
+  Speaker: { camera: [1.4, 1.4, 2], target: [0, 0.6, 0] },
+  AcousticPanel: { camera: [1, 1.4, 2.2], target: [0, 1, 0], props: { position: [0, 1, 0] } },
+  BassTrap: { camera: [2.2, 1.8, 2.4], target: [0, 1, 0], props: { height: 2.4 } },
 }

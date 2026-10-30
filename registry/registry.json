@@ -1343,6 +1343,152 @@
       "example": {
         "cells": 11
       }
+    },
+    {
+      "name": "beach-chair",
+      "title": "BeachChair",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A sun lounger for a beach or pool deck: a slatted frame on four legs along local Z, a flat bed and a back raised on a hinge (recline), cushioned. Seeded cushion and teak or white frame. One cuboid collider round the bed.",
+      "files": [
+        {
+          "path": "packages/components/src/BeachChair.tsx",
+          "target": "BeachChair.tsx"
+        }
+      ],
+      "example": {
+        "recline": 0.7
+      }
+    },
+    {
+      "name": "umbrella",
+      "title": "Umbrella",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "A beach umbrella: a weighted base, a wooden pole and a canopy of alternating panels on ribs, sagging a little between them. Leans with tilt; the pole runs up through a Table. One cylinder collider round the pole.",
+      "files": [
+        {
+          "path": "packages/components/src/Umbrella.tsx",
+          "target": "Umbrella.tsx"
+        }
+      ],
+      "example": {
+        "tilt": 0.2
+      }
+    },
+    {
+      "name": "newspapers",
+      "title": "Newspapers",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "The day's papers on a table: a pile of folded newspapers with headlines, photos and columns, and magazines fanned beside it, as one instanced mesh. Seeded covers. Decorative.",
+      "files": [
+        {
+          "path": "packages/components/src/Newspapers.tsx",
+          "target": "Newspapers.tsx"
+        }
+      ],
+      "example": {
+        "papers": 2,
+        "magazines": 3
+      }
+    },
+    {
+      "name": "magazine-rack",
+      "title": "MagazineRack",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A freestanding magazine rack: side panels and a back leaning back, sloped tiers with a lip holding magazines covers out, and newspapers on the foot. Covers shared with Newspapers. One cuboid collider.",
+      "files": [
+        {
+          "path": "packages/components/src/MagazineRack.tsx",
+          "target": "MagazineRack.tsx"
+        }
+      ],
+      "example": {
+        "tiers": 3
+      }
+    },
+    {
+      "name": "glass-rail",
+      "title": "GlassRail",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A straight glass balustrade: a pane in a steel shoe with a round handrail, matching CurvedWall's glass. One cuboid collider the rail's height, so a player can't walk off an edge.",
+      "files": [
+        {
+          "path": "packages/components/src/GlassRail.tsx",
+          "target": "GlassRail.tsx"
+        }
+      ],
+      "example": {
+        "width": 3
+      }
+    },
+    {
+      "name": "mic-stand",
+      "title": "MicStand",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A vocal mic on a tripod stand, straight up at a singer's mouth or on a boom arm reaching toward +Z over a seated player. Decorative.",
+      "files": [
+        {
+          "path": "packages/components/src/MicStand.tsx",
+          "target": "MicStand.tsx"
+        }
+      ],
+      "example": {
+        "boom": true
+      }
+    },
+    {
+      "name": "speaker",
+      "title": "Speaker",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A loudspeaker facing +Z: a studio monitor on a stand, a floor PA cabinet with two woofers under a horn, or a guitar amp combo with grille cloth and knobs. Seeded kind and finish. One cuboid collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Speaker.tsx",
+          "target": "Speaker.tsx"
+        }
+      ],
+      "example": {
+        "kind": "monitor"
+      }
+    },
+    {
+      "name": "acoustic-panel",
+      "title": "AcousticPanel",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A fabric-wrapped acoustic absorber panel proud of a slim frame, wall-mounted from its back like Poster, or turned face down as a ceiling cloud. Seeded fabric. Decorative.",
+      "files": [
+        {
+          "path": "packages/components/src/AcousticPanel.tsx",
+          "target": "AcousticPanel.tsx"
+        }
+      ],
+      "example": {
+        "width": 0.6,
+        "height": 1.2
+      }
+    },
+    {
+      "name": "bass-trap",
+      "title": "BassTrap",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "A floor-to-ceiling corner bass trap: a foam column with a plinth and cap, origin on the corner with the room toward +X and +Z. Seeded foam. Decorative.",
+      "files": [
+        {
+          "path": "packages/components/src/BassTrap.tsx",
+          "target": "BassTrap.tsx"
+        }
+      ],
+      "example": {
+        "size": 0.3
+      }
     }
   ]
 }

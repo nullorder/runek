@@ -1,7 +1,10 @@
 import type { ComponentRegistry, CompositeDef } from '@runek/core'
+import { AcousticPanel } from './AcousticPanel'
 import { ArcadeCabinet } from './ArcadeCabinet'
 import { Arch } from './Arch'
 import { Barrel } from './Barrel'
+import { BassTrap } from './BassTrap'
+import { BeachChair } from './BeachChair'
 import { Bed } from './Bed'
 import { Bench } from './Bench'
 import { Birds } from './Birds'
@@ -38,6 +41,7 @@ import { Flowers } from './Flowers'
 import { Fountain } from './Fountain'
 import { Fridge } from './Fridge'
 import { GameConsole } from './GameConsole'
+import { GlassRail } from './GlassRail'
 import { GlassWall } from './GlassWall'
 import { Grass } from './Grass'
 import { Guitar } from './Guitar'
@@ -50,8 +54,11 @@ import { Lamp } from './Lamp'
 import { Level } from './Level'
 import { Lighthouse } from './Lighthouse'
 import { LightRig } from './LightRig'
+import { MagazineRack } from './MagazineRack'
+import { MicStand } from './MicStand'
 import { Monitor } from './Monitor'
 import { NeonStrip } from './NeonStrip'
+import { Newspapers } from './Newspapers'
 import { Ocean } from './Ocean'
 import { OfficeChair } from './OfficeChair'
 import { Palm } from './Palm'
@@ -81,6 +88,7 @@ import { Signpost } from './Signpost'
 import { Sky } from './Sky'
 import { Slab } from './Slab'
 import { Sofa } from './Sofa'
+import { Speaker } from './Speaker'
 import { Staircase } from './Staircase'
 import { Stool } from './Stool'
 import { Table } from './Table'
@@ -91,6 +99,7 @@ import { Terrain } from './Terrain'
 import { TikiTorch } from './TikiTorch'
 import { Trees } from './Trees'
 import { Tv } from './Tv'
+import { Umbrella } from './Umbrella'
 import { Wall } from './Wall'
 import { Well } from './Well'
 import { Whiteboard } from './Whiteboard'
@@ -99,9 +108,12 @@ import { Window } from './Window'
 
 /** The default Runek component registry: name → component, for data-driven rendering. */
 export const registry: ComponentRegistry = {
+  AcousticPanel,
   ArcadeCabinet,
   Arch,
   Barrel,
+  BassTrap,
+  BeachChair,
   Bed,
   Bench,
   Birds,
@@ -136,6 +148,7 @@ export const registry: ComponentRegistry = {
   Fountain,
   Fridge,
   GameConsole,
+  GlassRail,
   GlassWall,
   Grass,
   Guitar,
@@ -151,8 +164,11 @@ export const registry: ComponentRegistry = {
   Level,
   LightRig,
   Lighthouse,
+  MagazineRack,
+  MicStand,
   Monitor,
   NeonStrip,
+  Newspapers,
   Ocean,
   OfficeChair,
   Palm,
@@ -183,6 +199,7 @@ export const registry: ComponentRegistry = {
   Sky,
   Slab,
   Sofa,
+  Speaker,
   Staircase,
   Stool,
   Table,
@@ -193,6 +210,7 @@ export const registry: ComponentRegistry = {
   TikiTorch,
   Trees,
   Tv,
+  Umbrella,
   Wall,
   Well,
   Whiteboard,

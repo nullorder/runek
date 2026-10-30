@@ -85,6 +85,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [#38](https://github.com/nullorder/runek/issues/38),
   [#39](https://github.com/nullorder/runek/issues/39),
   [#43](https://github.com/nullorder/runek/issues/43))
+- Beach: `BeachChair` (a sun lounger with a back raised to `recline`,
+  seeded cushion and teak or white frame) and `Umbrella` (a striped
+  canopy sagging between its ribs, on a pole thin enough to run up
+  through a `Table`; `tilt` leans it).
+  ([#27](https://github.com/nullorder/runek/issues/27),
+  [#28](https://github.com/nullorder/runek/issues/28))
+- Reading: `Newspapers` (folded papers and fanned magazines to leave on
+  a table) and `MagazineRack` (sloped tiers of magazines, papers on the
+  foot). Both share seeded covers and draw every page in one go.
+  ([#29](https://github.com/nullorder/runek/issues/29),
+  [#30](https://github.com/nullorder/runek/issues/30))
+- `GlassRail`: a straight glass balustrade for galleries and mezzanines,
+  matching `CurvedWall`'s glass, that stops a player walking off the
+  edge. ([#32](https://github.com/nullorder/runek/issues/32))
+- Studio: `MicStand` (straight, or on a `boom` over a seated player),
+  `Speaker` (a studio `monitor` on a stand, a `pa` cabinet or a guitar
+  `amp`), `AcousticPanel` (wall panel or ceiling cloud) and `BassTrap`
+  (a foam column for a room's corner).
+  ([#40](https://github.com/nullorder/runek/issues/40),
+  [#41](https://github.com/nullorder/runek/issues/41),
+  [#42](https://github.com/nullorder/runek/issues/42),
+  [#44](https://github.com/nullorder/runek/issues/44))
 
 ### Changed
 

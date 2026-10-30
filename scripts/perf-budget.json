@@ -7,7 +7,7 @@
       "shadowPasses": 1,
       "lights": 10,
       "casters": 500,
-      "materials": 480,
+      "materials": 570,
       "allocs": 10
     },
     "gallery": {
@@ -16,7 +16,7 @@
       "shadowPasses": 1,
       "lights": 10,
       "casters": 500,
-      "materials": 480,
+      "materials": 570,
       "allocs": 10
     },
     "turn": {
@@ -25,7 +25,7 @@
       "shadowPasses": 1,
       "lights": 10,
       "casters": 500,
-      "materials": 480,
+      "materials": 570,
       "allocs": 10
     }
   },
