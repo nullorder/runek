@@ -1,0 +1,17 @@
+{
+  "name": "bass-trap",
+  "title": "BassTrap",
+  "type": "registry:component",
+  "description": "A floor-to-ceiling corner bass trap: a foam column with a plinth and cap, origin on the corner with the room toward +X and +Z. Seeded foam. Decorative.",
+  "dependencies": [
+    "@runek/core@^0.16.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "BassTrap.tsx",
+      "content": "import { pick, rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'\n\nexport interface BassTrapProps extends WorldComponentProps {\n  /** Floor to ceiling, in units. */\n  height?: number\n  /** How far its face runs along each wall from the corner, in units. */\n  size?: number\n  /** The foam. Seeded from muted studio colours when unset. */\n  color?: string\n}\n\n// The same muted colours as `AcousticPanel`, so a seed treats a room in one fabric.\nconst FOAMS = ['#3b4a5a', '#4a5a48', '#5e4b3c', '#6b3b3b', '#2f2f35', '#7a7268', '#3d4f63']\n\n/**\n * A floor-to-ceiling bass trap: a column of absorbent foam filling a room's corner, with a\n * dark plinth and cap. Its origin is on the corner, with the room toward local +X and +Z. It\n * is drawn as a square column turned 45° about the corner, so the three quarters inside the\n * walls never show and the visible face meets each wall `size` out from the corner. Seeded:\n * the foam. Decorative: no collider.\n */\nexport function BassTrap({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  seed = 1,\n  height = 3,\n  size = 0.3,\n  color,\n}: BassTrapProps) {\n  const { unit } = useWorld()\n  const m = useMaterials({\n    foam: { color: color ?? pick(rng(seed), FOAMS), roughness: 1 },\n    trim: { color: '#1d1d1f', roughness: 0.5 },\n  })\n  const H = height * unit\n  const side = size * Math.SQRT2 * unit\n  const trim = Math.min(0.08 * unit, H / 8)\n\n  return (\n    <group position={position} rotation={rotation}>\n      <group rotation={[0, Math.PI / 4, 0]}>\n        <mesh material={m.foam} receiveShadow position={[0, H / 2, 0]}>\n          <boxGeometry args={[side, H - trim * 2, side]} />\n        </mesh>\n        {[trim / 2, H - trim / 2].map((y) => (\n          <mesh key={y} material={m.trim} position={[0, y, 0]}>\n            <boxGeometry args={[side * 1.04, trim, side * 1.04]} />\n          </mesh>\n        ))}\n      </group>\n    </group>\n  )\n}\n\nBassTrap.groundSitting = true\n",
+      "type": "registry:component"
+    }
+  ]
+}

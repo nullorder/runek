@@ -1,4 +1,63 @@
 {
+  "AcousticPanel": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A fabric-wrapped absorber panel: a slab of foam in cloth, standing proud of a slim frame\nthat shows round its edge. Its origin is the middle of its back, against the wall (local\n-Z), like `Poster`; turned to face down, it hangs from a ceiling as a cloud. Seeded: the\nfabric. Decorative: no collider.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 1.2
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Out from the wall, in units.",
+        "optional": true,
+        "default": 0.05
+      },
+      "color": {
+        "type": "color",
+        "doc": "The fabric. Seeded from muted studio colours when unset.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "acoustic-panel",
+    "category": "interiors",
+    "description": "A fabric-wrapped acoustic absorber panel proud of a slim frame, wall-mounted from its back like Poster, or turned face down as a ceiling cloud. Seeded fabric. Decorative."
+  },
   "ArcadeCabinet": {
     "kind": "component",
     "seeded": true,
@@ -208,6 +267,129 @@
     "name": "barrel",
     "category": "interiors",
     "description": "Staved barrel bellied at the middle, banded by metal hoops; convex-hull collider."
+  },
+  "BassTrap": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A floor-to-ceiling bass trap: a column of absorbent foam filling a room's corner, with a\ndark plinth and cap. Its origin is on the corner, with the room toward local +X and +Z. It\nis drawn as a square column turned 45° about the corner, so the three quarters inside the\nwalls never show and the visible face meets each wall `size` out from the corner. Seeded:\nthe foam. Decorative: no collider.",
+    "props": {
+      "height": {
+        "type": "number",
+        "doc": "Floor to ceiling, in units.",
+        "optional": true,
+        "default": 3
+      },
+      "size": {
+        "type": "number",
+        "doc": "How far its face runs along each wall from the corner, in units.",
+        "optional": true,
+        "default": 0.3
+      },
+      "color": {
+        "type": "color",
+        "doc": "The foam. Seeded from muted studio colours when unset.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "bass-trap",
+    "category": "interiors",
+    "description": "A floor-to-ceiling corner bass trap: a foam column with a plinth and cap, origin on the corner with the room toward +X and +Z. Seeded foam. Decorative."
+  },
+  "BeachChair": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A sun lounger for a beach or a pool deck: a slatted frame on four legs lying along local Z,\na flat bed, and a back raised on a hinge at the -Z end, with a cushion over both. A\n`Person` in the `lie` pose lies along it at `height`, head toward the back (lower `recline`\nto lay the back flat). Seeded: the cushion and the frame. One cuboid collider round the bed.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Along local Z, in units.",
+        "optional": true,
+        "default": 1.9
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width, in units.",
+        "optional": true,
+        "default": 0.66
+      },
+      "height": {
+        "type": "number",
+        "doc": "To the top of the cushion on the bed, in units.",
+        "optional": true,
+        "default": 0.36
+      },
+      "recline": {
+        "type": "number",
+        "doc": "How far the back is raised from flat, in radians.",
+        "optional": true,
+        "default": 0.7
+      },
+      "color": {
+        "type": "color",
+        "doc": "The cushion. Seeded from beach colours when unset.",
+        "optional": true
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "The frame. Seeded teak or white when unset.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "beach-chair",
+    "category": "interiors",
+    "description": "A sun lounger for a beach or pool deck: a slatted frame on four legs along local Z, a flat bed and a back raised on a hinge (recline), cushioned. Seeded cushion and teak or white frame. One cuboid collider round the bed."
   },
   "Bed": {
     "kind": "component",
@@ -2652,6 +2834,65 @@
     "category": "interiors",
     "description": "A games console (tower, slab, or cube) with up to four controllers laid out in front, to sit under a TV."
   },
+  "GlassRail": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A straight glass balustrade for a gallery or a mezzanine: a pane standing in a steel shoe\nalong local X, with a round handrail along its top. Its glass matches `CurvedWall`'s, so the\ntwo run on from each other. One cuboid collider the height of the rail, so a player can't\nwalk off the edge it guards.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Length along local X, in units, centred on the origin.",
+        "optional": true,
+        "default": 2
+      },
+      "height": {
+        "type": "number",
+        "doc": "To the top of the handrail, in units.",
+        "optional": true,
+        "default": 1.05
+      },
+      "glassColor": {
+        "type": "color",
+        "doc": "Glass tint.",
+        "optional": true,
+        "default": "#b7d8e8"
+      },
+      "color": {
+        "type": "color",
+        "doc": "Shoe and handrail. Defaults to the world palette's `metal` slot.",
+        "optional": true,
+        "palette": "metal"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "glass-rail",
+    "category": "structures",
+    "description": "A straight glass balustrade: a pane in a steel shoe with a round handrail, matching CurvedWall's glass. One cuboid collider the rail's height, so a player can't walk off an edge."
+  },
   "GlassWall": {
     "kind": "component",
     "seeded": false,
@@ -3707,6 +3948,106 @@
     "category": "structures",
     "description": "A banded lighthouse with a gallery, a glazed lantern and a lamp whose two beams sweep round after dusk; the lamp lights its surroundings through the world's light pool. One cylinder collider."
   },
+  "MagazineRack": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A freestanding magazine rack for a lounge or a waiting room, facing local +Z: two side\npanels and a back leaning back, sloped tiers with a lip, each holding magazines leaning\nback with their covers out, and folded newspapers lying on the foot. It shares its covers\nwith `Newspapers`. Seeded: the covers and how many on each tier. One cuboid collider.",
+    "props": {
+      "width": {
+        "type": "number",
+        "doc": "Across, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "tiers": {
+        "type": "number",
+        "doc": "Sloped tiers of magazines, 1 to 4.",
+        "optional": true,
+        "default": 3
+      },
+      "color": {
+        "type": "color",
+        "doc": "Defaults to the world palette's `woodDark` slot.",
+        "optional": true,
+        "palette": "woodDark"
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "magazine-rack",
+    "category": "interiors",
+    "description": "A freestanding magazine rack: side panels and a back leaning back, sloped tiers with a lip holding magazines covers out, and newspapers on the foot. Covers shared with Newspapers. One cuboid collider."
+  },
+  "MicStand": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A vocal microphone on a tripod stand: three splayed legs, a pole, and a mic with a round\ngrille, held straight up and tipped toward local +Z, or on a `boom` arm with a counterweight\nthat reaches out over a seated player. Decorative: no collider.",
+    "props": {
+      "height": {
+        "type": "number",
+        "doc": "To the middle of the mic's grille, in units. Defaults to 1.6, a standing singer's mouth,\nor 1.25 on a boom, a seated player's.",
+        "optional": true
+      },
+      "boom": {
+        "type": "boolean",
+        "doc": "Hold the mic on a boom arm reaching toward local +Z, instead of straight up.",
+        "optional": true,
+        "default": false
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
+        "optional": true
+      }
+    },
+    "name": "mic-stand",
+    "category": "interiors",
+    "description": "A vocal mic on a tripod stand, straight up at a singer's mouth or on a boom arm reaching toward +Z over a seated player. Decorative."
+  },
   "Monitor": {
     "kind": "component",
     "seeded": true,
@@ -3850,6 +4191,54 @@
     "name": "neon-strip",
     "category": "interiors",
     "description": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, glowing at any hour. Decorative; light washes nearby walls in its colour through the world's light pool."
+  },
+  "Newspapers": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "The day's papers and a few magazines left on a coffee table or a counter: a pile of folded\nnewspapers, each with a headline bar, a photo and columns, and magazines fanned out beside\nit. Its origin is on the top it lies on. Seeded: the covers and how squarely each one lies.\nDrawn as one instanced mesh. Decorative: no collider.",
+    "props": {
+      "papers": {
+        "type": "number",
+        "doc": "Folded newspapers in the pile, 0 to 4.",
+        "optional": true,
+        "default": 2
+      },
+      "magazines": {
+        "type": "number",
+        "doc": "Magazines fanned beside it, 0 to 4.",
+        "optional": true,
+        "default": 2
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "newspapers",
+    "category": "interiors",
+    "description": "The day's papers on a table: a pile of folded newspapers with headlines, photos and columns, and magazines fanned beside it, as one instanced mesh. Seeded covers. Decorative."
   },
   "Ocean": {
     "kind": "component",
@@ -6764,6 +7153,57 @@
     "category": "interiors",
     "description": "A sofa seating one to four: upholstered frame, seat and back cushions in soft shades of the fabric, square, rolled, or slim arms, pegs or a plinth, and throw pillows. Seeded, each choice pinnable."
   },
+  "Speaker": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A loudspeaker facing local +Z, in three kinds: a studio `monitor` at ear height on a stand,\na woofer under a dome tweeter; a floor `pa` cabinet with two woofers under a horn and steel\ncorners; or a guitar `amp` combo with grille cloth, a strip of knobs and a handle. Seeded:\nthe kind and the finish. One cuboid collider round it.",
+    "props": {
+      "kind": {
+        "type": "enum",
+        "options": [
+          "monitor",
+          "pa",
+          "amp"
+        ],
+        "doc": "Seeded when unset.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "The cabinet. Seeded from a few finishes for its kind when unset.",
+        "optional": true
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "speaker",
+    "category": "interiors",
+    "description": "A loudspeaker facing +Z: a studio monitor on a stand, a floor PA cabinet with two woofers under a horn, or a guitar amp combo with grille cloth and knobs. Seeded kind and finish. One cuboid collider."
+  },
   "Staircase": {
     "kind": "component",
     "seeded": false,
@@ -7533,6 +7973,77 @@
     "name": "tv",
     "category": "interiors",
     "description": "A flat-screen TV on a stand, a low media console, or a wall. Switched on, it shows a seeded picture (sky, sun, hills) drawn from flat shapes, or a texture the app hands it."
+  },
+  "Umbrella": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A beach umbrella: a weighted base, a wooden pole, and a canopy of panels in alternating\ncolours stretched over ribs, sagging a little between them, with a finial on top. `tilt`\nleans the pole and canopy from its foot to shade against a low sun; the pole is thin enough\nto run up through a `Table`. Seeded: the canvas colour. One cylinder collider round the pole.",
+    "props": {
+      "radius": {
+        "type": "number",
+        "doc": "Canopy radius, in units.",
+        "optional": true,
+        "default": 1.1
+      },
+      "height": {
+        "type": "number",
+        "doc": "From the ground to the canopy's rim, in units.",
+        "optional": true,
+        "default": 2.1
+      },
+      "tilt": {
+        "type": "number",
+        "doc": "Lean toward local +Z, in radians, from the foot of the pole.",
+        "optional": true,
+        "default": 0
+      },
+      "color": {
+        "type": "color",
+        "doc": "Every other panel. Seeded from beach colours when unset.",
+        "optional": true
+      },
+      "stripeColor": {
+        "type": "color",
+        "doc": "The panels between.",
+        "optional": true,
+        "default": "#f4f1ea"
+      },
+      "panels": {
+        "type": "number",
+        "doc": "Canopy panels, rounded to an even count so the stripes alternate all the way round.",
+        "optional": true,
+        "default": 8
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 1
+      }
+    },
+    "name": "umbrella",
+    "category": "environment",
+    "description": "A beach umbrella: a weighted base, a wooden pole and a canopy of alternating panels on ribs, sagging a little between them. Leans with tilt; the pole runs up through a Table. One cylinder collider round the pole."
   },
   "Wall": {
     "kind": "component",

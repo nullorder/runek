@@ -1,0 +1,18 @@
+{
+  "name": "glass-rail",
+  "title": "GlassRail",
+  "type": "registry:component",
+  "description": "A straight glass balustrade: a pane in a steel shoe with a round handrail, matching CurvedWall's glass. One cuboid collider the rail's height, so a player can't walk off an edge.",
+  "dependencies": [
+    "@react-three/rapier@^2.2.0",
+    "@runek/core@^0.16.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "GlassRail.tsx",
+      "content": "import { CuboidCollider, RigidBody } from '@react-three/rapier'\nimport { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'\n\nexport interface GlassRailProps extends WorldComponentProps {\n  /** Length along local X, in units, centred on the origin. */\n  width?: number\n  /** To the top of the handrail, in units. */\n  height?: number\n  /** Glass tint. */\n  glassColor?: string\n  /** Shoe and handrail. Defaults to the world palette's `metal` slot. */\n  color?: string\n}\n\n/**\n * A straight glass balustrade for a gallery or a mezzanine: a pane standing in a steel shoe\n * along local X, with a round handrail along its top. Its glass matches `CurvedWall`'s, so the\n * two run on from each other. One cuboid collider the height of the rail, so a player can't\n * walk off the edge it guards.\n */\nexport function GlassRail({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  width = 2,\n  height = 1.05,\n  glassColor = '#b7d8e8',\n  color,\n}: GlassRailProps) {\n  const { unit, palette } = useWorld()\n  const m = useMaterials({\n    glass: { color: glassColor, transparent: true, opacity: 0.28, roughness: 0.08 },\n    steel: { color: color ?? palette.metal, roughness: 0.6 },\n  })\n  const W = width * unit\n  const H = height * unit\n  const shoeH = 0.1 * unit\n  const shoeD = 0.06 * unit\n  const rail = 0.025 * unit\n  const paneH = H - shoeH * 0.6 - rail * 2.2\n\n  return (\n    <RigidBody type=\"fixed\" colliders={false} position={position} rotation={rotation}>\n      <CuboidCollider args={[W / 2, H / 2, 0.05 * unit]} position={[0, H / 2, 0]} />\n      <mesh material={m.steel} castShadow receiveShadow position={[0, shoeH / 2, 0]}>\n        <boxGeometry args={[W, shoeH, shoeD]} />\n      </mesh>\n      <mesh material={m.glass} position={[0, shoeH * 0.6 + paneH / 2, 0]}>\n        <boxGeometry args={[W - rail, paneH, 0.015 * unit]} />\n      </mesh>\n      <mesh material={m.steel} position={[0, H - rail * 1.6, 0]}>\n        <boxGeometry args={[W, rail * 0.6, 0.03 * unit]} />\n      </mesh>\n      <mesh\n        material={m.steel}\n        castShadow\n        position={[0, H - rail, 0]}\n        rotation={[0, 0, Math.PI / 2]}\n      >\n        <cylinderGeometry args={[rail, rail, W, 12]} />\n      </mesh>\n    </RigidBody>\n  )\n}\n\nGlassRail.groundSitting = true\n",
+      "type": "registry:component"
+    }
+  ]
+}

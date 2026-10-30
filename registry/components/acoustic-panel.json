@@ -1,0 +1,17 @@
+{
+  "name": "acoustic-panel",
+  "title": "AcousticPanel",
+  "type": "registry:component",
+  "description": "A fabric-wrapped acoustic absorber panel proud of a slim frame, wall-mounted from its back like Poster, or turned face down as a ceiling cloud. Seeded fabric. Decorative.",
+  "dependencies": [
+    "@runek/core@^0.16.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "AcousticPanel.tsx",
+      "content": "import { pick, rng, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'\n\nexport interface AcousticPanelProps extends WorldComponentProps {\n  width?: number\n  height?: number\n  /** Out from the wall, in units. */\n  depth?: number\n  /** The fabric. Seeded from muted studio colours when unset. */\n  color?: string\n}\n\nconst FABRICS = ['#3b4a5a', '#4a5a48', '#5e4b3c', '#6b3b3b', '#2f2f35', '#7a7268', '#3d4f63']\n\n/**\n * A fabric-wrapped absorber panel: a slab of foam in cloth, standing proud of a slim frame\n * that shows round its edge. Its origin is the middle of its back, against the wall (local\n * -Z), like `Poster`; turned to face down, it hangs from a ceiling as a cloud. Seeded: the\n * fabric. Decorative: no collider.\n */\nexport function AcousticPanel({\n  position = [0, 0, 0],\n  rotation = [0, 0, 0],\n  seed = 1,\n  width = 0.6,\n  height = 1.2,\n  depth = 0.05,\n  color,\n}: AcousticPanelProps) {\n  const { unit } = useWorld()\n  const m = useMaterials({\n    fabric: { color: color ?? pick(rng(seed), FABRICS), roughness: 1 },\n    frame: { color: '#1d1d1f', roughness: 0.5 },\n  })\n  const W = width * unit\n  const H = height * unit\n  const D = depth * unit\n  const f = 0.012 * unit\n\n  return (\n    <group position={position} rotation={rotation}>\n      <mesh material={m.frame} position={[0, 0, D * 0.4]}>\n        <boxGeometry args={[W, H, D * 0.8]} />\n      </mesh>\n      <mesh material={m.fabric} castShadow receiveShadow position={[0, 0, D / 2 + f / 2]}>\n        <boxGeometry args={[W - f * 2, H - f * 2, D]} />\n      </mesh>\n    </group>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ]
+}
