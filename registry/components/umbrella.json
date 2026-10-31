@@ -5,7 +5,7 @@
   "description": "A beach umbrella: a weighted base, a wooden pole and a canopy of alternating panels on ribs, sagging a little between them. Leans with tilt; the pole runs up through a Table. One cylinder collider round the pole.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

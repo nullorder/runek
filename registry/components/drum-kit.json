@@ -5,7 +5,7 @@
   "description": "A five-piece drum kit with hi-hat, crash and ride cymbals on stands and a throne behind it; seeded shell finish. One cuboid collider round the drums.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0"
+    "@runek/core@^0.17.0"
   ],
   "registryDependencies": [],
   "files": [

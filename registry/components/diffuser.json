@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A skyline acoustic diffuser: wooden blocks on a backboard, their depths from a quadratic-residue sequence, instanced. Wall-mounted, decorative.",
   "dependencies": [
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

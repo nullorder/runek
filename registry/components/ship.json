@@ -5,7 +5,7 @@
   "description": "A big three-masted sailing ship you can board and walk through: a plank up from the dock, the waist, the quarterdeck with its wheel, the forecastle with its bell and bowsprit, a gun deck with a cannon at every port and hammocks slung forward, a cargo hold, and the captain's cabin under the stern windows. Lanterns light the decks below. Seeded planking, sails, gunport lids and cargo; moored and steady.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [

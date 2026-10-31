@@ -5,7 +5,7 @@
   "description": "A grand piano: a lacquered case on three legs, the lid propped open, eighty-eight keys, a pedal lyre and a bench a Person can sit on. One cuboid collider round the case.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

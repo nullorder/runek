@@ -5,7 +5,7 @@
   "description": "A loudspeaker facing +Z: a studio monitor on a stand, a floor PA cabinet with two woofers under a horn, or a guitar amp combo with grille cloth and knobs. Seeded kind and finish. One cuboid collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

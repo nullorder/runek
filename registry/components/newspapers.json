@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "The day's papers on a table: a pile of folded newspapers with headlines, photos and columns, and magazines fanned beside it, as one instanced mesh. Seeded covers. Decorative.",
   "dependencies": [
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

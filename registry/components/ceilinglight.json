@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A ceiling fitting hanging from its origin: a flush dome, a pendant shade on a cord, or an aimed spot can. Can light only after dusk.",
   "dependencies": [
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

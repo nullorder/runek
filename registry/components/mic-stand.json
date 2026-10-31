@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A vocal mic on a tripod stand, straight up at a singer's mouth or on a boom arm reaching toward +Z over a seated player. Decorative.",
   "dependencies": [
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

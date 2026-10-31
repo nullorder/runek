@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add magazine-rack
 ```
 
-Pulls `newspapers`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.16.0`, `three@^0.184.0`.
+Pulls `newspapers`, `@react-three/rapier@^2.2.0`, `@runek/core@^0.17.0`, `three@^0.184.0`.
 
 ## Use it
 

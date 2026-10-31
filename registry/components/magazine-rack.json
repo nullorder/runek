@@ -5,7 +5,7 @@
   "description": "A freestanding magazine rack: side panels and a back leaning back, sloped tiers with a lip holding magazines covers out, and newspapers on the foot. Covers shared with Newspapers. One cuboid collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [

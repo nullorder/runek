@@ -5,7 +5,7 @@
   "description": "A floor-to-ceiling glass partition: panes between slim mullions in a frame, with an optional doorway and a pane over it. A cuboid collider either side of the doorway.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0"
+    "@runek/core@^0.17.0"
   ],
   "registryDependencies": [],
   "files": [

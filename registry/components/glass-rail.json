@@ -5,7 +5,7 @@
   "description": "A straight glass balustrade: a pane in a steel shoe with a round handrail, matching CurvedWall's glass. One cuboid collider the rail's height, so a player can't walk off an edge.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0"
+    "@runek/core@^0.17.0"
   ],
   "registryDependencies": [],
   "files": [

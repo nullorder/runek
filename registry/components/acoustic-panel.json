@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A fabric-wrapped acoustic absorber panel proud of a slim frame, wall-mounted from its back like Poster, or turned face down as a ceiling cloud. Seeded fabric. Decorative.",
   "dependencies": [
-    "@runek/core@^0.16.0"
+    "@runek/core@^0.17.0"
   ],
   "registryDependencies": [],
   "files": [

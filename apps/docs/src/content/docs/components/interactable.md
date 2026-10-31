@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add interactable
 ```
 
-Pulls `sign`, `@react-three/drei@^10.7.7`, `@runek/core@^0.16.0`, `three@^0.184.0`.
+Pulls `sign`, `@react-three/drei@^10.7.7`, `@runek/core@^0.17.0`, `three@^0.184.0`.
 
 ## Use it
 

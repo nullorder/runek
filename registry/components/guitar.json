@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "An acoustic, electric or bass guitar leaning on a floor stand; the kind and finish are seeded. Decorative.",
   "dependencies": [
-    "@runek/core@^0.16.0"
+    "@runek/core@^0.17.0"
   ],
   "registryDependencies": [],
   "files": [

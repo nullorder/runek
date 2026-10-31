@@ -5,7 +5,7 @@
   "description": "A sun lounger for a beach or pool deck: a slatted frame on four legs along local Z, a flat bed and a back raised on a hinge (recline), cushioned. Seeded cushion and teak or white frame. One cuboid collider round the bed.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0"
+    "@runek/core@^0.17.0"
   ],
   "registryDependencies": [],
   "files": [

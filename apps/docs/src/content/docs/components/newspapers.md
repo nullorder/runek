@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add newspapers
 ```
 
-Pulls `@runek/core@^0.16.0`, `three@^0.184.0`.
+Pulls `@runek/core@^0.17.0`, `three@^0.184.0`.
 
 ## Use it
 

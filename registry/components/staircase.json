@@ -5,7 +5,7 @@
   "description": "Stepped staircase with per-step colliders: solid (a built-in stair on a floor) or floating (thin treads on sloped stringers, open underneath, to span a void).",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0"
+    "@runek/core@^0.17.0"
   ],
   "registryDependencies": [],
   "files": [

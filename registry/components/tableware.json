@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "Tableware to set a table: a plate, bowl, glass, cup, or water jug turned from a profile, or a whole place setting. Drinks fill to a line; plates and bowls stack.",
   "dependencies": [
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

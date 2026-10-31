@@ -5,7 +5,7 @@
   "description": "A fitted kitchen run: seeded door and drawer fronts under one worktop, an optional sink and a hob over an oven, wall units with a hood, and an overhang for an island. One cuboid collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.16.0",
+    "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],
