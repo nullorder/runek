@@ -41,6 +41,8 @@ import { Player } from './runek/Player'
 | `shadowRate` | `number` | `30` | How many times a second shadow maps are redrawn. `Infinity` redraws every frame. |
 | `batching` | `boolean \| { cell }` | `true` | Merge static parts that share a material into one mesh per material per 20 m cell (or `cell` m). Moving parts and anything inside `<Dynamic>` stay as they are. |
 | `dpr` | `number \| [min, max]` | `[1, 1.5]` | Pixel ratio to render at. A range follows the screen's own up to `max` and steps toward `min` while frames run slow. |
+| `now` | `() => number` | `Date.now` | The world's wall clock, in epoch milliseconds. Walking figures, trips, live day/night and `Clock` read it; pass a server-synced clock so every player sees the same world. |
+| `renderer` | R3F `gl` | WebGL | The renderer to draw with: parameters, an instance, or a (sync or async) factory. See [Embedding a world](/docs/embedding-a-world#your-own-renderer). |
 | `debug` | `boolean` | `false` | Draw Rapier collider wireframes. |
 
 ## Controls
@@ -109,5 +111,22 @@ While a `Player` is mounted, `useWorld().player?.current` is its avatar (an `Obj
 height), so a component can react to where the player *is* rather than where the camera is.
 In third person those differ: the camera trails a few meters behind. Read it inside
 `useFrame`, and fall back to the camera when it's `null` (no `Player`, e.g. an orbit view).
+
+`useWorld().playerControl?.current` moves the avatar after it has spawned: a checkpoint, fast
+travel, a respawn, or a position the server corrected. The camera comes along, so the view
+doesn't sweep across the world, and the avatar arrives at rest unless you keep its velocity:
+
+```tsx
+const { playerControl } = useWorld()
+playerControl?.current?.teleport([0, 2, -12], { yaw: Math.PI })
+```
+
+`position` is in world coordinates, like `Player`'s own `position`, and `yaw` (radians, 0 faces
++z) turns the view. The handle is a ref, so keep `playerControl` and call it from anywhere, a
+network message handler or a button outside the canvas included. A `Rift` carries the avatar
+through the same call.
+
+`useWorld().now()` is the world's clock in epoch milliseconds (`<World now>`, or `Date.now`).
+Anything that moves or tells time by the wall clock reads it instead of `Date.now()`.
 
 Next: [the component contract](/docs/the-component-contract) — the rules every component follows.

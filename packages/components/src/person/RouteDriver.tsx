@@ -72,7 +72,7 @@ export function RouteDriver({
   blocked,
   onArrive,
 }: RouteDriverProps) {
-  const { player, walkers } = useWorld()
+  const { player, walkers, now = Date.now } = useWorld()
   const groundAt = useGround()
   const self = useMemo<Walker>(() => ({ x: 0, z: 0, radius }), [radius])
   const state = useRef({
@@ -108,7 +108,7 @@ export function RouteDriver({
     if (!node) return
     const dt = Math.min(delta, 0.1)
     const s = state.current
-    const t = Date.now() / 1000 + route.phase - s.lag
+    const t = now() / 1000 + route.phase - s.lag
     const p = route.sample(t)
 
     node.updateWorldMatrix(true, false)

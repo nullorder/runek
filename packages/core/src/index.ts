@@ -80,7 +80,9 @@ export {
 export type {
   AvatarView,
   Interactor,
+  PlayerControl,
   PlayerMotion,
+  TeleportOptions,
   Vec3,
   Walker,
   WorldComponentProps,

@@ -1,4 +1,4 @@
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import { BallCollider, type RapierRigidBody, RigidBody } from '@react-three/rapier'
 import { rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
 import { type RefObject, useEffect, useMemo, useRef } from 'react'
@@ -10,7 +10,6 @@ import {
   type Group,
   HalfFloatType,
   type Mesh,
-  type Object3D,
   PerspectiveCamera,
   Plane,
   ShaderMaterial,
@@ -230,10 +229,6 @@ interface Shared {
 // frame it last drew rather than recursing.
 let drawingView = false
 
-// ecctrl's camera rig: a pivot at the scene root holding a single follow point.
-const isCameraRig = (o: Object3D) =>
-  o.type === 'Object3D' && o.children.length === 1 && o.children[0].type === 'Object3D'
-
 /**
  * A pair of linked rifts torn in the air: ragged, breathing openings edged in iridescent light
  * and shedding glitter. Each shows the other end live and in parallax, exactly as you'd see it
@@ -257,9 +252,7 @@ export function Rift({
   active = true,
   onTravel,
 }: RiftProps) {
-  const { unit, player } = useWorld()
-  const scene = useThree((s) => s.scene)
-  const get = useThree((s) => s.get)
+  const { unit, player, playerControl } = useWorld()
   const R = radius * unit
   const there: Vec3 = destination ?? [position[0], position[1], position[2] - 8 * unit]
 
@@ -282,8 +275,8 @@ export function Rift({
     shared.uTime.value = clock.elapsedTime
   })
 
-  // Carry a body from one end to the matching spot at the other, keeping its velocity. When it
-  // is the avatar, its camera rig hops with it so the view doesn't sweep across the world.
+  // Carry a body from one end to the matching spot at the other, keeping its velocity. The avatar
+  // goes through the player's teleport, which takes its camera along.
   const travel = (
     body: RapierRigidBody,
     from: RefObject<Group | null>,
@@ -297,17 +290,15 @@ export function Rift({
       .sub(from.current.getWorldPosition(new Vector3()))
     const t = body.translation()
     const was = new Vector3(t.x, t.y, t.z)
+    const dest = was.clone().add(offset)
     landing.add(body.handle)
-    body.setTranslation(was.clone().add(offset), true)
 
     const eye = player?.current?.getWorldPosition(new Vector3())
-    if (eye && eye.distanceToSquared(was) < 4 * unit * unit) {
-      get().camera.position.add(offset)
-      for (const o of scene.children) {
-        if (isCameraRig(o) && o.position.distanceToSquared(was) < 9 * unit * unit) {
-          o.position.add(offset)
-        }
-      }
+    const control = playerControl?.current
+    if (control && eye && eye.distanceToSquared(was) < 4 * unit * unit) {
+      control.teleport([dest.x, dest.y, dest.z], { keepVelocity: true })
+    } else {
+      body.setTranslation(dest, true)
     }
     onTravel?.(arrival)
   }

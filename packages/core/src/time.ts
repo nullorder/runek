@@ -29,10 +29,11 @@ export function parseClockTime(value: string): number | null {
   return h + m / 60
 }
 
-/** Read the current fractional hours-of-day in `timezone` (or the local system
- *  clock when omitted), falling back to UTC if the zone is unusable. */
-export function clockHours(timezone?: string): number {
-  const now = new Date()
+/** Read the fractional hours-of-day in `timezone` (or the local system zone when omitted) at
+ *  `at` epoch milliseconds, falling back to UTC if the zone is unusable. `at` defaults to
+ *  `Date.now()`; pass the world's clock (`useWorld().now()`) so every viewer agrees. */
+export function clockHours(timezone?: string, at: number = Date.now()): number {
+  const now = new Date(at)
   if (timezone) {
     try {
       const parts = new Intl.DateTimeFormat('en-GB', {
@@ -61,18 +62,21 @@ export function clockHours(timezone?: string): number {
  * valid pinned `time` wins (deterministic); else a live clock in `timezone`; else
  * the local system clock; else UTC. A malformed `time` is ignored, not fatal.
  */
-export function resolveWorldTime(opts: { time?: string; timezone?: string }): WorldTime {
+export function resolveWorldTime(
+  opts: { time?: string; timezone?: string },
+  at: number = Date.now(),
+): WorldTime {
   if (opts.time !== undefined) {
     const hours = parseClockTime(opts.time)
     if (hours !== null) return { hours, live: false, timezone: opts.timezone }
   }
-  return { hours: clockHours(opts.timezone), live: true, timezone: opts.timezone }
+  return { hours: clockHours(opts.timezone, at), live: true, timezone: opts.timezone }
 }
 
-/** The fractional hours for a `WorldTime` right now: constant when pinned, the
- *  live clock when not. Components call this each frame for a live world. */
-export function currentHours(time: WorldTime): number {
-  return time.live ? clockHours(time.timezone) : time.hours
+/** The fractional hours for a `WorldTime` at `at` epoch milliseconds (default now): constant
+ *  when pinned, the live clock when not. Components call this each frame for a live world. */
+export function currentHours(time: WorldTime, at: number = Date.now()): number {
+  return time.live ? clockHours(time.timezone, at) : time.hours
 }
 
 /** Where the sun sits for a given time-of-day, shared by `Sky` and `LightRig` so

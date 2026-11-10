@@ -106,7 +106,55 @@ Before `departAt` the figure waits at the first point; after the last it stays p
 
 `onArrive` fires once per trip, on the first frame the trip is over. That includes a trip that ended while the world was paused or not mounted at all, so the arrival is always reported; dedupe by `departAt` if your app remounts the world.
 
-Pathfinding stays in your app: compute the waypoints (a small graph through your doorways is plenty) and hand them over. If a new trip starts before the last one ended, `tripAt(waypoints, departAt, Date.now())` gives where the figure had got to, in the same node-local frame, as the start of the next.
+Pathfinding stays in your app: compute the waypoints (a small graph through your doorways is plenty) and hand them over. If a new trip starts before the last one ended, `tripAt(waypoints, departAt, now())` (with `now` from `useWorld()`, or `Date.now` in app code that runs on the system clock) gives where the figure had got to, in the same node-local frame, as the start of the next.
+
+## Several players, one world
+
+Routes, trips and a live time of day are functions of the wall clock, so two windows on one machine always agree. Players on different machines agree only as far as their system clocks do, and those can be seconds apart. Give the world the clock your server keeps, estimated the usual way from round trips, and every figure, trip and sunset lines up for everyone:
+
+```tsx
+const offset = useServerClockOffset() // your app's estimate, in ms
+const now = useCallback(() => Date.now() + offset, [offset])
+
+<World now={now}>{/* … */}</World>
+```
+
+`departAt` is then a time on that clock too. `now` isn't part of the world file: it's a fact about where the world runs, like `paused`.
+
+When the server rejects a move (too fast, through a wall) or respawns the player, put the avatar where it says with the teleport handle. It moves the camera along with the body, so the correction doesn't show as a sweep:
+
+```tsx
+const { playerControl } = useWorld()
+socket.on('correct', ({ x, y, z }) => playerControl?.current?.teleport([x, y, z]))
+```
+
+`Player` takes the body's size and speeds as props (`height`, `radius`, `eyeHeight`, `speed`, `sprintSpeed`, and `cameraDistance` for third person), so an avatar can match the scale of your world and of the `Person` figures in it:
+
+```tsx
+<Player height={1.75} eyeHeight={1.62} speed={4} sprintSpeed={6.5}>
+  <Person physics={false} height={1.75} position={[0, -0.875, 0]} />
+</Player>
+```
+
+## Your own renderer
+
+`<World>` draws with a `WebGLRenderer` unless you pass `renderer`: renderer parameters, an instance, or a function (sync or async) that gets the default parameters and returns a renderer. It goes to R3F's `Canvas` as `gl`, so three's `WebGPURenderer` runs a world like this:
+
+```tsx
+import { WebGPURenderer } from 'three/webgpu'
+
+<World
+  renderer={async (props) => {
+    const renderer = new WebGPURenderer(props)
+    await renderer.init()
+    return renderer
+  }}
+>
+  {/* … */}
+</World>
+```
+
+`shadowRate` keeps its meaning under both renderers. Under WebGPU, components that build their materials from `useMaterial` looks render as they do under WebGL; those that write their own shaders (`Grass`, `Lake`, `Ocean`, `Portal`, `Rift`, `Screen`'s static, `Person` skin, `Sky`, `Sign` text and the first-person lens) don't yet, and are tracked in [#67](https://github.com/nullorder/runek/issues/67).
 
 ## Actions near a figure
 

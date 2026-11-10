@@ -99,7 +99,7 @@ prints a link to the [workshop](/docs/the-workshop) with your world loaded: walk
 - **`anchor: "ground"`** makes `position[1]` a height above the terrain at that spot, so nothing ends up buried. Use `"surface"` to stand on the highest thing there (a dock, a floor). See [Placing things on uneven ground](/docs/placing-things-on-uneven-ground).
 - **Colors** are CSS color strings. Leave them unset to follow the world `palette`, which re-themes every component at once.
 - **Callbacks, React children, and live three.js objects** (`onEnter`, `onSelect`, a `Screen`'s `texture`, ...) can't live in JSON. The props tables mark them "code only"; use them from TSX.
-- **Editing a copied component:** static materials come from `useMaterial(look)` and are shared, so never change one in place; parts moved or reshaped after mount go inside `<Dynamic>`; light comes from `useLight(look)` with its `ref` placed where it shines, never a `<pointLight>`. See [The component contract](/docs/the-component-contract).
+- **Editing a copied component:** static materials come from `useMaterial(look)` and are shared, so never change one in place; parts moved or reshaped after mount go inside `<Dynamic>`; light comes from `useLight(look)` with its `ref` placed where it shines, never a `<pointLight>`; wall-clock motion reads `useWorld().now()`, never `Date.now()`. See [The component contract](/docs/the-component-contract).
 - Only ever use props listed in the component's props table or in `props.json`. Defaults are listed too, so leave out anything you don't need to change.
 
 ## Common mistakes

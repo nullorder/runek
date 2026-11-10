@@ -9,11 +9,11 @@ import { useWorld } from './useWorld'
  * a live clock re-renders only when the sun has moved enough to matter (about a minute).
  */
 export function useSun(): SunState {
-  const { time } = useWorld()
-  const [liveHours, setLiveHours] = useState(() => currentHours(time))
+  const { time, now = Date.now } = useWorld()
+  const [liveHours, setLiveHours] = useState(() => currentHours(time, now()))
   useFrame(() => {
     if (!time.live) return
-    const h = currentHours(time)
+    const h = currentHours(time, now())
     setLiveHours((prev) => (Math.abs(h - prev) > 0.02 ? h : prev))
   })
   const hours = time.live ? liveHours : time.hours

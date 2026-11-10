@@ -27,12 +27,15 @@ export interface ClockProps {
 }
 
 /**
- * Read hours/minutes/seconds for a timezone (or the local clock), with a UTC
- * fallback. The sub-second fraction is timezone-independent, so we add it back
+ * Read hours/minutes/seconds at `at` epoch milliseconds for a timezone (or the local zone),
+ * with a UTC fallback. The sub-second fraction is timezone-independent, so we add it back
  * for a smooth second-hand sweep.
  */
-function readTime(fmt: Intl.DateTimeFormat | null): { h: number; m: number; s: number } {
-  const now = new Date()
+function readTime(
+  fmt: Intl.DateTimeFormat | null,
+  at: number,
+): { h: number; m: number; s: number } {
+  const now = new Date(at)
   const frac = (now.getTime() % 1000) / 1000
   try {
     if (fmt) {
@@ -54,7 +57,8 @@ function readTime(fmt: Intl.DateTimeFormat | null): { h: number; m: number; s: n
 
 /**
  * A procedural analog clock — face, rim, ticks, and three hands, all from code
- * (no fonts or textures). The hands track the system clock, or a given `timezone`.
+ * (no fonts or textures). The hands track the world's clock (`<World now>`, or the system
+ * clock) in the local zone, or a given `timezone`.
  * Decorative: it registers no colliders (mount it against a wall that has one).
  */
 export function Clock({
@@ -67,7 +71,7 @@ export function Clock({
   handColor = '#e8eef5',
   accentColor,
 }: ClockProps) {
-  const { unit, palette, time } = useWorld()
+  const { unit, palette, time, now = Date.now } = useWorld()
   const accent = accentColor ?? palette.accent
   const mat = useMaterials({
     rim: { color: frameColor ?? palette.metal, metalness: 0.4, roughness: 0.6 },
@@ -107,7 +111,7 @@ export function Clock({
   const second = useRef<Group>(null)
 
   useFrame(() => {
-    const { h, m, s } = readTime(fmt)
+    const { h, m, s } = readTime(fmt, now())
     const TAU = Math.PI * 2
     // Clockwise, so negate; 12 o'clock is up (rotation 0).
     if (second.current) second.current.rotation.z = -(s / 60) * TAU
