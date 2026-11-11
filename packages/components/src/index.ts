@@ -123,6 +123,10 @@ export { Palm } from './Palm'
 export type { PathProps } from './Path'
 export { Path } from './Path'
 export type {
+  Humanoid,
+  HumanoidBone,
+  HumanoidBoneName,
+  HumanoidPose,
   PersonAccessory,
   PersonAge,
   PersonBodySpec,
@@ -147,10 +151,26 @@ export type {
   PersonStyle,
   PersonTrait,
   PersonTraitSource,
+  PoseContext,
+  PoseSource,
+  PoseSourceFactory,
   ResolvedGarment,
   ResolvedPerson,
 } from './Person'
-export { PERSON_COLORS, PERSON_SKINS, Person, resolvePerson, tripAt } from './Person'
+export {
+  applyPose,
+  createHumanoidPose,
+  HUMANOID_BONES,
+  HUMANOID_PARENT,
+  humanoidFromTPose,
+  PERSON_COLORS,
+  PERSON_SKINS,
+  Person,
+  PoseSourceContext,
+  resetHumanoidPose,
+  resolvePerson,
+  tripAt,
+} from './Person'
 export type { PianoProps } from './Piano'
 export { Piano } from './Piano'
 export type { PictureLightProps } from './PictureLight'

@@ -1,10 +1,11 @@
 import { useKeyboardControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useRapier } from '@react-three/rapier'
+import { useAfterPhysicsStep, useRapier } from '@react-three/rapier'
 import {
   type AvatarView,
   Dynamic,
   type PlayerControl,
+  type PlayerMotion,
   PlayerMotionContext,
   type TeleportOptions,
   useMaterial,
@@ -94,17 +95,68 @@ function CameraKeyLook({ pitchable }: { pitchable: boolean }) {
   return null
 }
 
-/** Publish the avatar's horizontal speed, so the body it carries walks in step. */
+// How fast the avatar must move over the ground before its body turns to face that way (m/s),
+// and how quickly it turns (per second, eased).
+const TURNS_AT = 0.3
+const BODY_TURN = 10
+
+const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a))
+
+/** Measure the avatar after every physics step, so a body posed later in the same frame strides
+ *  with this frame's distance. The heading turns toward the direction of travel and holds when
+ *  the avatar stops; `faceCamera` (first person) turns it to the camera at rest instead. */
 function MotionProbe({
   body,
   motion,
+  faceCamera,
 }: {
   body: RefObject<CustomEcctrlRigidBody | null>
-  motion: { current: { speed: number } }
+  motion: { current: PlayerMotion }
+  faceCamera: boolean
 }) {
+  const scene = useThree((s) => s.scene)
+  const pivot = useRef<Object3D | null>(null)
+  useAfterPhysicsStep((world) => {
+    const rb = body.current?.group
+    if (!rb) return
+    const m = motion.current
+    const dt = world.timestep
+    const v = rb.linvel()
+    m.speed = Math.hypot(v.x, v.z)
+    m.distance += m.speed * dt
+    m.vertical = v.y
+    // ecctrl's ground test, from its float ray.
+    m.grounded = (rb.userData as { canJump?: boolean } | undefined)?.canJump === true
+    pivot.current ??= findPivot(scene)
+    const camera = pivot.current
+    const cameraYaw = camera?.rotation.y ?? m.heading
+    const ease = 1 - Math.exp(-BODY_TURN * dt)
+    if (m.speed > TURNS_AT) m.heading += wrap(Math.atan2(v.x, v.z) - m.heading) * ease
+    else if (faceCamera) m.heading += wrap(cameraYaw - m.heading) * ease
+    m.heading = wrap(m.heading)
+    m.lookYaw = wrap(cameraYaw - m.heading)
+    m.lookPitch = -(camera?.children[0]?.rotation.x ?? 0)
+  })
+  return null
+}
+
+/** Turn the body the avatar carries to its heading. ecctrl squares the whole model to the camera
+ *  pivot every frame, so this takes the pivot's yaw back out beneath it. Mounted after
+ *  `CameraKeyLook`, so it sees the pivot after this frame's keyboard turn. */
+function BodyFacing({
+  turn,
+  motion,
+}: {
+  turn: RefObject<Group | null>
+  motion: { current: PlayerMotion }
+}) {
+  const scene = useThree((s) => s.scene)
+  const pivot = useRef<Object3D | null>(null)
   useFrame(() => {
-    const v = body.current?.group?.linvel()
-    motion.current.speed = v ? Math.hypot(v.x, v.z) : 0
+    pivot.current ??= findPivot(scene)
+    const group = turn.current
+    if (!group || !pivot.current) return
+    group.rotation.y = motion.current.heading - pivot.current.rotation.y
   })
   return null
 }
@@ -209,8 +261,10 @@ export interface PlayerProps {
   peripheralBlur?: number
   /** Custom avatar visual, replacing the default capsule. Size it to the capsule envelope
    *  (`height` tall, centered at the character origin, so feet go at y = -height / 2: -0.65 at
-   *  the default size); the Player lowers it onto the ground beneath the floating capsule. It is
-   *  hidden in first-person view. In world JSON, nest it as a child node of the Player. */
+   *  the default size); the Player lowers it onto the ground beneath the floating capsule and
+   *  turns it to face the way it travels (in first person, the camera's way when it stops). It is
+   *  hidden in first-person view. A `Person` here walks in step with the avatar and looks where
+   *  the camera looks. In world JSON, nest it as a child node of the Player. */
   children?: ReactNode
 }
 
@@ -297,8 +351,7 @@ function moveAvatar(
   const pivot = findPivot(scene)
   if (!pivot) return true
   pivot.position.add(offset)
-  // In camera-based movement ecctrl squares the visible body to the pivot every frame, so turning
-  // the pivot turns both.
+  // The camera turns with the pivot; the body takes the same heading from `Player`'s motion.
   if (yaw !== undefined) pivot.rotation.y = yaw
   // Put the camera where the follow-cam wants it, so neither the jump nor a new heading is lerped.
   pivot.updateMatrixWorld(true)
@@ -321,7 +374,7 @@ export function Player({
   peripheralBlur = 4,
   children,
 }: PlayerProps) {
-  const { avatar, player, playerControl, keyboard, controls, gravity } = useWorld()
+  const { avatar, player, playerControl, playerMotion, keyboard, controls, gravity } = useWorld()
   const scene = useThree((s) => s.scene)
   const camera = useThree((s) => s.camera)
   const wanted = view ?? avatar ?? 'first'
@@ -340,8 +393,17 @@ export function Player({
   const eyes = useRef<Object3D>(null)
   const body = useRef<CustomEcctrlRigidBody>(null)
   const [grounded, setGrounded] = useState(false)
-  const motion = useRef({ speed: 0 })
+  const motion = useRef<PlayerMotion>({
+    speed: 0,
+    distance: 0,
+    vertical: 0,
+    grounded: false,
+    heading: yaw,
+    lookYaw: 0,
+    lookPitch: 0,
+  })
   const lift = useRef<Group>(null)
+  const turn = useRef<Group>(null)
   const capsule = useMaterial({ color: '#4a90d9' })
 
   const capsuleRadius = Math.min(Math.max(radius, 0.05), height / 2)
@@ -408,6 +470,15 @@ export function Player({
     // A new view or size remounts ecctrl, and with it the anchor.
   }, [player, mount.setup])
 
+  useEffect(() => {
+    if (!playerMotion) return
+    const mine = motion.current
+    playerMotion.current = mine
+    return () => {
+      if (playerMotion.current === mine) playerMotion.current = null
+    }
+  }, [playerMotion])
+
   // A teleport asked for before the body exists (just mounted, or remounting for a new view)
   // waits for it.
   const pendingTeleport = useRef<[Vec3, TeleportOptions] | null>(null)
@@ -415,6 +486,7 @@ export function Player({
     if (!playerControl) return
     const control: PlayerControl = {
       teleport(to, options = {}) {
+        if (options.yaw !== undefined) motion.current.heading = options.yaw
         const moved = moveAvatar(body.current, scene, camera, to, options)
         pendingTeleport.current = moved ? null : [to, options]
       },
@@ -464,20 +536,23 @@ export function Player({
     >
       <Dynamic>
         <group ref={lift} visible={!firstPerson} position={[0, -FLOAT_HEIGHT, 0]}>
-          <PlayerMotionContext.Provider value={motion}>
-            {children ?? (
-              <mesh material={capsule} castShadow>
-                <capsuleGeometry args={[capsuleRadius, halfHeight * 2, 8, 16]} />
-              </mesh>
-            )}
-          </PlayerMotionContext.Provider>
+          <group ref={turn}>
+            <PlayerMotionContext.Provider value={motion}>
+              {children ?? (
+                <mesh material={capsule} castShadow>
+                  <capsuleGeometry args={[capsuleRadius, halfHeight * 2, 8, 16]} />
+                </mesh>
+              )}
+            </PlayerMotionContext.Provider>
+          </group>
         </group>
       </Dynamic>
       <object3D ref={eyes} position={[0, eyeOffset, 0]} />
       <CameraKeyLook pitchable={!cam.locked} />
+      <BodyFacing turn={turn} motion={motion} />
       {firstPerson && <PaniniLens fov={fov} blur={peripheralBlur} />}
-      {!firstPerson && <MotionProbe body={body} motion={motion} />}
-      {!firstPerson && <StandOnGround body={body} lift={lift} />}
+      <MotionProbe body={body} motion={motion} faceCamera={firstPerson} />
+      <StandOnGround body={body} lift={lift} />
       {!grounded && <GroundGuard body={body} onGrounded={() => setGrounded(true)} />}
     </Ecctrl>
   )

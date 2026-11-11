@@ -10,6 +10,7 @@ import {
   Mesh,
   MeshPhysicalMaterial,
   Object3D,
+  Quaternion,
   Skeleton,
   SkinnedMesh,
   Sphere,
@@ -17,6 +18,7 @@ import {
   Vector3,
 } from 'three'
 import type { BuiltFigure } from './build'
+import type { Humanoid, HumanoidBoneName } from './humanoid'
 import { eyeGeometry, lidGeometry, personMaterials } from './materials'
 import type { V3 } from './sdf'
 import { BONES, type BoneName, PARENT, type Shape } from './shape'
@@ -25,6 +27,57 @@ export interface Rig {
   group: Group
   bones: Record<BoneName, Bone>
   skeleton: Skeleton
+  /** The bones under their VRM humanoid names, for `applyPose`. */
+  humanoid: Humanoid
+}
+
+/** Each bone's humanoid name. `root`, the figure's footprint on the ground, has none. */
+const HUMANOID_NAME: Partial<Record<BoneName, HumanoidBoneName>> = {
+  pelvis: 'hips',
+  spine: 'spine',
+  chest: 'chest',
+  neck: 'neck',
+  head: 'head',
+  'upperArm.L': 'leftUpperArm',
+  'foreArm.L': 'leftLowerArm',
+  'hand.L': 'leftHand',
+  'upperArm.R': 'rightUpperArm',
+  'foreArm.R': 'rightLowerArm',
+  'hand.R': 'rightHand',
+  'thigh.L': 'leftUpperLeg',
+  'shin.L': 'leftLowerLeg',
+  'foot.L': 'leftFoot',
+  'thigh.R': 'rightUpperLeg',
+  'shin.R': 'rightLowerLeg',
+  'foot.R': 'rightFoot',
+}
+
+/** Each bone's rotation in the canonical T-pose, in the figure's frame. Every bone is unrotated in
+ *  the bind pose, so the torso, head and feet already stand as they would; arms swing out level
+ *  along ±X (palms down) and legs straighten, each segment from its own joints, whatever the
+ *  proportions. */
+function tPose(joints: V3[]): Quaternion[] {
+  const at = (n: BoneName) => new Vector3(...joints[BONES.indexOf(n)])
+  const along = (from: BoneName, to: BoneName, dir: Vector3) =>
+    new Quaternion().setFromUnitVectors(at(to).sub(at(from)).normalize(), dir)
+  const t = BONES.map(() => new Quaternion())
+  const set = (n: BoneName, q: Quaternion) => {
+    t[BONES.indexOf(n)] = q
+  }
+  const down = new Vector3(0, -1, 0)
+  for (const [side, x] of [
+    ['L', 1],
+    ['R', -1],
+  ] as const) {
+    const out = new Vector3(x, 0, 0)
+    set(`upperArm.${side}`, along(`upperArm.${side}`, `foreArm.${side}`, out))
+    const fore = along(`foreArm.${side}`, `hand.${side}`, out)
+    set(`foreArm.${side}`, fore)
+    set(`hand.${side}`, fore.clone())
+    set(`thigh.${side}`, along(`thigh.${side}`, `shin.${side}`, down))
+    set(`shin.${side}`, along(`shin.${side}`, `foot.${side}`, down))
+  }
+  return t
 }
 
 export function createRig(joints: V3[]): Rig {
@@ -44,7 +97,19 @@ export function createRig(joints: V3[]): Rig {
   group.updateMatrixWorld(true)
   const skeleton = new Skeleton(list)
   const bones = Object.fromEntries(BONES.map((n, i) => [n, list[i]])) as Record<BoneName, Bone>
-  return { group, bones, skeleton }
+  const t = tPose(joints)
+  const humanoid: Humanoid = {}
+  BONES.forEach((n, i) => {
+    const name = HUMANOID_NAME[n]
+    if (!name) return
+    humanoid[name] = {
+      bone: list[i],
+      pre: PARENT[i] >= 0 ? t[PARENT[i]].clone().invert() : new Quaternion(),
+      post: t[i],
+      rest: list[i].position.clone(),
+    }
+  })
+  return { group, bones, skeleton, humanoid }
 }
 
 /** Skinned meshes for one build, bound to the rig's skeleton (the caller adds them to `rig.group`). */

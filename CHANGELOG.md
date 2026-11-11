@@ -29,11 +29,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `eyeHeight`, `speed`, `sprintSpeed`, and `cameraDistance` for third
   person. The defaults are the old fixed values.
   ([#55](https://github.com/nullorder/runek/issues/55))
+- A canonical humanoid skeleton on `Person` rigs: the bones under their
+  VRM 1.0 names, and `applyPose(rig, pose, weight)` writing a pose given
+  relative to a T-pose facing +Z, so the identity pose stands any figure
+  in a T-pose and one authored pose reads the same on every build. Names
+  a rig lacks (`upperChest`, the shoulders) fold into the bones below.
+  `HUMANOID_BONES`, `HumanoidPose` and `humanoidFromTPose` (which measures
+  a glTF rig standing in T-pose) let other rigs share the same clips.
+  ([#56](https://github.com/nullorder/runek/issues/56))
+- `Person` `poseSource`, and `PoseSourceContext` to give every figure
+  below it one: a source fills a canonical pose each frame from the
+  figure's speed, distance walked, heading, look direction and leg length,
+  in place of the built-in walk cycle. Authored poses (sitting, waving,
+  drinking) and the head turning to look still play over it, and removing
+  it brings the built-in motion back without a remount.
+  ([#57](https://github.com/nullorder/runek/issues/57))
+- `useWorld().playerMotion`: the avatar's live motion for net code, in
+  every view. ([#58](https://github.com/nullorder/runek/issues/58))
 
 ### Changed
 
 - Contract §2: wall-clock motion and time of day read the world's clock
   (`useWorld().now()`), not `Date.now()` or `new Date()` directly.
+- `Player` publishes a fuller `PlayerMotion` (speed, distance, vertical
+  speed, grounded, heading, and where the camera looks relative to the
+  body) after every physics step in every view, so the body it carries
+  strides with the same frame's distance. The body turns to face the way
+  it travels and holds that heading when it stops, instead of strafing
+  square to the camera; in first person at rest it turns to the camera.
+  A `Person` body looks where the camera looks, and a teleport's `yaw`
+  turns the body too. A hand-made `PlayerMotionContext` value must fill
+  the new fields. ([#58](https://github.com/nullorder/runek/issues/58))
+- Changing a `Person`'s look without changing its proportions (a shirt
+  color, a hat) keeps its skeleton, so a walking figure no longer snaps
+  back to its bind pose and restarts its stride.
+  ([#70](https://github.com/nullorder/runek/issues/70))
+
+### Fixed
+
+- A walking `Person` with its own body strides with the distance its
+  drawn body has reached, a frame behind its route, so its feet no longer
+  run a frame ahead of where the body is drawn.
+  ([#57](https://github.com/nullorder/runek/issues/57))
 
 ## [0.17.0](https://github.com/nullorder/runek/compare/v0.16.0...v0.17.0) - 2026-10-31
 
