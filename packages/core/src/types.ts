@@ -44,17 +44,35 @@ export interface Interactor {
   distance: number
 }
 
-/** What `Player` publishes to its children (its third-person body): live motion, written in
- *  place every frame. */
+/** The avatar's live motion, published by `Player` to the body it carries and to app code
+ *  (`useWorld().playerMotion`), in every view. Written in place after every physics step, so a
+ *  body posed in the same frame strides with that frame's distance. Plain numbers, so net code
+ *  can send it as it is and feed a remote copy through `PlayerMotionContext`. */
 export interface PlayerMotion {
   /** Horizontal speed, in world units per second. */
   speed: number
+  /** Horizontal distance covered since the avatar spawned, in world units: what a stride's phase
+   *  follows, so feet stay planted at any speed. */
+  distance: number
+  /** Vertical speed, in world units per second, positive rising. */
+  vertical: number
+  /** Standing on something (the controller's ground test). False from take-off to landing. */
+  grounded: boolean
+  /** Which way the body faces, in radians (0 faces +z, as `Player`'s `yaw`). It turns toward the
+   *  direction of travel and holds when the avatar stops; in first person at rest it turns to
+   *  the camera. */
+  heading: number
+  /** Where the camera looks relative to the body: yaw in radians, positive toward the body's
+   *  left (+x when it faces +z). */
+  lookYaw: number
+  /** The camera's pitch in radians, positive looking up. */
+  lookPitch: number
 }
 
 /** How `PlayerControl.teleport` lands the avatar. */
 export interface TeleportOptions {
-  /** Face this way on arrival: camera yaw in radians (0 faces +z), as `Player`'s `yaw`. Unset
-   *  keeps the current heading. */
+  /** Face this way on arrival, camera and body: yaw in radians (0 faces +z), as `Player`'s
+   *  `yaw`. Unset keeps the current heading. */
   yaw?: number
   /** Carry the avatar's velocity through the jump. Default false: it arrives at rest. */
   keepVelocity?: boolean
@@ -99,6 +117,11 @@ export interface WorldContextValue {
    *  otherwise). A ref, so app code can keep it and call `playerControl.current?.teleport(...)`
    *  later, from outside React. Absent under a hand-rolled provider. */
   playerControl?: RefObject<PlayerControl | null>
+  /** The avatar's live motion (speed, distance, vertical speed, grounded, heading, look), set by
+   *  `Player` while one is mounted (`null` otherwise) and written in place, so net code can keep
+   *  the ref and read `playerMotion.current` whenever it sends. Absent under a hand-rolled
+   *  provider. */
+  playerMotion?: RefObject<PlayerMotion | null>
   /** The curved projection the screen is drawn through, set by a `Player` with a wide
    *  first-person view (`null` while the camera's own flat projection is used). Read
    *  `lens.current` per frame, or use `useLensPosition` for `<Html>` labels. Absent under a

@@ -14,7 +14,15 @@ import { glProps } from './renderer'
 import { ShadowRate } from './ShadowRate'
 import { StaticBatching } from './StaticBatching'
 import { resolveWorldTime } from './time'
-import type { AvatarView, Interactor, PlayerControl, Vec3, Walker, WorldFog } from './types'
+import type {
+  AvatarView,
+  Interactor,
+  PlayerControl,
+  PlayerMotion,
+  Vec3,
+  Walker,
+  WorldFog,
+} from './types'
 
 export interface WorldProps {
   unit?: number
@@ -143,6 +151,7 @@ export function World({
 
   const player = useRef<Object3D | null>(null)
   const playerControl = useRef<PlayerControl | null>(null)
+  const playerMotion = useRef<PlayerMotion | null>(null)
   const lens = useRef<Lens | null>(null)
   const walkers = useMemo(() => new Set<Walker>(), [])
   const interactions = useMemo(() => new Set<Interactor>(), [])
@@ -159,6 +168,7 @@ export function World({
       controls: resolvedControls,
       player,
       playerControl,
+      playerMotion,
       lens,
       walkers,
       interactions,

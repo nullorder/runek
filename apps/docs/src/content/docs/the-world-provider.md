@@ -122,9 +122,16 @@ playerControl?.current?.teleport([0, 2, -12], { yaw: Math.PI })
 ```
 
 `position` is in world coordinates, like `Player`'s own `position`, and `yaw` (radians, 0 faces
-+z) turns the view. The handle is a ref, so keep `playerControl` and call it from anywhere, a
-network message handler or a button outside the canvas included. A `Rift` carries the avatar
-through the same call.
++z) turns the view and the body. The handle is a ref, so keep `playerControl` and call it from
+anywhere, a network message handler or a button outside the canvas included. A `Rift` carries
+the avatar through the same call.
+
+`useWorld().playerMotion?.current` is what the avatar is doing, in every view: ground `speed`,
+`distance` covered, `vertical` speed, `grounded`, the body's `heading`, and where the camera
+looks relative to it (`lookYaw`, `lookPitch`). It is written in place after every physics step,
+so keep the ref and read it whenever you need it, a network send included. The body `Player`
+carries reads the same record through `PlayerMotionContext` (see [embedding a
+world](/docs/embedding-a-world#several-players-one-world) for feeding a remote copy).
 
 `useWorld().now()` is the world's clock in epoch milliseconds (`<World now>`, or `Date.now`).
 Anything that moves or tells time by the wall clock reads it instead of `Date.now()`.

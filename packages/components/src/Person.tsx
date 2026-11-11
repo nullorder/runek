@@ -15,6 +15,7 @@ import {
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   CylinderGeometry,
+  Euler,
   type Group,
   Mesh,
   type Object3D,
@@ -26,16 +27,18 @@ import {
 import { InteractionPrompt } from './Interactable'
 import { Emote, SpeechBubble } from './person/Bubble'
 import type { BuiltFigure, Lod } from './person/build'
+import { applyPose, createHumanoidPose, resetHumanoidPose } from './person/humanoid'
+import { type PoseContext, type PoseSource, PoseSourceContext } from './person/pose'
 import {
   type GaitState,
   PhysicsRouteDriver,
   RouteDriver,
   type WalkRoute,
 } from './person/RouteDriver'
-import { attach, createRig, skinnedMeshes } from './person/rig'
+import { attach, createRig, type Rig, skinnedMeshes } from './person/rig'
 import { buildRoute, type RouteLoop, wanderPoints } from './person/route'
 import { figureKey, requestFigure } from './person/scheduler'
-import { ARM_SPREAD, shapeFigure } from './person/shape'
+import { ARM_SPREAD, BONES, type BoneName, type Shape, shapeFigure } from './person/shape'
 import { type PersonSkinName, resolveFigure } from './person/spec'
 import type {
   PersonAccessory,
@@ -59,6 +62,24 @@ import type {
 } from './person/types'
 import { Sign } from './Sign'
 
+export {
+  applyPose,
+  createHumanoidPose,
+  HUMANOID_BONES,
+  HUMANOID_PARENT,
+  type Humanoid,
+  type HumanoidBone,
+  type HumanoidBoneName,
+  type HumanoidPose,
+  humanoidFromTPose,
+  resetHumanoidPose,
+} from './person/humanoid'
+export {
+  type PoseContext,
+  type PoseSource,
+  PoseSourceContext,
+  type PoseSourceFactory,
+} from './person/pose'
 export {
   type PersonTrait,
   type PersonTraitSource,
@@ -170,6 +191,12 @@ export interface PersonProps extends WorldComponentProps {
   /** Walk-cycle speed, in units per second, for a figure something else moves (a cart, a
    *  script). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed. */
   gait?: number
+  /** Motion from outside the built-in gait (a clip library, motion matching, poses off the
+   *  network): each frame it fills a canonical humanoid pose from the figure's speed, distance
+   *  walked and heading, in place of the walk cycle and idle. The authored `pose` and the head
+   *  turning to look still play over it. A `PoseSourceContext` gives every figure below it one;
+   *  this wins. */
+  poseSource?: PoseSource
   /** Breathing, weight shift, and blinking. */
   idle?: boolean
   /** Turn the head (and eyes) toward the player's avatar (or the camera, when no `Player` is
@@ -258,6 +285,112 @@ function useBuild(
   return built && want ? built : null
 }
 
+/** What an authored pose does to the body: how far it leans, where the arms and legs go, how far
+ *  it sits down. */
+function poseParams(pose: PersonPose, marks: Shape['marks'], stoop: number) {
+  const sit = pose === 'sit' || pose === 'type'
+  const lean: Partial<Record<PersonPose, number>> = {
+    work: 0.42,
+    lean: -0.14,
+    type: 0.14,
+    play: 0.1,
+    sit: 0.06,
+  }
+  const armX: Partial<Record<PersonPose, number>> = {
+    work: -0.7,
+    type: -0.5,
+    play: -0.45,
+    sit: -0.25,
+    drink: -0.12,
+  }
+  const elbow: Partial<Record<PersonPose, number>> = {
+    work: -0.6,
+    type: -1.15,
+    play: -1.25,
+    sit: -0.5,
+    drink: -0.35,
+    lie: -0.08,
+  }
+  return {
+    sit,
+    lie: pose === 'lie',
+    drop: sit ? -(marks.hipY - marks.thigh * 0.92) : 0,
+    spineX: stoop * (pose === 'lie' ? 0 : 1) + (lean[pose] ?? 0),
+    armX: armX[pose] ?? 0,
+    armZ: pose === 'lean' ? 0.1 : pose === 'lie' ? 0.16 : 0.02,
+    elbow: elbow[pose] ?? -0.18,
+    thighX: sit ? -Math.PI / 2 : 0,
+    shinX: sit ? Math.PI / 2.1 : 0,
+    wave: pose === 'wave',
+    drink: pose === 'drink',
+    /** Finger tapping (keys, buttons): how fast. */
+    tap: pose === 'type' ? 17 : pose === 'play' ? 9 : 0,
+  }
+}
+type PoseParams = ReturnType<typeof poseParams>
+
+/** The bones `wave` and `drink` take over from a pose source; every other pose takes them all. */
+const ONE_ARM: readonly BoneName[] = ['upperArm.R', 'foreArm.R', 'hand.R']
+
+/** One frame of the built-in motion: the walk-cycle and authored-pose blends (`s`, `q`) and what
+ *  they drive. */
+interface FrameMotion {
+  t: number
+  /** Stride phase, radians: one full cycle per two steps. */
+  phase: number
+  s: number
+  q: number
+  swing: number
+  bob: number
+  breath: number
+  sway: number
+  sip: number
+  waving: boolean
+}
+
+/** The built-in body (idle, walk cycle, authored pose) written onto every bone but the head's
+ *  turn, so it also clears whatever a pose source left. */
+function posture(rig: Rig, p: PoseParams, m: FrameMotion, H: number, stoop: number) {
+  const b = rig.bones
+  const { t, s, q, swing, breath, sway, sip } = m
+  const tap = (side: number) => (p.tap ? Math.sin(t * p.tap + side) * 0.035 * q : 0)
+  b.root.position.y = p.drop * q + breath * 0.003 * H + m.bob
+  const hips = rig.humanoid.hips
+  if (hips) b.pelvis.position.copy(hips.rest)
+  b.pelvis.rotation.set(0, 0, sway * 0.022)
+  const lean = stoop + (p.spineX - stoop) * q + s * 0.05
+  b.spine.rotation.set(lean * 0.45, 0, 0)
+  b.chest.rotation.set(lean * 0.55 + breath * 0.012, swing * 0.18, -sway * 0.012)
+  b.neck.rotation.set(0, 0, 0)
+  b.head.rotation.set(0, 0, 0)
+  // Opposite arm to leg: an arm swings back as its leg reaches forward.
+  b['upperArm.L'].rotation.set(p.armX * q - sway * 0.06 + swing * 0.7, 0, p.armZ - ARM_SPREAD)
+  b['foreArm.L'].rotation.set(p.elbow * q - 0.18 * (1 - q) - s * 0.25 + tap(0), 0, 0)
+  if (p.drink && q > 0.05) {
+    // Mug at the chest, lifted to the lips for a sip.
+    b['upperArm.R'].rotation.set((-0.35 - 0.3 * sip) * q, 0, ARM_SPREAD + (0.4 + 0.12 * sip) * q)
+    b['foreArm.R'].rotation.set((-1.75 - 0.6 * sip) * q - 0.18 * (1 - q), 0, 0)
+  } else if (m.waving) {
+    // Upper arm out just above level, forearm raised and rocking at the elbow.
+    b['upperArm.R'].rotation.set(-0.25, 0, ARM_SPREAD - 1.75)
+    b['foreArm.R'].rotation.set(0, 0, -1.15 - Math.sin(t * 6) * 0.35)
+  } else {
+    b['upperArm.R'].rotation.set(p.armX * q + sway * 0.06 - swing * 0.7, 0, ARM_SPREAD - p.armZ)
+    b['foreArm.R'].rotation.set(p.elbow * q - 0.18 * (1 - q) - s * 0.25 + tap(2.1), 0, 0)
+  }
+  b['hand.L'].rotation.set(0, 0, 0)
+  b['hand.R'].rotation.set(0, 0, 0)
+  // Legs: the thigh swings (negative X is forward), and the knee flexes while that leg travels
+  // forward, which is what lifts the foot clear of the ground.
+  const knee = (side: number) => s * (0.12 + 0.6 * Math.max(0, Math.cos(m.phase + side)))
+  b['thigh.L'].rotation.set(p.thighX * q - swing, 0, 0)
+  b['thigh.R'].rotation.set(p.thighX * q + swing, 0, 0)
+  b['shin.L'].rotation.set(p.shinX * q + knee(0), 0, 0)
+  b['shin.R'].rotation.set(p.shinX * q + knee(Math.PI), 0, 0)
+  b['foot.L'].rotation.set(-knee(0) * 0.3, 0, 0)
+  b['foot.R'].rotation.set(-knee(Math.PI) * 0.3, 0, 0)
+}
+
 /**
  * A procedural person: a sculpted, clothed, skinned figure generated from a seed.
  *
@@ -282,6 +415,12 @@ function useBuild(
  *
  * Meshes build in the background a few milliseconds per frame, coarse first; the full-detail
  * mesh only builds near the camera. Identical figures share one build.
+ *
+ * The skeleton also answers to the VRM 1.0 humanoid bone names, and `applyPose` writes a pose
+ * given relative to a T-pose, so one pose reads the same on every figure. A `poseSource` (or a
+ * `PoseSourceContext` above) fills one each frame in place of the walk cycle, from the figure's
+ * speed, distance walked and heading; the authored `pose` and the head turning to look play over
+ * it.
  *
  * `resolvePerson(props)` reports what every trait resolves to and where it came from (prop,
  * skin, kind, seed, or default), so an editor can show what the seed chose; `PERSON_COLORS`
@@ -321,6 +460,7 @@ export function Person({
   departAt = 0,
   onArrive,
   gait,
+  poseSource,
   idle = true,
   lookAt = true,
   lookRadius = 5,
@@ -397,7 +537,10 @@ export function Person({
   const key = useMemo(() => figureKey(spec), [spec])
   // Joints and landmarks only: cheap, and the same for every level of detail.
   const shape = useMemo(() => shapeFigure(spec), [key])
-  const rig = useMemo(() => createRig(shape.joints), [shape])
+  // A new look (a shirt color, a hat) keeps the skeleton, and with it the stride, the gesture and
+  // where the figure looks; only new proportions rebuild it.
+  const jointsKey = JSON.stringify(shape.joints)
+  const rig = useMemo(() => createRig(shape.joints), [jointsKey])
   const marks = shape.marks
 
   // The route is node-local geometry like any other: waypoints scale by `unit` and turn with the
@@ -436,18 +579,12 @@ export function Person({
     return meshes.dispose
   }, [meshes, rig])
 
+  // Keyed on what `attach` reads, so a change of clothes keeps the eyes and lids.
+  const { eye, skin: skinColor, metal, wood } = spec.colors
+  const attachKey = JSON.stringify([shape.eyes, shape.lidRadius, shape.props])
   const parts = useMemo(
-    () =>
-      attach(
-        rig,
-        shape,
-        shape.joints,
-        spec.colors.eye,
-        spec.colors.skin,
-        spec.colors.metal,
-        spec.colors.wood,
-      ),
-    [rig, shape, spec.colors],
+    () => attach(rig, shape, shape.joints, eye, skinColor, metal, wood),
+    [rig, attachKey, eye, skinColor, metal, wood],
   )
   useEffect(() => parts.dispose, [parts])
   const detailed = active?.lod === 'near'
@@ -476,46 +613,7 @@ export function Person({
   const blend = useRef({ stride: 0, posed: 1 })
 
   const H = spec.height
-  const p = useMemo(() => {
-    const sit = pose === 'sit' || pose === 'type'
-    const lean: Partial<Record<PersonPose, number>> = {
-      work: 0.42,
-      lean: -0.14,
-      type: 0.14,
-      play: 0.1,
-      sit: 0.06,
-    }
-    const armX: Partial<Record<PersonPose, number>> = {
-      work: -0.7,
-      type: -0.5,
-      play: -0.45,
-      sit: -0.25,
-      drink: -0.12,
-    }
-    const elbow: Partial<Record<PersonPose, number>> = {
-      work: -0.6,
-      type: -1.15,
-      play: -1.25,
-      sit: -0.5,
-      drink: -0.35,
-      lie: -0.08,
-    }
-    return {
-      sit,
-      lie: pose === 'lie',
-      drop: sit ? -(marks.hipY - marks.thigh * 0.92) : 0,
-      spineX: motion.stoop * (pose === 'lie' ? 0 : 1) + (lean[pose] ?? 0),
-      armX: armX[pose] ?? 0,
-      armZ: pose === 'lean' ? 0.1 : pose === 'lie' ? 0.16 : 0.02,
-      elbow: elbow[pose] ?? -0.18,
-      thighX: sit ? -Math.PI / 2 : 0,
-      shinX: sit ? Math.PI / 2.1 : 0,
-      wave: pose === 'wave',
-      drink: pose === 'drink',
-      /** Finger tapping (keys, buttons): how fast. */
-      tap: pose === 'type' ? 17 : pose === 'play' ? 9 : 0,
-    }
-  }, [pose, marks, motion.stoop])
+  const p = useMemo(() => poseParams(pose, marks, motion.stoop), [pose, marks, motion.stoop])
 
   // A mug for `drink`, held in the right hand and kept upright whatever the wrist does.
   const mugMaterial = useMaterial({
@@ -554,6 +652,67 @@ export function Person({
   useEffect(() => mug.dispose, [mug])
   const quat = useMemo(() => ({ a: new Quaternion(), b: new Quaternion() }), [])
 
+  // ---- outside motion ---------------------------------------------------------------------------
+  const factory = useContext(PoseSourceContext)
+  const made = useRef<PoseSource | null>(null)
+  useEffect(() => {
+    if (poseSource || !factory) return
+    const own = factory({ seed })
+    made.current = own
+    return () => {
+      if (made.current === own) made.current = null
+      own.dispose?.()
+    }
+  }, [poseSource, factory, seed])
+  const poseOut = useMemo(() => createHumanoidPose(), [])
+  const ctx = useMemo<PoseContext>(
+    () => ({
+      dt: 0,
+      speed: 0,
+      distance: 0,
+      grounded: true,
+      vertical: 0,
+      heading: 0,
+      lookYaw: 0,
+      lookPitch: 0,
+      legLength: 0,
+      height: 0,
+    }),
+    [],
+  )
+  // The bones an authored pose takes over from a source while the figure stands, and the source's
+  // pose kept aside while the built-in one is worked out over it.
+  const layer = useMemo(() => {
+    if (pose === 'stand') return null
+    const names: readonly BoneName[] = pose === 'wave' || pose === 'drink' ? ONE_ARM : BONES
+    return new Set<Object3D>(names.map((n) => rig.bones[n]))
+  }, [pose, rig])
+  const held = useMemo(() => {
+    const bones = Object.values(rig.humanoid).map((e) => e.bone)
+    return { bones, quats: bones.map(() => new Quaternion()), hips: new Vector3() }
+  }, [rig])
+  const lastDistance = useRef<number | null>(null)
+  const look = useRef({ yaw: 0, pitch: 0 })
+  const tmp = useMemo(
+    () => ({ q: new Quaternion(), euler: new Euler(0, 0, 0, 'YXZ'), dir: new Vector3() }),
+    [],
+  )
+  const frameMotion = useMemo<FrameMotion>(
+    () => ({
+      t: 0,
+      phase: 0,
+      s: 0,
+      q: 0,
+      swing: 0,
+      bob: 0,
+      breath: 0,
+      sway: 0,
+      sip: 0,
+      waving: false,
+    }),
+    [],
+  )
+
   useFrame((state, dt) => {
     const t = state.clock.elapsedTime
     const k = 1 - Math.exp(-7 * dt)
@@ -568,94 +727,73 @@ export function Person({
       }
     }
 
-    // Walking speed comes from the route, else an explicit `gait`, else the carrying `Player`.
-    // Off-route, distance is integrated so the stride phase still tracks the feet.
+    // Walking speed comes from the route, else an explicit `gait`, else the carrying `Player`
+    // (which also says how far it has gone). Otherwise distance is integrated so the stride phase
+    // still tracks the feet.
     const w = walk.current
+    const m = avatarMotion?.current
     if (!route) {
-      w.speed = gait ?? avatarMotion?.current.speed ?? 0
-      w.distance += w.speed * dt
+      if (gait !== undefined) {
+        w.speed = gait
+        w.distance += gait * dt
+      } else if (m) {
+        w.speed = m.speed
+        // A `Player` vendored before this release publishes only its speed.
+        w.distance = Number.isFinite(m.distance) ? m.distance : w.distance + m.speed * dt
+      } else w.speed = 0
     }
+    // A figure on its own kinematic body is drawn where its route put it a frame ago (the body
+    // takes each move at the next physics step), so its stride follows the distance from then.
+    const drawn = physics && route ? (lastDistance.current ?? w.distance) : w.distance
+    lastDistance.current = w.distance
+
     const bl = blend.current
     const moving = w.speed > 0.05 * unit
     bl.stride += (Math.min(w.speed / (CRUISE * unit), 1) - bl.stride) * (1 - Math.exp(-10 * dt))
     bl.posed += ((moving ? 0 : 1) - bl.posed) * (1 - Math.exp(-8 * dt))
     const s = bl.stride
     const q = bl.posed
-    const waving = p.wave && q > 0.5
     // Lying down turns the whole figure onto its back, centered on the origin, back on the
     // surface, head toward -Z.
     const lie = p.lie ? q : 0
     rig.group.rotation.x = -(Math.PI / 2) * lie
     rig.group.position.set(0, 0.075 * H * lie, (H / 2) * lie)
-    const tap = (side: number) => (p.tap ? Math.sin(t * p.tap + side) * 0.035 * q : 0)
     const cyc = (t + motion.phase * 3) % SIP_EVERY
     const sip = p.drink && cyc < SIP ? Math.sin((cyc / SIP) * Math.PI) * q : 0
     // Stride phase from distance walked: one full cycle (two steps) per 0.8 body heights.
-    const phase = (w.distance / (0.8 * H)) * Math.PI * 2
-    const swing = Math.sin(phase) * s * Math.min(0.3 + 0.2 * (w.speed / unit), 0.7)
-    const bob = s * 0.012 * H * (Math.abs(Math.cos(phase)) - 0.6)
-    const breath = idle ? Math.sin(t * 1.6 + motion.phase) : 0
-    const sway = idle ? Math.sin(t * 0.42 + motion.phase) * (1 - s) : 0
+    const phase = (drawn / (0.8 * H)) * Math.PI * 2
+    const fm = frameMotion
+    fm.t = t
+    fm.phase = phase
+    fm.s = s
+    fm.q = q
+    fm.swing = Math.sin(phase) * s * Math.min(0.3 + 0.2 * (w.speed / unit), 0.7)
+    fm.bob = s * 0.012 * H * (Math.abs(Math.cos(phase)) - 0.6)
+    fm.breath = idle ? Math.sin(t * 1.6 + motion.phase) : 0
+    fm.sway = idle ? Math.sin(t * 0.42 + motion.phase) * (1 - s) : 0
+    fm.sip = sip
+    fm.waving = p.wave && q > 0.5
 
-    b.root.position.y = p.drop * q + breath * 0.003 * H + bob
-    b.pelvis.rotation.z = sway * 0.022
-    const lean = motion.stoop + (p.spineX - motion.stoop) * q + s * 0.05
-    b.spine.rotation.x = lean * 0.45
-    b.chest.rotation.set(lean * 0.55 + breath * 0.012, swing * 0.18, -sway * 0.012)
-    // Opposite arm to leg: an arm swings back as its leg reaches forward.
-    b['upperArm.L'].rotation.set(p.armX * q - sway * 0.06 + swing * 0.7, 0, p.armZ - ARM_SPREAD)
-    b['foreArm.L'].rotation.set(p.elbow * q - 0.18 * (1 - q) - s * 0.25 + tap(0), 0, 0)
-    if (p.drink && q > 0.05) {
-      // Mug at the chest, lifted to the lips for a sip.
-      b['upperArm.R'].rotation.set((-0.35 - 0.3 * sip) * q, 0, ARM_SPREAD + (0.4 + 0.12 * sip) * q)
-      b['foreArm.R'].rotation.set((-1.75 - 0.6 * sip) * q - 0.18 * (1 - q), 0, 0)
-    } else if (waving) {
-      // Upper arm out just above level, forearm raised and rocking at the elbow.
-      b['upperArm.R'].rotation.set(-0.25, 0, ARM_SPREAD - 1.75)
-      b['foreArm.R'].rotation.set(0, 0, -1.15 - Math.sin(t * 6) * 0.35)
-    } else {
-      b['upperArm.R'].rotation.set(p.armX * q + sway * 0.06 - swing * 0.7, 0, ARM_SPREAD - p.armZ)
-      b['foreArm.R'].rotation.set(p.elbow * q - 0.18 * (1 - q) - s * 0.25 + tap(2.1), 0, 0)
-    }
-    if (p.drink) {
-      // Undo the wrist's turn so the mug stays upright, tipping only as it reaches the lips.
-      rig.group.updateMatrixWorld()
-      rig.group.getWorldQuaternion(quat.a).invert()
-      b['hand.R'].getWorldQuaternion(quat.b)
-      mug.group.quaternion.copy(quat.a.multiply(quat.b)).invert()
-      mug.group.rotateX(0.5 * sip)
-    }
-    // Legs: the thigh swings (negative X is forward), and the knee flexes while that leg travels
-    // forward, which is what lifts the foot clear of the ground.
-    const knee = (side: number) => s * (0.12 + 0.6 * Math.max(0, Math.cos(phase + side)))
-    b['thigh.L'].rotation.x = p.thighX * q - swing
-    b['thigh.R'].rotation.x = p.thighX * q + swing
-    b['shin.L'].rotation.x = p.shinX * q + knee(0)
-    b['shin.R'].rotation.x = p.shinX * q + knee(Math.PI)
-    b['foot.L'].rotation.x = -knee(0) * 0.3
-    b['foot.R'].rotation.x = -knee(Math.PI) * 0.3
-
-    // Blink: the lid sweeps down over the eye and back.
-    if (parts.lids.length) {
-      const blink = (t + motion.blinkPhase) % motion.blinkEvery
-      const closed = idle && blink < 0.14 ? Math.sin((blink / 0.14) * Math.PI) : 0
-      for (const lid of parts.lids) lid.rotation.x = -0.95 + closed * 1.75
-    }
-
-    // Head tracking: the target in the head's own parent space gives yaw and pitch directly. The
+    // Where to look: the target in the head's own parent space gives yaw and pitch directly. The
     // target is the player's avatar when a `Player` is mounted (in third person the camera trails
     // behind it), else the camera. Outside the radius, or behind the shoulder, the head eases back
     // to neutral; the eyes lead the head and cover what it can't. A figure that *is* the avatar's
-    // body has nobody to watch.
+    // body (or a copy fed a player's motion) looks where that player's camera looks.
     const h = b.head
-    if (h.rotation.order !== 'YXZ') h.rotation.order = 'YXZ'
-    let yaw = idle ? sway * 0.05 : 0
+    let yaw = idle ? fm.sway * 0.05 : 0
     let pitch = 0
     let wanted = 0
     let tracking = false
     const avatar = player?.current
     const self = avatar?.parent != null && isInside(h, avatar.parent)
-    if (lookAt && h.parent && !self && !p.lie) {
+    if (lookAt && m && !p.lie) {
+      wanted = m.lookYaw
+      if (Math.abs(wanted) < MAX_YAW + EYE_REACH) {
+        tracking = true
+        yaw = clamp(wanted, -MAX_YAW, MAX_YAW)
+        pitch = clamp(-m.lookPitch, -MAX_PITCH, MAX_PITCH)
+      }
+    } else if (lookAt && h.parent && !self && !p.lie) {
       if (avatar) avatar.getWorldPosition(scratch)
       else scratch.copy(state.camera.position)
       h.parent.worldToLocal(scratch).sub(h.position)
@@ -667,9 +805,76 @@ export function Person({
         pitch = clamp(-Math.atan2(scratch.y, flat), -MAX_PITCH, MAX_PITCH)
       }
     }
-    h.rotation.y += (yaw - h.rotation.y) * k
-    h.rotation.x += (pitch - 0.25 * sip - h.rotation.x) * k
-    const eyeYaw = tracking ? clamp(wanted - h.rotation.y, -EYE_REACH, EYE_REACH) : 0
+
+    const source = poseSource ?? made.current
+    let sourced = false
+    if (source) {
+      ctx.dt = dt
+      ctx.speed = w.speed
+      ctx.distance = drawn
+      ctx.grounded = m?.grounded ?? true
+      ctx.vertical = m?.vertical ?? 0
+      if (m) ctx.heading = m.heading
+      else if (root.current) {
+        root.current.getWorldDirection(tmp.dir)
+        ctx.heading = Math.atan2(tmp.dir.x, tmp.dir.z)
+      }
+      ctx.lookYaw = m ? m.lookYaw : tracking ? wanted : 0
+      ctx.lookPitch = m ? m.lookPitch : tracking ? -pitch : 0
+      ctx.legLength = marks.hipY
+      ctx.height = H
+      resetHumanoidPose(poseOut)
+      sourced = source.update(ctx, poseOut)
+    }
+
+    if (!sourced) posture(rig, p, fm, H, motion.stoop)
+    else {
+      applyPose(rig, poseOut)
+      b.root.position.y = 0
+      if (layer && q > 0.001) {
+        // The authored pose over the source's, weighted by how far into it the figure is.
+        const { bones, quats, hips } = held
+        for (let i = 0; i < bones.length; i++) quats[i].copy(bones[i].quaternion)
+        hips.copy(b.pelvis.position)
+        fm.s = 0
+        fm.q = 1
+        fm.swing = 0
+        fm.bob = 0
+        posture(rig, p, fm, H, motion.stoop)
+        for (let i = 0; i < bones.length; i++) {
+          const bone = bones[i]
+          if (!layer.has(bone)) bone.quaternion.copy(quats[i])
+          else bone.quaternion.copy(tmp.q.copy(quats[i]).slerp(bone.quaternion, q))
+        }
+        b.pelvis.position.lerpVectors(hips, b.pelvis.position, layer.has(b.pelvis) ? q : 0)
+        b.root.position.y = layer.has(b.pelvis) ? (p.drop + fm.breath * 0.003 * H) * q : 0
+      }
+    }
+
+    if (p.drink) {
+      // Undo the wrist's turn so the mug stays upright, tipping only as it reaches the lips.
+      rig.group.updateMatrixWorld()
+      rig.group.getWorldQuaternion(quat.a).invert()
+      b['hand.R'].getWorldQuaternion(quat.b)
+      mug.group.quaternion.copy(quat.a.multiply(quat.b)).invert()
+      mug.group.rotateX(0.5 * sip)
+    }
+
+    // Blink: the lid sweeps down over the eye and back.
+    if (parts.lids.length) {
+      const blink = (t + motion.blinkPhase) % motion.blinkEvery
+      const closed = idle && blink < 0.14 ? Math.sin((blink / 0.14) * Math.PI) : 0
+      for (const lid of parts.lids) lid.rotation.x = -0.95 + closed * 1.75
+    }
+
+    // The head turns by its own eased layer, over the source's head when there is one.
+    const lk = look.current
+    lk.yaw += (yaw - lk.yaw) * k
+    lk.pitch += (pitch - 0.25 * sip - lk.pitch) * k
+    if (h.rotation.order !== 'YXZ') h.rotation.order = 'YXZ'
+    if (sourced) h.quaternion.multiply(tmp.q.setFromEuler(tmp.euler.set(lk.pitch, lk.yaw, 0)))
+    else h.rotation.set(lk.pitch, lk.yaw, 0)
+    const eyeYaw = tracking ? clamp(wanted - lk.yaw, -EYE_REACH, EYE_REACH) : 0
     for (const e of parts.eyes) e.rotation.y += (eyeYaw - e.rotation.y) * Math.min(1, k * 3)
 
     // Keep the name legible from wherever it's read.

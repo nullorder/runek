@@ -38,6 +38,16 @@ const isUndefined = (t) => (t.flags & (ts.TypeFlags.Undefined | ts.TypeFlags.Voi
 
 const nameOfType = (t) => t.aliasSymbol?.name ?? t.getSymbol()?.name
 
+/** An object of methods only (a pose source, a controller): a live handle, never data. */
+function isHandle(type) {
+  return type.getProperties().every((symbol) => {
+    const decl = symbol.valueDeclaration ?? symbol.declarations?.[0]
+    if (!decl) return false
+    const t = checker.getTypeOfSymbolAtLocation(symbol, decl).getNonNullableType()
+    return t.getCallSignatures().length > 0
+  })
+}
+
 function describe(type, ctx, depth, hint) {
   const text = checker.typeToString(type)
   if (/ReactNode|ReactElement|JSX\.Element/.test(text)) return { type: 'node' }
@@ -87,7 +97,8 @@ function describe(type, ctx, depth, hint) {
     if (
       /^(Object3D|Group|Mesh|Vector3|Color|Euler|Quaternion|Texture|Ref|RefObject|MutableRefObject)$/.test(
         name,
-      )
+      ) ||
+      isHandle(type)
     ) {
       return { type: 'instance', text: name }
     }

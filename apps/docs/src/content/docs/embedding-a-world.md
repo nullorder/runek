@@ -136,6 +136,60 @@ socket.on('correct', ({ x, y, z }) => playerControl?.current?.teleport([x, y, z]
 </Player>
 ```
 
+The body turns to face the way the avatar travels and holds that heading when it stops (in first person, it turns to the camera at rest). What it is doing is published every physics step in every view as `useWorld().playerMotion`: ground `speed`, `distance` covered, `vertical` speed, `grounded`, the body's `heading`, and where the camera looks relative to it (`lookYaw`, `lookPitch`). It's plain numbers written in place, so send it with the position:
+
+```tsx
+const { player, playerMotion } = useWorld()
+const eye = new Vector3()
+setInterval(() => {
+  const motion = playerMotion?.current
+  if (!player?.current || !motion) return
+  player.current.getWorldPosition(eye) // the eyes: `eyeHeight` above the feet
+  socket.emit('move', { eye: eye.toArray(), ...motion })
+}, 100)
+```
+
+On the other side, hand a remote player's latest motion to a `Person` through `PlayerMotionContext`, and turn it by the `heading`. It strides from the same `distance` and looks where that player looks, so it matches what they see of their own body:
+
+```tsx
+import { PlayerMotionContext } from '@runek/core'
+
+const motion = useRef(remote.motion) // Object.assign(motion.current, msg) as messages arrive
+const [x, y, z] = remote.eye
+<group position={[x, y - 1.62, z]} rotation={[0, motion.current.heading, 0]}>
+  <PlayerMotionContext.Provider value={motion}>
+    <Person physics={false} height={1.75} seed={remote.seed} />
+  </PlayerMotionContext.Provider>
+</group>
+```
+
+## Your own animation
+
+A `Person` animates itself with a procedural walk cycle. To drive it with something else (a clip library, motion matching, poses off the network), give it a `poseSource`, or put a `PoseSourceContext` around many figures. Each frame the source gets what the figure knows about its motion (`speed`, `distance` walked, `heading`, `grounded`, `vertical`, look direction, `legLength`) and a pose reset to the T-pose, fills it, and returns `true`:
+
+```tsx
+import { PoseSourceContext, type PoseSourceFactory } from './runek/Person'
+
+const e = new Euler()
+const stroll: PoseSourceFactory = () => ({
+  update(ctx, out) {
+    const phase = (ctx.distance / (ctx.legLength * 1.6)) * Math.PI * 2
+    const swing = Math.sin(phase) * Math.min(ctx.speed / 1.3, 1) * 0.5
+    out.rotations.leftUpperArm.setFromEuler(e.set(0, 0, -1.3)) // arms down from the T-pose
+    out.rotations.rightUpperArm.setFromEuler(e.set(0, 0, 1.3))
+    out.rotations.leftUpperLeg.setFromEuler(e.set(-swing, 0, 0)) // negative x swings forward
+    out.rotations.rightUpperLeg.setFromEuler(e.set(swing, 0, 0))
+    return true
+  },
+})
+
+<PoseSourceContext.Provider value={stroll}>{/* every Person below walks this way */}</PoseSourceContext.Provider>
+```
+
+A pose names bones as VRM 1.0 does (`hips`, `spine`, `chest`, `leftUpperArm`, `leftLowerLeg` and so on, listed in `HUMANOID_BONES`), each rotation relative to a T-pose facing +Z, plus a `hips` offset in units. The same pose reads the same on every figure, whatever its build. Names a figure has no bone for (`upperChest`, the shoulders) fold into the bones below them, and the toes drop out. Stride from `ctx.distance` rather than time and the feet stay planted at any speed, on a route walker, a figure with an explicit `gait`, or a `Player`'s body.
+
+The authored `pose` still plays over the source while the figure stands (a seated figure sits, `wave` and `drink` take the right arm), and the head still turns to look. Return `false` for a frame to leave the figure to its own walk cycle; removing the source brings it back without a remount. To share clips with a glTF rig, `humanoidFromTPose(root, bones)` measures one standing in T-pose into the same table, and `applyPose` drives it.
+
 ## Your own renderer
 
 `<World>` draws with a `WebGLRenderer` unless you pass `renderer`: renderer parameters, an instance, or a function (sync or async) that gets the default parameters and returns a renderer. It goes to R3F's `Canvas` as `gl`, so three's `WebGPURenderer` runs a world like this:
