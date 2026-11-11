@@ -36,9 +36,15 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
 | `view` | `"first" \| "third" \| "overhead"` |  | Camera view: `first` (through the avatar's eyes), `third` (behind it), or `overhead` (high above at a fixed tilt, following it; scroll zooms, WASD walks relative to the screen). Unset defers to the world default (`<World avatar>`); falls back to first-person. An explicit value here always wins. A world `view` control (e.g. `controls: { view: ['KeyV'] }`) cycles the three at runtime. |
 | `yaw` | `number` | `0` | Initial camera yaw in radians (0 faces +z). |
+| `height` | `number` | `1.3` | How tall the avatar is, feet to crown, in meters: the length of its capsule. |
+| `radius` | `number` | `0.3` | The capsule's radius, in meters. |
+| `eyeHeight` | `number` |  | Eye height above the feet, in meters: where the first-person camera sits, what the third-person camera turns about, and what others look at when they look at the player. Unset, just under the top of the capsule as it floats (about 1.4 at the default size). |
+| `speed` | `number` | `2.5` | Top walking speed, in meters per second. |
+| `sprintSpeed` | `number` | `5` | Top speed while the `run` key is held, in meters per second. |
+| `cameraDistance` | `number` | `5` | How far behind the avatar the third-person camera starts, in meters; scrolling zooms from there. |
 | `fov` | `number` | `140` | How wide the first-person view is, in degrees across, on a 16:9 screen. The default, 140, takes in most of what both eyes see, so the world wraps around you instead of sitting behind a window. Like most games it follows the screen's shape, not its size: a wider screen (an ultrawide or curved monitor) keeps the same angle top to bottom and sees more across, up to 200°; a narrower one sees less across, down to 110°, then holds that and opens up top to bottom, until a tall phone screen just shows less across. It is drawn through a gently curved (Panini) lens: true to life straight ahead, the sides squeezed in rather than stretched as a flat camera would. Third-person and overhead keep the world camera's own lens. |
 | `peripheralBlur` | `number` | `4` | How blurred the very edge of the first-person view is, in CSS pixels, easing to sharp toward the centre the way peripheral vision does; turn to look at something and it comes into focus. 0 turns it off. |
-| `children` | `node` (code only) |  | Custom avatar visual, replacing the default capsule. Size it to the capsule envelope (1.3 units tall, centered at the character origin, so feet go at y = -0.65); the Player lowers it onto the ground beneath the floating capsule. It is hidden in first-person view. In world JSON, nest it as a child node of the Player. |
+| `children` | `node` (code only) |  | Custom avatar visual, replacing the default capsule. Size it to the capsule envelope (`height` tall, centered at the character origin, so feet go at y = -height / 2: -0.65 at the default size); the Player lowers it onto the ground beneath the floating capsule. It is hidden in first-person view. In world JSON, nest it as a child node of the Player. |
 
 ## Registry manifest
 

@@ -20,6 +20,7 @@ Runek components all follow the same small contract. Honor it and a component is
 9. **Lend, don't light.** If your component gives off light, register it with `useLight({ color, intensity, distance })` and put the returned emitter's `ref` where the light sits. Don't mount a `<pointLight>` yourself: the world keeps a small fixed pool of real lights and lends them to the lamps that matter most to the view.
 10. **Mark what moves.** The world merges static parts that share a material into a few big meshes. Wrap the parts you move, scale, hide or reshape after mount in `<Dynamic>` (from `@runek/core`) so they stay separate.
 11. **Publish your surface.** If people can stand on your component, attach `Component.surface` (its walkable top, as a pure function in a `surfaces/<name>.ts` module). If it stands on the ground, set `Component.groundSitting = true`. That's what lets worlds anchor to it and `runek check-world` catch buried or floating props.
+12. **Tell time by the world's clock.** Anything that moves or reads the time by the wall clock (a route, a trip, clock hands) takes it from `useWorld().now()`, never `Date.now()` or `new Date()`, so an app that gives the world a shared clock gets your component on it too.
 
 ## A minimal compliant component
 

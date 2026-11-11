@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.17.0...HEAD)
 
+### Added
+
+- `<World now>`: the world's wall clock, in epoch milliseconds (default
+  `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
+  and `Clock` all read it through `useWorld().now()`, so a multiplayer app
+  can hand every player one server-synced clock and see the same world.
+  `clockHours`, `currentHours` and `resolveWorldTime` take an optional
+  instant to read at. ([#53](https://github.com/nullorder/runek/issues/53))
+- `<World renderer>`: the renderer to draw with, passed to the canvas as
+  R3F's `gl` (parameters, an instance, or a sync or async factory), so an
+  app can run on three's `WebGPURenderer`. `shadowRate` now also works
+  where the renderer has no shared shadow switch, through each
+  shadow-casting light's own. ([#54](https://github.com/nullorder/runek/issues/54))
+- `useWorld().playerControl`: a teleport handle for the player's avatar.
+  `playerControl.current?.teleport([x, y, z], { yaw, keepVelocity })`
+  moves the body and its camera together, so the view doesn't sweep, and
+  works from outside the canvas (a network message, a button). `Rift`
+  carries the avatar through it. ([#52](https://github.com/nullorder/runek/issues/52))
+- `Player` props for the body and its pace: `height`, `radius`,
+  `eyeHeight`, `speed`, `sprintSpeed`, and `cameraDistance` for third
+  person. The defaults are the old fixed values.
+  ([#55](https://github.com/nullorder/runek/issues/55))
+
+### Changed
+
+- Contract §2: wall-clock motion and time of day read the world's clock
+  (`useWorld().now()`), not `Date.now()` or `new Date()` directly.
+
 ## [0.17.0](https://github.com/nullorder/runek/compare/v0.16.0...v0.17.0) - 2026-10-31
 
 ### Added

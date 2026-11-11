@@ -4,14 +4,24 @@ import { useRapier } from '@react-three/rapier'
 import {
   type AvatarView,
   Dynamic,
+  type PlayerControl,
   PlayerMotionContext,
+  type TeleportOptions,
   useMaterial,
   useWorld,
   type Vec3,
 } from '@runek/core'
 import Ecctrl, { type CustomEcctrlRigidBody } from 'ecctrl'
-import { type ReactNode, type RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { Group, Object3D, Scene } from 'three'
+import {
+  type ReactNode,
+  type RefObject,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { type Camera, type Group, type Object3D, type Scene, Vector3 } from 'three'
 import { PaniniLens } from './player/PaniniLens'
 
 export type PlayerView = AvatarView
@@ -168,6 +178,21 @@ export interface PlayerProps {
   view?: PlayerView
   /** Initial camera yaw in radians (0 faces +z). */
   yaw?: number
+  /** How tall the avatar is, feet to crown, in meters: the length of its capsule. */
+  height?: number
+  /** The capsule's radius, in meters. */
+  radius?: number
+  /** Eye height above the feet, in meters: where the first-person camera sits, what the
+   *  third-person camera turns about, and what others look at when they look at the player.
+   *  Unset, just under the top of the capsule as it floats (about 1.4 at the default size). */
+  eyeHeight?: number
+  /** Top walking speed, in meters per second. */
+  speed?: number
+  /** Top speed while the `run` key is held, in meters per second. */
+  sprintSpeed?: number
+  /** How far behind the avatar the third-person camera starts, in meters; scrolling zooms from
+   *  there. */
+  cameraDistance?: number
   /** How wide the first-person view is, in degrees across, on a 16:9 screen. The default,
    *  140, takes in most of what both eyes see, so the world wraps around you instead of
    *  sitting behind a window. Like most games it follows the screen's shape, not its size: a
@@ -182,10 +207,10 @@ export interface PlayerProps {
    *  toward the centre the way peripheral vision does; turn to look at something and it comes
    *  into focus. 0 turns it off. */
   peripheralBlur?: number
-  /** Custom avatar visual, replacing the default capsule. Size it to the capsule
-   *  envelope (1.3 units tall, centered at the character origin, so feet go at y = -0.65);
-   *  the Player lowers it onto the ground beneath the floating capsule. It is hidden in
-   *  first-person view. In world JSON, nest it as a child node of the Player. */
+  /** Custom avatar visual, replacing the default capsule. Size it to the capsule envelope
+   *  (`height` tall, centered at the character origin, so feet go at y = -height / 2: -0.65 at
+   *  the default size); the Player lowers it onto the ground beneath the floating capsule. It is
+   *  hidden in first-person view. In world JSON, nest it as a child node of the Player. */
   children?: ReactNode
 }
 
@@ -242,29 +267,76 @@ const CAMERA: Record<
 }
 const VIEWS: PlayerView[] = ['first', 'third', 'overhead']
 
-const CAPSULE_RADIUS = 0.3
-const CAPSULE_HALF_HEIGHT = 0.35
 // ecctrl's float spring, passed explicitly because `StandOnGround` depends on both.
 const FLOAT_HEIGHT = 0.3
 const SPRING_K = 1.2
-// Where the avatar's eyes sit on the capsule: what others look at when they look at the player.
-const EYE_HEIGHT = 0.5
+
+/** How far below `FLOAT_HEIGHT` the capsule rides at 60 fps: the spring's sag under the capsule's
+ *  own weight (rapier gives a collider a density of 1), as `StandOnGround` works it out. */
+function restingSag(radius: number, halfHeight: number, gravity: number) {
+  const mass = Math.PI * radius * radius * (2 * halfHeight + (4 / 3) * radius)
+  return (mass * gravity) / 60 / SPRING_K
+}
+
+/** Move the avatar's body, and its camera with it so the view doesn't sweep across the world.
+ *  False when the body doesn't exist yet. */
+function moveAvatar(
+  ecctrl: CustomEcctrlRigidBody | null,
+  scene: Scene,
+  camera: Camera,
+  to: Vec3,
+  { yaw, keepVelocity = false }: TeleportOptions,
+) {
+  const rb = ecctrl?.group
+  if (!rb) return false
+  const from = rb.translation()
+  const offset = new Vector3(to[0] - from.x, to[1] - from.y, to[2] - from.z)
+  rb.setTranslation({ x: to[0], y: to[1], z: to[2] }, true)
+  if (!keepVelocity) rb.setLinvel({ x: 0, y: 0, z: 0 }, true)
+
+  const pivot = findPivot(scene)
+  if (!pivot) return true
+  pivot.position.add(offset)
+  // In camera-based movement ecctrl squares the visible body to the pivot every frame, so turning
+  // the pivot turns both.
+  if (yaw !== undefined) pivot.rotation.y = yaw
+  // Put the camera where the follow-cam wants it, so neither the jump nor a new heading is lerped.
+  pivot.updateMatrixWorld(true)
+  pivot.children[0].getWorldPosition(camera.position)
+  camera.lookAt(pivot.position)
+  return true
+}
 
 export function Player({
   position = [0, 3, 0],
   view,
   yaw = 0,
+  height = 1.3,
+  radius = 0.3,
+  eyeHeight,
+  speed = 2.5,
+  sprintSpeed = 5,
+  cameraDistance = 5,
   fov = 140,
   peripheralBlur = 4,
   children,
 }: PlayerProps) {
-  const { avatar, player, keyboard, controls } = useWorld()
+  const { avatar, player, playerControl, keyboard, controls, gravity } = useWorld()
   const scene = useThree((s) => s.scene)
+  const camera = useThree((s) => s.camera)
   const wanted = view ?? avatar ?? 'first'
   const [current, setCurrent] = useState<PlayerView>(wanted)
   useEffect(() => setCurrent(wanted), [wanted])
   const firstPerson = current === 'first'
-  const cam = CAMERA[current]
+  const cam = useMemo(() => {
+    if (current !== 'third') return CAMERA[current]
+    const far = Math.max(cameraDistance, 0.5)
+    return {
+      ...CAMERA.third,
+      distance: -far,
+      zoom: [Math.max(CAMERA.third.zoom[0], -far), Math.min(CAMERA.third.zoom[1], -far)],
+    } satisfies (typeof CAMERA)[PlayerView]
+  }, [current, cameraDistance])
   const eyes = useRef<Object3D>(null)
   const body = useRef<CustomEcctrlRigidBody>(null)
   const [grounded, setGrounded] = useState(false)
@@ -272,21 +344,37 @@ export function Player({
   const lift = useRef<Group>(null)
   const capsule = useMaterial({ color: '#4a90d9' })
 
-  // ecctrl reads its camera setup once, at mount, so a new view remounts it: from where the
-  // avatar stands now, facing the way the camera faced. The old camera pivot is taken out of the
-  // scene so nothing finds it again.
-  const [mount, setMount] = useState({ view: current, at: position, yaw })
+  const capsuleRadius = Math.min(Math.max(radius, 0.05), height / 2)
+  const halfHeight = Math.max(height / 2 - capsuleRadius, 0.01)
+  // ecctrl's camera turns about a point `halfHeight + radius / 2` above the capsule's centre, plus
+  // `camTargetPos`. An `eyeHeight` is from the feet, which stand `FLOAT_HEIGHT` (less the spring's
+  // sag) below the capsule's bottom.
+  const centre = FLOAT_HEIGHT - restingSag(capsuleRadius, halfHeight, Math.abs(gravity[1]))
+  const eyeOffset =
+    eyeHeight === undefined
+      ? halfHeight + capsuleRadius / 2
+      : eyeHeight - centre - halfHeight - capsuleRadius
+  const camTarget = useMemo(
+    () => ({ x: 0, y: eyeOffset - halfHeight - capsuleRadius / 2, z: 0 }),
+    [eyeOffset, halfHeight, capsuleRadius],
+  )
+
+  // ecctrl reads its camera and capsule setup once, at mount, so a new view or size remounts it:
+  // from where the avatar stands now, facing the way the camera faced. The old camera pivot is
+  // taken out of the scene so nothing finds it again.
+  const setup = `${current}:${halfHeight}:${capsuleRadius}:${cam.distance}`
+  const [mount, setMount] = useState({ setup, at: position, yaw })
   useLayoutEffect(() => {
-    if (mount.view === current) return
+    if (mount.setup === setup) return
     const pivot = findPivot(scene)
     const t = body.current?.group?.translation()
     pivot?.removeFromParent()
     setMount({
-      view: current,
+      setup,
       at: t ? [t.x, t.y, t.z] : mount.at,
       yaw: pivot?.rotation.y ?? mount.yaw,
     })
-  }, [current, scene, mount])
+  }, [setup, scene, mount])
 
   useEffect(() => {
     const keys = controls.view
@@ -317,12 +405,36 @@ export function Player({
     return () => {
       if (player.current === anchor) player.current = null
     }
-    // A view change remounts ecctrl, and with it the anchor.
-  }, [player, mount.view])
+    // A new view or size remounts ecctrl, and with it the anchor.
+  }, [player, mount.setup])
+
+  // A teleport asked for before the body exists (just mounted, or remounting for a new view)
+  // waits for it.
+  const pendingTeleport = useRef<[Vec3, TeleportOptions] | null>(null)
+  useEffect(() => {
+    if (!playerControl) return
+    const control: PlayerControl = {
+      teleport(to, options = {}) {
+        const moved = moveAvatar(body.current, scene, camera, to, options)
+        pendingTeleport.current = moved ? null : [to, options]
+      },
+    }
+    playerControl.current = control
+    return () => {
+      if (playerControl.current === control) playerControl.current = null
+    }
+  }, [playerControl, scene, camera])
+  useFrame(() => {
+    const queued = pendingTeleport.current
+    if (!queued) return
+    if (moveAvatar(body.current, scene, camera, ...queued)) {
+      pendingTeleport.current = null
+    }
+  })
 
   return (
     <Ecctrl
-      key={mount.view}
+      key={mount.setup}
       ref={body}
       type={grounded ? 'dynamic' : 'kinematicPosition'}
       position={mount.at}
@@ -335,10 +447,13 @@ export function Player({
       autoBalance={false}
       {...(cam.locked ? { camUpLimit: cam.pitch, camLowLimit: cam.pitch } : {})}
       camCollision={cam.collision}
-      capsuleRadius={CAPSULE_RADIUS}
-      capsuleHalfHeight={CAPSULE_HALF_HEIGHT}
+      capsuleRadius={capsuleRadius}
+      capsuleHalfHeight={halfHeight}
       floatHeight={FLOAT_HEIGHT}
       springK={SPRING_K}
+      maxVelLimit={speed}
+      sprintMult={speed > 0 ? sprintSpeed / speed : 1}
+      camTargetPos={camTarget}
       camInitDis={cam.distance}
       camMinDis={cam.zoom[0]}
       camMaxDis={cam.zoom[1]}
@@ -352,13 +467,13 @@ export function Player({
           <PlayerMotionContext.Provider value={motion}>
             {children ?? (
               <mesh material={capsule} castShadow>
-                <capsuleGeometry args={[CAPSULE_RADIUS, CAPSULE_HALF_HEIGHT * 2, 8, 16]} />
+                <capsuleGeometry args={[capsuleRadius, halfHeight * 2, 8, 16]} />
               </mesh>
             )}
           </PlayerMotionContext.Provider>
         </group>
       </Dynamic>
-      <object3D ref={eyes} position={[0, EYE_HEIGHT, 0]} />
+      <object3D ref={eyes} position={[0, eyeOffset, 0]} />
       <CameraKeyLook pitchable={!cam.locked} />
       {firstPerson && <PaniniLens fov={fov} blur={peripheralBlur} />}
       {!firstPerson && <MotionProbe body={body} motion={motion} />}

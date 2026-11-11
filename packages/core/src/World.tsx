@@ -1,7 +1,7 @@
 import { KeyboardControls, type KeyboardControlsEntry, PerformanceMonitor } from '@react-three/drei'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, type GLProps, useFrame } from '@react-three/fiber'
 import { Physics, useRapier } from '@react-three/rapier'
-import { type ReactNode, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react'
 import type { Object3D } from 'three'
 import { WorldContext } from './context'
 import { DEFAULT_FONTS, type WorldFonts } from './font'
@@ -10,10 +10,11 @@ import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
 import { LightBudget } from './LightBudget'
 import type { Lens } from './lens'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
+import { glProps } from './renderer'
 import { ShadowRate } from './ShadowRate'
 import { StaticBatching } from './StaticBatching'
 import { resolveWorldTime } from './time'
-import type { AvatarView, Interactor, Vec3, Walker, WorldFog } from './types'
+import type { AvatarView, Interactor, PlayerControl, Vec3, Walker, WorldFog } from './types'
 
 export interface WorldProps {
   unit?: number
@@ -59,6 +60,16 @@ export interface WorldProps {
    *  (the editor enables this for the "suggest changes" PNG). Off by default — it can
    *  cost a little performance. */
   preserveDrawingBuffer?: boolean
+  /** The renderer to draw with, passed to the canvas as R3F's `gl`: renderer parameters, a
+   *  renderer instance, or a function (sync or async) that receives the default parameters and
+   *  returns one. Use it to run on three's `WebGPURenderer`. A factory also receives
+   *  `preserveDrawingBuffer`. Unset, a `WebGLRenderer`. */
+  renderer?: GLProps
+  /** The world's wall clock, in epoch milliseconds. Everything that moves or tells time by the
+   *  wall clock (walking `Person`s and their trips, live day/night, `Clock`) reads it, so viewers
+   *  whose system clocks disagree can share one: pass a server-synced clock in a multiplayer app.
+   *  Default `Date.now`. */
+  now?: () => number
   /** Pixel ratio to render at. A number pins it. A `[min, max]` range follows the display's own
    *  ratio up to `max`, and steps down toward `min` while frames run slow (back up when they
    *  recover). Default `[1, 1.5]`: sharp on a high-density screen at about half the cost of 2x. */
@@ -98,6 +109,8 @@ export function World({
   avatar,
   onPointerMissed,
   preserveDrawingBuffer = false,
+  renderer,
+  now,
   dpr = DEFAULT_DPR,
   batching = true,
   lightBudget = DEFAULT_LIGHT_BUDGET,
@@ -122,7 +135,14 @@ export function World({
 
   const keySource = useKeySource(input && !paused)
 
+  // One stable function on the context that always reads the latest `now`, so an inline clock
+  // doesn't re-render every component that reads the world.
+  const clock = useRef(now)
+  clock.current = now
+  const worldNow = useCallback(() => (clock.current ?? Date.now)(), [])
+
   const player = useRef<Object3D | null>(null)
+  const playerControl = useRef<PlayerControl | null>(null)
   const lens = useRef<Lens | null>(null)
   const walkers = useMemo(() => new Set<Walker>(), [])
   const interactions = useMemo(() => new Set<Interactor>(), [])
@@ -134,14 +154,16 @@ export function World({
       ground,
       palette: { ...DEFAULT_PALETTE, ...palette },
       fonts: { ...DEFAULT_FONTS, ...fonts },
-      time: resolveWorldTime({ time, timezone }),
+      time: resolveWorldTime({ time, timezone }, worldNow()),
       avatar,
       controls: resolvedControls,
       player,
+      playerControl,
       lens,
       walkers,
       interactions,
       keyboard: keySource,
+      now: worldNow,
     }),
     [
       unit,
@@ -156,7 +178,13 @@ export function World({
       walkers,
       interactions,
       keySource,
+      worldNow,
     ],
+  )
+
+  const gl = useMemo(
+    () => glProps(renderer, preserveDrawingBuffer),
+    [renderer, preserveDrawingBuffer],
   )
 
   const [minDpr, maxDpr] = typeof dpr === 'number' ? [dpr, dpr] : dpr
@@ -171,7 +199,7 @@ export function World({
         shadows
         dpr={[minDpr, ceiling]}
         camera={{ position: [6, 4, 6], fov: 60 }}
-        gl={{ preserveDrawingBuffer }}
+        gl={gl}
         onPointerMissed={onPointerMissed}
       >
         <WorldContext.Provider value={context}>

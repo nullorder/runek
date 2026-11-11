@@ -51,6 +51,23 @@ export interface PlayerMotion {
   speed: number
 }
 
+/** How `PlayerControl.teleport` lands the avatar. */
+export interface TeleportOptions {
+  /** Face this way on arrival: camera yaw in radians (0 faces +z), as `Player`'s `yaw`. Unset
+   *  keeps the current heading. */
+  yaw?: number
+  /** Carry the avatar's velocity through the jump. Default false: it arrives at rest. */
+  keepVelocity?: boolean
+}
+
+/** Imperative handle on the player's avatar, published by `Player` while one is mounted. Safe to
+ *  call from anywhere, including outside the canvas (a network message, a UI button). */
+export interface PlayerControl {
+  /** Move the avatar's body to `position`, in world coordinates (where `Player`'s `position` puts
+   *  it). The camera moves with it, so the view doesn't sweep across the world. */
+  teleport(position: Vec3, options?: TeleportOptions): void
+}
+
 export interface WorldContextValue {
   /** Meters per unit. Components scale their geometry by this. */
   unit: number
@@ -78,6 +95,10 @@ export interface WorldContextValue {
    *  player *is*, which in third person is not where the camera is. Absent under a
    *  hand-rolled provider, where components fall back to the camera. */
   player?: RefObject<Object3D | null>
+  /** Teleport handle for the player's avatar, set by `Player` while one is mounted (`null`
+   *  otherwise). A ref, so app code can keep it and call `playerControl.current?.teleport(...)`
+   *  later, from outside React. Absent under a hand-rolled provider. */
+  playerControl?: RefObject<PlayerControl | null>
   /** The curved projection the screen is drawn through, set by a `Player` with a wide
    *  first-person view (`null` while the camera's own flat projection is used). Read
    *  `lens.current` per frame, or use `useLensPosition` for `<Html>` labels. Absent under a
@@ -93,4 +114,9 @@ export interface WorldContextValue {
    *  none while `input` is off or the world is paused. Listen for `keydown` / `keyup`. Absent
    *  under a hand-rolled provider. */
   keyboard?: EventTarget
+  /** The world's wall clock, in epoch milliseconds: `<World now>`, or `Date.now`. Read it for
+   *  anything that moves or tells time by the wall clock (routes, trips, live day/night, clock
+   *  hands), so viewers whose own clocks disagree still see the same world. Stable across
+   *  renders. A hand-rolled provider may leave it out: fall back to `Date.now`. */
+  now?: () => number
 }

@@ -14,6 +14,7 @@ export const WorldContext = createContext<WorldContextValue>({
   fonts: DEFAULT_FONTS,
   time: DEFAULT_WORLD_TIME,
   controls: DEFAULT_CONTROLS,
+  now: Date.now,
 })
 
 /** The world's ground index, provided by `WorldRenderer`/`WorldEditor`. */

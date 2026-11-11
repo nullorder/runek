@@ -59,7 +59,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `pause` | `number` | `1.5` | Seconds held at each waypoint. Walking always stands; the authored `pose` plays here. |
 | `loop` | `"loop" \| "pingpong"` | `"loop"` | `loop` walks from the last waypoint back to the first; `pingpong` retraces the route. |
 | `route` | `[x, y, z][]` |  | A one-way trip through these waypoints, relative to `position` like `patrol`, setting off at `departAt`. Before then the figure waits at the first point facing its `rotation`; after the last it stays there, facing the way it came, in its `pose`. Wins over `patrol` and `wander`. Give a new trip a new `position` (the old one's end) and `departAt`. |
-| `departAt` | `number` | `0` | When the `route` trip sets off, in epoch milliseconds (`Date.now()`). Plain data, so every viewer sees the figure at the same point of its trip. Unset, the trip is long over. |
+| `departAt` | `number` | `0` | When the `route` trip sets off, in epoch milliseconds on the world's clock (`useWorld().now()`, which is `Date.now()` unless the world is given a clock). Plain data, so every viewer sees the figure at the same point of its trip. Unset, the trip is long over. |
 | `onArrive` | `function` (code only) |  | Called once per trip (`route` + `departAt`) when the figure has arrived, on the first frame it has, so a trip that ended while the world was paused or unmounted still reports. |
 | `gait` | `number` |  | Walk-cycle speed, in units per second, for a figure something else moves (a cart, a script). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed. |
 | `idle` | `boolean` | `true` | Breathing, weight shift, and blinking. |

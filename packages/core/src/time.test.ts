@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { currentHours, parseClockTime, resolveWorldTime, sunState, type WorldTime } from './time'
+import {
+  clockHours,
+  currentHours,
+  parseClockTime,
+  resolveWorldTime,
+  sunState,
+  type WorldTime,
+} from './time'
 
 describe('parseClockTime', () => {
   it('parses HH:MM into fractional hours', () => {
@@ -38,12 +45,34 @@ describe('resolveWorldTime', () => {
     expect(live.hours).toBeGreaterThanOrEqual(0)
     expect(live.hours).toBeLessThan(24)
   })
+
+  it('snapshots a live clock at the given instant', () => {
+    expect(resolveWorldTime({ timezone: 'UTC' }, Date.UTC(2026, 0, 1, 21, 0)).hours).toBe(21)
+  })
+})
+
+describe('clockHours', () => {
+  const at = Date.UTC(2026, 10, 10, 18, 30)
+
+  it('reads the given instant, not the system clock', () => {
+    expect(clockHours('UTC', at)).toBe(18.5)
+    expect(clockHours('Asia/Kolkata', at)).toBe(0)
+  })
+
+  it('falls back to UTC for an unusable zone', () => {
+    expect(clockHours('Not/AZone', at)).toBe(18.5)
+  })
 })
 
 describe('currentHours', () => {
   it('returns the pinned hours unchanged', () => {
     const pinned: WorldTime = { hours: 7.25, live: false }
     expect(currentHours(pinned)).toBe(7.25)
+  })
+
+  it('reads a live clock at the given instant', () => {
+    const live: WorldTime = { hours: 0, live: true, timezone: 'UTC' }
+    expect(currentHours(live, Date.UTC(2026, 0, 1, 6, 15))).toBe(6.25)
   })
 
   it('reads a live clock within range', () => {

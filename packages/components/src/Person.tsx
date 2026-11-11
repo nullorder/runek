@@ -160,8 +160,9 @@ export interface PersonProps extends WorldComponentProps {
    *  the last it stays there, facing the way it came, in its `pose`. Wins over `patrol` and
    *  `wander`. Give a new trip a new `position` (the old one's end) and `departAt`. */
   route?: Vec3[]
-  /** When the `route` trip sets off, in epoch milliseconds (`Date.now()`). Plain data, so every
-   *  viewer sees the figure at the same point of its trip. Unset, the trip is long over. */
+  /** When the `route` trip sets off, in epoch milliseconds on the world's clock
+   *  (`useWorld().now()`, which is `Date.now()` unless the world is given a clock). Plain data, so
+   *  every viewer sees the figure at the same point of its trip. Unset, the trip is long over. */
   departAt?: number
   /** Called once per trip (`route` + `departAt`) when the figure has arrived, on the first
    *  frame it has, so a trip that ended while the world was paused or unmounted still reports. */
