@@ -1,4 +1,11 @@
-import { useLight, useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  glowLook,
+  useLight,
+  useLuminance,
+  useMaterials,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 
 export interface NeonStripProps extends WorldComponentProps {
   /** Length along local X, in units, centred on the origin. */
@@ -10,13 +17,16 @@ export interface NeonStripProps extends WorldComponentProps {
   /** Cast real light as well as glowing, from the middle of the tube. Leave it off on most
    *  strips: the world lends real lights to only a few emitters at a time. */
   light?: boolean
+  /** The real light's strength, with `light`. How bright the tube itself looks is the world's
+   *  `tube` luminance level. */
   intensity?: number
 }
 
 /**
  * A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, unlit by
  * the scene so it reads as light at any hour, for cove lighting, a desk's edge or a line round
- * a room. `light` also washes nearby walls in its colour. Decorative: no collider.
+ * a room, at the world's `tube` luminance level. `light` also washes nearby walls in its colour.
+ * Decorative: no collider.
  */
 export function NeonStrip({
   position = [0, 0, 0],
@@ -28,20 +38,14 @@ export function NeonStrip({
   intensity = 3,
 }: NeonStripProps) {
   const { unit } = useWorld()
+  const { tube } = useLuminance()
   const L = length * unit
   const r = (thickness / 2) * unit
   const glow = useLight({ color, intensity, distance: (length + 3) * unit, decay: 1.6 }, light)
   const m = useMaterials({
-    core: { kind: 'basic', color: '#ffffff', toneMapped: false },
-    sleeve: { kind: 'basic', color, transparent: true, opacity: 0.85, toneMapped: false },
-    halo: {
-      kind: 'basic',
-      color,
-      transparent: true,
-      opacity: 0.12,
-      depthWrite: false,
-      toneMapped: false,
-    },
+    core: glowLook('#ffffff', tube),
+    sleeve: glowLook(color, tube, { transparent: true, opacity: 0.85 }),
+    halo: glowLook(color, tube, { transparent: true, opacity: 0.12, depthWrite: false }),
   })
 
   return (

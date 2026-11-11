@@ -3,6 +3,7 @@ import { CylinderCollider, RigidBody } from '@react-three/rapier'
 import {
   Dynamic,
   useLight,
+  useLuminance,
   useMaterials,
   useSun,
   useWorld,
@@ -49,6 +50,7 @@ export function Lighthouse({
   nightOnly = true,
 }: LighthouseProps) {
   const { unit } = useWorld()
+  const { lamp: glow } = useLuminance()
   const sun = useSun()
   const lit = !nightOnly || !sun.day
   const lamp = useLight({ color: lightColor, intensity: 30, distance: 40 * unit, decay: 1.4 }, lit)
@@ -60,7 +62,7 @@ export function Lighthouse({
     iron: { color: IRON, roughness: 0.6, metalness: 0.4 },
     glass: { color: '#cfe6ee', transparent: true, opacity: 0.3, roughness: 0.05, side: DoubleSide },
     bulb: lit
-      ? { color: lightColor, emissive: lightColor, emissiveIntensity: 3, toneMapped: false }
+      ? { color: lightColor, emissive: lightColor, emissiveIntensity: 3 * glow, toneMapped: false }
       : { color: '#d9d4ca' },
   })
   const beams = useRef<Group>(null)

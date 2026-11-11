@@ -42,8 +42,11 @@ export type { Lens } from './lens'
 export { useLensPosition } from './lens'
 export type { LightEmitter, LightKind, LightLook } from './light'
 export { LightPool, LightPoolContext, useLight } from './light'
+export type { LuminanceLevel, WorldLuminance } from './luminance'
+export { DEFAULT_LUMINANCE } from './luminance'
 export type { MaterialKind, MaterialLook } from './material'
 export {
+  glowLook,
   materialKey,
   releaseMaterial,
   retainMaterial,
@@ -91,7 +94,7 @@ export type {
 } from './types'
 export { useGround } from './useGround'
 export { useSun } from './useSun'
-export { useWorld } from './useWorld'
+export { useLuminance, useWorld } from './useWorld'
 export type { JsonPath, ValidationIssue } from './validate'
 export { suggest, validateWorld } from './validate'
 export type { WorldProps } from './World'

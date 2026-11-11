@@ -1,10 +1,12 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import {
+  glowLook,
   int,
   pick,
   type Rng,
   rng,
   sub,
+  useLuminance,
   useMaterials,
   useWorld,
   type WorldComponentProps,
@@ -267,6 +269,7 @@ export function ArcadeCabinet({
   game = 'invaders',
 }: ArcadeCabinetProps) {
   const { unit } = useWorld()
+  const { screen, tube } = useLuminance()
   const u = unit
   const W = width * u
 
@@ -360,15 +363,15 @@ export function ArcadeCabinet({
 
   const m = useMaterials({
     body: { color: look.body, roughness: 0.6 },
-    neon: { kind: 'basic', color: look.neon, toneMapped: false },
+    neon: glowLook(look.neon, tube),
     kick: { color: '#141416', roughness: 0.7 },
     panel: { color: '#1b1b1e', roughness: 0.5 },
     stick: { color: '#222' },
     ball: { color: '#d23b3b', roughness: 0.3 },
     bezel: { color: '#0b0b0d', roughness: 0.3 },
-    screenOn: { kind: 'basic', color: '#05060c', toneMapped: false },
+    screenOn: glowLook('#05060c', screen),
     screenOff: { color: '#101214', roughness: 0.1, metalness: 0.4 },
-    pixel: { kind: 'basic', toneMapped: false },
+    pixel: glowLook('#ffffff', screen),
   })
   const buttons = useMaterials(
     [0, 1, 2].map((b) => ({

@@ -68,18 +68,27 @@ interface Entry {
 
 const shared = new Map<string, Entry>()
 const scratch = new Color()
+const srgb = { r: 0, g: 0, b: 0 }
 
-/** The cache key for a look: same key, same material. Colors compare by value, key order and
- *  unset fields don't matter. */
+// The 8-bit sRGB channels, unclamped: the hex string while all three are in range, so colors
+// that print the same share a material; past 1 (an HDR glow feeding bloom) the multiplier stays
+// in the key instead of clamping to `ff`.
+function colorKey(value: ColorRepresentation): string {
+  scratch.set(value).getRGB(srgb, SRGBColorSpace)
+  const channels = [srgb.r, srgb.g, srgb.b].map((c) => Math.round(c * 255))
+  if (channels.some((n) => n < 0 || n > 255)) return channels.join(',')
+  return channels.map((n) => n.toString(16).padStart(2, '0')).join('')
+}
+
+/** The cache key for a look: same key, same material. Colors compare by value (including
+ *  brightness above 1), key order and unset fields don't matter. */
 export function materialKey(look: MaterialLook): string {
   const { kind = 'standard', ...params } = look
   const parts: string[] = []
   for (const name of Object.keys(params).sort()) {
     const value = params[name as keyof typeof params]
     if (value === undefined) continue
-    parts.push(
-      `${name}=${COLOR_KEYS.has(name) ? scratch.set(value as ColorRepresentation).getHexString(SRGBColorSpace) : value}`,
-    )
+    parts.push(`${name}=${COLOR_KEYS.has(name) ? colorKey(value as ColorRepresentation) : value}`)
   }
   return `${kind}|${parts.join(';')}`
 }
@@ -187,4 +196,28 @@ export function useMaterials<T extends Record<string, MaterialLook> | MaterialLo
     }
   }, [signature])
   return materials
+}
+
+/**
+ * The look of an unlit surface glowing `color` at `level` (a world luminance level: read it from
+ * `useLuminance()`). Basic and not tone mapped, with the color scaled by the level, so above 1 it
+ * reaches bloom. Share it through `useMaterial(s)` like any look; `look` adds the rest (opacity,
+ * side).
+ *
+ * ```tsx
+ * const { tube } = useLuminance()
+ * const m = useMaterials({ core: glowLook('#ffffff', tube), sleeve: glowLook(color, tube) })
+ * ```
+ */
+export function glowLook(
+  color: ColorRepresentation,
+  level: number,
+  look?: Omit<MaterialLook, 'kind' | 'color' | 'toneMapped'>,
+): MaterialLook {
+  return {
+    ...look,
+    kind: 'basic',
+    color: new Color(color).multiplyScalar(level),
+    toneMapped: false,
+  }
 }

@@ -3,6 +3,7 @@ import {
   rng,
   sub,
   useLight,
+  useLuminance,
   useMaterials,
   useSun,
   useWorld,
@@ -109,6 +110,7 @@ export function Chandelier({
   nightOnly = false,
 }: ChandelierProps) {
   const { unit, palette } = useWorld()
+  const { lamp } = useLuminance()
   const sun = useSun()
   const lit = on && (!nightOnly || !sun.day)
   const brass = color ?? palette.accent
@@ -197,7 +199,7 @@ export function Chandelier({
     bulb: {
       color: '#fff3d6',
       emissive: lightColor,
-      emissiveIntensity: lit ? 2.2 : 0,
+      emissiveIntensity: lit ? 2.2 * lamp : 0,
       toneMapped: !lit,
     },
     // Faceted, glossy, see-through glass. Real refraction (`transmission`) would make three draw
@@ -209,7 +211,7 @@ export function Chandelier({
       transparent: true,
       opacity: 0.75,
       emissive: lightColor,
-      emissiveIntensity: lit ? 0.35 : 0,
+      emissiveIntensity: lit ? 0.35 * lamp : 0,
     },
   })
 

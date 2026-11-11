@@ -4,6 +4,7 @@ import {
   rng,
   sub,
   useLight,
+  useLuminance,
   useMaterials,
   useSun,
   useWorld,
@@ -65,6 +66,7 @@ export function CeilingLight({
   nightOnly = false,
 }: CeilingLightProps) {
   const { unit, palette } = useWorld()
+  const { lamp } = useLuminance()
   const sun = useSun()
   const lit = on && (!nightOnly || !sun.day)
   const metal = color ?? palette.metal
@@ -87,13 +89,13 @@ export function CeilingLight({
     bulb: {
       color: '#fff6e0',
       emissive: lightColor,
-      emissiveIntensity: lit ? 2 : 0,
+      emissiveIntensity: lit ? 2 * lamp : 0,
       toneMapped: !lit,
     },
     globe: {
       color: look.shadeColor,
       emissive: lightColor,
-      emissiveIntensity: lit ? 0.9 : 0,
+      emissiveIntensity: lit ? 0.9 * lamp : 0,
       transparent: true,
       opacity: 0.92,
     },

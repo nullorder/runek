@@ -36,7 +36,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `color` | `color` | `"#ff2fb3"` | The glow. |
 | `thickness` | `number` | `0.03` | Tube diameter, in units. |
 | `light` | `boolean` | `false` | Cast real light as well as glowing, from the middle of the tube. Leave it off on most strips: the world lends real lights to only a few emitters at a time. |
-| `intensity` | `number` | `3` |  |
+| `intensity` | `number` | `3` | The real light's strength, with `light`. How bright the tube itself looks is the world's `tube` luminance level. |
 | `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
 | `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
 | `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |

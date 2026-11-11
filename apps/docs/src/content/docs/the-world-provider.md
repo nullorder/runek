@@ -33,6 +33,7 @@ import { Player } from './runek/Player'
 | `gravity` | `[x, y, z]` | `[0, -9.81, 0]` | Physics gravity. |
 | `lights` | `boolean` | `true` | Render the default lights. Set `false` to use your own. |
 | `palette` | `Partial<WorldPalette>` | built-in | Override color slots; every component re-themes at once. |
+| `luminance` | `Partial<WorldLuminance>` | all `1` | How bright glowing surfaces are, per kind (`screen`, `sign`, `tube`, `lamp`, `flame`). See [Luminance](#luminance). |
 | `controls` | `Record<string, string[]>` | built-in | Remap input bindings (action → key codes); serializable. |
 | `fog` | `{ color, near, far }` | off | Linear distance fog; pair the color with the sky's horizon. |
 | `input` | `boolean` | `true` | Read the keyboard. Set `false` to ignore it, e.g. while a modal is open. |
@@ -92,6 +93,33 @@ Components default their colors to named slots — `wood`, `wall`, `foliage`, `w
 
 The full slot list is the `WorldPalette` interface in `@runek/core`.
 
+## Luminance
+
+Glowing surfaces (a screen, neon, a bulb, a flame) are drawn unlit, and how bright each one looks is the world's call, not the component's. `luminance` sets a level per kind of light source, in scene-linear units relative to diffuse white: `1` draws a color at face value, `4` four times brighter. Above 1 a surface goes past what the display shows, which is what feeds bloom when you add a post-processing pass.
+
+| Level | What follows it |
+|---|---|
+| `screen` | `Screen`, `Monitor`, `Tv`, arcade screens |
+| `sign` | a `Sign` with `lit` |
+| `tube` | `NeonStrip`, an arcade marquee |
+| `lamp` | the bulbs of `Lamp`, `CeilingLight`, `DeskLamp`, `Chandelier`, `PictureLight`, `Lighthouse`, and the shades and glass they light |
+| `flame` | `Campfire`, `TikiTorch` |
+
+```tsx
+<World luminance={{ lamp: 6, tube: 4, screen: 1.5 }}>
+  {/* street lamps outshine neon, neon outshines the shop's screens */}
+</World>
+```
+
+Every level defaults to `1`, so a world that sets none looks as it always has. Changing one rescales every surface of that kind at once. The light a lamp casts on its surroundings is still its own `intensity` prop. In your own components, read the levels with `useLuminance()` and build the shared material for a glowing color with `glowLook`:
+
+```tsx
+import { glowLook, useLuminance, useMaterials } from '@runek/core'
+
+const { tube } = useLuminance()
+const m = useMaterials({ core: glowLook('#ffffff', tube), sleeve: glowLook(color, tube) })
+```
+
 ## useWorld()
 
 Components read the shared scale from the provider so they size consistently:
@@ -132,6 +160,8 @@ looks relative to it (`lookYaw`, `lookPitch`). It is written in place after ever
 so keep the ref and read it whenever you need it, a network send included. The body `Player`
 carries reads the same record through `PlayerMotionContext` (see [embedding a
 world](/docs/embedding-a-world#several-players-one-world) for feeding a remote copy).
+
+`useWorld().luminance` holds the resolved levels; `useLuminance()` reads the same with the defaults filled in under a hand-rolled provider.
 
 `useWorld().now()` is the world's clock in epoch milliseconds (`<World now>`, or `Date.now`).
 Anything that moves or tells time by the wall clock reads it instead of `Date.now()`.

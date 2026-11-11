@@ -1,3 +1,4 @@
+import { DEFAULT_LUMINANCE } from './luminance.ts'
 import { DEFAULT_PALETTE } from './palette.ts'
 import { describeType, isCodeOnly, matches, type SchemaMap } from './prop-schema.ts'
 
@@ -24,6 +25,7 @@ const WORLD_KEYS = [
   'controls',
   'palette',
   'fonts',
+  'luminance',
   'fog',
   'nodes',
 ]
@@ -134,6 +136,24 @@ export function validateWorld(
         issues.push({
           path: ['palette', slot],
           message: 'A palette slot is a color string.',
+          severity: 'warning',
+        })
+    }
+  }
+  if (isObj(data.luminance)) {
+    const levels = Object.keys(DEFAULT_LUMINANCE)
+    for (const [level, value] of Object.entries(data.luminance)) {
+      if (!levels.includes(level))
+        issues.push({
+          path: ['luminance', level],
+          key: true,
+          message: `Unknown luminance level "${level}".${mean(level, levels)}`,
+          severity: 'warning',
+        })
+      else if (typeof value !== 'number' || !(value >= 0))
+        issues.push({
+          path: ['luminance', level],
+          message: 'A luminance level is a number, 0 or more (1 is face value).',
           severity: 'warning',
         })
     }

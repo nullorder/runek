@@ -23,6 +23,7 @@ interface WorldData {
   controls?: Record<string, string[]> // input remap: action → KeyboardEvent.codes
   palette?: Partial<WorldPalette> // color-slot overrides for the whole world
   fonts?: Partial<WorldFonts> // fonts the world ships, by role (display, body)
+  luminance?: Partial<WorldLuminance> // glow levels: screen, sign, tube, lamp, flame
   fog?: { color: string; near: number; far: number }
   nodes: WorldNode[]
 }
@@ -83,6 +84,7 @@ A handful of top-level fields are the world's **rules**: values components read 
 - **`avatar`** (`"first"`, `"third"`, or `"overhead"`) is the default camera view. `Player` uses it unless its own `view` prop is set — an explicit prop always wins.
 - **`controls`** remaps input bindings: a partial `action → KeyboardEvent.code[]` map merged over the defaults (WASD moves, arrow keys turn/look — in either view). Declare only what you change (`{ "forward": ["KeyW", "KeyZ"] }` for AZERTY), bind `[]` to disable an action, or add unknown action names as custom bindings your own components read via `useKeyboardControls`. Components see the resolved map at `useWorld().controls`. Controls are orthogonal to `avatar`: bindings behave the same in every view.
 - **`ground`** is the baseline ground level (a `Y` value, default `0`): the datum that `Floor` and water like `Lake` default their placement to. In a coastal world it is effectively your **sea level**, the terrain rises from it and the water sits at it, so moving `ground` shifts a whole world's datum at once (a sunken basin, a plateau). Open water sits at or below it (a floating lake is a bug); an explicit `position` still wins.
+- **`luminance`** sets how bright glowing surfaces are, per kind: `screen` (screens, monitors, TVs), `sign` (a `Sign` with `lit`), `tube` (neon), `lamp` (bulbs and the shades they light) and `flame` (fires), in scene-linear units where `1` is face value. Above 1 they feed bloom. Every level defaults to `1`, so `{ "luminance": { "lamp": 6, "screen": 1.5 } }` is a world's exposure in one line (see [the World provider](/docs/the-world-provider#luminance)).
 - **`fonts`** are the typefaces the world ships, keyed by role (`display` for titles and signage, `body` for labels). They are the one exception to the no-assets moat: components hold no fonts, so the world declares them and `Sign` draws from them. An undeclared role falls back to the pixel font bundled in `@runek/core`, so `Sign` always renders even with no `fonts` set.
 
 Every setting is optional with a sensible default (a bright midday, first-person), so a world that declares none renders exactly as before.

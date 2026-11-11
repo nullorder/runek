@@ -203,6 +203,38 @@
       },
       "additionalProperties": false
     },
+    "luminance": {
+      "type": "object",
+      "description": "How bright glowing surfaces are, per kind, relative to diffuse white (1 is face value).",
+      "properties": {
+        "screen": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        },
+        "sign": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        },
+        "tube": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        },
+        "lamp": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        },
+        "flame": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "fog": {
       "type": "object",
       "required": [
@@ -5453,6 +5485,7 @@
         },
         "intensity": {
           "type": "number",
+          "description": "The real light's strength, with `light`. How bright the tube itself looks is the world's\n`tube` luminance level.",
           "default": 3
         },
         "position": {
@@ -8563,7 +8596,7 @@
       "additionalProperties": false
     },
     "props.Sign": {
-      "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core.",
+      "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core. Can glow at a world luminance level, and read from both sides.",
       "type": "object",
       "properties": {
         "children": {
@@ -8677,6 +8710,29 @@
             "#7a5a40"
           ],
           "description": "A crisp edge in this color, so the text reads against any background. Wins over `glow`."
+        },
+        "lit": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "enum": [
+                "screen",
+                "sign",
+                "tube",
+                "lamp",
+                "flame"
+              ]
+            }
+          ],
+          "description": "Glow: unlit by the scene and brightened by the world's `sign` luminance level, so lettering\nreads as light and, above 1, blooms. Name another level (`screen`, `tube`) to glow at that\none instead.",
+          "default": false
+        },
+        "twoSided": {
+          "type": "boolean",
+          "description": "Read from both sides, for a sign that stands free of a wall (hanging, on a roof, on a glass\ndoor): two faces back to back, each front-side only, so neither shows the other mirrored.",
+          "default": false
         }
       },
       "required": [

@@ -1,6 +1,7 @@
 // Build a JSON Schema (draft 2020-12) for world files from the prop schema, so editors and
 // agents can validate a world.json and complete component names and props. Served at
 // https://runek.nullorder.org/r/world.schema.json.
+import { DEFAULT_LUMINANCE } from '../packages/core/src/luminance.ts'
 import { DEFAULT_PALETTE } from '../packages/core/src/palette.ts'
 
 const SCHEMA_URL = 'https://runek.nullorder.org/r/world.schema.json'
@@ -173,6 +174,18 @@ export function worldSchema(components) {
       fonts: {
         type: 'object',
         properties: { display: { type: 'string' }, body: { type: 'string' } },
+        additionalProperties: false,
+      },
+      luminance: {
+        type: 'object',
+        description:
+          'How bright glowing surfaces are, per kind, relative to diffuse white (1 is face value).',
+        properties: Object.fromEntries(
+          Object.keys(DEFAULT_LUMINANCE).map((level) => [
+            level,
+            { type: 'number', minimum: 0, default: DEFAULT_LUMINANCE[level] },
+          ]),
+        ),
         additionalProperties: false,
       },
       fog: {

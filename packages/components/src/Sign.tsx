@@ -1,6 +1,14 @@
 import { Text } from '@react-three/drei'
-import { useWorld, type Vec3, type WorldFonts } from '@runek/core'
-import type { ReactNode } from 'react'
+import {
+  type LuminanceLevel,
+  useLuminance,
+  useMaterial,
+  useWorld,
+  type Vec3,
+  type WorldFonts,
+} from '@runek/core'
+import { type ReactNode, useMemo } from 'react'
+import { Color, DoubleSide, FrontSide } from 'three'
 
 export interface SignProps {
   /** The text to render. */
@@ -31,6 +39,13 @@ export interface SignProps {
   glow?: boolean
   /** A crisp edge in this color, so the text reads against any background. Wins over `glow`. */
   outline?: string
+  /** Glow: unlit by the scene and brightened by the world's `sign` luminance level, so lettering
+   *  reads as light and, above 1, blooms. Name another level (`screen`, `tube`) to glow at that
+   *  one instead. */
+  lit?: boolean | LuminanceLevel
+  /** Read from both sides, for a sign that stands free of a wall (hanging, on a roof, on a glass
+   *  door): two faces back to back, each front-side only, so neither shows the other mirrored. */
+  twoSided?: boolean
   /** Called with the laid-out text's width and height, in world units, whenever it changes:
    *  for fitting a backdrop behind it. */
   onBounds?: (width: number, height: number) => void
@@ -40,8 +55,9 @@ export interface SignProps {
  * In-world text. The one component that renders glyphs, and so the single
  * carve-out to the no-assets rule (CONTRACT §4): it ships no font of its own,
  * drawing only from the world's declared `fonts` or the default bundled in
- * `@runek/core`. Decorative: it registers no colliders (mount it on a surface
- * that has one, e.g. a Wall).
+ * `@runek/core`. `lit` makes it glow at a world luminance level, `twoSided` reads
+ * it from behind as well. Decorative: it registers no colliders (mount it on a
+ * surface that has one, e.g. a Wall).
  */
 export function Sign({
   children,
@@ -57,37 +73,57 @@ export function Sign({
   anchorY = 'middle',
   glow = false,
   outline,
+  lit = false,
+  twoSided = false,
   onBounds,
 }: SignProps) {
   const { unit, fonts, palette } = useWorld()
+  const luminance = useLuminance()
   const face = font ?? fonts[variant]
   const ink = color ?? palette.accent
+  const level = lit ? luminance[lit === true ? 'sign' : lit] : 1
+  const tint = useMemo(() => (lit ? new Color(ink).multiplyScalar(level) : ink), [lit, ink, level])
+  // The glyphs' base material, shared: troika keeps each text's color on its own derived copy.
+  const material = useMaterial({
+    kind: 'basic',
+    transparent: true,
+    side: twoSided ? FrontSide : DoubleSide,
+    toneMapped: !lit,
+  })
 
-  return (
+  const text = (anchor: SignProps['anchorX'], report?: SignProps['onBounds']) => (
     <Text
       font={face}
-      position={position}
-      rotation={rotation}
+      material={material}
       fontSize={size * unit}
-      color={ink}
+      color={tint}
       maxWidth={maxWidth !== undefined ? maxWidth * unit : undefined}
       letterSpacing={letterSpacing}
-      anchorX={anchorX}
+      anchorX={anchor}
       anchorY={anchorY}
       outlineWidth={outline ? '9%' : glow ? 0.02 * unit : 0}
-      outlineColor={outline ?? ink}
+      outlineColor={outline ?? tint}
       outlineBlur={outline || !glow ? 0 : '45%'}
       outlineOpacity={outline || !glow ? 1 : 0.5}
       onSync={
-        onBounds
-          ? (text: { textRenderInfo?: { blockBounds: number[] } }) => {
-              const b = text.textRenderInfo?.blockBounds
-              if (b) onBounds(b[2] - b[0], b[3] - b[1])
+        report
+          ? (mesh: { textRenderInfo?: { blockBounds: number[] } }) => {
+              const b = mesh.textRenderInfo?.blockBounds
+              if (b) report(b[2] - b[0], b[3] - b[1])
             }
           : undefined
       }
     >
       {children}
     </Text>
+  )
+
+  // The back face is turned half a turn, so its anchor mirrors to cover the same span.
+  const back = anchorX === 'left' ? 'right' : anchorX === 'right' ? 'left' : 'center'
+  return (
+    <group position={position} rotation={rotation}>
+      {text(anchorX, onBounds)}
+      {twoSided && <group rotation={[0, Math.PI, 0]}>{text(back)}</group>}
+    </group>
   )
 }

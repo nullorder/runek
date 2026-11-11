@@ -1,6 +1,6 @@
 ---
 title: "Sign"
-summary: "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core."
+summary: "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core. Can glow at a world luminance level, and read from both sides."
 category: component
 component: sign
 order: 100
@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sign
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.17.0`.
+Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.17.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -46,6 +46,8 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `anchorY` | `"top" \| "bottom" \| "middle"` | `"middle"` |  |
 | `glow` | `boolean` | `false` | Soft colored halo around the glyphs, for a glow without bloom. |
 | `outline` | `color` |  | A crisp edge in this color, so the text reads against any background. Wins over `glow`. |
+| `lit` | `boolean \| "screen" \| "sign" \| "tube" \| "lamp" \| "flame"` | `false` | Glow: unlit by the scene and brightened by the world's `sign` luminance level, so lettering reads as light and, above 1, blooms. Name another level (`screen`, `tube`) to glow at that one instead. |
+| `twoSided` | `boolean` | `false` | Read from both sides, for a sign that stands free of a wall (hanging, on a roof, on a glass door): two faces back to back, each front-side only, so neither shows the other mirrored. |
 | `onBounds` | `function` (code only) |  | Called with the laid-out text's width and height, in world units, whenever it changes: for fitting a backdrop behind it. |
 
 ## Registry manifest

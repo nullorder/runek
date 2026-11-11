@@ -46,6 +46,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([#57](https://github.com/nullorder/runek/issues/57))
 - `useWorld().playerMotion`: the avatar's live motion for net code, in
   every view. ([#58](https://github.com/nullorder/runek/issues/58))
+- World `luminance`: how bright each kind of glowing surface is (`screen`,
+  `sign`, `tube`, `lamp`, `flame`), in scene-linear units relative to
+  diffuse white, on `<World luminance>` and in world files. Screens,
+  monitors, TVs and arcade screens follow `screen`, `NeonStrip` and an
+  arcade marquee `tube`, lamp bulbs and the shades and glass they light
+  `lamp`, and campfires and torches `flame`, so one number in the world
+  file rescales every surface of that kind and a world sets its exposure
+  in one place. Every level defaults to 1, today's look. `useLuminance()`
+  reads the levels and `glowLook(color, level)` builds the shared unlit
+  look for a color at one. ([#60](https://github.com/nullorder/runek/issues/60))
+- `Sign` `lit`: the text glows, unlit and brightened by the world's `sign`
+  level (or another level by name), so it reaches bloom.
+  ([#60](https://github.com/nullorder/runek/issues/60))
+- `Sign` `twoSided`: two faces back to back, so a sign standing free of a
+  wall reads left to right from both sides and neither face shows through
+  the other. ([#69](https://github.com/nullorder/runek/issues/69))
 
 ### Changed
 
@@ -64,6 +80,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   color, a hat) keeps its skeleton, so a walking figure no longer snaps
   back to its bind pose and restarts its stride.
   ([#70](https://github.com/nullorder/runek/issues/70))
+- A `Screen` banner's text glows with the screen (at the `screen` level,
+  not tone mapped), like its backdrop already did, so it reads a little
+  brighter than before. ([#60](https://github.com/nullorder/runek/issues/60))
 
 ### Fixed
 
@@ -71,6 +90,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   drawn body has reached, a frame behind its route, so its feet no longer
   run a frame ahead of where the body is drawn.
   ([#57](https://github.com/nullorder/runek/issues/57))
+- Shared materials keep colors brighter than 1 apart: `useMaterial` keyed
+  colors by their 8-bit hex, which clamps, so white at 4x and white at 20x
+  got the same material. ([#59](https://github.com/nullorder/runek/issues/59))
+- A large `Screen` seen from a distance no longer flickers: the gaps
+  between its layers (the mat, the picture, a banner's text) grow with the
+  screen instead of staying a fraction of a millimetre.
+  ([#68](https://github.com/nullorder/runek/issues/68))
 
 ## [0.17.0](https://github.com/nullorder/runek/compare/v0.16.0...v0.17.0) - 2026-10-31
 

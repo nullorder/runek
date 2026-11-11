@@ -34,6 +34,7 @@ const WORLD_FIELDS = [
   'controls',
   'palette',
   'fonts',
+  'luminance',
   'fog',
 ] as const
 

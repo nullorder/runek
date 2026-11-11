@@ -1,5 +1,14 @@
 import { useFrame } from '@react-three/fiber'
-import { Dynamic, rng, useLight, useMaterials, useWorld, type Vec3 } from '@runek/core'
+import {
+  Dynamic,
+  glowLook,
+  rng,
+  useLight,
+  useLuminance,
+  useMaterials,
+  useWorld,
+  type Vec3,
+} from '@runek/core'
 import { useMemo, useRef } from 'react'
 import type { Group } from 'three'
 
@@ -27,17 +36,12 @@ export function Campfire({
   seed = 1,
 }: CampfireProps) {
   const { unit, palette } = useWorld()
+  const { flame } = useLuminance()
   const m = useMaterials({
     stone: { color: palette.stone, flatShading: true, roughness: 1 },
     log: { color: logColor ?? palette.wood, roughness: 0.9 },
-    flame: {
-      kind: 'basic',
-      color: flameColor,
-      transparent: true,
-      opacity: 0.85,
-      toneMapped: false,
-    },
-    core: { kind: 'basic', color: '#ffd84d', transparent: true, opacity: 0.9, toneMapped: false },
+    flame: glowLook(flameColor, flame, { transparent: true, opacity: 0.85 }),
+    core: glowLook('#ffd84d', flame, { transparent: true, opacity: 0.9 }),
   })
   const R = radius * unit
   const flameRef = useRef<Group>(null)
