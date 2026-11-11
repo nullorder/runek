@@ -65,6 +65,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `just perf` counts draw calls per frame without shadow passes, and the
+  shadow passes' draws per pass, and budgets each. Shadow maps redraw 30
+  times a second, so the old per-frame total rose as the frame rate fell:
+  the same build read about 100 draws higher on a slow run, and CI's
+  software renderer, which carries a shadow pass in every frame, sat one
+  draw under the spawn budget. The library's gallery exhibits also settle
+  in seconds instead of frames, so CI, at a frame every few seconds,
+  measures the whole gallery instead of one still hiding its exhibits.
 - Contract §2: wall-clock motion and time of day read the world's clock
   (`useWorld().now()`), not `Date.now()` or `new Date()` directly.
 - `Player` publishes a fuller `PlayerMotion` (speed, distance, vertical
