@@ -68,6 +68,16 @@ export {
   useMaterial,
   useMaterials,
 } from './material'
+export {
+  inScenePass,
+  MIRROR_TOLERANCE,
+  MirrorPlane,
+  MirrorPlanes,
+  MirrorPool,
+  MirrorPoolContext,
+  scenePass,
+  useMirrorMaterial,
+} from './mirror'
 export type { OrbitKeysOptions } from './orbitKeys'
 export { groundForward, MOVE_KEYS, useOrbitKeys } from './orbitKeys'
 export type { WorldPalette } from './palette'

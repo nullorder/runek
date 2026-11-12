@@ -1,6 +1,14 @@
 import { useFrame } from '@react-three/fiber'
 import { BallCollider, type RapierRigidBody, RigidBody } from '@react-three/rapier'
-import { rng, sub, useWorld, type Vec3, type WorldComponentProps } from '@runek/core'
+import {
+  inScenePass,
+  rng,
+  scenePass,
+  sub,
+  useWorld,
+  type Vec3,
+  type WorldComponentProps,
+} from '@runek/core'
 import { type RefObject, useEffect, useMemo, useRef } from 'react'
 import {
   AdditiveBlending,
@@ -224,10 +232,6 @@ interface Shared {
   uOpen: Uniform<number>
   uTurb: Uniform<number>
 }
-
-// Only one rift draws its far view at a time: a rift seen inside another's view keeps the
-// frame it last drew rather than recursing.
-let drawingView = false
 
 /**
  * A pair of linked rifts torn in the air: ragged, breathing openings edged in iridescent light
@@ -512,7 +516,9 @@ function RiftEnd({
     const mesh = pane.current
     if (!mesh) return
     mesh.onBeforeRender = (renderer, scene, camera) => {
-      if (drawingView || !core.current || !otherCore.current) return
+      // Never inside another pass that draws the scene (another rift's view, a mirror): a rift
+      // seen there keeps the frame it last drew rather than recursing.
+      if (inScenePass() || !core.current || !otherCore.current) return
       core.current.getWorldPosition(view.here)
       const scale = core.current.getWorldScale(view.point).x
       renderer.getCurrentViewport(view.viewport)
@@ -528,7 +534,6 @@ function RiftEnd({
       view.uLive.value = smoothstep(px, LIVE_SIZE * 0.7, LIVE_SIZE)
       if (view.uLive.value === 0) return
 
-      drawingView = true
       otherCore.current.getWorldPosition(view.there)
       const target = viewTarget(view.targets, w, h)
       view.uView.value = target.texture
@@ -576,14 +581,13 @@ function RiftEnd({
       renderer.setRenderTarget(target)
       renderer.state.buffers.depth.setMask(true)
       if (!renderer.autoClear) renderer.clear()
-      renderer.render(scene, eye)
+      scenePass(() => renderer.render(scene, eye))
       renderer.clippingPlanes = planes
       renderer.shadowMap.autoUpdate = shadows
       renderer.xr.enabled = xr
       renderer.setRenderTarget(previous)
       renderer.state.viewport(view.viewport)
       for (const e of ends) if (e.current) e.current.visible = true
-      drawingView = false
     }
     return () => {
       mesh.onBeforeRender = () => {}

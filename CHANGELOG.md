@@ -22,6 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   face covers most of its text. `runek validate` warns about a `Sign` whose
   text the bundled font can't draw, and about unknown font roles.
   ([#66](https://github.com/nullorder/runek/issues/66))
+- Shared reflections: `useMirrorMaterial(look, strength)` gives a flat
+  surface the world's reflection for its height, and `<World mirrors>`
+  caps how many heights reflect (default 2, at half the screen's size).
+  Every reflective surface at one height shares one extra scene render a
+  frame, drawn only while one of them is in view. `Floor` `reflect` and
+  `Road` `wet` use it. `scenePass()`/`inScenePass()` keep passes that draw
+  the scene (mirrors, `Rift`) from nesting.
+  ([#63](https://github.com/nullorder/runek/issues/63))
 - `<World now>`: the world's wall clock, in epoch milliseconds (default
   `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
   and `Clock` all read it through `useWorld().now()`, so a multiplayer app

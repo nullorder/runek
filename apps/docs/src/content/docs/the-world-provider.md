@@ -41,6 +41,7 @@ import { Player } from './runek/Player'
 | `paused` | `boolean` | `false` | Stop rendering and physics until set back to `false`. |
 | `lightBudget` | `number \| { point, spot }` | `{ point: 6, spot: 2 }` | Real lights the world lends to its lamps (`useLight` emitters), each frame to the ones that matter most to the view. |
 | `shadowRate` | `number` | `30` | How many times a second shadow maps are redrawn. `Infinity` redraws every frame. |
+| `mirrors` | `number \| { planes, scale }` | `2` planes at `0.5` | Reflection planes for mirror surfaces (a `Floor` with `reflect`, a `Road` with `wet`). See [Reflections](#reflections). |
 | `batching` | `boolean \| { cell }` | `true` | Merge static parts that share a material into one mesh per material per 20 m cell (or `cell` m). Moving parts and anything inside `<Dynamic>` stay as they are. |
 | `dpr` | `number \| [min, max]` | `[1, 1.5]` | Pixel ratio to render at. A range follows the screen's own up to `max` and steps toward `min` while frames run slow. |
 | `now` | `() => number` | `Date.now` | The world's wall clock, in epoch milliseconds. Walking figures, trips, live day/night and `Clock` read it; pass a server-synced clock so every player sees the same world. |
@@ -172,6 +173,29 @@ const m = useMaterials({
   kerb: { slot: 'concrete', color: palette.wall, roughness: 1 },
 })
 ```
+
+## Reflections
+
+A polished floor or a wet street reflects the world through `useMirrorMaterial`. Drawing the world again for every reflective patch would multiply the cost of everything else, so the world keeps one reflection per surface height and lends it to every surface there: twenty wet paving slabs on one street cost one extra scene render a frame, not twenty. That render runs at half the screen's size, only in frames where one of the surfaces is in view, and never inside another such pass (a `Rift`'s view). A world with no reflective surfaces pays nothing.
+
+`mirrors` caps how many heights reflect at once (default 2: a ground floor and a terrace, say). A surface at a height past the cap draws without its reflection until a slot frees, which happens a few seconds after every surface on a plane leaves the view. `{ planes, scale }` also sets the reflection's size against the screen's; `0` turns reflections off.
+
+```tsx
+<World mirrors={{ planes: 1, scale: 0.35 }}>
+  <Floor size={[12, 12]} reflect={0.6} />
+  <Road position={[0, 0, 10]} wet={0.8} />
+</World>
+```
+
+In your own components, use it for flat, upward-facing surfaces, with the look you'd give `useMaterial` and a strength from 0 to 1 (at 0 it is `useMaterial(look)`):
+
+```tsx
+import { useMirrorMaterial } from '@runek/core'
+
+const material = useMirrorMaterial({ color: palette.floor, roughness: 0.3 }, reflect)
+```
+
+Reflections need `WebGLRenderer`; under `WebGPURenderer` these surfaces draw without one. Anything else that draws the world again should run inside `scenePass()` and skip when `inScenePass()` is true, so passes never nest.
 
 ## useWorld()
 

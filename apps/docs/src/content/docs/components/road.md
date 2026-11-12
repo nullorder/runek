@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add road
 ```
 
-Pulls `@runek/core@^0.17.0`.
+Pulls `@runek/core@^0.17.0`, `three@^0.184.0`.
 
 ## Use it
 
@@ -36,6 +36,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `width` | `number` | `3` | Width along local X, in units. |
 | `color` | `color` |  | Deck color; defaults to the palette's `stone`. |
 | `kerbColor` | `color` |  | Kerb color; defaults to the palette's `woodDark`. |
+| `wet` | `number` | `0` | How wet the deck is, 0 (dry, the default) to 1 (standing water): it darkens and reflects the street, through the world's shared mirror for its height. |
 | `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
 | `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
 | `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |

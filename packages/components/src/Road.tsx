@@ -1,4 +1,5 @@
-import { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
+import { useMaterial, useMirrorMaterial, useWorld, type WorldComponentProps } from '@runek/core'
+import { Color } from 'three'
 
 export interface RoadProps extends WorldComponentProps {
   /** Length along local Z, in units. */
@@ -9,6 +10,9 @@ export interface RoadProps extends WorldComponentProps {
   color?: string
   /** Kerb color; defaults to the palette's `woodDark`. */
   kerbColor?: string
+  /** How wet the deck is, 0 (dry, the default) to 1 (standing water): it darkens and reflects
+   *  the street, through the world's shared mirror for its height. */
+  wet?: number
 }
 
 /**
@@ -23,12 +27,19 @@ export function Road({
   width = 3,
   color,
   kerbColor,
+  wet = 0,
 }: RoadProps) {
   const { unit, palette } = useWorld()
-  const m = useMaterials({
-    deck: { slot: 'asphalt', color: color ?? palette.stone, roughness: 1 },
-    kerb: { slot: 'concrete', color: kerbColor ?? palette.woodDark, roughness: 1 },
-  })
+  const deckColor = color ?? palette.stone
+  const m = {
+    deck: useMirrorMaterial(
+      wet > 0
+        ? { slot: 'asphalt', color: wetColor(deckColor, wet), roughness: 1 - 0.7 * wet }
+        : { slot: 'asphalt', color: deckColor, roughness: 1 },
+      wet * 0.8,
+    ),
+    kerb: useMaterial({ slot: 'concrete', color: kerbColor ?? palette.woodDark, roughness: 1 }),
+  }
   const L = length * unit
   const W = width * unit
   const kerbW = 0.18 * unit
@@ -48,4 +59,9 @@ export function Road({
       </mesh>
     </group>
   )
+}
+
+/** A surface darkens as water fills its pores. */
+function wetColor(color: string, wet: number) {
+  return `#${new Color(color).multiplyScalar(1 - 0.45 * wet).getHexString()}`
 }

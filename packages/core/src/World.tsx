@@ -11,6 +11,7 @@ import { LightBudget } from './LightBudget'
 import type { Lens } from './lens'
 import { DEFAULT_LUMINANCE, type WorldLuminance } from './luminance'
 import type { MaterialSlots } from './material'
+import { MirrorPlanes } from './mirror'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { glProps } from './renderer'
 import { ShadowRate } from './ShadowRate'
@@ -103,6 +104,12 @@ export interface WorldProps {
    *  fading as they hand off; the count never changes, so nothing recompiles. Default 6 point
    *  lights and 2 spotlights. */
   lightBudget?: number | { point?: number; spot?: number }
+  /** Reflection planes for mirror surfaces (`useMirrorMaterial`: a polished `Floor`, a wet
+   *  `Road`): every reflective surface at one height shares one reflection, drawn once a frame
+   *  while one of them is in view. A number of planes (distinct heights), or `{ planes, scale }`
+   *  with `scale` the reflection's size against the screen's. Surfaces past the limit draw
+   *  without a reflection; `0` turns reflections off. Default 2 planes at half size. */
+  mirrors?: number | { planes?: number; scale?: number }
   /** How many times a second shadow maps are redrawn. Redrawing walks the whole scene for the
    *  light, so a big world saves a millisecond or two by not doing it every frame; moving
    *  shadows still read as smooth at the default 30. `Infinity` redraws every frame. */
@@ -135,6 +142,7 @@ export function World({
   dpr = DEFAULT_DPR,
   batching = true,
   lightBudget = DEFAULT_LIGHT_BUDGET,
+  mirrors = 2,
   shadowRate = 30,
   debug = false,
   children,
@@ -267,11 +275,16 @@ export function World({
             point={typeof lightBudget === 'number' ? lightBudget : lightBudget.point}
             spot={typeof lightBudget === 'number' ? undefined : lightBudget.spot}
           >
-            {/* Stepped by <FrameStep> below, never by rapier's own loop. */}
-            <Physics gravity={gravity} paused debug={debug} timeStep="vary">
-              <FrameStep />
-              {children}
-            </Physics>
+            <MirrorPlanes
+              planes={typeof mirrors === 'number' ? mirrors : mirrors.planes}
+              scale={typeof mirrors === 'number' ? undefined : mirrors.scale}
+            >
+              {/* Stepped by <FrameStep> below, never by rapier's own loop. */}
+              <Physics gravity={gravity} paused debug={debug} timeStep="vary">
+                <FrameStep />
+                {children}
+              </Physics>
+            </MirrorPlanes>
           </LightBudget>
         </WorldContext.Provider>
       </Canvas>

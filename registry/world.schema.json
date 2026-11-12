@@ -3493,6 +3493,11 @@
             "#7a5a40"
           ],
           "description": "Defaults to the world palette's `floor` slot."
+        },
+        "reflect": {
+          "type": "number",
+          "description": "How much of the room the top reflects, 0 (matte, the default) to 1 (a mirror): a polished\nstone or lacquered floor. Every reflective surface at one height shares the world's mirror\nfor it.",
+          "default": 0
         }
       },
       "additionalProperties": false
@@ -7658,6 +7663,11 @@
             "#7a5a40"
           ],
           "description": "Kerb color; defaults to the palette's `woodDark`."
+        },
+        "wet": {
+          "type": "number",
+          "description": "How wet the deck is, 0 (dry, the default) to 1 (standing water): it darkens and reflects\nthe street, through the world's shared mirror for its height.",
+          "default": 0
         },
         "position": {
           "type": "array",
