@@ -2,9 +2,11 @@ import { useFrame } from '@react-three/fiber'
 import { BallCollider, type RapierRigidBody, RigidBody } from '@react-three/rapier'
 import {
   inScenePass,
+  lazyModule,
   rng,
   scenePass,
   sub,
+  useNodeRenderer,
   useWorld,
   type Vec3,
   type WorldComponentProps,
@@ -17,16 +19,22 @@ import {
   Color,
   type Group,
   HalfFloatType,
+  InstancedBufferAttribute,
   type Mesh,
   PerspectiveCamera,
   Plane,
   ShaderMaterial,
   type Texture,
+  Vector2,
   Vector3,
   Vector4,
+  type WebGLRenderer,
   WebGLRenderTarget,
 } from 'three'
 import { Sign } from './Sign'
+
+// The WebGPU (TSL) twins of the shaders below, loaded only under a node renderer.
+const riftNodes = lazyModule(() => import('./nodes/rift'))
 
 export interface RiftProps extends WorldComponentProps {
   /**
@@ -338,6 +346,8 @@ export function Rift({
   )
 }
 
+const bufferSize = new Vector2()
+
 const smoothstep = (x: number, from: number, to: number) => {
   const t = Math.min(Math.max((x - from) / (to - from), 0), 1)
   return t * t * (3 - 2 * t)
@@ -432,28 +442,31 @@ function RiftEnd({
   const tint = useMemo(() => new Color(color ?? '#ffffff'), [color])
   const tintMix = color ? 0.65 : 0
   const own = useMemo(() => ({ uSeed: { value: rng(seed)() * 100 } }), [seed])
+  const nodes = useNodeRenderer() ? riftNodes() : null
 
-  const material = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader: WINDOW_VERTEX,
-        fragmentShader: WINDOW_FRAGMENT,
-        uniforms: {
-          ...shared,
-          ...own,
-          uR: { value: R },
-          uView: view.uView,
-          uViewport: { value: view.viewport },
-          uLive: view.uLive,
-          uTint: { value: tint },
-          uTintMix: { value: tintMix },
-        },
-        transparent: true,
-        premultipliedAlpha: true,
-        depthWrite: false,
-      }),
-    [shared, own, R, view, tint, tintMix],
-  )
+  const windowPane = useMemo(() => {
+    const uniforms = {
+      ...shared,
+      ...own,
+      uR: { value: R },
+      uView: view.uView,
+      uViewport: { value: view.viewport },
+      uLive: view.uLive,
+      uTint: { value: tint },
+      uTintMix: { value: tintMix },
+    }
+    if (nodes) return nodes.windowMaterial(uniforms, CLOSED, EXTENT)
+    const material = new ShaderMaterial({
+      vertexShader: WINDOW_VERTEX,
+      fragmentShader: WINDOW_FRAGMENT,
+      uniforms,
+      transparent: true,
+      premultipliedAlpha: true,
+      depthWrite: false,
+    })
+    return { material, view: null }
+  }, [shared, own, R, view, tint, tintMix, nodes])
+  const material = windowPane.material
 
   const motes = useMemo(() => {
     const r = rng(sub(seed, 1))
@@ -467,6 +480,28 @@ function RiftEnd({
       kind[i * 3 + 1] = r()
       kind[i * 3 + 2] = r() < 0.2 ? -0.08 - r() * 0.12 : 0.1 + r() * 0.55
     }
+    const uniforms = {
+      ...shared,
+      ...own,
+      uR: { value: R },
+      uSize: { value: 0.05 * R },
+      uHalfHeight: { value: 400 },
+      uTint: { value: tint },
+      uTintMix: { value: tintMix },
+    }
+    if (nodes) {
+      // WebGPU draws points a pixel wide: instanced quads instead.
+      const geometry = nodes.pointQuads(MOTES, {
+        aMote: new InstancedBufferAttribute(mote, 3),
+        aKind: new InstancedBufferAttribute(kind, 3),
+      })
+      return {
+        geometry,
+        material: nodes.riftMotesMaterial(uniforms, CLOSED),
+        uniforms,
+        quads: true,
+      }
+    }
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new BufferAttribute(new Float32Array(MOTES * 3), 3))
     geometry.setAttribute('aMote', new BufferAttribute(mote, 3))
@@ -474,41 +509,35 @@ function RiftEnd({
     const material = new ShaderMaterial({
       vertexShader: MOTE_VERTEX,
       fragmentShader: MOTE_FRAGMENT,
-      uniforms: {
-        ...shared,
-        ...own,
-        uR: { value: R },
-        uSize: { value: 0.05 * R },
-        uHalfHeight: { value: 400 },
-        uTint: { value: tint },
-        uTintMix: { value: tintMix },
-      },
+      uniforms,
       transparent: true,
       blending: AdditiveBlending,
       depthWrite: false,
       toneMapped: false,
     })
-    return { geometry, material }
-  }, [shared, own, R, seed, tint, tintMix])
+    return { geometry, material, uniforms, quads: false }
+  }, [shared, own, R, seed, tint, tintMix, nodes])
 
-  const pool = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader: POOL_VERTEX,
-        fragmentShader: POOL_FRAGMENT,
-        uniforms: { uColor: { value: new Color(color ?? '#c86bff') }, uOpen: shared.uOpen },
-        transparent: true,
-        blending: AdditiveBlending,
-        depthWrite: false,
-        toneMapped: false,
-      }),
-    [color, shared],
-  )
+  const pool = useMemo(() => {
+    const uniforms = { uColor: { value: new Color(color ?? '#c86bff') }, uOpen: shared.uOpen }
+    return nodes
+      ? nodes.poolMaterial(uniforms, 0.4)
+      : new ShaderMaterial({
+          vertexShader: POOL_VERTEX,
+          fragmentShader: POOL_FRAGMENT,
+          uniforms,
+          transparent: true,
+          blending: AdditiveBlending,
+          depthWrite: false,
+          toneMapped: false,
+        })
+  }, [color, shared, nodes])
 
   useFrame(({ size, viewport }) => {
-    motes.material.uniforms.uHalfHeight.value = (size.height * viewport.dpr) / 2
+    motes.uniforms.uHalfHeight.value = (size.height * viewport.dpr) / 2
   })
 
+  const windowView = windowPane.view
   // Draw the other end just before this window draws, with whatever camera is drawing it, so
   // the view never lags the viewer by a frame and is skipped whenever the rift is culled or too
   // small on screen to matter.
@@ -521,7 +550,21 @@ function RiftEnd({
       if (inScenePass() || !core.current || !otherCore.current) return
       core.current.getWorldPosition(view.here)
       const scale = core.current.getWorldScale(view.point).x
-      renderer.getCurrentViewport(view.viewport)
+      // `WebGLRenderer` keeps viewport and depth-mask state a nested render disturbs;
+      // `WebGPURenderer` draws each render in its own pass, so it has neither, and counts rows
+      // from the top.
+      const gl = (renderer as { isWebGLRenderer?: boolean }).isWebGLRenderer
+        ? (renderer as WebGLRenderer)
+        : null
+      if (gl) gl.getCurrentViewport(view.viewport)
+      else {
+        const drawing = renderer.getRenderTarget()
+        if (drawing) view.viewport.set(0, 0, drawing.width, drawing.height)
+        else {
+          renderer.getDrawingBufferSize(bufferSize)
+          view.viewport.set(0, 0, bufferSize.x, bufferSize.y)
+        }
+      }
       const w = view.viewport.z
       const h = view.viewport.w
 
@@ -537,13 +580,18 @@ function RiftEnd({
       otherCore.current.getWorldPosition(view.there)
       const target = viewTarget(view.targets, w, h)
       view.uView.value = target.texture
+      if (windowView) windowView.value = target.texture
       const previous = renderer.getRenderTarget()
+      const autoClear = renderer.autoClear
       const xr = renderer.xr.enabled
       const shadows = renderer.shadowMap.autoUpdate
       const planes = renderer.clippingPlanes
 
       // The viewer's camera, carried to the other end.
       const eye = view.camera
+      // In the drawing camera's clip space (WebGPU's depth runs 0..1), or the renderer would
+      // rebuild the copied projection from the eye's own `fov`.
+      eye.coordinateSystem = camera.coordinateSystem
       eye.projectionMatrix.copy(camera.projectionMatrix)
       eye.projectionMatrixInverse.copy(camera.projectionMatrixInverse)
       eye.matrixWorld.copy(camera.matrixWorld)
@@ -561,8 +609,10 @@ function RiftEnd({
         const ry = ((extent * p[5]) / -c.z) * (h / 2)
         c.applyMatrix4(camera.projectionMatrix)
         const x = Math.max(0, Math.floor(((c.x * 0.5 + 0.5) * w - rx) * k))
-        const y = Math.max(0, Math.floor(((c.y * 0.5 + 0.5) * h - ry) * k))
-        target.scissor.set(x, y, Math.ceil(2 * rx * k), Math.ceil(2 * ry * k))
+        const tall = Math.ceil(2 * ry * k)
+        const up = Math.max(0, Math.floor(((c.y * 0.5 + 0.5) * h - ry) * k))
+        const y = gl ? up : Math.max(0, target.height - up - tall)
+        target.scissor.set(x, y, Math.ceil(2 * rx * k), tall)
         target.scissorTest = true
       } else {
         target.scissorTest = false
@@ -579,20 +629,22 @@ function RiftEnd({
       renderer.shadowMap.autoUpdate = false
       renderer.clippingPlanes = [view.clip]
       renderer.setRenderTarget(target)
-      renderer.state.buffers.depth.setMask(true)
-      if (!renderer.autoClear) renderer.clear()
+      gl?.state.buffers.depth.setMask(true)
+      if (gl && !autoClear) renderer.clear()
+      if (!gl) renderer.autoClear = true
       scenePass(() => renderer.render(scene, eye))
+      renderer.autoClear = autoClear
       renderer.clippingPlanes = planes
       renderer.shadowMap.autoUpdate = shadows
       renderer.xr.enabled = xr
       renderer.setRenderTarget(previous)
-      renderer.state.viewport(view.viewport)
+      gl?.state.viewport(view.viewport)
       for (const e of ends) if (e.current) e.current.visible = true
     }
     return () => {
       mesh.onBeforeRender = () => {}
     }
-  }, [view, ends, core, otherCore, R])
+  }, [view, ends, core, otherCore, R, windowView])
 
   const extent = R * EXTENT
 
@@ -619,12 +671,21 @@ function RiftEnd({
           <mesh ref={pane} material={material} renderOrder={1}>
             <planeGeometry args={[extent * 2, extent * 2]} />
           </mesh>
-          <points
-            geometry={motes.geometry}
-            material={motes.material}
-            frustumCulled={false}
-            renderOrder={2}
-          />
+          {motes.quads ? (
+            <mesh
+              geometry={motes.geometry}
+              material={motes.material}
+              frustumCulled={false}
+              renderOrder={2}
+            />
+          ) : (
+            <points
+              geometry={motes.geometry}
+              material={motes.material}
+              frustumCulled={false}
+              renderOrder={2}
+            />
+          )}
         </group>
 
         <mesh position={[0, 0.02 * unit, 0]} rotation={[-Math.PI / 2, 0, 0]} material={pool}>

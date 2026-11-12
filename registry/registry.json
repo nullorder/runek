@@ -63,6 +63,22 @@
         {
           "path": "packages/components/src/Rift.tsx",
           "target": "Rift.tsx"
+        },
+        {
+          "path": "packages/components/src/nodes/rift.ts",
+          "target": "nodes/rift.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/portal.ts",
+          "target": "nodes/portal.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/noise.ts",
+          "target": "nodes/noise.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/uniforms.ts",
+          "target": "nodes/uniforms.ts"
         }
       ]
     },
