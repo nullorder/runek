@@ -17,6 +17,14 @@
         {
           "path": "packages/components/src/player",
           "target": "player"
+        },
+        {
+          "path": "packages/components/src/nodes/lens.ts",
+          "target": "nodes/lens.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/uniforms.ts",
+          "target": "nodes/uniforms.ts"
         }
       ]
     },
