@@ -35,11 +35,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shaded by three's `TiledLighting`, so a street of 200 lamps is fully lit
   with no hand-offs. Spotlights, and `WebGLRenderer`, keep the light pool.
   ([#65](https://github.com/nullorder/runek/issues/65))
-- `Lake`, `Ocean`, `Grass` and `Screen`'s static render under
-  `WebGPURenderer`: each carries a node (TSL) twin of its GLSL, loaded only
-  when the renderer is WebGPU. `useNodeRenderer()` and `lazyModule()` in
-  `@runek/core` let any component do the same. `Portal`, `Rift`, `Sky`,
-  `Sign` text and the first-person lens are still WebGL only.
+- Every registry component renders under `WebGPURenderer`: `Lake`,
+  `Ocean`, `Grass`, `Screen`'s static, `Portal`, `Rift` (live far view
+  included), `Sky` and its stars, `Person` skin, `Sign` text, mirror
+  surfaces and the first-person lens each carry a node (TSL) twin of their
+  GLSL, loaded only when the renderer is WebGPU, so WebGL worlds never
+  download `three/webgpu`. `useNodeRenderer()` and `lazyModule()` in
+  `@runek/core` let any component do the same. Under WebGPU a `Rift` skips
+  its cut-away plane and a `Sign` draws no `glow` halo.
   ([#67](https://github.com/nullorder/runek/issues/67))
 - Streaming for dense worlds: `"stream": true` (or `{ radius, cell }`) in a
   world file mounts only the top-level nodes near the viewer, from a cell
