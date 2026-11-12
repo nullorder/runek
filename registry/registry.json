@@ -1252,6 +1252,10 @@
         {
           "path": "packages/components/src/person",
           "target": "person"
+        },
+        {
+          "path": "packages/components/src/nodes/skin.ts",
+          "target": "nodes/skin.ts"
         }
       ]
     },

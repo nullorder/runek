@@ -6,6 +6,7 @@ import {
   BufferGeometry,
   CylinderGeometry,
   Group,
+  type Material,
   Matrix4,
   Mesh,
   MeshPhysicalMaterial,
@@ -113,8 +114,8 @@ export function createRig(joints: V3[]): Rig {
 }
 
 /** Skinned meshes for one build, bound to the rig's skeleton (the caller adds them to `rig.group`). */
-export function skinnedMeshes(built: BuiltFigure, rig: Rig) {
-  const materials = personMaterials()
+export function skinnedMeshes(built: BuiltFigure, rig: Rig, skin?: Material) {
+  const materials = personMaterials(skin)
   const bounds = new Sphere(new Vector3(0, built.height * 0.5, 0), built.height * 0.85)
   const meshes = built.parts.map((part) => {
     const g = new BufferGeometry()
@@ -161,13 +162,14 @@ export function attach(
   skinColor: string,
   metal: string,
   wood: string,
+  skin?: Material,
 ): Attachments {
   const head = rig.bones.head
   const hj = joints[BONES.indexOf('head')]
   const local = (p: V3): V3 => [p[0] - hj[0], p[1] - hj[1], p[2] - hj[2]]
   const owned: { obj: Object3D; geo: BufferGeometry[]; mat?: MeshPhysicalMaterial }[] = []
   const props: Object3D[] = []
-  const materials = personMaterials()
+  const materials = personMaterials(skin)
   const eyes: Object3D[] = []
   const lids: Object3D[] = []
   for (const e of shape.eyes) {
