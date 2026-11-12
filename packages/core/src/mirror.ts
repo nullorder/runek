@@ -18,8 +18,13 @@ import {
   Vector4,
   type WebGLRenderer,
   WebGLRenderTarget,
+  WebGPUCoordinateSystem,
 } from 'three'
 import { type MaterialLook, useMaterial } from './material'
+import { lazyModule } from './node'
+
+// The WebGPU (TSL) twin of the mirror material, loaded only under a node renderer.
+const mirrorNodes = lazyModule(() => import('./mirror-node'))
 
 let passes = 0
 
@@ -83,6 +88,9 @@ export function aimMirror(
   virtual.up.set(0, 1, 0).applyMatrix4(rotation).reflect(UP)
   virtual.lookAt(target)
   virtual.far = camera.far
+  // WebGPU's clip depth runs 0..1 (WebGL's -1..1); a renderer resets a camera in the other
+  // system, which would wipe the oblique plane below.
+  virtual.coordinateSystem = camera.coordinateSystem
   virtual.updateMatrixWorld()
   virtual.projectionMatrix.copy(camera.projectionMatrix)
   matrix.copy(BIAS).multiply(virtual.projectionMatrix).multiply(virtual.matrixWorldInverse)
@@ -97,10 +105,11 @@ export function aimMirror(
     -1,
     (1 + p[10]) / p[14],
   )
-  clip.multiplyScalar(2 / clip.dot(q))
+  const webgpu = camera.coordinateSystem === WebGPUCoordinateSystem
+  clip.multiplyScalar((webgpu ? 1 : 2) / clip.dot(q))
   p[2] = clip.x
   p[6] = clip.y
-  p[10] = clip.z + 1 - CLIP_BIAS
+  p[10] = clip.z + (webgpu ? 0 : 1) - CLIP_BIAS
   p[14] = clip.w
   virtual.projectionMatrixInverse.copy(virtual.projectionMatrix).invert()
 }
@@ -153,20 +162,26 @@ export class MirrorPlane {
         hidden.push(o)
       }
     }
+    // `WebGLRenderer` keeps state a nested render disturbs; `WebGPURenderer` draws each render
+    // in its own pass and has none of it.
+    const gl = (renderer as { isWebGLRenderer?: boolean }).isWebGLRenderer ? renderer : null
     const previous = renderer.getRenderTarget()
     const xr = renderer.xr.enabled
     const shadows = renderer.shadowMap.autoUpdate
-    renderer.getCurrentViewport(viewport)
+    const autoClear = renderer.autoClear
+    gl?.getCurrentViewport(viewport)
     renderer.xr.enabled = false
     renderer.shadowMap.autoUpdate = false
     renderer.setRenderTarget(this.target)
-    renderer.state.buffers.depth.setMask(true)
-    if (!renderer.autoClear) renderer.clear()
+    gl?.state.buffers.depth.setMask(true)
+    if (gl && !autoClear) renderer.clear()
+    if (!gl) renderer.autoClear = true
     scenePass(() => renderer.render(scene, virtual))
+    renderer.autoClear = autoClear
     renderer.shadowMap.autoUpdate = shadows
     renderer.xr.enabled = xr
     renderer.setRenderTarget(previous)
-    renderer.state.viewport(viewport)
+    gl?.state.viewport(viewport)
     for (const o of hidden) o.visible = true
     return true
   }
@@ -269,6 +284,25 @@ if ( uMirrorStrength > 0.0 ) {
   outgoingLight = mix( outgoingLight, texture2D( uMirror, mirrorUv ).rgb, mirrorMix );
 }`
 
+/** Borrow the plane for `object`'s height for one draw, drawing it first if nothing has this
+ *  frame. Null inside another scene pass (it draws plain there and claims no plane: only what
+ *  the viewer sees takes a slot) or past the plane limit. */
+function borrow(
+  pool: MirrorPool,
+  object: Object3D,
+  renderer: unknown,
+  scene: Scene,
+  camera: Camera,
+): MirrorPlane | null {
+  if (inScenePass()) return null
+  const plane = pool.planeFor(topOf(object))
+  if (!plane) return null
+  plane.used = pool.frame
+  plane.borrowers.add(object)
+  if (plane.drawn !== pool.frame) plane.draw(renderer as WebGLRenderer, scene, camera, pool.frame)
+  return plane
+}
+
 /**
  * A material for `look` that reflects the world above its surface at `strength` (0 to 1): a
  * polished floor, a wet street, still water. The reflection comes from the world's mirror for
@@ -286,18 +320,21 @@ if ( uMirrorStrength > 0.0 ) {
 export function useMirrorMaterial(look: MaterialLook, strength: number): Material {
   const pool = useContext(MirrorPoolContext)
   const plain = useMaterial(look)
-  const gl = useThree((s) => s.gl)
+  const gl = useThree((s) => s.gl) as { isWebGLRenderer?: boolean; isWebGPURenderer?: boolean }
   const kind = look.kind === 'physical' ? 'physical' : 'standard'
   const { kind: _kind, slot: _slot, ...params } = look
   const key = JSON.stringify(params)
+  const wanted = !!pool && strength > 0 && look.kind !== 'basic'
+  const nodes = wanted && gl.isWebGPURenderer ? mirrorNodes() : null
   const reflective = useMemo(() => {
-    if (
-      !pool ||
-      !(strength > 0) ||
-      look.kind === 'basic' ||
-      !(gl as { isWebGLRenderer?: boolean }).isWebGLRenderer
-    )
-      return null
+    if (!pool || !wanted) return null
+    if (nodes) {
+      const material = nodes.mirrorNodeMaterial(kind, params, strength, (o, r, s, c) =>
+        borrow(pool, o, r, s, c),
+      )
+      return { material }
+    }
+    if (!gl.isWebGLRenderer) return null
     const material =
       kind === 'physical' ? new MeshPhysicalMaterial(params) : new MeshStandardMaterial(params)
     const uniforms = {
@@ -317,21 +354,14 @@ export function useMirrorMaterial(look: MaterialLook, strength: number): Materia
     material.customProgramCacheKey = () => 'runek-mirror'
     material.onBeforeRender = (renderer, scene, camera, _geometry, object) => {
       uniforms.uMirrorStrength.value = 0
-      // Inside another pass (this mirror's own, another plane's, a rift's view) it draws plain,
-      // and claims no plane: only what the viewer sees takes a slot.
-      if (inScenePass()) return
-      const plane = pool.planeFor(topOf(object))
+      const plane = borrow(pool, object, renderer, scene, camera)
       if (!plane) return
-      plane.used = pool.frame
-      plane.borrowers.add(object)
-      if (plane.drawn !== pool.frame)
-        plane.draw(renderer as WebGLRenderer, scene, camera, pool.frame)
       uniforms.uMirror.value = plane.texture
       uniforms.uMirrorMatrix.value.copy(plane.matrix)
       uniforms.uMirrorStrength.value = strength
     }
-    return { material, uniforms }
-  }, [pool, gl, kind, key, strength])
+    return { material }
+  }, [pool, gl, kind, key, strength, wanted, nodes])
 
   useEffect(() => {
     if (!reflective) return
