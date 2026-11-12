@@ -30,7 +30,7 @@
     },
     {
       "path": "nodes/uniforms.ts",
-      "content": "import { uniform } from 'three/tsl'\nimport type { Node } from 'three/webgpu'\n\n/** A TSL uniform that follows `entry.value` every render, so the `{ value }` records a\n *  component already updates (for its GLSL material) drive its node material too. */\nexport function follow<N extends Node>(entry: { value: unknown }): N {\n  return uniform(entry.value as never).onRenderUpdate(() => entry.value as never) as unknown as N\n}\n",
+      "content": "import { float, uniform } from 'three/tsl'\nimport { Node, type NodeFrame, NodeUpdateType } from 'three/webgpu'\n\n/** A TSL uniform that follows `entry.value` every render, so the `{ value }` records a\n *  component already updates (for its GLSL material) drive its node material too. */\nexport function follow<N extends Node>(entry: { value: unknown }): N {\n  return uniform(entry.value as never).onRenderUpdate(() => entry.value as never) as unknown as N\n}\n\nclass BeforeDraw extends Node {\n  constructor(private readonly run: (frame: NodeFrame) => void) {\n    super('float')\n    this.updateBeforeType = NodeUpdateType.OBJECT\n  }\n\n  updateBefore(frame: NodeFrame) {\n    this.run(frame)\n    return true\n  }\n\n  setup() {\n    return float(0)\n  }\n}\n\n/**\n * A node worth 0 that runs `run` before each object using it draws: add it to anything in the\n * material to have it run. For what a uniform can't do per object, like pointing a texture node at\n * another texture (a texture node resets its own update hook when it builds).\n */\nexport function beforeDraw(run: (frame: NodeFrame) => void): Node<'float'> {\n  return new BeforeDraw(run) as unknown as Node<'float'>\n}\n",
       "type": "registry:component"
     }
   ]

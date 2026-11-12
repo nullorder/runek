@@ -364,6 +364,14 @@
         {
           "path": "packages/components/src/Sign.tsx",
           "target": "Sign.tsx"
+        },
+        {
+          "path": "packages/components/src/nodes/text.ts",
+          "target": "nodes/text.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/uniforms.ts",
+          "target": "nodes/uniforms.ts"
         }
       ]
     },

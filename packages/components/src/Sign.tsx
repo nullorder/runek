@@ -3,20 +3,25 @@ import {
   type FontRole,
   type LuminanceLevel,
   lastResortFont,
+  lazyModule,
   useLuminance,
   useMaterial,
+  useNodeRenderer,
   useTextFont,
   useWorld,
   type Vec3,
 } from '@runek/core'
-import { Children, type ReactNode, useMemo } from 'react'
-import { Color, DoubleSide, FrontSide } from 'three'
+import { Children, type ReactNode, useEffect, useMemo } from 'react'
+import { Color, DoubleSide, FrontSide, type Texture } from 'three'
 // @ts-expect-error troika-three-text (what drei's Text draws with) ships no types
 import { configureTextBuilder } from 'troika-three-text'
 
 // Whatever a text's font lacks, troika draws from its default font, and without one it looks the
 // character up on a public CDN. Runek's box face, built in code, claims every character, so no
 // text ever leaves the fonts the world declared. troika takes this once, before its first text.
+// The WebGPU (TSL) twin of troika's text material, loaded only under a node renderer.
+const textNodes = lazyModule(() => import('./nodes/text'))
+
 const CONFIGURED = Symbol.for('runek.textBuilder')
 const page = globalThis as { [CONFIGURED]?: boolean }
 if (!page[CONFIGURED]) {
@@ -100,17 +105,31 @@ export function Sign({
   const level = lit ? luminance[lit === true ? 'sign' : lit] : 1
   const tint = useMemo(() => (lit ? new Color(ink).multiplyScalar(level) : ink), [lit, ink, level])
   // The glyphs' base material, shared: troika keeps each text's color on its own derived copy.
-  const material = useMaterial({
-    kind: 'basic',
-    transparent: true,
-    side: twoSided ? FrontSide : DoubleSide,
-    toneMapped: !lit,
-  })
+  const side = twoSided ? FrontSide : DoubleSide
+  const material = useMaterial({ kind: 'basic', transparent: true, side, toneMapped: !lit })
+  // Under WebGPU troika's GLSL doesn't compile: each text mesh gets the node twin, its own since
+  // troika keeps per-mesh values on it.
+  const nodes = useNodeRenderer() ? textNodes() : null
+  const faces = useMemo(
+    () =>
+      nodes && [
+        nodes.textMaterial({ side, toneMapped: !lit }),
+        nodes.textMaterial({ side, toneMapped: !lit }),
+      ],
+    [nodes, side, lit],
+  )
+  useEffect(
+    () => () => {
+      for (const f of faces ?? []) f.dispose()
+    },
+    [faces],
+  )
 
-  const text = (anchor: SignProps['anchorX'], report?: SignProps['onBounds']) => (
+  const text = (anchor: SignProps['anchorX'], which: number, report?: SignProps['onBounds']) => (
     <Text
+      ref={settle}
       font={face}
-      material={material}
+      material={faces?.[which] ?? material}
       fontSize={size * unit}
       color={tint}
       maxWidth={maxWidth !== undefined ? maxWidth * unit : undefined}
@@ -122,10 +141,12 @@ export function Sign({
       outlineBlur={outline || !glow ? 0 : '45%'}
       outlineOpacity={outline || !glow ? 1 : 0.5}
       onSync={
-        report
-          ? (mesh: { textRenderInfo?: { blockBounds: number[] } }) => {
+        report || nodes
+          ? (mesh: { textRenderInfo?: { blockBounds: number[]; sdfTexture?: Texture } }) => {
+              // Right after troika drew any new glyphs: the only moment WebGPU can copy them.
+              nodes?.captureAtlas(mesh.textRenderInfo?.sdfTexture)
               const b = mesh.textRenderInfo?.blockBounds
-              if (b) report(b[2] - b[0], b[3] - b[1])
+              if (b && report) report(b[2] - b[0], b[3] - b[1])
             }
           : undefined
       }
@@ -138,8 +159,8 @@ export function Sign({
   const back = anchorX === 'left' ? 'right' : anchorX === 'right' ? 'left' : 'center'
   return (
     <group position={position} rotation={rotation}>
-      {text(anchorX, onBounds)}
-      {twoSided && <group rotation={[0, Math.PI, 0]}>{text(back)}</group>}
+      {text(anchorX, 0, onBounds)}
+      {twoSided && <group rotation={[0, Math.PI, 0]}>{text(back, 1)}</group>}
     </group>
   )
 }
@@ -151,4 +172,11 @@ function textOf(children: ReactNode): string {
     if (typeof child === 'string' || typeof child === 'number') text += child
   })
   return text
+}
+
+/** Draw no glyphs until troika has laid the text out: its glyph geometry starts with an endless
+ *  instance count, which WebGL clamps and WebGPU rejects. */
+function settle(mesh: { geometry?: { instanceCount: number } } | null) {
+  if (mesh?.geometry && !Number.isFinite(mesh.geometry.instanceCount))
+    mesh.geometry.instanceCount = 0
 }
