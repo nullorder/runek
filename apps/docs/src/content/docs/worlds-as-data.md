@@ -22,7 +22,7 @@ interface WorldData {
   avatar?: 'first' | 'third' | 'overhead' // default player camera view
   controls?: Record<string, string[]> // input remap: action → KeyboardEvent.codes
   palette?: Partial<WorldPalette> // color-slot overrides for the whole world
-  fonts?: Partial<WorldFonts> // fonts the world ships, by role (display, body)
+  fonts?: Partial<WorldFonts> // fonts the world ships, by role (display, body), and a fallback
   luminance?: Partial<WorldLuminance> // glow levels: screen, sign, tube, lamp, flame
   fog?: { color: string; near: number; far: number }
   nodes: WorldNode[]
@@ -86,6 +86,7 @@ A handful of top-level fields are the world's **rules**: values components read 
 - **`ground`** is the baseline ground level (a `Y` value, default `0`): the datum that `Floor` and water like `Lake` default their placement to. In a coastal world it is effectively your **sea level**, the terrain rises from it and the water sits at it, so moving `ground` shifts a whole world's datum at once (a sunken basin, a plateau). Open water sits at or below it (a floating lake is a bug); an explicit `position` still wins.
 - **`luminance`** sets how bright glowing surfaces are, per kind: `screen` (screens, monitors, TVs), `sign` (a `Sign` with `lit`), `tube` (neon), `lamp` (bulbs and the shades they light) and `flame` (fires), in scene-linear units where `1` is face value. Above 1 they feed bloom. Every level defaults to `1`, so `{ "luminance": { "lamp": 6, "screen": 1.5 } }` is a world's exposure in one line (see [the World provider](/docs/the-world-provider#luminance)).
 - **`fonts`** are the typefaces the world ships, keyed by role (`display` for titles and signage, `body` for labels). They are the one exception to the no-assets moat: components hold no fonts, so the world declares them and `Sign` draws from them. An undeclared role falls back to the pixel font bundled in `@runek/core`, so `Sign` always renders even with no `fonts` set.
+- **`fonts.fallback`** is a font URL, or a list of them in order of preference, for text a role's font can't fully draw: a CJK or symbol face under a Latin display font. A `Sign` whose text its role font can't draw is drawn in whichever declared face covers most of it (the text renderer draws one text from one face, so the whole sign switches, not single characters). Characters no declared face draws show as boxes, from a face built in code: text never fetches a font the world didn't declare. `runek validate` warns about a `Sign` whose text the bundled font can't draw.
 
 Every setting is optional with a sensible default (a bright midday, first-person), so a world that declares none renders exactly as before.
 

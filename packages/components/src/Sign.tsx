@@ -1,14 +1,28 @@
 import { Text } from '@react-three/drei'
 import {
+  type FontRole,
   type LuminanceLevel,
+  lastResortFont,
   useLuminance,
   useMaterial,
+  useTextFont,
   useWorld,
   type Vec3,
-  type WorldFonts,
 } from '@runek/core'
-import { type ReactNode, useMemo } from 'react'
+import { Children, type ReactNode, useMemo } from 'react'
 import { Color, DoubleSide, FrontSide } from 'three'
+// @ts-expect-error troika-three-text (what drei's Text draws with) ships no types
+import { configureTextBuilder } from 'troika-three-text'
+
+// Whatever a text's font lacks, troika draws from its default font, and without one it looks the
+// character up on a public CDN. Runek's box face, built in code, claims every character, so no
+// text ever leaves the fonts the world declared. troika takes this once, before its first text.
+const CONFIGURED = Symbol.for('runek.textBuilder')
+const page = globalThis as { [CONFIGURED]?: boolean }
+if (!page[CONFIGURED]) {
+  page[CONFIGURED] = true
+  configureTextBuilder({ defaultFontURL: lastResortFont() })
+}
 
 export interface SignProps {
   /** The text to render. */
@@ -20,11 +34,13 @@ export interface SignProps {
   /**
    * Which world font role to render in (`display` for titles/signage, `body`
    * for labels). The world declares the actual face via `<World fonts>`; an
-   * undeclared role falls back to the font bundled in `@runek/core`. (Named
-   * `variant`, not `role`, so it doesn't trip JSX a11y linters.)
+   * undeclared role falls back to the font bundled in `@runek/core`. Text the face
+   * can't fully draw is drawn in the world's `fallback` font that covers more of it;
+   * characters no declared font has draw as boxes. (Named `variant`, not `role`, so it
+   * doesn't trip JSX a11y linters.)
    */
-  variant?: keyof WorldFonts
-  /** Explicit font URL, overriding the world role. */
+  variant?: FontRole
+  /** Explicit font URL, overriding the world role. The world's `fallback` fonts still apply. */
   font?: string
   /** Cap height in units. */
   size?: number
@@ -79,7 +95,7 @@ export function Sign({
 }: SignProps) {
   const { unit, fonts, palette } = useWorld()
   const luminance = useLuminance()
-  const face = font ?? fonts[variant]
+  const face = useTextFont(font ?? fonts[variant], textOf(children))
   const ink = color ?? palette.accent
   const level = lit ? luminance[lit === true ? 'sign' : lit] : 1
   const tint = useMemo(() => (lit ? new Color(ink).multiplyScalar(level) : ink), [lit, ink, level])
@@ -126,4 +142,13 @@ export function Sign({
       {twoSided && <group rotation={[0, Math.PI, 0]}>{text(back)}</group>}
     </group>
   )
+}
+
+/** The text drei's `Text` draws from `children`: its strings and numbers, joined. */
+function textOf(children: ReactNode): string {
+  let text = ''
+  Children.forEach(children, (child) => {
+    if (typeof child === 'string' || typeof child === 'number') text += child
+  })
+  return text
 }

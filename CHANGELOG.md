@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as before. Registry components name their slots (`Road` deck `asphalt`,
   `Wall` `plaster`, `Window` `glass`, furniture `wood`, …).
   ([#62](https://github.com/nullorder/runek/issues/62))
+- `fonts.fallback`: a font URL, or a list in order of preference, for text
+  a role's font can't fully draw. A `Sign` is drawn in whichever declared
+  face covers most of its text. `runek validate` warns about a `Sign` whose
+  text the bundled font can't draw, and about unknown font roles.
+  ([#66](https://github.com/nullorder/runek/issues/66))
 - `<World now>`: the world's wall clock, in epoch milliseconds (default
   `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
   and `Clock` all read it through `useWorld().now()`, so a multiplayer app
@@ -102,6 +107,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Text never fetches a font from a CDN: a character no declared font has
+  (an arrow, a CJK character, an emoji) used to send troika-three-text to a
+  public font index. `Sign` now sets troika's default font to a face built
+  in code that draws a box for it, so `runek add sign` now also installs
+  `troika-three-text` (the same version drei already brings).
+  ([#66](https://github.com/nullorder/runek/issues/66))
 - A walking `Person` with its own body strides with the distance its
   drawn body has reached, a frame behind its route, so its feet no longer
   run a frame ahead of where the body is drawn.

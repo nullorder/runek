@@ -173,7 +173,15 @@ export function worldSchema(components) {
       },
       fonts: {
         type: 'object',
-        properties: { display: { type: 'string' }, body: { type: 'string' } },
+        description: 'Font URLs by role, and fallback fonts for characters a role lacks.',
+        properties: {
+          display: { type: 'string' },
+          body: { type: 'string' },
+          fallback: {
+            description: 'Fonts tried in order for characters the role font lacks.',
+            anyOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }],
+          },
+        },
         additionalProperties: false,
       },
       luminance: {

@@ -15,7 +15,7 @@ A world needs three things a strict policy usually blocks. On top of whatever yo
 |---|---|---|
 | `script-src` | `'wasm-unsafe-eval'` | Rapier, the physics engine, is WebAssembly. Without it the world fails to start. |
 | `script-src` | `blob:` | Text (`Sign`, a `Person`'s `label`, interaction prompts) is laid out in a worker that loads its code from `blob:` URLs. |
-| `connect-src` | `data:` | The default font bundled in `@runek/core` is a `data:` URL, fetched from that worker. Fonts your world declares in `fonts` need their own origins here too. |
+| `connect-src` | `data:` | The default font bundled in `@runek/core` and the box face for characters no font has are `data:` URLs, fetched from that worker. Fonts your world declares in `fonts` need their own origins here too. |
 
 So a host that otherwise allows only itself ends up with:
 
@@ -25,7 +25,7 @@ script-src 'self' 'wasm-unsafe-eval' blob:;
 connect-src 'self' data:;
 ```
 
-`worker-src` falls back to `script-src`, so it needs nothing unless your policy sets it, in which case add `blob:` there too. `img-src` and `font-src` need nothing: no component loads an image or a CSS font. Development servers usually want more than this (inline scripts for hot reload), which is between you and your bundler.
+`worker-src` falls back to `script-src`, so it needs nothing unless your policy sets it, in which case add `blob:` there too. Nothing else is fetched for text, whatever it says: `Sign` sets troika's default font to a face built in code that draws a box for anything the world's fonts lack, so troika never looks a character up on its CDN. If your app draws its own drei `<Text>` before any `Sign` loads, do the same first: `configureTextBuilder({ defaultFontURL: lastResortFont() })` from `troika-three-text` and `@runek/core`. `img-src` and `font-src` need nothing: no component loads an image or a CSS font. Development servers usually want more than this (inline scripts for hot reload), which is between you and your bundler.
 
 In Tauri the policy lives in `app.security.csp` in `tauri.conf.json`.
 

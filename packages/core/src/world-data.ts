@@ -241,8 +241,9 @@ export function parseWorld(json: string): WorldData {
     if (typeof fonts !== 'object' || fonts === null || Array.isArray(fonts)) {
       throw new Error('World "fonts" must be an object of role to font URL')
     }
-    for (const value of Object.values(fonts as Record<string, unknown>)) {
-      if (typeof value !== 'string') {
+    for (const [role, value] of Object.entries(fonts as Record<string, unknown>)) {
+      const urls = role === 'fallback' && Array.isArray(value) ? value : [value]
+      if (urls.some((url) => typeof url !== 'string')) {
         throw new Error('World "fonts" values must be font URL strings')
       }
     }

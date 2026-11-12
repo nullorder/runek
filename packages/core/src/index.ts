@@ -2,8 +2,10 @@ export { BATCHED_LAYER, DYNAMIC_KEY, isBatchable, StaticBatcher } from './batchi
 export { GroundContext, PlayerMotionContext, WorldContext } from './context'
 export type { GitHubSource } from './contribute'
 export { editFileUrl, forkUrl, parseGitHubSource } from './contribute'
-export type { WorldFonts } from './font'
-export { DEFAULT_FONT, DEFAULT_FONTS } from './font'
+export type { CodeRanges } from './coverage'
+export { DEFAULT_FONT_COVERAGE, missingGlyphs, readCoverage } from './coverage'
+export type { FontRole, WorldFonts } from './font'
+export { DEFAULT_FONT, DEFAULT_FONTS, FONT_ROLES, fontCoverage, pickFace } from './font'
 export type {
   CheckWorldOptions,
   GroundEntry,
@@ -38,6 +40,7 @@ export {
   resolveControls,
 } from './keyboard'
 export { LightBudget } from './LightBudget'
+export { lastResortFont } from './last-resort'
 export type { Lens } from './lens'
 export { useLensPosition } from './lens'
 export type { LightEmitter, LightKind, LightLook } from './light'
@@ -104,7 +107,7 @@ export type {
 } from './types'
 export { useGround } from './useGround'
 export { useSun } from './useSun'
-export { useLuminance, useWorld } from './useWorld'
+export { useLuminance, useTextFont, useWorld } from './useWorld'
 export type { JsonPath, ValidationIssue } from './validate'
 export { suggest, validateWorld } from './validate'
 export type { WorldProps } from './World'

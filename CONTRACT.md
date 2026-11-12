@@ -35,7 +35,7 @@ The keywords **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are
 - A component **MUST NOT** depend on binary assets: no `.glb`/`.gltf`, no image textures, no HDR environment maps.
 - A component **MUST NOT** fetch anything at runtime or require a CDN. Geometry, color, and materials come from code.
 - A look **MAY** name a material slot (`slot`, from `MATERIAL_SLOTS` in `@runek/core`) that a world answers with a material of its own. The component still gives a complete look, which draws when the world doesn't answer; an app that answers a slot with textures owns those assets, as it does for any texture it passes a component.
-- **Text is the one carve-out.** A component that renders text uses a font drawn only from `world.fonts` (declared by the world) or the single default font bundled in `@runek/core`. It still **MUST NOT** ship its own font file or fetch a font from a CDN. Every other component stays asset-free.
+- **Text is the one carve-out.** A component that renders text uses a font drawn only from `world.fonts` (declared by the world) or the single default font bundled in `@runek/core`. It still **MUST NOT** ship its own font file or fetch a font from a CDN, including through its renderer's fallback for characters its fonts lack: troika-three-text's default font is set to `lastResortFont()` from `@runek/core`, which draws a box for anything the world's fonts don't have. Every other component stays asset-free.
 
 ## 5. Colliders
 

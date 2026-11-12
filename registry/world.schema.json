@@ -193,12 +193,27 @@
     },
     "fonts": {
       "type": "object",
+      "description": "Font URLs by role, and fallback fonts for characters a role lacks.",
       "properties": {
         "display": {
           "type": "string"
         },
         "body": {
           "type": "string"
+        },
+        "fallback": {
+          "description": "Fonts tried in order for characters the role font lacks.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -8656,12 +8671,12 @@
             "display",
             "body"
           ],
-          "description": "Which world font role to render in (`display` for titles/signage, `body`\nfor labels). The world declares the actual face via `<World fonts>`; an\nundeclared role falls back to the font bundled in `@runek/core`. (Named\n`variant`, not `role`, so it doesn't trip JSX a11y linters.)",
+          "description": "Which world font role to render in (`display` for titles/signage, `body`\nfor labels). The world declares the actual face via `<World fonts>`; an\nundeclared role falls back to the font bundled in `@runek/core`. Text the face\ncan't fully draw is drawn in the world's `fallback` font that covers more of it;\ncharacters no declared font has draw as boxes. (Named `variant`, not `role`, so it\ndoesn't trip JSX a11y linters.)",
           "default": "display"
         },
         "font": {
           "type": "string",
-          "description": "Explicit font URL, overriding the world role."
+          "description": "Explicit font URL, overriding the world role. The world's `fallback` fonts still apply."
         },
         "size": {
           "type": "number",

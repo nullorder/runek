@@ -27,7 +27,8 @@
     "@react-three/rapier": "catalog:",
     "ecctrl": "catalog:",
     "react": "catalog:",
-    "three": "catalog:"
+    "three": "catalog:",
+    "troika-three-text": "catalog:"
   },
   "devDependencies": {
     "@react-three/drei": "catalog:",
@@ -38,6 +39,7 @@
     "ecctrl": "catalog:",
     "react": "catalog:",
     "three": "catalog:",
+    "troika-three-text": "catalog:",
     "vitest": "catalog:"
   }
 }
