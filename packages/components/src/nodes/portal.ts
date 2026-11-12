@@ -22,7 +22,6 @@ import {
   pow,
   sin,
   smoothstep,
-  sRGBTransferEOTF,
   uv,
   varying,
   vec2,
@@ -36,8 +35,6 @@ import { follow } from './uniforms'
 type F = Node<'float'>
 type V2 = Node<'vec2'>
 type V3 = Node<'vec3'>
-
-const eotf = (c: Node) => sRGBTransferEOTF(c) as V3
 
 /** A point `offset` (in view units) from the object's center, facing the camera: the clip
  *  position the GLSL computes as `projectionMatrix * (modelViewMatrix * origin + offset)`. */
@@ -113,8 +110,9 @@ export function vortexMaterial(record: VortexUniforms) {
     depthWrite: false,
   })
   material.vertexNode = facing(positionGeometry.xy.mul(extent).mul(R) as V2)
-  // The GLSL writes its color as is; undo the node pipeline's sRGB output conversion to match.
-  material.colorNode = vec4(eotf(light), alpha)
+  // Light added over the scene: the GLSL adds it to display values, this to linear light, so it
+  // goes in as is (converting it would wash the swirl out against a bright sky).
+  material.colorNode = vec4(light, alpha)
   material.toneMapped = false
   return material
 }
@@ -162,7 +160,7 @@ export function portalMotesMaterial(record: PortalMoteUniforms) {
     depthWrite: false,
   })
   material.vertexNode = facing(offset)
-  material.colorNode = vec4(eotf(color.mul(smoothstep(0.5, 0, d)).mul(fade)), 1)
+  material.colorNode = vec4(color.mul(smoothstep(0.5, 0, d)).mul(fade), 1)
   material.toneMapped = false
   return material
 }
@@ -181,8 +179,7 @@ export function poolMaterial(
     blending: AdditiveBlending,
     depthWrite: false,
   })
-  // Added over a lit floor: blended in linear light here (display values in WebGL), so the color
-  // goes in as is rather than converted, which lands closer to how bright WebGL's glow reads.
+  // Added over the floor in linear light, as is (see the vortex).
   material.colorNode = vec4(color.mul(a), 1)
   material.toneMapped = false
   return material

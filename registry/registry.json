@@ -624,6 +624,22 @@
         {
           "path": "packages/components/src/Sky.tsx",
           "target": "Sky.tsx"
+        },
+        {
+          "path": "packages/components/src/nodes/sky.ts",
+          "target": "nodes/sky.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/portal.ts",
+          "target": "nodes/portal.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/noise.ts",
+          "target": "nodes/noise.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/uniforms.ts",
+          "target": "nodes/uniforms.ts"
         }
       ]
     },
