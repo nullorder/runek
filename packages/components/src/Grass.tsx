@@ -1,7 +1,10 @@
 import { useFrame } from '@react-three/fiber'
-import { rng, sub, useWorld, type Vec3 } from '@runek/core'
+import { lazyModule, rng, sub, useNodeRenderer, useWorld, type Vec3 } from '@runek/core'
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+
+// The WebGPU (TSL) twin of the sway patch, loaded only under a node renderer.
+const grassNodes = lazyModule(() => import('./nodes/grass'))
 
 /** Named blade heights, from a mown lawn to reeds you can hide in. */
 export type GrassHeight = 'short' | 'medium' | 'tall' | 'very-tall'
@@ -73,7 +76,9 @@ export function Grass({
   swayUniforms.current.uBladeHeight.value = h
   swayUniforms.current.uSway.value = sway * h * 0.18
 
+  const nodes = useNodeRenderer() ? grassNodes() : null
   const material = useMemo(() => {
+    if (nodes) return nodes.grassMaterial(swayUniforms.current)
     const mat = new THREE.MeshStandardMaterial()
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uTime = swayUniforms.current.uTime
@@ -99,7 +104,7 @@ export function Grass({
     }
     mat.customProgramCacheKey = () => 'runek-grass-sway'
     return mat
-  }, [])
+  }, [nodes])
 
   useEffect(() => () => material.dispose(), [material])
 

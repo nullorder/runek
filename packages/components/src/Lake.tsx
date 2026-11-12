@@ -1,8 +1,23 @@
 import { useFrame } from '@react-three/fiber'
-import { useWorld, type Vec3 } from '@runek/core'
-import { useMemo, useRef } from 'react'
+import { lazyModule, useNodeRenderer, useWorld, type Vec3 } from '@runek/core'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
+import type { WaterShape } from './nodes/water'
 import { lakeSurface } from './surfaces/lake'
+
+// The WebGPU (TSL) twin of the shader below, loaded only under a node renderer.
+const waterNodes = lazyModule(() => import('./nodes/water'))
+const WATER: WaterShape = {
+  freq: [0.6, 0.4, 0.2, 0.8, 1.5],
+  chop: 1.6,
+  eps: 0.35,
+  world: false,
+  sky: 0.55,
+  glint: [70, 0.7],
+  crest: 0.4,
+  alpha: [0.78, 0.18],
+  fog: false,
+}
 
 export interface LakeProps {
   position?: Vec3
@@ -108,8 +123,6 @@ export function Lake({
   const pos = position ?? [0, ground, 0]
   const w = size[0] * unit
   const d = size[1] * unit
-  const matRef = useRef<THREE.ShaderMaterial>(null)
-
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
@@ -122,20 +135,30 @@ export function Lake({
     [waveHeight, waveSpeed, deep, shallow, sunPosition, unit],
   )
 
+  const nodes = useNodeRenderer() ? waterNodes() : null
+  const nodeMaterial = useMemo(
+    () => nodes?.waterMaterial(uniforms, WATER) ?? null,
+    [nodes, uniforms],
+  )
+  useEffect(() => () => nodeMaterial?.dispose(), [nodeMaterial])
+
   useFrame((_, delta) => {
-    if (matRef.current) matRef.current.uniforms.uTime.value += delta
+    uniforms.uTime.value += delta
   })
 
   return (
     <mesh position={pos} rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}>
       <planeGeometry args={[w, d, segments, segments]} />
-      <shaderMaterial
-        ref={matRef}
-        uniforms={uniforms}
-        vertexShader={VERTEX}
-        fragmentShader={FRAGMENT}
-        transparent
-      />
+      {nodeMaterial ? (
+        <primitive object={nodeMaterial} attach="material" />
+      ) : (
+        <shaderMaterial
+          uniforms={uniforms}
+          vertexShader={VERTEX}
+          fragmentShader={FRAGMENT}
+          transparent
+        />
+      )}
     </mesh>
   )
 }

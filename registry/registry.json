@@ -475,6 +475,14 @@
         {
           "path": "packages/components/src/surfaces/lake.ts",
           "target": "surfaces/lake.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/water.ts",
+          "target": "nodes/water.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/uniforms.ts",
+          "target": "nodes/uniforms.ts"
         }
       ]
     },
@@ -501,6 +509,14 @@
         {
           "path": "packages/components/src/Ocean.tsx",
           "target": "Ocean.tsx"
+        },
+        {
+          "path": "packages/components/src/nodes/water.ts",
+          "target": "nodes/water.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/uniforms.ts",
+          "target": "nodes/uniforms.ts"
         }
       ]
     },
@@ -540,7 +556,11 @@
       "type": "registry:component",
       "category": "water",
       "description": "A big three-masted sailing ship you can board and walk through: a plank up from the dock, the waist, the quarterdeck with its wheel, the forecastle with its bell and bowsprit, a gun deck with a cannon at every port and hammocks slung forward, a cargo hold, and the captain's cabin under the stern windows. Lanterns light the decks below. Seeded planking, sails, gunport lids and cargo; moored and steady.",
-      "example": { "sails": "set", "guns": 8, "gangway": "starboard" },
+      "example": {
+        "sails": "set",
+        "guns": 8,
+        "gangway": "starboard"
+      },
       "files": [
         {
           "path": "packages/components/src/Ship.tsx",
@@ -601,11 +621,21 @@
       "type": "registry:component",
       "category": "environment",
       "description": "Instanced grass blades (seeded scatter).",
-      "example": { "height": "tall" },
+      "example": {
+        "height": "tall"
+      },
       "files": [
         {
           "path": "packages/components/src/Grass.tsx",
           "target": "Grass.tsx"
+        },
+        {
+          "path": "packages/components/src/nodes/grass.ts",
+          "target": "nodes/grass.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/uniforms.ts",
+          "target": "nodes/uniforms.ts"
         }
       ]
     },
@@ -935,6 +965,14 @@
         {
           "path": "packages/components/src/Screen.tsx",
           "target": "Screen.tsx"
+        },
+        {
+          "path": "packages/components/src/nodes/screen.ts",
+          "target": "nodes/screen.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/uniforms.ts",
+          "target": "nodes/uniforms.ts"
         }
       ]
     },

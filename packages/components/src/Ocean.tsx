@@ -1,7 +1,22 @@
 import { useFrame } from '@react-three/fiber'
-import { useWorld, type Vec3 } from '@runek/core'
-import { useMemo, useRef } from 'react'
+import { lazyModule, useNodeRenderer, useWorld, type Vec3 } from '@runek/core'
+import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import type { WaterShape } from './nodes/water'
+
+// The WebGPU (TSL) twin of the shader below, loaded only under a node renderer.
+const waterNodes = lazyModule(() => import('./nodes/water'))
+const WATER: WaterShape = {
+  freq: [0.045, 0.035, 0.018, 0.06, 0.09],
+  chop: 1.4,
+  eps: 1.5,
+  world: true,
+  sky: 0.5,
+  glint: [80, 0.8],
+  crest: 0.35,
+  alpha: [0.86, 0.14],
+  fog: true,
+}
 
 export interface OceanProps {
   position?: Vec3
@@ -126,7 +141,6 @@ export function Ocean({
   const w = size[0] * unit
   const d = size[1] * unit
   const meshRef = useRef<THREE.Mesh>(null)
-  const matRef = useRef<THREE.ShaderMaterial>(null)
 
   const uniforms = useMemo(
     () => ({
@@ -143,18 +157,22 @@ export function Ocean({
     [waveHeight, waveSpeed, deep, shallow, sunPosition, unit],
   )
 
+  const nodes = useNodeRenderer() ? waterNodes() : null
+  const nodeMaterial = useMemo(
+    () => nodes?.waterMaterial(uniforms, WATER) ?? null,
+    [nodes, uniforms],
+  )
+  useEffect(() => () => nodeMaterial?.dispose(), [nodeMaterial])
+
   useFrame((state, delta) => {
-    const mat = matRef.current
-    if (mat) {
-      mat.uniforms.uTime.value += delta
-      // Mirror the world's distance fog so the ocean horizon matches everything else.
-      const fog = state.scene.fog
-      if (fog && 'near' in fog) {
-        const linear = fog as THREE.Fog
-        mat.uniforms.uFogColor.value.copy(linear.color)
-        mat.uniforms.uFogNear.value = linear.near
-        mat.uniforms.uFogFar.value = linear.far
-      }
+    uniforms.uTime.value += delta
+    // Mirror the world's distance fog so the ocean horizon matches everything else.
+    const fog = state.scene.fog
+    if (fog && 'near' in fog) {
+      const linear = fog as THREE.Fog
+      uniforms.uFogColor.value.copy(linear.color)
+      uniforms.uFogNear.value = linear.near
+      uniforms.uFogFar.value = linear.far
     }
     if (follow && meshRef.current) {
       meshRef.current.position.x = state.camera.position.x + (position?.[0] ?? 0)
@@ -172,13 +190,16 @@ export function Ocean({
       rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}
     >
       <planeGeometry args={[w, d, segments, segments]} />
-      <shaderMaterial
-        ref={matRef}
-        uniforms={uniforms}
-        vertexShader={VERTEX}
-        fragmentShader={FRAGMENT}
-        transparent
-      />
+      {nodeMaterial ? (
+        <primitive object={nodeMaterial} attach="material" />
+      ) : (
+        <shaderMaterial
+          uniforms={uniforms}
+          vertexShader={VERTEX}
+          fragmentShader={FRAGMENT}
+          transparent
+        />
+      )}
     </mesh>
   )
 }

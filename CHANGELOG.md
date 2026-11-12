@@ -35,6 +35,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shaded by three's `TiledLighting`, so a street of 200 lamps is fully lit
   with no hand-offs. Spotlights, and `WebGLRenderer`, keep the light pool.
   ([#65](https://github.com/nullorder/runek/issues/65))
+- `Lake`, `Ocean`, `Grass` and `Screen`'s static render under
+  `WebGPURenderer`: each carries a node (TSL) twin of its GLSL, loaded only
+  when the renderer is WebGPU. `useNodeRenderer()` and `lazyModule()` in
+  `@runek/core` let any component do the same. `Portal`, `Rift`, `Sky`,
+  `Sign` text and the first-person lens are still WebGL only.
+  ([#67](https://github.com/nullorder/runek/issues/67))
 - `<World now>`: the world's wall clock, in epoch milliseconds (default
   `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
   and `Clock` all read it through `useWorld().now()`, so a multiplayer app

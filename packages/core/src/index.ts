@@ -78,6 +78,7 @@ export {
   scenePass,
   useMirrorMaterial,
 } from './mirror'
+export { lazyModule, useNodeRenderer } from './node'
 export type { OrbitKeysOptions } from './orbitKeys'
 export { groundForward, MOVE_KEYS, useOrbitKeys } from './orbitKeys'
 export type { WorldPalette } from './palette'
