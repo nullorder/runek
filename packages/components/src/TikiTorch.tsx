@@ -2,10 +2,12 @@ import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import {
   Dynamic,
+  glowLook,
   range,
   rng,
   sub,
   useLight,
+  useLuminance,
   useMaterials,
   useSun,
   useWorld,
@@ -49,6 +51,7 @@ export function TikiTorch({
   nightOnly = false,
 }: TikiTorchProps) {
   const { unit, palette } = useWorld()
+  const { flame } = useLuminance()
   const sun = useSun()
   const lit = on && (!nightOnly || !sun.day)
   const pole = color ?? '#b89a5e'
@@ -58,20 +61,8 @@ export function TikiTorch({
     cord: { color: pole, roughness: 0.9 },
     head: { color: headColor ?? palette.bark, roughness: 1, side: DoubleSide, flatShading: true },
     char: { color: '#1a1410', roughness: 1 },
-    flame: {
-      kind: 'basic',
-      color: flameColor,
-      transparent: true,
-      opacity: 0.85,
-      toneMapped: false,
-    },
-    flameCore: {
-      kind: 'basic',
-      color: '#ffd84d',
-      transparent: true,
-      opacity: 0.9,
-      toneMapped: false,
-    },
+    flame: glowLook(flameColor, flame, { transparent: true, opacity: 0.85 }),
+    flameCore: glowLook('#ffd84d', flame, { transparent: true, opacity: 0.9 }),
   })
   const H = height * unit
   const flameRef = useRef<Group>(null)

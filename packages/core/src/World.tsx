@@ -9,6 +9,7 @@ import { useKeySource } from './input'
 import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
 import { LightBudget } from './LightBudget'
 import type { Lens } from './lens'
+import { DEFAULT_LUMINANCE, type WorldLuminance } from './luminance'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { glProps } from './renderer'
 import { ShadowRate } from './ShadowRate'
@@ -52,6 +53,9 @@ export interface WorldProps {
   /** Fonts the world ships, by role (`display`, `body`). Text components draw from
    *  these; unset roles fall back to the bundled default. Values are font URLs. */
   fonts?: Partial<WorldFonts>
+  /** How bright glowing surfaces are, per kind (`screen`, `sign`, `tube`, `lamp`, `flame`), in
+   *  scene-linear units relative to diffuse white. Unset levels stay at 1 (face value). */
+  luminance?: Partial<WorldLuminance>
   /** Linear distance fog. Pair the color with your sky's horizon. */
   fog?: WorldFog
   /** Pin a fixed time-of-day ("HH:MM", 24h) so the world is reproducible. Drives
@@ -111,6 +115,7 @@ export function World({
   lights = true,
   palette,
   fonts,
+  luminance,
   fog,
   time,
   timezone,
@@ -163,6 +168,7 @@ export function World({
       ground,
       palette: { ...DEFAULT_PALETTE, ...palette },
       fonts: { ...DEFAULT_FONTS, ...fonts },
+      luminance: { ...DEFAULT_LUMINANCE, ...luminance },
       time: resolveWorldTime({ time, timezone }, worldNow()),
       avatar,
       controls: resolvedControls,
@@ -181,6 +187,7 @@ export function World({
       ground,
       palette,
       fonts,
+      luminance,
       time,
       timezone,
       avatar,

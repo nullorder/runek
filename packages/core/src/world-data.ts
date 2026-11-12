@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import type { WorldFonts } from './font.ts'
 import type { WorldControls } from './keyboard.ts'
+import type { WorldLuminance } from './luminance.ts'
 import type { WorldPalette } from './palette.ts'
 import { sub } from './rng.ts'
 import type { AvatarView, Vec3, WorldFog } from './types.ts'
@@ -85,6 +86,9 @@ export interface WorldData {
   /** Fonts the world ships, by role (`display`, `body`). Text components draw from
    *  these; unset roles fall back to the bundled default. Values are font URLs. */
   fonts?: Partial<WorldFonts>
+  /** How bright glowing surfaces are, per kind (`screen`, `sign`, `tube`, `lamp`, `flame`), in
+   *  scene-linear units relative to diffuse white. Unset levels stay at 1 (face value). */
+  luminance?: Partial<WorldLuminance>
   fog?: WorldFog
   nodes: WorldNode[]
 }
@@ -241,6 +245,15 @@ export function parseWorld(json: string): WorldData {
       if (typeof value !== 'string') {
         throw new Error('World "fonts" values must be font URL strings')
       }
+    }
+  }
+  if (data.luminance !== undefined) {
+    const luminance = data.luminance as unknown
+    if (typeof luminance !== 'object' || luminance === null || Array.isArray(luminance)) {
+      throw new Error('World "luminance" must be an object of level to number')
+    }
+    for (const value of Object.values(luminance as Record<string, unknown>)) {
+      if (typeof value !== 'number') throw new Error('World "luminance" values must be numbers')
     }
   }
   validateAnchors(data.nodes)

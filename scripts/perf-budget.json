@@ -1,8 +1,9 @@
 {
-  "$comment": "Per-frame ceilings for the docs library world, checked by scripts/perf.mjs (`just perf`, and CI on pull requests). Counts are about 15% over what main measures, so a regression shows up before it ships. Lower them when cost comes down; raise one only with a reason in the PR. minFps is enforced only with --timing (a real GPU).",
+  "$comment": "Per-frame ceilings for the docs library world, checked by scripts/perf.mjs (`just perf`, and CI on pull requests). draws counts a frame's draw calls without shadow passes and shadowDraws one shadow pass's: shadow maps redraw on a timer, so a per-frame total would move with the frame rate. Counts are about 15% over the higher of what main measures on a GPU and in CI's software renderer, so a regression shows up before it ships. Lower them when cost comes down; raise one only with a reason in the PR. minFps is enforced only with --timing (a real GPU).",
   "scenarios": {
     "spawn": {
-      "draws": 790,
+      "draws": 540,
+      "shadowDraws": 540,
       "scenePasses": 2,
       "shadowPasses": 1,
       "lights": 10,
@@ -11,7 +12,8 @@
       "allocs": 10
     },
     "gallery": {
-      "draws": 1190,
+      "draws": 1010,
+      "shadowDraws": 540,
       "scenePasses": 2,
       "shadowPasses": 1,
       "lights": 10,
@@ -20,7 +22,8 @@
       "allocs": 10
     },
     "turn": {
-      "draws": 1140,
+      "draws": 880,
+      "shadowDraws": 540,
       "scenePasses": 2,
       "shadowPasses": 1,
       "lights": 10,

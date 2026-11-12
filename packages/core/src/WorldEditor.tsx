@@ -35,6 +35,7 @@ export interface WorldEditorProps
     | 'unit'
     | 'gravity'
     | 'palette'
+    | 'luminance'
     | 'fog'
     | 'time'
     | 'timezone'
@@ -276,6 +277,7 @@ export function WorldEditor({ data, registry, onChange, ...worldProps }: WorldEd
         ground={data.ground}
         palette={data.palette}
         fonts={data.fonts}
+        luminance={data.luminance}
         fog={data.fog}
         time={data.time}
         timezone={data.timezone}

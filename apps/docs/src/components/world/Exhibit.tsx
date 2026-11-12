@@ -98,10 +98,11 @@ function measure(root: Object3D): Box3 {
   return box
 }
 
-/** Frames a measurement must hold before it counts (text and instances fill in late); moving
- *  exhibits (birds, steam) settle within a small tolerance or at the frame cap. */
-const SETTLE_FRAMES = 20
-const MAX_FRAMES = 90
+/** Seconds a measurement must hold before it counts (text and instances fill in late); moving
+ *  exhibits (birds, steam) settle within a small tolerance or at the cap. Seconds, not frames, so
+ *  a slow renderer (CI's software one draws a frame every few seconds) shows the gallery as soon. */
+const SETTLE_SECONDS = 1 / 3
+const MAX_SECONDS = 1.5
 
 function settled(a: Box3 | null, b: Box3): boolean {
   if (!a || a.isEmpty() !== b.isEmpty()) return false
@@ -119,15 +120,18 @@ function settled(a: Box3 | null, b: Box3): boolean {
 function FittedMini({ name, props }: { name: string; props: Record<string, unknown> }) {
   const [fit, setFit] = useState<Fit | null>(null)
   const probe = useRef<Group>(null)
-  const frames = useRef(0)
-  const steady = useRef(0)
+  const started = useRef<number | null>(null)
+  const steadySince = useRef(0)
   const last = useRef<Box3 | null>(null)
-  useFrame(() => {
+  useFrame(({ clock }) => {
     if (fit || !probe.current) return
+    const now = clock.elapsedTime
+    started.current ??= now
     const box = measure(probe.current)
-    steady.current = settled(last.current, box) ? steady.current + 1 : 0
+    if (!settled(last.current, box)) steadySince.current = now
     last.current = box
-    if (steady.current >= SETTLE_FRAMES || ++frames.current >= MAX_FRAMES) setFit(fitBox(box))
+    if (now - steadySince.current >= SETTLE_SECONDS || now - started.current >= MAX_SECONDS)
+      setFit(fitBox(box))
   })
   if (!fit)
     return (

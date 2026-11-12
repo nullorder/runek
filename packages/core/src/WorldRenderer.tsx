@@ -13,6 +13,7 @@ export interface WorldRendererProps
     | 'unit'
     | 'gravity'
     | 'palette'
+    | 'luminance'
     | 'fog'
     | 'time'
     | 'timezone'
@@ -43,6 +44,7 @@ export function WorldRenderer({ data, registry, ...worldProps }: WorldRendererPr
         ground={data.ground}
         palette={data.palette}
         fonts={data.fonts}
+        luminance={data.luminance}
         fog={data.fog}
         time={data.time}
         timezone={data.timezone}

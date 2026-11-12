@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { validateWorld } from './validate'
 import { assignNodeIds, parseWorld, serializeWorld, type WorldData } from './world-data'
 
 const sample: WorldData = {
@@ -105,6 +106,25 @@ describe('world-data', () => {
 
   it('rejects a non-string font value', () => {
     expect(() => parseWorld('{"version":1,"fonts":{"display":42},"nodes":[]}')).toThrow()
+  })
+
+  it('keeps luminance levels and rejects non-numbers', () => {
+    const world = parseWorld('{"version":1,"luminance":{"screen":2,"tube":6},"nodes":[]}')
+    expect(world.luminance).toEqual({ screen: 2, tube: 6 })
+    expect(() => parseWorld('{"version":1,"luminance":[2],"nodes":[]}')).toThrow()
+    expect(() => parseWorld('{"version":1,"luminance":{"screen":"2"},"nodes":[]}')).toThrow()
+  })
+
+  it('flags unknown and negative luminance levels', () => {
+    const issues = validateWorld(
+      { version: 1, luminance: { scren: 2, lamp: -1, tube: 4 }, nodes: [] },
+      {},
+    )
+    expect(issues.map((i) => [i.path.join('.'), i.severity])).toEqual([
+      ['luminance.scren', 'warning'],
+      ['luminance.lamp', 'warning'],
+    ])
+    expect(issues[0].message).toContain('Did you mean "screen"?')
   })
 
   it('rejects an unsupported version', () => {

@@ -1,9 +1,11 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import {
+  glowLook,
   pick,
   range,
   rng,
   sub,
+  useLuminance,
   useMaterials,
   useWorld,
   type Vec3,
@@ -61,6 +63,7 @@ export function Tv({
   texture,
 }: TvProps) {
   const { unit, palette } = useWorld()
+  const { screen: level } = useLuminance()
   const frame = color ?? palette.metal
   const W = width * unit
   const Hs = (W * 9) / 16
@@ -114,14 +117,12 @@ export function Tv({
     stand: { color: frame, roughness: 0.5, metalness: 0.3 },
     foot: { color: frame, roughness: 0.5 },
     off: { color: OFF, roughness: 0.12, metalness: 0.4 },
-    sky: { kind: 'basic', color: look.sky, toneMapped: false },
-    ground: { kind: 'basic', color: look.ground, toneMapped: false },
+    sky: glowLook(look.sky, level),
+    ground: glowLook(look.ground, level),
     console: { color: consoleColor ?? palette.woodDark, roughness: 0.7 },
     door: { color: consoleColor ?? palette.wood, roughness: 0.6 },
   })
-  const blobMaterials = useMaterials(
-    look.blobs.map((b) => ({ kind: 'basic' as const, color: b.color, toneMapped: false })),
-  )
+  const blobMaterials = useMaterials(look.blobs.map((b) => glowLook(b.color, level)))
 
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
@@ -143,7 +144,7 @@ export function Tv({
         {on && texture ? (
           <mesh key="texture">
             <planeGeometry args={[W, Hs]} />
-            <meshBasicMaterial map={texture} toneMapped={false} />
+            <meshBasicMaterial map={texture} color={[level, level, level]} toneMapped={false} />
           </mesh>
         ) : on ? (
           <>

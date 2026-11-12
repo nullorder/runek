@@ -1,6 +1,7 @@
-import type { JsonValue, WorldAuthor, WorldData, WorldPalette } from '@runek/core'
+import type { JsonValue, LuminanceLevel, WorldAuthor, WorldData, WorldPalette } from '@runek/core'
 import {
   DEFAULT_CONTROLS,
+  DEFAULT_LUMINANCE,
   DEFAULT_PALETTE,
   keyLabel,
   parseClockTime,
@@ -259,6 +260,45 @@ function PaletteSection({ world }: { world: WorldData }) {
           </div>
         </div>
       ))}
+    </Group>
+  )
+}
+
+function LuminanceSection({ world }: { world: WorldData }) {
+  const luminance = world.luminance ?? {}
+  const set = (level: LuminanceLevel, value: number | undefined) => {
+    const next = { ...luminance }
+    if (value === undefined || value === DEFAULT_LUMINANCE[level]) delete next[level]
+    else next[level] = value
+    setWorldField('luminance', Object.keys(next).length ? next : undefined, `luminance:${level}`)
+  }
+  return (
+    <Group title="Luminance">
+      {(Object.keys(DEFAULT_LUMINANCE) as LuminanceLevel[]).map((level) => (
+        <div key={level} className={`ws-field ${level in luminance ? 'is-modified' : ''}`}>
+          <div className="ws-field__label">
+            {level in luminance && <i className="ws-dot" />}
+            {level}
+            {level in luminance && (
+              <button type="button" className="ws-reset" onClick={() => set(level, undefined)}>
+                ⟲
+              </button>
+            )}
+          </div>
+          <div className="ws-field__control">
+            <NumberInput
+              value={luminance[level] ?? DEFAULT_LUMINANCE[level]}
+              step={0.1}
+              min={0}
+              onChange={(v) => set(level, Math.max(0, v))}
+            />
+          </div>
+        </div>
+      ))}
+      <p className="ws-muted ws-pad">
+        How bright glowing surfaces are, per kind, against diffuse white (1 is face value). Above 1
+        they feed bloom.
+      </p>
     </Group>
   )
 }
@@ -604,6 +644,7 @@ export default function WorldPanel() {
       <div className="ws-worldpanel">
         <TimeSection world={world} />
         <PaletteSection world={world} />
+        <LuminanceSection world={world} />
         <FogSection world={world} />
         <PhysicsSection world={world} />
         <ControlsSection world={world} />

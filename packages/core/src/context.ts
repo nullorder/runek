@@ -2,6 +2,7 @@ import { createContext } from 'react'
 import { DEFAULT_FONTS } from './font'
 import type { GroundIndex } from './ground'
 import { DEFAULT_CONTROLS } from './keyboard'
+import { DEFAULT_LUMINANCE } from './luminance'
 import { DEFAULT_PALETTE } from './palette'
 import { DEFAULT_WORLD_TIME } from './time'
 import type { PlayerMotion, WorldContextValue } from './types'
@@ -12,6 +13,7 @@ export const WorldContext = createContext<WorldContextValue>({
   ground: 0,
   palette: DEFAULT_PALETTE,
   fonts: DEFAULT_FONTS,
+  luminance: DEFAULT_LUMINANCE,
   time: DEFAULT_WORLD_TIME,
   controls: DEFAULT_CONTROLS,
   now: Date.now,

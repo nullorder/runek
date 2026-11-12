@@ -3,6 +3,7 @@ import type { Object3D } from 'three'
 import type { WorldFonts } from './font'
 import type { WorldControls } from './keyboard'
 import type { Lens } from './lens'
+import type { WorldLuminance } from './luminance'
 import type { WorldPalette } from './palette'
 import type { WorldTime } from './time'
 
@@ -99,6 +100,10 @@ export interface WorldContextValue {
    *  is filled (the world's overrides over the bundled default), so a text
    *  component can read `fonts[role]` unconditionally. */
   fonts: WorldFonts
+  /** Resolved luminance levels glowing surfaces scale their color by (the world's over the
+   *  defaults). A hand-rolled provider may leave it out: read it through `useLuminance()`,
+   *  which fills the defaults. */
+  luminance?: WorldLuminance
   /** Resolved time-of-day. Day/night-aware components (`Sky`, `LightRig`,
    *  `Clock`) read this; defaults to a pinned midday. */
   time: WorldTime

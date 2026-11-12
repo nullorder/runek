@@ -4131,7 +4131,7 @@
   "NeonStrip": {
     "kind": "component",
     "seeded": false,
-    "doc": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, unlit by\nthe scene so it reads as light at any hour, for cove lighting, a desk's edge or a line round\na room. `light` also washes nearby walls in its colour. Decorative: no collider.",
+    "doc": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, unlit by\nthe scene so it reads as light at any hour, for cove lighting, a desk's edge or a line round\na room, at the world's `tube` luminance level. `light` also washes nearby walls in its colour.\nDecorative: no collider.",
     "props": {
       "length": {
         "type": "number",
@@ -4159,6 +4159,7 @@
       },
       "intensity": {
         "type": "number",
+        "doc": "The real light's strength, with `light`. How bright the tube itself looks is the world's\n`tube` luminance level.",
         "optional": true,
         "default": 3
       },
@@ -6415,7 +6416,7 @@
   "Screen": {
     "kind": "component",
     "seeded": true,
-    "doc": "A display of any size: a phone, a computer screen, a TV, a digital picture frame, or a large\ndigital banner. It shows a seeded picture or desktop, a banner of text, animated static, or a\nplain color, all geometry, and an app can hand it a live `texture` (video, canvas, a render of\nanother camera) to show instead; the screen itself never loads anything. On a `wall` or in a\n`frame` its origin is the middle of the screen with its back to the wall (local -Z); on a\n`stand` or a `desk` it is the foot. One cuboid collider.",
+    "doc": "A display of any size: a phone, a computer screen, a TV, a digital picture frame, or a large\ndigital banner. It shows a seeded picture or desktop, a banner of text, animated static, or a\nplain color, all geometry, and an app can hand it a live `texture` (video, canvas, a render of\nanother camera) to show instead; the screen itself never loads anything. It glows at the world's\n`screen` luminance level. On a `wall` or in a\n`frame` its origin is the middle of the screen with its back to the wall (local -Z); on a\n`stand` or a `desk` it is the foot. One cuboid collider.",
     "props": {
       "size": {
         "type": "tuple",
@@ -6791,7 +6792,7 @@
   "Sign": {
     "kind": "component",
     "seeded": false,
-    "doc": "In-world text. The one component that renders glyphs, and so the single\ncarve-out to the no-assets rule (CONTRACT §4): it ships no font of its own,\ndrawing only from the world's declared `fonts` or the default bundled in\n`@runek/core`. Decorative: it registers no colliders (mount it on a surface\nthat has one, e.g. a Wall).",
+    "doc": "In-world text. The one component that renders glyphs, and so the single\ncarve-out to the no-assets rule (CONTRACT §4): it ships no font of its own,\ndrawing only from the world's declared `fonts` or the default bundled in\n`@runek/core`. `lit` makes it glow at a world luminance level, `twoSided` reads\nit from behind as well. Decorative: it registers no colliders (mount it on a\nsurface that has one, e.g. a Wall).",
     "props": {
       "children": {
         "type": "string",
@@ -6891,6 +6892,33 @@
         "doc": "A crisp edge in this color, so the text reads against any background. Wins over `glow`.",
         "optional": true
       },
+      "lit": {
+        "type": "union",
+        "variants": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "enum",
+            "options": [
+              "screen",
+              "sign",
+              "tube",
+              "lamp",
+              "flame"
+            ]
+          }
+        ],
+        "doc": "Glow: unlit by the scene and brightened by the world's `sign` luminance level, so lettering\nreads as light and, above 1, blooms. Name another level (`screen`, `tube`) to glow at that\none instead.",
+        "optional": true,
+        "default": false
+      },
+      "twoSided": {
+        "type": "boolean",
+        "doc": "Read from both sides, for a sign that stands free of a wall (hanging, on a roof, on a glass\ndoor): two faces back to back, each front-side only, so neither shows the other mirrored.",
+        "optional": true,
+        "default": false
+      },
       "onBounds": {
         "type": "function",
         "doc": "Called with the laid-out text's width and height, in world units, whenever it changes:\nfor fitting a backdrop behind it.",
@@ -6899,7 +6927,7 @@
     },
     "name": "sign",
     "category": "interiors",
-    "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core."
+    "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core. Can glow at a world luminance level, and read from both sides."
   },
   "Signpost": {
     "kind": "component",

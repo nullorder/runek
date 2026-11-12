@@ -1,4 +1,11 @@
-import { useLight, useMaterials, useSun, useWorld, type WorldComponentProps } from '@runek/core'
+import {
+  useLight,
+  useLuminance,
+  useMaterials,
+  useSun,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
 import { DoubleSide } from 'three'
 
 export interface PictureLightProps extends WorldComponentProps {
@@ -39,6 +46,7 @@ export function PictureLight({
   nightOnly = false,
 }: PictureLightProps) {
   const { unit, palette } = useWorld()
+  const { lamp } = useLuminance()
   const sun = useSun()
   const lit = on && (!nightOnly || !sun.day)
   const brass = color ?? palette.accent
@@ -68,7 +76,7 @@ export function PictureLight({
     bulb: {
       color: '#fff6e0',
       emissive: lightColor,
-      emissiveIntensity: lit ? 2 : 0,
+      emissiveIntensity: lit ? 2 * lamp : 0,
       toneMapped: !lit,
     },
   })

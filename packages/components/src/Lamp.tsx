@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useLight, useMaterials, useWorld, type Vec3 } from '@runek/core'
+import { useLight, useLuminance, useMaterials, useWorld, type Vec3 } from '@runek/core'
 import { DoubleSide } from 'three'
 
 export interface LampProps {
@@ -29,6 +29,7 @@ export function Lamp({
   flicker = 0.08,
 }: LampProps) {
   const { unit, palette } = useWorld()
+  const { lamp } = useLuminance()
   const metalColor = color ?? palette.metal
   const h = height * unit
   const baseR = 0.16 * unit
@@ -39,7 +40,12 @@ export function Lamp({
   const glow = useLight({ color: lightColor, intensity, distance: 12 * unit, decay: 2 })
   const m = useMaterials({
     metal: { color: metalColor, metalness: 0.4, roughness: 0.5 },
-    shade: { color: shadeColor, emissive: shadeColor, emissiveIntensity: 0.4, side: DoubleSide },
+    shade: {
+      color: shadeColor,
+      emissive: shadeColor,
+      emissiveIntensity: 0.4 * lamp,
+      side: DoubleSide,
+    },
   })
 
   useFrame(({ clock }) => {

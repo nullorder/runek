@@ -27,6 +27,8 @@ Each view runs at pixel densities 1, 1.5 and 2. Vsync and the frame-rate cap are
 
 A GitHub runner has no GPU, so pull requests don't check frame rates. Instead, `.github/workflows/perf.yml` renders the same three views in software and fails when a count goes over its budget in `scripts/perf-budget.json`: draw calls, full-scene passes, shadow passes, real lights, shadow casters, material instances and render-target allocations. These don't depend on the machine, and each one going up is what made earlier versions slow.
 
+Draw calls are counted two ways: per frame without the shadow passes, and per shadow pass. Shadow maps redraw 30 times a second (`<World shadowRate>`), so a frame carries a shadow pass more often the slower the machine runs, every frame in CI's software renderer and about three in four on a laptop GPU. Counted apart, neither number moves with the frame rate.
+
 ## Add your machine
 
 Different GPUs, operating systems and browsers behave differently, and the table above only knows the machines someone measured. Weaker GPUs are the most useful: an integrated laptop GPU or an older card says more about where Runek struggles than another fast one. From a clone of the repo, with Chrome installed:

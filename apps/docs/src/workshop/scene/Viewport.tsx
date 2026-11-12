@@ -43,6 +43,7 @@ export default function Viewport() {
       ground={world.ground}
       palette={world.palette}
       fonts={world.fonts}
+      luminance={world.luminance}
       fog={world.fog}
       time={previewTime ?? world.time}
       timezone={world.timezone}

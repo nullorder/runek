@@ -1,9 +1,11 @@
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import {
+  glowLook,
   pick,
   range,
   rng,
   sub,
+  useLuminance,
   useMaterials,
   useWorld,
   type Vec3,
@@ -62,6 +64,7 @@ export function Monitor({
   texture,
 }: MonitorProps) {
   const { unit, palette } = useWorld()
+  const { screen: level } = useLuminance()
   const frame = color ?? palette.metal
   const W = width * unit
   const Hs = W / aspect
@@ -109,12 +112,10 @@ export function Monitor({
   const m = useMaterials({
     bezel: { color: frame, roughness: 0.45, metalness: 0.3 },
     stand: { color: frame, roughness: 0.5, metalness: 0.3 },
-    glow: { kind: 'basic', color: look.glow, toneMapped: false },
+    glow: glowLook(look.glow, level),
     off: { color: OFF, roughness: 0.15, metalness: 0.4 },
   })
-  const panelMaterials = useMaterials(
-    look.panels.map((p) => ({ kind: 'basic' as const, color: p.color, toneMapped: false })),
-  )
+  const panelMaterials = useMaterials(look.panels.map((p) => glowLook(p.color, level)))
 
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
@@ -127,7 +128,7 @@ export function Monitor({
         {on && texture ? (
           <mesh key="texture">
             <planeGeometry args={[W, Hs]} />
-            <meshBasicMaterial map={texture} toneMapped={false} />
+            <meshBasicMaterial map={texture} color={[level, level, level]} toneMapped={false} />
           </mesh>
         ) : (
           <mesh material={on ? m.glow : m.off}>

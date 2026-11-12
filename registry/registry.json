@@ -323,7 +323,7 @@
       "title": "Sign",
       "type": "registry:component",
       "category": "interiors",
-      "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core.",
+      "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core. Can glow at a world luminance level, and read from both sides.",
       "files": [
         {
           "path": "packages/components/src/Sign.tsx",

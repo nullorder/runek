@@ -3,6 +3,7 @@ import {
   rng,
   sub,
   useLight,
+  useLuminance,
   useMaterials,
   useSun,
   useWorld,
@@ -48,6 +49,7 @@ export function DeskLamp({
   nightOnly = false,
 }: DeskLampProps) {
   const { unit, palette } = useWorld()
+  const { lamp } = useLuminance()
   const sun = useSun()
   const lit = on && (!nightOnly || !sun.day)
   const glow = useLight({ color: lightColor, intensity, distance: 3 * unit, decay: 2 }, lit)
@@ -64,13 +66,13 @@ export function DeskLamp({
       roughness: 0.15,
       metalness: 0.1,
       emissive: shade,
-      emissiveIntensity: lit ? 0.25 : 0,
+      emissiveIntensity: lit ? 0.25 * lamp : 0,
       side: DoubleSide,
     },
     bulb: {
       color: '#fff6e0',
       emissive: lightColor,
-      emissiveIntensity: lit ? 2 : 0,
+      emissiveIntensity: lit ? 2 * lamp : 0,
       toneMapped: !lit,
     },
   })

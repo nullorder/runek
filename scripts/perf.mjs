@@ -6,7 +6,9 @@
 // full circle. Per frame it counts draw calls, full-scene passes (every time the world is
 // rendered again: lens views, rift views), shadow passes, active point/spot lights, shadow
 // casters, material instances and render-target allocations, then checks them against
-// scripts/perf-budget.json.
+// scripts/perf-budget.json. Shadow maps redraw on a timer (`<World shadowRate>`), so how many
+// frames carry one depends on the frame rate: draws are counted per frame without them, and
+// shadow draws per shadow pass.
 // These counts don't depend on the machine, so CI enforces them. Frame times are reported
 // always but only enforced with --timing (a real GPU, not CI's software renderer).
 //
@@ -219,7 +221,7 @@ async function launch(port) {
 // Installed before any page script: counts draws and render-target allocations per frame.
 const INSTRUMENT = `(() => {
   const P = (window.__perfFrames = { frames: [], firstDraw: null, allocs: 0 })
-  const cur = { draws: 0, passes: 0, shadows: 0 }
+  const cur = { draws: 0, shadowDraws: 0, passes: 0, shadows: 0 }
   const gl = WebGL2RenderingContext.prototype
   for (const k of ['drawElements', 'drawArrays', 'drawElementsInstanced', 'drawArraysInstanced', 'drawRangeElements']) {
     const o = gl[k]
@@ -235,12 +237,16 @@ const INSTRUMENT = `(() => {
   P.hook = (state) => {
     const r = state.gl, render = r.render.bind(r), shadow = r.shadowMap.render.bind(r.shadowMap)
     r.render = (scene, camera) => { if (scene === state.scene) cur.passes++; return render(scene, camera) }
-    r.shadowMap.render = (...a) => { const d = cur.draws; shadow(...a); if (cur.draws > d) cur.shadows++ }
+    r.shadowMap.render = (...a) => {
+      const d = cur.draws
+      shadow(...a)
+      if (cur.draws > d) { cur.shadows++; cur.shadowDraws += cur.draws - d }
+    }
   }
   let last = null
   const tick = (t) => {
     if (last !== null) P.frames.push({ ms: t - last, js: busy, ...cur })
-    last = t; busy = 0; cur.draws = 0; cur.passes = 0; cur.shadows = 0
+    last = t; busy = 0; cur.draws = 0; cur.shadowDraws = 0; cur.passes = 0; cur.shadows = 0
     raf(tick)
   }
   raf(tick)
@@ -264,12 +270,16 @@ const BATCH_STATS = `JSON.stringify(window.__runekPerf.get().scene.children.find
 
 const WINDOW_STATS = (from) => `(() => {
   const P = window.__perfFrames, f = P.frames.slice(${from})
-  const avg = (k) => f.reduce((a, x) => a + x[k], 0) / Math.max(1, f.length)
+  const sum = (k) => f.reduce((a, x) => a + x[k], 0)
+  const avg = (k) => sum(k) / Math.max(1, f.length)
   const max = (k) => Math.max(0, ...f.map((x) => x[k]))
   const ms = f.map((x) => x.ms).sort((a, b) => a - b)
   return { frames: f.length, fps: 1000 / avg('ms'), p95: ms[Math.floor(0.95 * (ms.length - 1))] ?? 0,
-    jsMs: avg('js'), draws: avg('draws'), maxDraws: max('draws'), scenePasses: max('passes'),
-    shadowPasses: max('shadows'), allocs: P.allocs, firstDraw: P.firstDraw }
+    jsMs: avg('js'), draws: avg('draws') - avg('shadowDraws'),
+    shadowDraws: sum('shadows') ? sum('shadowDraws') / sum('shadows') : 0,
+    shadowFrames: f.filter((x) => x.shadows > 0).length / Math.max(1, f.length),
+    maxDraws: max('draws'), scenePasses: max('passes'), shadowPasses: max('shadows'),
+    allocs: P.allocs, firstDraw: P.firstDraw }
 })()`
 
 const GPU_NAME = `(() => {
@@ -330,6 +340,7 @@ async function measure(base, scenario, port, dpr) {
 
 const COUNTERS = [
   ['draws', 'draws/frame', (r) => Math.round(r.draws)],
+  ['shadowDraws', 'shadow draws/pass', (r) => Math.round(r.shadowDraws)],
   ['scenePasses', 'scene passes', (r) => r.scenePasses],
   ['shadowPasses', 'shadow passes', (r) => r.shadowPasses],
   ['lights', 'point+spot lights', (r) => r.lights],
@@ -374,6 +385,7 @@ async function measureAll(at) {
     if (timing && slow) failures.push(`${scenario.name}: ${r.fps.toFixed(1)} fps < ${minFps}`)
     console.log(
       `${scenario.name.padEnd(8)} ${r.fps.toFixed(1).padStart(6)} fps  p95 ${r.p95.toFixed(1)} ms  js ${r.jsMs.toFixed(1)} ms` +
+        `  shadows redrawn in ${Math.round(r.shadowFrames * 100)}% of frames` +
         `${minFps !== undefined ? `  (min ${minFps}${slow ? (timing ? ' ✗' : ', not enforced') : ''})` : ''}`,
     )
     console.log(`         ${cells.join('  ')}`)
