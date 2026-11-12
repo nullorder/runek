@@ -1,6 +1,9 @@
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef, useState } from 'react'
 import { Vector3 } from 'three'
+import { type BuiltNode, BuiltNodes } from './BuiltNodes'
+import { useBuildContext } from './BuiltView'
+import { buildOf, cachedBuild } from './build'
 import type { GroundIndex } from './ground'
 import { createStreamIndex, nearNodes, type StreamSetting, streamOptions } from './stream'
 import type { Vec3 } from './types'
@@ -83,8 +86,43 @@ function StreamedNodes({ stream, ...props }: WorldNodesProps) {
     setMounted({ index, nodes: new Set(next) })
   })
 
-  const visible = mounted.index === index ? mounted.nodes : undefined
-  return nodeList(props, index ? (visible ?? new Set(index.always)) : undefined)
+  const visible = index
+    ? mounted.index === index
+      ? mounted.nodes
+      : new Set(index.always)
+    : undefined
+
+  // Components with a `build` mount from it, without a component per node; the rest as React.
+  const ctx = useBuildContext()
+  const split = useMemo(() => {
+    if (!index || !visible || !index.options.build) return null
+    const react = new Set<number>()
+    const built: BuiltNode[] = []
+    for (const i of visible) {
+      const node = nodes[i]
+      const build = buildOf(registry[node.type])
+      if (!build || node.children?.length) {
+        react.add(i)
+        continue
+      }
+      const anchored = node.anchor ? ground?.position(nodePath(undefined, i)) : undefined
+      const props = anchored ? { ...node.props, position: anchored } : (node.props ?? {})
+      built.push({
+        key: node.id ?? nodePath(undefined, i),
+        built: cachedBuild(node.type, build, props, ctx),
+        position: asVec3(props.position) ?? [0, 0, 0],
+        rotation: asVec3(props.rotation) ?? [0, 0, 0],
+      })
+    }
+    return { react, built }
+  }, [index, visible, nodes, registry, ground, ctx])
+
+  return (
+    <>
+      {nodeList(props, split?.react ?? visible)}
+      {split && <BuiltNodes items={split.built} />}
+    </>
+  )
 }
 
 function nodeList(

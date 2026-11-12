@@ -194,6 +194,11 @@ export function worldSchema(components) {
             properties: {
               radius: { type: 'number', exclusiveMinimum: 0, default: 80 },
               cell: { type: 'number', exclusiveMinimum: 0, default: 20 },
+              build: {
+                type: 'boolean',
+                default: true,
+                description: 'Mount components that have a build function without React.',
+              },
             },
             additionalProperties: false,
           },

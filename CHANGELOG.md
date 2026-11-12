@@ -52,6 +52,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `LightRig` stay mounted. `WorldRenderer` takes `stream` to override
   the file.
   ([#64](https://github.com/nullorder/runek/issues/64))
+- Component builds: a component can export its geometry as data,
+  `Component.build = (props, ctx) => Built` (parts, colliders, lights),
+  and render it with `<BuiltView>` / `useBuilt`. A streamed world mounts
+  such components straight into the scene and the physics world without a
+  React component per node (`BuiltNodes`), roughly halving the cost of
+  loading a neighbourhood; identical shapes share one geometry and
+  identical nodes build once. `Crate` and `Bench` have builds;
+  `stream.build: false` opts out.
+  ([#64](https://github.com/nullorder/runek/issues/64))
 - `<World now>`: the world's wall clock, in epoch milliseconds (default
   `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
   and `Clock` all read it through `useWorld().now()`, so a multiplayer app

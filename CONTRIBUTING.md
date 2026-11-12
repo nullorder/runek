@@ -42,6 +42,7 @@ Dependency direction is one-way: `app → components → core`.
    - **Materials:** take static ones from `useMaterial` / `useMaterials` (see `Bench`, `Lamp`); they're shared and read-only, so a material you change after mount (a flicker, a texture you draw into) stays your own.
    - **Motion:** wrap parts you move, scale, hide or reshape after mount in `<Dynamic>` (see `Clock`'s hands, `Windmill`'s sails), so the world's static batching leaves them alone.
    - **Light:** register light with `useLight(look)` and put the emitter's `ref` where it shines from (see `Lamp`, `CeilingLight` for a spot); never mount a `<pointLight>` yourself. Flicker by writing the emitter's `intensity`.
+   - **Build (static props worlds place in bulk):** write the geometry as a pure `build(props, ctx)` returning a `Built` (parts, colliders, lights as data), assign it as `<Name>.build`, and render it with `<BuiltView built={useBuilt(build, props)} />` (see `Crate`, `Bench`). Put the prop defaults in the build function's parameters: the prop schema reads them from there. Streamed worlds then mount it without a React component per node.
 
 2. **Export it.** Add to `packages/components/src/index.ts` (the type and the component, kept alphabetical):
 

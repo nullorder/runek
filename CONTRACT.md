@@ -29,6 +29,7 @@ The keywords **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are
 
 - Geometry **MUST** be generated inside `useMemo`, **keyed on every geometry-affecting prop** (including `seed`). Unrelated re-renders **MUST NOT** rebuild geometry.
 - Detail **SHOULD** scale with props and/or distance (parametric LOD) where it's meaningful.
+- A static component a world places by the hundred (furniture, props, street parts) **SHOULD** also export its geometry as data: `Component.build = (props, ctx) => Built` from `@runek/core`, returning its parts (primitive shapes or raw arrays, each with a material look), cuboid colliders and lights, and render that same `Built` from its React form with `<BuiltView>` / `useBuilt`. A `build` **MUST** be pure (§2): the same props and `ctx` (`unit`, `palette`) give the same result, with no React, no three objects other than raw arrays, and nothing that changes after mount. A streamed world mounts such components without React. See `Crate`, `Bench`.
 
 ## 4. No assets (the moat)
 

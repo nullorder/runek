@@ -6,20 +6,22 @@ import { type ComponentRegistry, isCompositeDef, type WorldNode } from './world-
  * Streaming for a dense world: only the nodes near the viewer are mounted. A world file turns it
  * on with `"stream": true` or `{ "radius": 80, "cell": 20 }`.
  */
-export type StreamSetting = boolean | { radius?: number; cell?: number }
+export type StreamSetting = boolean | { radius?: number; cell?: number; build?: boolean }
 
 export interface StreamOptions {
   /** Mount a node once its footprint comes within this many world units of the viewer. */
   radius: number
   /** Side of the index's grid cells, in world units. */
   cell: number
+  /** Mount components that have a `build` from it, without a React component per node. */
+  build: boolean
 }
 
 /** Mounted nodes stay until they are this much farther than `radius`, so a viewer standing on a
  *  boundary doesn't make them flicker in and out. */
 export const STREAM_HYSTERESIS = 1.25
 
-export const DEFAULT_STREAM: StreamOptions = { radius: 80, cell: 20 }
+export const DEFAULT_STREAM: StreamOptions = { radius: 80, cell: 20, build: true }
 
 /** The options a world's `stream` setting asks for, or null when it doesn't stream. */
 export function streamOptions(setting: StreamSetting | undefined, unit = 1): StreamOptions | null {
@@ -28,6 +30,7 @@ export function streamOptions(setting: StreamSetting | undefined, unit = 1): Str
   return {
     radius: (given.radius ?? DEFAULT_STREAM.radius) * unit,
     cell: (given.cell ?? DEFAULT_STREAM.cell) * unit,
+    build: given.build ?? DEFAULT_STREAM.build,
   }
 }
 

@@ -18,13 +18,17 @@ describe('streamOptions (#64)', () => {
   it('is off unless asked for, and scales by unit', () => {
     expect(streamOptions(undefined)).toBeNull()
     expect(streamOptions(false)).toBeNull()
-    expect(streamOptions(true)).toEqual({ radius: 80, cell: 20 })
-    expect(streamOptions({ radius: 30 }, 2)).toEqual({ radius: 60, cell: 40 })
+    expect(streamOptions(true)).toEqual({ radius: 80, cell: 20, build: true })
+    expect(streamOptions({ radius: 30, build: false }, 2)).toEqual({
+      radius: 60,
+      cell: 40,
+      build: false,
+    })
   })
 })
 
 describe('createStreamIndex / nearNodes', () => {
-  const options = { radius: 50, cell: 20 }
+  const options = { radius: 50, cell: 20, build: true }
 
   it('mounts only what is near, and always what never streams', () => {
     const nodes = [

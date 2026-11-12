@@ -35,7 +35,7 @@ Docs index: https://runek.nullorder.org/llms.txt (every page is also Markdown: a
 
 - `type` is the PascalCase title (`Bookshelf`); `add` takes the lowercase name (`bookshelf`). `Group` is a built-in container for `children`.
 - Node keys are only `type`, `id`, `anchor`, `props`, `children`. Every component prop goes under `props`.
-- World-level keys: `version` (always 1), `meta`, `unit`, `gravity`, `ground`, `time` ("HH:MM"), `timezone`, `avatar` ("first" | "third" | "overhead"), `controls`, `palette`, `fonts` (`display`, `body`, and `fallback`: a URL or a list, for text the role font can't draw), `stream` (`true` or `{ radius, cell }`: mount only nodes near the viewer, for dense worlds), `luminance` (glow levels `screen`, `sign`, `tube`, `lamp`, `flame`; 1 is face value), `fog`, `nodes`.
+- World-level keys: `version` (always 1), `meta`, `unit`, `gravity`, `ground`, `time` ("HH:MM"), `timezone`, `avatar` ("first" | "third" | "overhead"), `controls`, `palette`, `fonts` (`display`, `body`, and `fallback`: a URL or a list, for text the role font can't draw), `stream` (`true` or `{ radius, cell, build }`: mount only nodes near the viewer, for dense worlds), `luminance` (glow levels `screen`, `sign`, `tube`, `lamp`, `flame`; 1 is face value), `fog`, `nodes`.
 
 ## Conventions
 

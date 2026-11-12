@@ -261,8 +261,10 @@ export function parseWorld(json: string): WorldData {
       (typeof stream === 'object' &&
         stream !== null &&
         !Array.isArray(stream) &&
-        Object.values(stream).every((v) => typeof v === 'number' && v > 0))
-    if (!ok) throw new Error('World "stream" must be true, false or { radius, cell } in units')
+        Object.entries(stream).every(([k, v]) =>
+          k === 'build' ? typeof v === 'boolean' : typeof v === 'number' && v > 0,
+        ))
+    if (!ok) throw new Error('World "stream" must be true, false or { radius, cell, build }')
   }
   if (data.luminance !== undefined) {
     const luminance = data.luminance as unknown

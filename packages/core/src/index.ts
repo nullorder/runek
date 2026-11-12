@@ -1,4 +1,17 @@
+export type { BuiltNode } from './BuiltNodes'
+export { BuiltNodes } from './BuiltNodes'
+export { BuiltView, useBuildContext, useBuilt } from './BuiltView'
 export { BATCHED_LAYER, DYNAMIC_KEY, isBatchable, StaticBatcher } from './batching'
+export type {
+  BuildContext,
+  BuildFunction,
+  Built,
+  BuiltCollider,
+  BuiltLight,
+  BuiltPart,
+  BuiltShape,
+} from './build'
+export { buildOf, cachedBuild, shapeGeometry, shapeGeometryCount, shapeKey } from './build'
 export { GroundContext, PlayerMotionContext, WorldContext } from './context'
 export type { GitHubSource } from './contribute'
 export { editFileUrl, forkUrl, parseGitHubSource } from './contribute'

@@ -191,14 +191,16 @@ export function validateWorld(
       typeof stream !== 'boolean' &&
       !(
         isObj(stream) &&
-        Object.entries(stream).every(
-          ([k, v]) => ['radius', 'cell'].includes(k) && typeof v === 'number' && v > 0,
+        Object.entries(stream).every(([k, v]) =>
+          k === 'build'
+            ? typeof v === 'boolean'
+            : ['radius', 'cell'].includes(k) && typeof v === 'number' && v > 0,
         )
       )
     )
       issues.push({
         path: ['stream'],
-        message: 'Stream is true, false, or { "radius": n, "cell": n } in units.',
+        message: 'Stream is true, false, or { "radius": n, "cell": n, "build": bool } in units.',
         severity: 'error',
       })
   }
