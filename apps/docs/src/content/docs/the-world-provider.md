@@ -39,7 +39,7 @@ import { Player } from './runek/Player'
 | `fog` | `{ color, near, far }` | off | Linear distance fog; pair the color with the sky's horizon. |
 | `input` | `boolean` | `true` | Read the keyboard. Set `false` to ignore it, e.g. while a modal is open. |
 | `paused` | `boolean` | `false` | Stop rendering and physics until set back to `false`. |
-| `lightBudget` | `number \| { point, spot }` | `{ point: 6, spot: 2 }` | Real lights the world lends to its lamps (`useLight` emitters), each frame to the ones that matter most to the view. |
+| `lightBudget` | `number \| { point, spot }` | `{ point: 6, spot: 2 }` | Real lights the world lends to its lamps (`useLight` emitters), each frame to the ones that matter most to the view. Under `WebGPURenderer` every point lamp gets its own light, up to `point` (default 1024). |
 | `shadowRate` | `number` | `30` | How many times a second shadow maps are redrawn. `Infinity` redraws every frame. |
 | `mirrors` | `number \| { planes, scale }` | `2` planes at `0.5` | Reflection planes for mirror surfaces (a `Floor` with `reflect`, a `Road` with `wet`). See [Reflections](#reflections). |
 | `batching` | `boolean \| { cell }` | `true` | Merge static parts that share a material into one mesh per material per 20 m cell (or `cell` m). Moving parts and anything inside `<Dynamic>` stay as they are. |

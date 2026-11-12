@@ -102,7 +102,9 @@ export interface WorldProps {
   /** Real lights the world lends to its lamps (`useLight` emitters): a number of point lights,
    *  or `{ point, spot }`. Each frame they go to the emitters that matter most to the view,
    *  fading as they hand off; the count never changes, so nothing recompiles. Default 6 point
-   *  lights and 2 spotlights. */
+   *  lights and 2 spotlights. Under `WebGPURenderer` point lights are shaded in screen tiles, so
+   *  every point emitter gets one of its own and `point` is the most there can be (default
+   *  1024). */
   lightBudget?: number | { point?: number; spot?: number }
   /** Reflection planes for mirror surfaces (`useMirrorMaterial`: a polished `Floor`, a wet
    *  `Road`): every reflective surface at one height shares one reflection, drawn once a frame
@@ -141,7 +143,7 @@ export function World({
   now,
   dpr = DEFAULT_DPR,
   batching = true,
-  lightBudget = DEFAULT_LIGHT_BUDGET,
+  lightBudget,
   mirrors = 2,
   shadowRate = 30,
   debug = false,
@@ -272,8 +274,8 @@ export function World({
             </>
           )}
           <LightBudget
-            point={typeof lightBudget === 'number' ? lightBudget : lightBudget.point}
-            spot={typeof lightBudget === 'number' ? undefined : lightBudget.spot}
+            point={typeof lightBudget === 'number' ? lightBudget : lightBudget?.point}
+            spot={typeof lightBudget === 'number' ? undefined : lightBudget?.spot}
           >
             <MirrorPlanes
               planes={typeof mirrors === 'number' ? mirrors : mirrors.planes}
@@ -293,7 +295,6 @@ export function World({
 }
 
 const DEFAULT_DPR: [number, number] = [1, 1.5]
-const DEFAULT_LIGHT_BUDGET = { point: 6, spot: 2 }
 
 // The longest single physics step. A longer frame (a hitch, a tab coming back into view) is split
 // into sub-steps so nothing moves far enough in one step to pass through a thin collider.

@@ -112,3 +112,61 @@ describe('LightPool', () => {
     expect(light.angle).toBe(0.5)
   })
 })
+
+describe('LightPool, direct point lighting (#65)', () => {
+  const street = (n: number) => Array.from({ length: n }, (_, i) => emitter(i % 2 ? 3 : -3, -i * 2))
+
+  it('gives every lit point emitter a light of its own', () => {
+    const lamps = street(200)
+    const pool = new LightPool(new Set(lamps), { point: 1024, spot: 0 }, 'direct')
+    pool.update(camera, 0.016)
+    expect(pool.lit).toHaveLength(200)
+    expect(pool.root.children).toHaveLength(200)
+    const light = pool.root.children[0] as PointLight
+    // no fade-in: full brightness on the first frame
+    expect(light.intensity).toBe(1)
+  })
+
+  it("doesn't hand lights over as the camera moves", () => {
+    const lamps = street(50)
+    const pool = new LightPool(new Set(lamps), { point: 1024, spot: 0 }, 'direct')
+    pool.update(camera, 0.016)
+    const before = pool.root.children.map((l) => l.uuid)
+    const moved = camera.clone()
+    moved.position.set(0, 1, -60)
+    moved.rotation.set(0, Math.PI, 0)
+    moved.updateMatrixWorld()
+    pool.update(moved, 0.016)
+    expect(pool.root.children.map((l) => l.uuid)).toEqual(before)
+  })
+
+  it('takes a light out of the scene when its lamp goes off, and reuses it', () => {
+    const [a, b] = street(2)
+    const pool = new LightPool(new Set([a, b]), { point: 1024, spot: 0 }, 'direct')
+    pool.update(camera, 0.016)
+    b.enabled = false
+    pool.update(camera, 0.016)
+    expect(pool.lit).toEqual([a])
+    expect(pool.root.children).toHaveLength(1)
+    b.enabled = true
+    pool.update(camera, 0.016)
+    expect(pool.root.children).toHaveLength(2)
+  })
+
+  it('keeps the ones that matter most past its limit, and an unlimited one a reach', () => {
+    const far = emitter(0, -80)
+    const near = emitter(0, -3, 1, { distance: 0 })
+    const pool = new LightPool(new Set([far, near]), { point: 1, spot: 0 }, 'direct')
+    pool.update(camera, 0.016)
+    expect(pool.lit).toEqual([near])
+    expect((pool.root.children[0] as PointLight).distance).toBeGreaterThan(0)
+  })
+
+  it('still lends spotlights', () => {
+    const spot = emitter(0, -3, 1, { kind: 'spot' })
+    const pool = new LightPool(new Set([spot, ...street(3)]), { point: 1024, spot: 1 }, 'direct')
+    run(pool, 1)
+    expect(pool.lit).toContain(spot)
+    expect(pool.lit).toHaveLength(4)
+  })
+})

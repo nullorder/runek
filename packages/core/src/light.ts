@@ -146,24 +146,39 @@ const frustum = new Frustum()
 const viewProjection = new Matrix4()
 
 /**
+ * How a pool lights point emitters: `pooled` lends a fixed set of lights to the emitters that
+ * matter most (a forward renderer pays for every light in every shader), `direct` gives each one a
+ * light of its own (a renderer that shades many point lights at once, like three's tiled lighting
+ * under `WebGPURenderer`, where adding one recompiles nothing).
+ */
+export type PointLighting = 'pooled' | 'direct'
+
+/**
  * A fixed set of real three.js lights (some point, some spot) lent each frame to the emitters
  * that matter most: brightest and nearest first, those whose reach touches the view ahead of
  * those behind you, fading over a moment when one hands off to another. The number of lights
- * never changes, so materials never recompile as lamps come and go.
+ * never changes, so materials never recompile as lamps come and go. With `direct` point
+ * lighting, every point emitter gets a light of its own instead, up to `budget.point`.
  */
 export class LightPool {
   readonly root = new Group()
   private readonly points: Slot<PointLight>[]
   private readonly spots: Slot<SpotLight>[]
+  private readonly direct = new Map<LightEmitter, PointLight>()
+  private readonly spare: PointLight[] = []
+  private readonly maxDirect: number
 
   constructor(
     readonly emitters: Set<LightEmitter>,
     budget: { point: number; spot: number },
+    readonly pointLighting: PointLighting = 'pooled',
   ) {
     this.root.name = 'runek:lights'
     // Reachable from the scene, for tooling (`just perf`, debugging) to read `lit`.
     this.root.userData.pool = this
-    this.points = Array.from({ length: budget.point }, () => this.slot(new PointLight()))
+    this.maxDirect = pointLighting === 'direct' ? budget.point : 0
+    const pooled = pointLighting === 'pooled' ? budget.point : 0
+    this.points = Array.from({ length: pooled }, () => this.slot(new PointLight()))
     this.spots = Array.from({ length: budget.spot }, () => {
       const slot = this.slot(new SpotLight())
       this.root.add(slot.light.target)
@@ -180,7 +195,10 @@ export class LightPool {
 
   /** Which emitters hold a light right now (for tests and tooling). */
   get lit(): LightEmitter[] {
-    return [...this.points, ...this.spots].flatMap((s) => (s.emitter ? [s.emitter] : []))
+    return [
+      ...this.direct.keys(),
+      ...[...this.points, ...this.spots].flatMap((s) => (s.emitter ? [s.emitter] : [])),
+    ]
   }
 
   update(camera: Camera, dt: number) {
@@ -188,8 +206,59 @@ export class LightPool {
     viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)
     frustum.setFromProjectionMatrix(viewProjection)
     const eye = camera.getWorldPosition(new Vector3())
-    this.assign(this.points, 'point', eye, dt)
+    if (this.pointLighting === 'direct') this.lightEach(eye)
+    else this.assign(this.points, 'point', eye, dt)
     this.assign(this.spots, 'spot', eye, dt)
+  }
+
+  /** How much an emitter matters to the view: brightness over reach, from the eye, less off view. */
+  private score(e: LightEmitter, eye: Vector3) {
+    e.ref.current?.getWorldPosition(at)
+    const reach = e.distance > 0 ? e.distance : OPEN_REACH
+    // Roughly how bright the light is over what it reaches, as seen from the eye: a dim light
+    // you stand next to beats a bright one across the hall.
+    let score = e.intensity / Math.max(reach, at.distanceTo(eye)) ** 2
+    sphere.set(at, reach)
+    if (!frustum.containsPoint(at)) {
+      score *= frustum.intersectsSphere(sphere) ? EDGE_OF_VIEW : OFF_VIEW
+    }
+    return score
+  }
+
+  /** `direct` point lighting: a light for every lit point emitter, no hand-offs. Past the
+   *  budget, the ones that matter most to the view. */
+  private lightEach(eye: Vector3) {
+    let lit = [...this.emitters].filter(
+      (e) => e.kind === 'point' && e.enabled && e.intensity > 0 && e.ref.current,
+    )
+    if (lit.length > this.maxDirect) {
+      const scores = new Map(lit.map((e) => [e, this.score(e, eye)]))
+      lit = lit.sort((a, b) => (scores.get(b) ?? 0) - (scores.get(a) ?? 0)).slice(0, this.maxDirect)
+    }
+    const keep = new Set(lit)
+    for (const [e, light] of this.direct) {
+      if (keep.has(e)) continue
+      // Out of the scene, not just dark: a tiled renderer would still give it a tile slot.
+      this.root.remove(light)
+      this.direct.delete(e)
+      this.spare.push(light)
+    }
+    for (const e of lit) {
+      let light = this.direct.get(e)
+      if (!light) {
+        light = this.spare.pop() ?? new PointLight()
+        light.castShadow = false
+        this.root.add(light)
+        this.direct.set(e, light)
+      }
+      e.ref.current?.getWorldPosition(light.position)
+      light.color.copy(e.color)
+      light.intensity = e.intensity
+      // A tiled renderer culls a light by its reach, so an unlimited one gets the reach the pool
+      // scores it by.
+      light.distance = e.distance > 0 ? e.distance : OPEN_REACH
+      light.decay = e.decay
+    }
   }
 
   private assign<L extends PointLight | SpotLight>(
@@ -203,15 +272,7 @@ export class LightPool {
     const ranked: [LightEmitter, number][] = []
     for (const e of this.emitters) {
       if (e.kind !== kind || !e.enabled || e.intensity <= 0 || !e.ref.current) continue
-      e.ref.current.getWorldPosition(at)
-      const reach = e.distance > 0 ? e.distance : OPEN_REACH
-      // Roughly how bright the light is over what it reaches, as seen from the eye: a dim light
-      // you stand next to beats a bright one across the hall.
-      let score = e.intensity / Math.max(reach, at.distanceTo(eye)) ** 2
-      sphere.set(at, reach)
-      if (!frustum.containsPoint(at)) {
-        score *= frustum.intersectsSphere(sphere) ? EDGE_OF_VIEW : OFF_VIEW
-      }
+      let score = this.score(e, eye)
       if (held.has(e)) score *= KEEP
       ranked.push([e, score])
     }
@@ -271,6 +332,8 @@ export class LightPool {
 
   dispose() {
     for (const s of [...this.points, ...this.spots]) s.light.dispose()
+    for (const light of [...this.direct.values(), ...this.spare]) light.dispose()
+    this.direct.clear()
     this.root.clear()
   }
 }

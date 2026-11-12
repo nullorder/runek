@@ -30,6 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Road` `wet` use it. `scenePass()`/`inScenePass()` keep passes that draw
   the scene (mirrors, `Rift`) from nesting.
   ([#63](https://github.com/nullorder/runek/issues/63))
+- Tiled lighting under `WebGPURenderer`: every `useLight` point lamp gets
+  a light of its own (up to `lightBudget.point`, default 1024 there),
+  shaded by three's `TiledLighting`, so a street of 200 lamps is fully lit
+  with no hand-offs. Spotlights, and `WebGLRenderer`, keep the light pool.
+  ([#65](https://github.com/nullorder/runek/issues/65))
 - `<World now>`: the world's wall clock, in epoch milliseconds (default
   `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
   and `Clock` all read it through `useWorld().now()`, so a multiplayer app

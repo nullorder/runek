@@ -208,7 +208,7 @@ import { WebGPURenderer } from 'three/webgpu'
 </World>
 ```
 
-`shadowRate` keeps its meaning under both renderers. Under WebGPU, components that build their materials from `useMaterial` looks render as they do under WebGL; those that write their own shaders (`Grass`, `Lake`, `Ocean`, `Portal`, `Rift`, `Screen`'s static, `Person` skin, `Sky`, `Sign` text and the first-person lens) don't yet, and are tracked in [#67](https://github.com/nullorder/runek/issues/67).
+`shadowRate` keeps its meaning under both renderers. Lamps light more under WebGPU: three's tiled lighting shades many point lights at once, so instead of lending a handful of lights to the lamps nearest the view, the world gives every `useLight` point lamp a light of its own (up to `lightBudget.point`, default 1024), and a street of two hundred lamps is lit end to end with no hand-offs as you walk. Spotlights are still lent from `lightBudget.spot`, and a lamp with no `distance` reaches 20 m under tiled lighting, which culls each light by its reach. The tiled lighting code loads only when the renderer is WebGPU. Under WebGPU, components that build their materials from `useMaterial` looks render as they do under WebGL; those that write their own shaders (`Grass`, `Lake`, `Ocean`, `Portal`, `Rift`, `Screen`'s static, `Person` skin, `Sky`, `Sign` text and the first-person lens) don't yet, and are tracked in [#67](https://github.com/nullorder/runek/issues/67).
 
 ## Actions near a figure
 
