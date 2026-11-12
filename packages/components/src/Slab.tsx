@@ -37,7 +37,7 @@ export function Slab({
   color,
 }: SlabProps) {
   const { unit, palette } = useWorld()
-  const material = useMaterial({ color: color ?? palette.wall })
+  const material = useMaterial({ slot: 'concrete', color: color ?? palette.wall })
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit

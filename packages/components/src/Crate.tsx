@@ -57,7 +57,7 @@ export function Crate({
     return out
   }, [s, b, c, wood, seed])
 
-  const core = useMaterial({ color: palette.woodDark, roughness: 0.9 })
+  const core = useMaterial({ slot: 'wood', color: palette.woodDark, roughness: 0.9 })
   const beamMaterials = useMaterials(beams.map((bm) => ({ color: bm.color, roughness: 0.85 })))
 
   return (

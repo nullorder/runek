@@ -25,8 +25,8 @@ export function DrumKit({
   const m = useMaterials({
     shell: { color: color ?? pick(rng(seed), SHELLS), roughness: 0.25, metalness: 0.2 },
     head: { color: '#efe9dc', roughness: 0.6 },
-    chrome: { color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
-    bronze: { color: '#c9a24a', roughness: 0.25, metalness: 0.8 },
+    chrome: { slot: 'metal.bare', color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
+    bronze: { slot: 'metal.bare', color: '#c9a24a', roughness: 0.25, metalness: 0.8 },
     seat: { color: '#1b1b1b', roughness: 0.7 },
   })
   const at = (p: Vec3): Vec3 => [p[0] * u, p[1] * u, p[2] * u]

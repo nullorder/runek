@@ -26,7 +26,7 @@ export function Bench({
   color,
 }: BenchProps) {
   const { unit, palette } = useWorld()
-  const wood = useMaterial({ color: color ?? palette.wood, roughness: 0.85 })
+  const wood = useMaterial({ slot: 'wood', color: color ?? palette.wood, roughness: 0.85 })
   const L = length * unit
   const D = depth * unit
   const sh = seatHeight * unit

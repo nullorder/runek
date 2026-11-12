@@ -115,8 +115,8 @@ export function Bookshelf({
   const { unit, palette } = useWorld()
   const labelAt = useLensPosition()
   const m = useMaterials({
-    frame: { color: color ?? palette.wood },
-    panel: { color: backColor ?? palette.woodDark },
+    frame: { slot: 'wood', color: color ?? palette.wood },
+    panel: { slot: 'wood', color: backColor ?? palette.woodDark },
     books: { roughness: 0.85 },
   })
   const w = width * unit

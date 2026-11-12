@@ -28,9 +28,9 @@ export function Bed({
   const wood = color ?? palette.wood
   const bedding = beddingColor ?? palette.fabric
   const m = useMaterials({
-    wood: { color: wood, roughness: 0.85 },
-    bedding: { color: bedding, roughness: 0.9 },
-    pillow: { color: '#f2ede2', roughness: 0.95 },
+    wood: { slot: 'wood', color: wood, roughness: 0.85 },
+    bedding: { slot: 'fabric', color: bedding, roughness: 0.9 },
+    pillow: { slot: 'fabric', color: '#f2ede2', roughness: 0.95 },
   })
   const W = width * unit
   const L = length * unit

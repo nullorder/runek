@@ -31,8 +31,8 @@ export function Window({
   const f = frame * unit
   const d = depth * unit
   const m = useMaterials({
-    frame: { color },
-    glass: { color: glassColor, transparent: true, opacity: 0.35, roughness: 0.1 },
+    frame: { slot: 'wood', color },
+    glass: { slot: 'glass', color: glassColor, transparent: true, opacity: 0.35, roughness: 0.1 },
   })
 
   return (

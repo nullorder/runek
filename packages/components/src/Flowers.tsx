@@ -36,7 +36,7 @@ export function Flowers({
 }: FlowersProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    stem: { color: stemColor ?? palette.foliage },
+    stem: { slot: 'foliage', color: stemColor ?? palette.foliage },
     head: { flatShading: true, roughness: 0.8 },
   })
   const w = area[0] * unit

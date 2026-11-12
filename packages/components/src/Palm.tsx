@@ -164,9 +164,9 @@ export function Palm({
   const bark = trunkColor ?? palette.bark
   const leaf = frondColor ?? palette.foliage
   const m = useMaterials({
-    trunk: { color: bark, roughness: 0.95, flatShading: true },
+    trunk: { slot: 'bark', color: bark, roughness: 0.95, flatShading: true },
     crown: { vertexColors: true, roughness: 0.9, side: THREE.DoubleSide, flatShading: true },
-    knot: { color: bark, roughness: 1, flatShading: true },
+    knot: { slot: 'bark', color: bark, roughness: 1, flatShading: true },
     nut: { color: '#6b5233', roughness: 1 },
   })
   const h = height * unit

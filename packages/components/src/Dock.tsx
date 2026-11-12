@@ -29,9 +29,9 @@ export function Dock({
 }: DockProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    deck: { color: color ?? palette.wood, roughness: 0.85 },
-    stringer: { color: palette.woodDark, roughness: 0.85 },
-    post: { color: palette.woodDark, roughness: 0.9 },
+    deck: { slot: 'wood', color: color ?? palette.wood, roughness: 0.85 },
+    stringer: { slot: 'wood', color: palette.woodDark, roughness: 0.85 },
+    post: { slot: 'wood', color: palette.woodDark, roughness: 0.9 },
   })
   const L = length * unit
   const W = width * unit

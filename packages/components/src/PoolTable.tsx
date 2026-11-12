@@ -112,9 +112,9 @@ export function PoolTable({
   }, [seed, balls, color, bedL, bedW, r])
 
   const m = useMaterials({
-    wood: { color: wood, roughness: 0.55 },
-    rail: { color: wood, roughness: 0.45 },
-    cloth: { color: look.cloth, roughness: 0.95 },
+    wood: { slot: 'wood', color: wood, roughness: 0.55 },
+    rail: { slot: 'wood', color: wood, roughness: 0.45 },
+    cloth: { slot: 'fabric', color: look.cloth, roughness: 0.95 },
     pocket: { color: '#0d0d0e', roughness: 0.9 },
     ball: { kind: 'physical', roughness: 0.15, clearcoat: 1 },
   })

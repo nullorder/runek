@@ -65,7 +65,7 @@ export function Piano({
   const { unit } = useWorld()
   const m = useMaterials({
     lacquer: { color, roughness: 0.18, metalness: 0.15 },
-    brass: { color: '#c9a24a', roughness: 0.3, metalness: 0.8 },
+    brass: { slot: 'metal.bare', color: '#c9a24a', roughness: 0.3, metalness: 0.8 },
     ivory: { color: '#f4f1e8', roughness: 0.35 },
     ebony: { color: '#141414', roughness: 0.3 },
   })

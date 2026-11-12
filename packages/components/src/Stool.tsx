@@ -23,8 +23,8 @@ export function Stool({
   const { unit, palette } = useWorld()
   const wood = color ?? palette.wood
   const m = useMaterials({
-    seat: { color: wood, roughness: 0.7 },
-    leg: { color: wood, roughness: 0.8 },
+    seat: { slot: 'wood', color: wood, roughness: 0.7 },
+    leg: { slot: 'wood', color: wood, roughness: 0.8 },
   })
   const H = height * unit
   const R = radius * unit

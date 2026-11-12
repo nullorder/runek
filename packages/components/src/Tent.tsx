@@ -55,11 +55,16 @@ export function Tent({
   const { unit, palette } = useWorld()
   const pole = poleColor ?? palette.woodDark
   const m = useMaterials({
-    fabric: { color: color ?? palette.fabric, side: DoubleSide, roughness: 0.95 },
-    stripe: { color: stripeColor ?? palette.wall, side: DoubleSide, roughness: 0.95 },
-    pole: { color: pole, roughness: 0.8 },
+    fabric: { slot: 'fabric', color: color ?? palette.fabric, side: DoubleSide, roughness: 0.95 },
+    stripe: {
+      slot: 'fabric',
+      color: stripeColor ?? palette.wall,
+      side: DoubleSide,
+      roughness: 0.95,
+    },
+    pole: { slot: 'wood', color: pole, roughness: 0.8 },
     rope: { color: palette.sand, roughness: 1 },
-    stake: { color: pole, roughness: 0.9 },
+    stake: { slot: 'wood', color: pole, roughness: 0.9 },
   })
   const W = width * unit
   const H = height * unit

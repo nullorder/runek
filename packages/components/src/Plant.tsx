@@ -56,7 +56,7 @@ export function Plant({
   }, [potR, potH, H, foliage, seed, unit])
 
   const m = useMaterials({
-    pot: { color: pot, roughness: 0.9 },
+    pot: { slot: 'ceramic', color: pot, roughness: 0.9 },
     soil: { color: '#3a2a1a', roughness: 1 },
   })
   const leafMaterials = useMaterials(

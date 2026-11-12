@@ -103,9 +103,15 @@ export function Sailboat({
 }: SailboatProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    hull: { color: color ?? palette.wood, side: DoubleSide, flatShading: true, roughness: 0.8 },
-    trim: { color: trimColor ?? palette.woodDark, roughness: 0.7 },
-    sail: { color: sailColor, side: DoubleSide, roughness: 0.9 },
+    hull: {
+      slot: 'wood',
+      color: color ?? palette.wood,
+      side: DoubleSide,
+      flatShading: true,
+      roughness: 0.8,
+    },
+    trim: { slot: 'wood', color: trimColor ?? palette.woodDark, roughness: 0.7 },
+    sail: { slot: 'fabric', color: sailColor, side: DoubleSide, roughness: 0.9 },
   })
   const boat = useRef<Group>(null)
 

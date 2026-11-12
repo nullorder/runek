@@ -25,7 +25,7 @@ export function Shelf({
   color,
 }: ShelfProps) {
   const { unit, palette } = useWorld()
-  const wood = useMaterial({ color: color ?? palette.wood })
+  const wood = useMaterial({ slot: 'wood', color: color ?? palette.wood })
   const w = width * unit
   const h = height * unit
   const d = depth * unit

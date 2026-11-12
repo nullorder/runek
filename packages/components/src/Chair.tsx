@@ -24,7 +24,7 @@ export function Chair({
   color,
 }: ChairProps) {
   const { unit, palette } = useWorld()
-  const wood = useMaterial({ color: color ?? palette.wood })
+  const wood = useMaterial({ slot: 'wood', color: color ?? palette.wood })
   const w = width * unit
   const d = depth * unit
   const seatY = seatHeight * unit

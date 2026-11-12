@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Material slots: a look can name the surface it stands for (`slot:
+  'asphalt'`, `'glass'`, `'wood'`, …, listed in `MATERIAL_SLOTS`), and
+  `<World materials>` answers slots with an app's own materials, or a
+  function that makes one from the look. One entry changes every such
+  surface in the world with no component edits; slots it leaves out draw
+  as before. Registry components name their slots (`Road` deck `asphalt`,
+  `Wall` `plaster`, `Window` `glass`, furniture `wood`, …).
+  ([#62](https://github.com/nullorder/runek/issues/62))
 - `<World now>`: the world's wall clock, in epoch milliseconds (default
   `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
   and `Clock` all read it through `useWorld().now()`, so a multiplayer app

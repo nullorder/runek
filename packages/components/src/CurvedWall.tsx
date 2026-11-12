@@ -59,9 +59,9 @@ export function CurvedWall({
   const glass = style === 'glass'
   const m = useMaterials({
     chord: glass
-      ? { color: glassColor, transparent: true, opacity: 0.28, roughness: 0.08 }
-      : { color: color ?? palette.wall },
-    frame: { color: frameColor ?? palette.metal, roughness: 0.6 },
+      ? { slot: 'glass', color: glassColor, transparent: true, opacity: 0.28, roughness: 0.08 }
+      : { slot: 'plaster', color: color ?? palette.wall },
+    frame: { slot: 'metal.painted', color: frameColor ?? palette.metal, roughness: 0.6 },
   })
   const chordsRef = useRef<THREE.InstancedMesh>(null)
   const mullionsRef = useRef<THREE.InstancedMesh>(null)

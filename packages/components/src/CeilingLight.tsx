@@ -83,8 +83,8 @@ export function CeilingLight({
   }, [seed, kind, shade, shadeColor])
 
   const m = useMaterials({
-    metal: { color: metal, metalness: 0.5, roughness: 0.4 },
-    can: { color: metal, metalness: 0.5, roughness: 0.4, side: DoubleSide },
+    metal: { slot: 'metal.painted', color: metal, metalness: 0.5, roughness: 0.4 },
+    can: { slot: 'metal.painted', color: metal, metalness: 0.5, roughness: 0.4, side: DoubleSide },
     cord: { color: metal },
     bulb: {
       color: '#fff6e0',

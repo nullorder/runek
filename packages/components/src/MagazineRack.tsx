@@ -36,7 +36,7 @@ export function MagazineRack({
   color,
 }: MagazineRackProps) {
   const { unit: u, palette } = useWorld()
-  const wood = useMaterial({ color: color ?? palette.woodDark, roughness: 0.85 })
+  const wood = useMaterial({ slot: 'wood', color: color ?? palette.woodDark, roughness: 0.85 })
   const n = Math.max(1, Math.min(4, Math.round(tiers)))
   const W = width
   const inner = W - SIDE * 2

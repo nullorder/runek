@@ -179,7 +179,7 @@ export function Sofa({
   const frameH = frameTop - legH
   const u = unit
   const m = useMaterials({
-    fabric: { color: fabric, roughness: 0.95 },
+    fabric: { slot: 'fabric', color: fabric, roughness: 0.95 },
     peg: { color: legTone, roughness: 0.6 },
     plinth: { color: legTone, roughness: 0.8 },
   })

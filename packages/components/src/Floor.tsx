@@ -68,7 +68,7 @@ export function Floor({
   color,
 }: FloorProps) {
   const { unit, palette, ground } = useWorld()
-  const material = useMaterial({ color: color ?? palette.floor })
+  const material = useMaterial({ slot: 'floor', color: color ?? palette.floor })
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit

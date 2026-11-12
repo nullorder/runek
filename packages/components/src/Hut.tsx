@@ -41,14 +41,14 @@ export function Hut({
   const roof = roofColor ?? palette.roof
   const post = palette.woodDark
   const m = useMaterials({
-    stone: { color: palette.stone, roughness: 1, flatShading: true },
-    floor: { color: palette.bark, roughness: 1 },
+    stone: { slot: 'stone', color: palette.stone, roughness: 1, flatShading: true },
+    floor: { slot: 'wood', color: palette.bark, roughness: 1 },
     wall: { color: wall, side: DoubleSide, roughness: 0.9 },
-    rib: { color: palette.wood, roughness: 0.9 },
-    post: { color: post, roughness: 0.8 },
-    rafter: { color: post, roughness: 0.9 },
-    thatch: { color: roof, roughness: 1, flatShading: true, side: DoubleSide },
-    knot: { color: roof, roughness: 1, flatShading: true },
+    rib: { slot: 'wood', color: palette.wood, roughness: 0.9 },
+    post: { slot: 'wood', color: post, roughness: 0.8 },
+    rafter: { slot: 'wood', color: post, roughness: 0.9 },
+    thatch: { slot: 'roofing', color: roof, roughness: 1, flatShading: true, side: DoubleSide },
+    knot: { slot: 'roofing', color: roof, roughness: 1, flatShading: true },
   })
   const R = radius * unit
   const H = wallHeight * unit

@@ -1,8 +1,12 @@
 import { Color, MeshBasicMaterial, MeshStandardMaterial } from 'three'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  isSharedMaterial,
+  lookMaterial,
+  type MaterialLook,
   materialKey,
   releaseMaterial,
+  resolveSlot,
   retainMaterial,
   sharedMaterial,
   sharedMaterialCount,
@@ -88,3 +92,51 @@ describe('sharedMaterial', () => {
     expect(dispose).toHaveBeenCalledOnce()
   })
 })
+
+describe('material slots (#62)', () => {
+  const asphalt: MaterialLook = { slot: 'asphalt', color: '#3a3a3a', roughness: 1 }
+
+  it('leaves the slot out of the key and off the built material', () => {
+    expect(materialKey(asphalt)).toBe(materialKey({ color: '#3a3a3a', roughness: 1 }))
+    const built = sharedMaterial(asphalt)
+    expect(built).toBe(sharedMaterial({ color: '#3a3a3a', roughness: 1 }))
+    expect('slot' in built).toBe(false)
+    expect(isSharedMaterial(built)).toBe(true)
+  })
+
+  it('draws the look as given when the world has no answer', () => {
+    expect(lookMaterial(asphalt, undefined)).toBe(sharedMaterial(asphalt))
+    expect(lookMaterial(asphalt, { glass: new MeshBasicMaterial() })).toBe(sharedMaterial(asphalt))
+    expect(lookMaterial({ color: '#3a3a3a', roughness: 1 }, { asphalt: () => wet() })).toBe(
+      sharedMaterial(asphalt),
+    )
+  })
+
+  it("answers a slot with the world's material", () => {
+    const road = new MeshStandardMaterial({ name: 'app:asphalt' })
+    expect(lookMaterial(asphalt, { asphalt: road })).toBe(road)
+    expect(isSharedMaterial(road)).toBe(true)
+  })
+
+  it('makes one material per resolver, slot and look', () => {
+    const make = vi.fn((look: MaterialLook) => new MeshStandardMaterial({ color: look.color }))
+    const slots = { asphalt: make, concrete: make }
+    const a = lookMaterial(asphalt, slots)
+    expect(lookMaterial({ ...asphalt }, slots)).toBe(a)
+    expect(make).toHaveBeenCalledOnce()
+    expect(make).toHaveBeenCalledWith(asphalt)
+    expect(isSharedMaterial(a)).toBe(true)
+
+    expect(lookMaterial({ ...asphalt, slot: 'concrete' }, slots)).not.toBe(a)
+    expect(lookMaterial({ ...asphalt, color: '#444444' }, slots)).not.toBe(a)
+    expect(make).toHaveBeenCalledTimes(3)
+
+    const other = vi.fn(() => new MeshStandardMaterial())
+    expect(resolveSlot(other, asphalt)).not.toBe(a)
+    expect(other).toHaveBeenCalledOnce()
+  })
+})
+
+function wet() {
+  return new MeshStandardMaterial({ roughness: 0.1 })
+}

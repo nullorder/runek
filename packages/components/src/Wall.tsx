@@ -79,7 +79,7 @@ export function Wall({
   openings,
 }: WallProps) {
   const { unit, palette } = useWorld()
-  const material = useMaterial({ color: color ?? palette.wall })
+  const material = useMaterial({ slot: 'plaster', color: color ?? palette.wall })
   const w = width * unit
   const h = height * unit
   const t = thickness * unit

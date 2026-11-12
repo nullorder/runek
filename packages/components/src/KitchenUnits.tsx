@@ -75,8 +75,8 @@ export function KitchenUnits({
     kick: { color: '#3a3a3c', roughness: 0.8 },
     finish: { color: finish, roughness: 0.55 },
     top: { color: topColor, roughness: 0.35 },
-    steel: { color: metalColor, roughness: 0.25, metalness: 0.8 },
-    glass: { color: '#141416', roughness: 0.12, metalness: 0.3 },
+    steel: { slot: 'metal.bare', color: metalColor, roughness: 0.25, metalness: 0.8 },
+    glass: { slot: 'glass', color: '#141416', roughness: 0.12, metalness: 0.3 },
     iron: { color: '#3a3a3e', roughness: 0.4, metalness: 0.4 },
   })
   const count = Math.max(1, Math.round(length / unitWidth))

@@ -28,13 +28,13 @@ export function Well({
   const stone = color ?? palette.stone
   const wood = roofColor ?? palette.wood
   const m = useMaterials({
-    wall: { color: stone, roughness: 0.95 },
-    rim: { color: stone, roughness: 0.9 },
+    wall: { slot: 'stone', color: stone, roughness: 0.95 },
+    rim: { slot: 'stone', color: stone, roughness: 0.9 },
     pool: { color: '#0c1a22', roughness: 1 },
-    post: { color: wood, roughness: 0.85 },
-    roof: { color: wood, roughness: 0.8, flatShading: true },
+    post: { slot: 'wood', color: wood, roughness: 0.85 },
+    roof: { slot: 'wood', color: wood, roughness: 0.8, flatShading: true },
     rope: { color: '#5a4a32' },
-    bucket: { color: wood, roughness: 0.8 },
+    bucket: { slot: 'wood', color: wood, roughness: 0.8 },
   })
   const R = radius * unit
   const wh = wallHeight * unit

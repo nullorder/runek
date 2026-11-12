@@ -71,8 +71,8 @@ export function PictureLight({
     lit,
   )
   const m = useMaterials({
-    metal: { color: brass, metalness: 0.75, roughness: 0.3 },
-    hood: { color: brass, metalness: 0.75, roughness: 0.3, side: DoubleSide },
+    metal: { slot: 'metal.bare', color: brass, metalness: 0.75, roughness: 0.3 },
+    hood: { slot: 'metal.bare', color: brass, metalness: 0.75, roughness: 0.3, side: DoubleSide },
     bulb: {
       color: '#fff6e0',
       emissive: lightColor,

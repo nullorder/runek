@@ -39,7 +39,7 @@ export function Guitar({
     dark: { color: '#1d1d1f', roughness: 0.5 },
     body: { color: finish, roughness: 0.25 },
     neck: { color: '#3a2414', roughness: 0.6 },
-    peg: { color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
+    peg: { slot: 'metal.bare', color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
   })
   const depth = acoustic ? 0.1 : 0.045
   const lower = acoustic ? 0.2 : 0.17

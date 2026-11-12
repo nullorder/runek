@@ -34,8 +34,8 @@ export function Bridge({
 }: BridgeProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    deck: { color: color ?? palette.wood, roughness: 0.85 },
-    rail: { color: palette.woodDark, roughness: 0.85 },
+    deck: { slot: 'wood', color: color ?? palette.wood, roughness: 0.85 },
+    rail: { slot: 'wood', color: palette.woodDark, roughness: 0.85 },
   })
   const L = length * unit
   const W = width * unit

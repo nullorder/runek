@@ -36,7 +36,7 @@ export function Fence({
 }: FenceProps) {
   const { unit, palette } = useWorld()
   const woodColor = color ?? palette.wood
-  const wood = useMaterial({ color: woodColor, roughness: 0.85 })
+  const wood = useMaterial({ slot: 'wood', color: woodColor, roughness: 0.85 })
   const L = length * unit
   const h = height * unit
   const postW = 0.1 * unit

@@ -66,8 +66,8 @@ export function Terrain({
   const { unit, palette } = useWorld()
   const groundColor = color ?? palette.ground
   const m = useMaterials({
-    displaced: { color: groundColor, flatShading: true },
-    flat: { color: groundColor },
+    displaced: { slot: 'ground', color: groundColor, flatShading: true },
+    flat: { slot: 'ground', color: groundColor },
   })
   const width = size[0] * unit
   const depth = size[1] * unit

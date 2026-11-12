@@ -36,7 +36,12 @@ export function Cliff({
   color,
 }: CliffProps) {
   const { unit, palette } = useWorld()
-  const rock = useMaterial({ color: color ?? palette.stone, roughness: 1, flatShading: true })
+  const rock = useMaterial({
+    slot: 'stone',
+    color: color ?? palette.stone,
+    roughness: 1,
+    flatShading: true,
+  })
   const R = radius * unit
   const Rt = topRadius * unit
   const Hgt = height * unit

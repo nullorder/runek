@@ -39,10 +39,10 @@ export function Windmill({
   const wall = color ?? palette.wall
   const wood = trimColor ?? palette.wood
   const m = useMaterials({
-    tower: { color: wall, flatShading: true },
-    cap: { color: palette.roof, flatShading: true },
-    wood: { color: wood },
-    canvas: { color: wall },
+    tower: { slot: 'plaster', color: wall, flatShading: true },
+    cap: { slot: 'roofing', color: palette.roof, flatShading: true },
+    wood: { slot: 'wood', color: wood },
+    canvas: { slot: 'fabric', color: wall },
   })
   const sails = useRef<Group>(null)
 

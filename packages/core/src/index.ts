@@ -44,11 +44,21 @@ export type { LightEmitter, LightKind, LightLook } from './light'
 export { LightPool, LightPoolContext, useLight } from './light'
 export type { LuminanceLevel, WorldLuminance } from './luminance'
 export { DEFAULT_LUMINANCE } from './luminance'
-export type { MaterialKind, MaterialLook } from './material'
+export type {
+  MaterialKind,
+  MaterialLook,
+  MaterialSlot,
+  MaterialSlots,
+  SlotResolver,
+} from './material'
 export {
   glowLook,
+  isSharedMaterial,
+  lookMaterial,
+  MATERIAL_SLOTS,
   materialKey,
   releaseMaterial,
+  resolveSlot,
   retainMaterial,
   sharedMaterial,
   sharedMaterialCount,

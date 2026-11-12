@@ -287,8 +287,8 @@ export function ChessBoard({
     dark: { color: darkSquare, roughness: 0.35 },
     white: { color: whiteColor, roughness: 0.35 },
     black: { color: blackColor, roughness: 0.35 },
-    board: { color: wood, roughness: 0.5 },
-    table: { color: wood, roughness: 0.55 },
+    board: { slot: 'wood', color: wood, roughness: 0.5 },
+    table: { slot: 'wood', color: wood, roughness: 0.55 },
   })
 
   const pieces = useMemo(() => chessPieces(fen, seed), [fen, seed])

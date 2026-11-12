@@ -34,6 +34,7 @@ import { Player } from './runek/Player'
 | `lights` | `boolean` | `true` | Render the default lights. Set `false` to use your own. |
 | `palette` | `Partial<WorldPalette>` | built-in | Override color slots; every component re-themes at once. |
 | `luminance` | `Partial<WorldLuminance>` | all `1` | How bright glowing surfaces are, per kind (`screen`, `sign`, `tube`, `lamp`, `flame`). See [Luminance](#luminance). |
+| `materials` | `MaterialSlots` | none | Materials of your own for named surfaces (`asphalt`, `glass`, `wood`, …). Code only. See [Material slots](#material-slots). |
 | `controls` | `Record<string, string[]>` | built-in | Remap input bindings (action → key codes); serializable. |
 | `fog` | `{ color, near, far }` | off | Linear distance fog; pair the color with the sky's horizon. |
 | `input` | `boolean` | `true` | Read the keyboard. Set `false` to ignore it, e.g. while a modal is open. |
@@ -120,6 +121,58 @@ const { tube } = useLuminance()
 const m = useMaterials({ core: glowLook('#ffffff', tube), sleeve: glowLook(color, tube) })
 ```
 
+## Material slots
+
+A component builds every surface from a look of plain colors and numbers, which keeps it asset-free. A look can also name the surface it stands for, its `slot`: a road deck is `asphalt`, a window pane `glass`, a table top `wood`. `materials` answers slots with materials of your own, so one entry changes every surface of that kind in the world, with no component edits:
+
+```tsx
+import { MeshPhysicalMaterial, MeshStandardMaterial } from 'three'
+import type { MaterialSlots } from '@runek/core'
+
+// Module scope (or useMemo): a new function on every render would make new materials.
+const materials: MaterialSlots = {
+  // One material for every look naming the slot.
+  glass: new MeshPhysicalMaterial({ roughness: 0.05, transparent: true, opacity: 0.3 }),
+  // Or a function of the component's look, called once per distinct look.
+  asphalt: (look) => new MeshStandardMaterial({ color: look.color, roughness: 0.9, map: asphaltTexture }),
+}
+
+<World materials={materials}>…</World>
+```
+
+A slot you leave out draws as the component's look says, so removing an entry puts the component's own surface back, and a world that sets none renders exactly as before. The materials you return are yours: the world shares them like any other (the static batcher merges what they draw unless they're transparent) but never disposes them, and any textures they carry are your app's assets, as with a `Screen`'s `texture`. `materials` holds functions, so it lives in code, not in a world file; `WorldRenderer` and `WorldEditor` pass it through like the other runtime props.
+
+| Slot | Surfaces |
+|---|---|
+| `asphalt` | road decks |
+| `concrete` | slabs, kerbs, plinths |
+| `stone` | masonry, paving, steps, rock |
+| `brick` | brickwork |
+| `plaster` | rendered and painted walls |
+| `floor` | interior floor finishes |
+| `roofing` | roof coverings, thatch |
+| `wood` | timber, joinery, wooden furniture |
+| `glass` | windows, glass walls and rails |
+| `metal.painted` | poles, frames, appliance bodies |
+| `metal.bare` | chrome, steel, brass |
+| `fabric` | upholstery, rugs, canvas, sails |
+| `leather` | leather upholstery |
+| `plastic` | molded plastic: bezels, consoles |
+| `ceramic` | tiles, tableware, pots |
+| `ground` | soil, terrain, dirt paths |
+| `sand` | shores and beaches |
+| `foliage` | leaves, hedges |
+| `bark` | trunks and branches |
+
+The same list is `MATERIAL_SLOTS` in `@runek/core`. In your own components, add the slot that fits to the look and keep the rest of it complete, since that is what draws when the world doesn't answer:
+
+```tsx
+const m = useMaterials({
+  deck: { slot: 'asphalt', color: palette.stone, roughness: 1 },
+  kerb: { slot: 'concrete', color: palette.wall, roughness: 1 },
+})
+```
+
 ## useWorld()
 
 Components read the shared scale from the provider so they size consistently:
@@ -160,6 +213,8 @@ looks relative to it (`lookYaw`, `lookPitch`). It is written in place after ever
 so keep the ref and read it whenever you need it, a network send included. The body `Player`
 carries reads the same record through `PlayerMotionContext` (see [embedding a
 world](/docs/embedding-a-world#several-players-one-world) for feeding a remote copy).
+
+`useWorld().materials` holds the world's slot answers (absent when it gives none); `useMaterial` reads it for you.
 
 `useWorld().luminance` holds the resolved levels; `useLuminance()` reads the same with the defaults filled in under a hand-rolled provider.
 

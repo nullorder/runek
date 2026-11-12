@@ -51,7 +51,7 @@ export function Bush({
     })
   }, [R, blobs, foliage, seed])
   const materials = useMaterials(
-    items.map((b) => ({ color: b.color, flatShading: true, roughness: 0.95 })),
+    items.map((b) => ({ slot: 'foliage', color: b.color, flatShading: true, roughness: 0.95 })),
   )
 
   return (

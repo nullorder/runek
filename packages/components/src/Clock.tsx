@@ -74,7 +74,12 @@ export function Clock({
   const { unit, palette, time, now = Date.now } = useWorld()
   const accent = accentColor ?? palette.accent
   const mat = useMaterials({
-    rim: { color: frameColor ?? palette.metal, metalness: 0.4, roughness: 0.6 },
+    rim: {
+      slot: 'metal.painted',
+      color: frameColor ?? palette.metal,
+      metalness: 0.4,
+      roughness: 0.6,
+    },
     face: { color: faceColor, roughness: 0.5 },
     tick: { color: handColor, emissive: handColor, emissiveIntensity: 0.2 },
     hand: { color: handColor, emissive: handColor, emissiveIntensity: 0.12 },

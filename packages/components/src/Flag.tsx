@@ -40,7 +40,7 @@ export function Flag({
   const m = useMaterials({
     pole: { color: pole, roughness: 0.7 },
     finial: { color: pole, metalness: 0.2, roughness: 0.5 },
-    cloth: { color: color ?? palette.fabric, side: DoubleSide, roughness: 0.9 },
+    cloth: { slot: 'fabric', color: color ?? palette.fabric, side: DoubleSide, roughness: 0.9 },
   })
   const U = unit
   const poleH = poleHeight * U

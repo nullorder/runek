@@ -78,7 +78,7 @@ export function Staircase({
   color,
 }: StaircaseProps) {
   const { unit, palette } = useWorld()
-  const stone = useMaterial({ color: color ?? palette.stone })
+  const stone = useMaterial({ slot: 'stone', color: color ?? palette.stone })
 
   const parts = useMemo(() => {
     const w = width * unit

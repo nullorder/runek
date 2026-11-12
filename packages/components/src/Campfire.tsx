@@ -38,8 +38,8 @@ export function Campfire({
   const { unit, palette } = useWorld()
   const { flame } = useLuminance()
   const m = useMaterials({
-    stone: { color: palette.stone, flatShading: true, roughness: 1 },
-    log: { color: logColor ?? palette.wood, roughness: 0.9 },
+    stone: { slot: 'stone', color: palette.stone, flatShading: true, roughness: 1 },
+    log: { slot: 'wood', color: logColor ?? palette.wood, roughness: 0.9 },
     flame: glowLook(flameColor, flame, { transparent: true, opacity: 0.85 }),
     core: glowLook('#ffd84d', flame, { transparent: true, opacity: 0.9 }),
   })

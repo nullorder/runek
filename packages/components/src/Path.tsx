@@ -39,6 +39,7 @@ export function Path({
 }: PathProps) {
   const { unit, palette } = useWorld()
   const material = useMaterial({
+    slot: 'ground',
     color: color ?? palette.ground,
     roughness: 1,
     side: THREE.DoubleSide,

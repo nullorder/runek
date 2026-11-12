@@ -26,8 +26,8 @@ export function Road({
 }: RoadProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    deck: { color: color ?? palette.stone, roughness: 1 },
-    kerb: { color: kerbColor ?? palette.woodDark, roughness: 1 },
+    deck: { slot: 'asphalt', color: color ?? palette.stone, roughness: 1 },
+    kerb: { slot: 'concrete', color: kerbColor ?? palette.woodDark, roughness: 1 },
   })
   const L = length * unit
   const W = width * unit

@@ -126,8 +126,8 @@ export function Trees({
   const bark = trunkColor ?? palette.bark
   const foliage = leafColor ?? palette.foliage
   const m = useMaterials({
-    bark: { color: bark, roughness: 0.95 },
-    leaves: { flatShading: true },
+    bark: { slot: 'bark', color: bark, roughness: 0.95 },
+    leaves: { slot: 'foliage', flatShading: true },
   })
   const segLen = segmentLength * unit
   const branchesRef = useRef<THREE.InstancedMesh>(null)

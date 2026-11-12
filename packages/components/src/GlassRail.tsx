@@ -28,8 +28,8 @@ export function GlassRail({
 }: GlassRailProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    glass: { color: glassColor, transparent: true, opacity: 0.28, roughness: 0.08 },
-    steel: { color: color ?? palette.metal, roughness: 0.6 },
+    glass: { slot: 'glass', color: glassColor, transparent: true, opacity: 0.28, roughness: 0.08 },
+    steel: { slot: 'metal.painted', color: color ?? palette.metal, roughness: 0.6 },
   })
   const W = width * unit
   const H = height * unit

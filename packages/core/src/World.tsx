@@ -10,6 +10,7 @@ import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
 import { LightBudget } from './LightBudget'
 import type { Lens } from './lens'
 import { DEFAULT_LUMINANCE, type WorldLuminance } from './luminance'
+import type { MaterialSlots } from './material'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { glProps } from './renderer'
 import { ShadowRate } from './ShadowRate'
@@ -56,6 +57,12 @@ export interface WorldProps {
   /** How bright glowing surfaces are, per kind (`screen`, `sign`, `tube`, `lamp`, `flame`), in
    *  scene-linear units relative to diffuse white. Unset levels stay at 1 (face value). */
   luminance?: Partial<WorldLuminance>
+  /** Materials of your own for named surfaces: wherever a component's look names a slot here
+   *  (`asphalt`, `glass`, `metal.painted`, see `MATERIAL_SLOTS`), it draws with your material, or
+   *  with what your function makes from the look. Slots you leave out draw as the component says.
+   *  Code only (not part of a world file); keep the object stable, since a new function makes new
+   *  materials. You own what you return, textures included. */
+  materials?: MaterialSlots
   /** Linear distance fog. Pair the color with your sky's horizon. */
   fog?: WorldFog
   /** Pin a fixed time-of-day ("HH:MM", 24h) so the world is reproducible. Drives
@@ -116,6 +123,7 @@ export function World({
   palette,
   fonts,
   luminance,
+  materials,
   fog,
   time,
   timezone,
@@ -169,6 +177,7 @@ export function World({
       palette: { ...DEFAULT_PALETTE, ...palette },
       fonts: { ...DEFAULT_FONTS, ...fonts },
       luminance: { ...DEFAULT_LUMINANCE, ...luminance },
+      materials,
       time: resolveWorldTime({ time, timezone }, worldNow()),
       avatar,
       controls: resolvedControls,
@@ -188,6 +197,7 @@ export function World({
       palette,
       fonts,
       luminance,
+      materials,
       time,
       timezone,
       avatar,
