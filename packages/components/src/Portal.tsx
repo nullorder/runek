@@ -1,9 +1,26 @@
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, sub, useWorld, type WorldComponentProps } from '@runek/core'
-import { useMemo } from 'react'
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, ShaderMaterial } from 'three'
+import {
+  lazyModule,
+  rng,
+  sub,
+  useNodeRenderer,
+  useWorld,
+  type WorldComponentProps,
+} from '@runek/core'
+import { useEffect, useMemo } from 'react'
+import {
+  AdditiveBlending,
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  InstancedBufferAttribute,
+  ShaderMaterial,
+} from 'three'
 import { Sign } from './Sign'
+
+// The WebGPU (TSL) twins of the shaders below, loaded only under a node renderer.
+const portalNodes = lazyModule(() => import('./nodes/portal'))
 
 export interface PortalProps extends WorldComponentProps {
   /**
@@ -176,27 +193,32 @@ export function Portal({
   const { unit, palette } = useWorld()
   const ink = color ?? palette.accent
   const R = radius * unit
+  const nodes = useNodeRenderer() ? portalNodes() : null
 
   const vortex = useMemo(() => {
     const hot = new Color(ink)
     const cool = hot.clone().offsetHSL(0.1, 0.05, -0.12)
-    return new ShaderMaterial({
-      vertexShader: VORTEX_VERTEX,
-      fragmentShader: VORTEX_FRAGMENT,
-      uniforms: {
-        uTime: { value: 0 },
-        uR: { value: R },
-        uExtent: { value: EXTENT },
-        uSeed: { value: rng(sub(seed, 0))() * 100 },
-        uHot: { value: hot },
-        uCool: { value: cool },
-      },
-      transparent: true,
-      premultipliedAlpha: true,
-      depthWrite: false,
-      toneMapped: false,
-    })
-  }, [ink, R, seed])
+    const uniforms = {
+      uTime: { value: 0 },
+      uR: { value: R },
+      uExtent: { value: EXTENT },
+      uSeed: { value: rng(sub(seed, 0))() * 100 },
+      uHot: { value: hot },
+      uCool: { value: cool },
+    }
+    const material = nodes
+      ? nodes.vortexMaterial(uniforms)
+      : new ShaderMaterial({
+          vertexShader: VORTEX_VERTEX,
+          fragmentShader: VORTEX_FRAGMENT,
+          uniforms,
+          transparent: true,
+          premultipliedAlpha: true,
+          depthWrite: false,
+          toneMapped: false,
+        })
+    return { material, uniforms }
+  }, [ink, R, seed, nodes])
 
   const motes = useMemo(() => {
     const r = rng(sub(seed, 1))
@@ -206,46 +228,63 @@ export function Portal({
       data[i * 3 + 1] = r()
       data[i * 3 + 2] = 0.08 + r() * 0.14
     }
+    const uniforms = {
+      uTime: { value: 0 },
+      uR: { value: R },
+      uSize: { value: 0.07 * R },
+      uHalfHeight: { value: 400 },
+      uColor: { value: new Color(ink).lerp(new Color('#ffffff'), 0.35) },
+    }
+    if (nodes) {
+      // WebGPU draws points a pixel wide: instanced quads instead.
+      const geometry = nodes.pointQuads(MOTES, { aMote: new InstancedBufferAttribute(data, 3) })
+      return { geometry, material: nodes.portalMotesMaterial(uniforms), uniforms, quads: true }
+    }
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new BufferAttribute(new Float32Array(MOTES * 3), 3))
     geometry.setAttribute('aMote', new BufferAttribute(data, 3))
     const material = new ShaderMaterial({
       vertexShader: MOTE_VERTEX,
       fragmentShader: MOTE_FRAGMENT,
-      uniforms: {
-        uTime: { value: 0 },
-        uR: { value: R },
-        uSize: { value: 0.07 * R },
-        uHalfHeight: { value: 400 },
-        uColor: { value: new Color(ink).lerp(new Color('#ffffff'), 0.35) },
-      },
+      uniforms,
       transparent: true,
       blending: AdditiveBlending,
       depthWrite: false,
       toneMapped: false,
     })
-    return { geometry, material }
-  }, [ink, R, seed])
+    return { geometry, material, uniforms, quads: false }
+  }, [ink, R, seed, nodes])
 
-  const pool = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader: POOL_VERTEX,
-        fragmentShader: POOL_FRAGMENT,
-        uniforms: { uColor: { value: new Color(ink) } },
-        transparent: true,
-        blending: AdditiveBlending,
-        depthWrite: false,
-        toneMapped: false,
-      }),
-    [ink],
+  const pool = useMemo(() => {
+    const uniforms = { uColor: { value: new Color(ink) } }
+    return nodes
+      ? nodes.poolMaterial(uniforms, 0.45)
+      : new ShaderMaterial({
+          vertexShader: POOL_VERTEX,
+          fragmentShader: POOL_FRAGMENT,
+          uniforms,
+          transparent: true,
+          blending: AdditiveBlending,
+          depthWrite: false,
+          toneMapped: false,
+        })
+  }, [ink, nodes])
+
+  useEffect(
+    () => () => {
+      vortex.material.dispose()
+      motes.material.dispose()
+      motes.geometry.dispose()
+      pool.dispose()
+    },
+    [vortex, motes, pool],
   )
 
   useFrame(({ clock, size, viewport }) => {
     const t = clock.elapsedTime
     vortex.uniforms.uTime.value = t
-    motes.material.uniforms.uTime.value = t
-    motes.material.uniforms.uHalfHeight.value = (size.height * viewport.dpr) / 2
+    motes.uniforms.uTime.value = t
+    motes.uniforms.uHalfHeight.value = (size.height * viewport.dpr) / 2
   })
 
   return (
@@ -266,15 +305,24 @@ export function Portal({
       />
 
       <group position={[0, R, 0]}>
-        <mesh material={vortex} renderOrder={1}>
+        <mesh material={vortex.material} renderOrder={1} frustumCulled={!nodes}>
           <planeGeometry args={[2, 2]} />
         </mesh>
-        <points
-          geometry={motes.geometry}
-          material={motes.material}
-          frustumCulled={false}
-          renderOrder={2}
-        />
+        {motes.quads ? (
+          <mesh
+            geometry={motes.geometry}
+            material={motes.material}
+            frustumCulled={false}
+            renderOrder={2}
+          />
+        ) : (
+          <points
+            geometry={motes.geometry}
+            material={motes.material}
+            frustumCulled={false}
+            renderOrder={2}
+          />
+        )}
       </group>
 
       {/* Light spilling onto the ground beneath the vortex. */}
