@@ -95,6 +95,14 @@ export type { Rng } from './rng'
 export { int, pick, range, rng, sub } from './rng'
 export { ShadowRate } from './ShadowRate'
 export { Dynamic, StaticBatching } from './StaticBatching'
+export type { StreamIndex, StreamOptions, StreamSetting } from './stream'
+export {
+  createStreamIndex,
+  DEFAULT_STREAM,
+  nearNodes,
+  STREAM_HYSTERESIS,
+  streamOptions,
+} from './stream'
 export type { SunState, WorldTime } from './time'
 export {
   clockHours,

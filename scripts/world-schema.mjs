@@ -184,6 +184,21 @@ export function worldSchema(components) {
         },
         additionalProperties: false,
       },
+      stream: {
+        description:
+          'Mount only the nodes near the viewer, for dense worlds: true, or { radius, cell } in units.',
+        anyOf: [
+          { type: 'boolean' },
+          {
+            type: 'object',
+            properties: {
+              radius: { type: 'number', exclusiveMinimum: 0, default: 80 },
+              cell: { type: 'number', exclusiveMinimum: 0, default: 20 },
+            },
+            additionalProperties: false,
+          },
+        ],
+      },
       luminance: {
         type: 'object',
         description:

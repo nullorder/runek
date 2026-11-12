@@ -40,3 +40,6 @@ export function Sky({
   }
   return <DreiSky sunPosition={sun.position} turbidity={turbidity} rayleigh={rayleigh} />
 }
+
+// Mounted wherever the viewer is when a world streams.
+Sky.stream = false

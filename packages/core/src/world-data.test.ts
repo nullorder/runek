@@ -108,6 +108,25 @@ describe('world-data', () => {
     expect(() => parseWorld('{"version":1,"fonts":{"display":42},"nodes":[]}')).toThrow()
   })
 
+  it('round-trips luminance and stream (#64)', () => {
+    const world: WorldData = {
+      version: 1,
+      luminance: { screen: 2 },
+      stream: { radius: 60 },
+      nodes: [],
+    }
+    const text = serializeWorld(world)
+    expect(Object.keys(JSON.parse(text))).toEqual(['version', 'luminance', 'stream', 'nodes'])
+    expect(parseWorld(text)).toEqual(world)
+    expect(parseWorld('{"version":1,"stream":true,"nodes":[]}').stream).toBe(true)
+    expect(() => parseWorld('{"version":1,"stream":{"radius":-1},"nodes":[]}')).toThrow()
+    expect(
+      validateWorld({ version: 1, stream: { radius: 50, size: 3 }, nodes: [] }, {}).map((i) =>
+        i.path.join('.'),
+      ),
+    ).toEqual(['stream'])
+  })
+
   it('takes one fallback font or a list (#66)', () => {
     expect(parseWorld('{"version":1,"fonts":{"fallback":"cjk.woff"},"nodes":[]}').fonts).toEqual({
       fallback: 'cjk.woff',

@@ -203,3 +203,6 @@ export function Ocean({
     </mesh>
   )
 }
+
+// Mounted wherever the viewer is when a world streams.
+Ocean.stream = false

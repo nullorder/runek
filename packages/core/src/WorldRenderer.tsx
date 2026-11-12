@@ -22,6 +22,8 @@ export interface WorldRendererProps
   > {
   data: WorldData
   registry: ComponentRegistry
+  /** Override the world file's `stream` (e.g. `false` to mount everything while authoring). */
+  stream?: WorldData['stream']
 }
 
 /** The world's ground index, rebuilt when the data changes, with its warnings logged once. */
@@ -34,7 +36,7 @@ export function useGroundIndex(data: WorldData, registry: ComponentRegistry): Gr
 }
 
 /** Render a `WorldData` object inside a `<World>`, resolving each node via the registry. */
-export function WorldRenderer({ data, registry, ...worldProps }: WorldRendererProps) {
+export function WorldRenderer({ data, registry, stream, ...worldProps }: WorldRendererProps) {
   const ground = useGroundIndex(data, registry)
   return (
     <>
@@ -53,7 +55,12 @@ export function WorldRenderer({ data, registry, ...worldProps }: WorldRendererPr
         {...worldProps}
       >
         <GroundContext.Provider value={ground}>
-          <WorldNodes nodes={data.nodes} registry={registry} ground={ground} />
+          <WorldNodes
+            nodes={data.nodes}
+            registry={registry}
+            ground={ground}
+            stream={stream ?? data.stream}
+          />
         </GroundContext.Provider>
       </World>
       <WorldAbout meta={data.meta} />

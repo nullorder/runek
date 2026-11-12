@@ -70,3 +70,6 @@ export function LightRig({
     </>
   )
 }
+
+// Mounted wherever the viewer is when a world streams.
+LightRig.stream = false

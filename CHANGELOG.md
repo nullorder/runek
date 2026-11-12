@@ -41,6 +41,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `@runek/core` let any component do the same. `Portal`, `Rift`, `Sky`,
   `Sign` text and the first-person lens are still WebGL only.
   ([#67](https://github.com/nullorder/runek/issues/67))
+- Streaming for dense worlds: `"stream": true` (or `{ radius, cell }`) in a
+  world file mounts only the top-level nodes near the viewer, from a cell
+  index of their positions and footprints (composite `bounds`, or `size`),
+  with a margin so boundaries don't flicker. 2,000 crates go from 29k
+  meshes to about 300 near the viewer. `Player`, `Sky`, `Ocean`, `Clouds`
+  and `LightRig` stay mounted. `WorldRenderer` takes `stream` to override
+  the file.
+  ([#64](https://github.com/nullorder/runek/issues/64))
 - `<World now>`: the world's wall clock, in epoch milliseconds (default
   `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
   and `Clock` all read it through `useWorld().now()`, so a multiplayer app
@@ -126,6 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `serializeWorld` keeps a world's `luminance`, which saving from the editor
+  or the workshop used to drop.
 - Text never fetches a font from a CDN: a character no declared font has
   (an arrow, a CJK character, an emoji) used to send troika-three-text to a
   public font index. `Sign` now sets troika's default font to a face built
