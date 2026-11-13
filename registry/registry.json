@@ -2081,6 +2081,99 @@
         "arm": 1.8,
         "color": "#ffa64d"
       }
+    },
+    {
+      "name": "neon-sign",
+      "title": "NeonSign",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Words bent out of glass tube on a dark board, at the world's tube luminance level, that flicker: bad tubes buzz and drop out and the whole sign stutters now and then, as a pure function of the world clock and `seed` so every viewer sees the same sign. The tubes are drawn in code from the world's fonts. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/NeonSign.tsx",
+          "target": "NeonSign.tsx"
+        },
+        {
+          "path": "packages/components/src/city/fontFace.ts",
+          "target": "city/fontFace.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/hash.ts",
+          "target": "city/hash.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/neon.ts",
+          "target": "nodes/neon.ts"
+        }
+      ],
+      "example": {
+        "text": "OPEN LATE",
+        "color": "#39ff88",
+        "flicker": 0.6
+      }
+    },
+    {
+      "name": "billboard",
+      "title": "Billboard",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A board that runs ads as data: one or two lines of lettering in the world's display font beside a mark drawn in code that moves with the world clock (steam off a bowl, a watch's hands, a cell filling), cut to the next every `hold` seconds through torn strips. Its picture is redrawn only while near the camera. Lit at the world's screen luminance level. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Billboard.tsx",
+          "target": "Billboard.tsx"
+        },
+        {
+          "path": "packages/components/src/city/fontFace.ts",
+          "target": "city/fontFace.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/hash.ts",
+          "target": "city/hash.ts"
+        }
+      ],
+      "example": {
+        "mount": "posts",
+        "stand": 3,
+        "hold": 6
+      }
+    },
+    {
+      "name": "hologram",
+      "title": "Hologram",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A plaza centrepiece: a pedestal, a beam of light with scan lines climbing it, and in it a wire cage turning round three rings that keep time (once a minute, once an hour, once every `round` seconds) off the world clock. The pedestal has a cylinder collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Hologram.tsx",
+          "target": "Hologram.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/hologram.ts",
+          "target": "nodes/hologram.ts"
+        }
+      ],
+      "example": {
+        "color": "#39ff88",
+        "round": 600
+      }
     }
   ]
 }

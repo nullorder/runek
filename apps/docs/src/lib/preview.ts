@@ -215,4 +215,20 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     props: { width: 12, depth: 12, height: 24, frontage: ['+z'] },
   },
   StreetLamp: { camera: [6, 4, 7], target: [1, 3, 0], props: { height: 5, arm: 1.6 } },
+  NeonSign: {
+    camera: [0, 1.4, 3.2],
+    target: [0, 1.4, 0],
+    props: { position: [0, 1.4, 0] },
+    background: '#1a1a22',
+  },
+  Billboard: {
+    camera: [0, 2.4, 8],
+    target: [0, 2.4, 0],
+    props: { position: [0, 2.4, 0], size: [4.8, 2.7] },
+  },
+  Hologram: {
+    camera: [6, 5, 9],
+    target: [0, 3.2, 0],
+    props: { height: 4, size: 1.4, radius: 1.2 },
+  },
 }

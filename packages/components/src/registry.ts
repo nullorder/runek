@@ -9,6 +9,7 @@ import { BassTrap } from './BassTrap'
 import { BeachChair } from './BeachChair'
 import { Bed } from './Bed'
 import { Bench } from './Bench'
+import { Billboard } from './Billboard'
 import { Birds } from './Birds'
 import { BladeSign } from './BladeSign'
 import { Book } from './Book'
@@ -50,6 +51,7 @@ import { GlassWall } from './GlassWall'
 import { Grass } from './Grass'
 import { Guitar } from './Guitar'
 import { Hedge } from './Hedge'
+import { Hologram } from './Hologram'
 import { Hut } from './Hut'
 import { Interactable } from './Interactable'
 import { KitchenUnits } from './KitchenUnits'
@@ -61,6 +63,7 @@ import { LightRig } from './LightRig'
 import { MagazineRack } from './MagazineRack'
 import { MicStand } from './MicStand'
 import { Monitor } from './Monitor'
+import { NeonSign } from './NeonSign'
 import { NeonStrip } from './NeonStrip'
 import { Newspapers } from './Newspapers'
 import { Ocean } from './Ocean'
@@ -128,6 +131,7 @@ export const registry: ComponentRegistry = {
   BeachChair,
   Bed,
   Bench,
+  Billboard,
   Birds,
   BladeSign,
   Book,
@@ -167,6 +171,7 @@ export const registry: ComponentRegistry = {
   Grass,
   Guitar,
   Hedge,
+  Hologram,
   // Composites: data-only arrangements of the parts below, expanded by the renderer.
   // (JSON imports infer wide types — number[] vs the bounds tuple — hence the two-step cast.)
   House: houseComposite as unknown as CompositeDef,
@@ -181,6 +186,7 @@ export const registry: ComponentRegistry = {
   MagazineRack,
   MicStand,
   Monitor,
+  NeonSign,
   NeonStrip,
   Newspapers,
   Ocean,

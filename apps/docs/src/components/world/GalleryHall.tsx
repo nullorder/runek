@@ -37,6 +37,7 @@ const EXCLUDE = new Set(['Tower', 'Player', 'LightRig', 'Compass', 'Sky', 'Inter
 
 /** Per-exhibit props layered over the gallery-preview config. */
 const TUNE: Record<string, Record<string, unknown>> = {
+  Billboard: { size: [2.4, 1.35], position: [0, 1.7, 0] },
   StreetLamp: { height: 3.6, arm: 1, poolRadius: 2 },
   // Facade parts at a size that fits a pedestal and the storey above it.
   Awning: { width: 2, position: [0, 2.6, 0] },
@@ -44,6 +45,7 @@ const TUNE: Record<string, Record<string, unknown>> = {
   CableSag: { span: 2.6, sag: 0.3, position: [0, 2.2, -1.3] },
   PipeRun: { length: 3 },
   RollerShutter: { width: 2, height: 2.2 },
+  Hologram: { height: 3, size: 1, radius: 0.9, light: false },
   // Ocean defaults to a 400-unit patch that follows the camera — pin a small pond.
   Ocean: { size: [7, 7], follow: false },
   // Bare visual — a dynamic body would roll off the pedestal.
