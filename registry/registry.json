@@ -2047,6 +2047,40 @@
         "frontage": ["+z"],
         "cableSpan": 12
       }
+    },
+    {
+      "name": "street-lamp",
+      "title": "StreetLamp",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A street lamp on an arm: a pole, a hot lens at the world's lamp luminance level, a haze cone under the head and a soft pool of light on the street, every lamp's cone and pool sharing two instanced draws. The real light comes from the world's light pool. One thin collider for the pole.",
+      "files": [
+        {
+          "path": "packages/components/src/StreetLamp.tsx",
+          "target": "StreetLamp.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/instances.ts",
+          "target": "city/instances.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/haze.ts",
+          "target": "nodes/haze.ts"
+        }
+      ],
+      "example": {
+        "height": 6,
+        "arm": 1.8,
+        "color": "#ffa64d"
+      }
     }
   ]
 }

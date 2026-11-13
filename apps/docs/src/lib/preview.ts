@@ -214,4 +214,5 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     target: [0, 8, 0],
     props: { width: 12, depth: 12, height: 24, frontage: ['+z'] },
   },
+  StreetLamp: { camera: [6, 4, 7], target: [1, 3, 0], props: { height: 5, arm: 1.6 } },
 }

@@ -37,6 +37,7 @@ const EXCLUDE = new Set(['Tower', 'Player', 'LightRig', 'Compass', 'Sky', 'Inter
 
 /** Per-exhibit props layered over the gallery-preview config. */
 const TUNE: Record<string, Record<string, unknown>> = {
+  StreetLamp: { height: 3.6, arm: 1, poolRadius: 2 },
   // Facade parts at a size that fits a pedestal and the storey above it.
   Awning: { width: 2, position: [0, 2.6, 0] },
   BladeSign: { text: 'TEA', letter: 0.4, position: [0, 0.6, 0] },

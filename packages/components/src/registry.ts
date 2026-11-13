@@ -97,6 +97,7 @@ import { Sofa } from './Sofa'
 import { Speaker } from './Speaker'
 import { Staircase } from './Staircase'
 import { Stool } from './Stool'
+import { StreetLamp } from './StreetLamp'
 import { Table } from './Table'
 import { TableTennis } from './TableTennis'
 import { Tableware } from './Tableware'
@@ -217,6 +218,7 @@ export const registry: ComponentRegistry = {
   Speaker,
   Staircase,
   Stool,
+  StreetLamp,
   Table,
   TableTennis,
   Tableware,
