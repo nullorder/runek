@@ -28,6 +28,15 @@ export interface PoseContext {
   legLength: number
   /** Standing height. */
   height: number
+  /** Which way the body travels, as a turn from `heading`: 0 ahead, π straight back, a quarter
+   *  turn toward its left. A carrying `Player` sets it in first person when the avatar backs up or
+   *  steps aside at a walk without turning, so a source can pick a backpedal or a sidestep. */
+  course: number
+  /** How far up a ladder the body has climbed, in world units, while a carrier holds it on one
+   *  (`PlayerControl.pin`). The climbing cycle follows it. Null when not climbing. */
+  climb: number | null
+  /** Where the figure stands in the world this frame, for a source that places footfalls. */
+  position: [number, number, number]
 }
 
 /**

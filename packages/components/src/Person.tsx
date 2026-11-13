@@ -88,6 +88,7 @@ export {
   PoseSourceContext,
   type PoseSourceFactory,
 } from './person/pose'
+export { type Routed, routed, type WalkRoute } from './person/RouteDriver'
 export {
   type PersonTrait,
   type PersonTraitSource,
@@ -476,7 +477,7 @@ export function Person({
   trimColor,
   hat,
   accessories,
-  pose = 'stand',
+  pose: authored = 'stand',
   patrol,
   wander,
   speed,
@@ -502,6 +503,9 @@ export function Person({
 }: PersonProps) {
   const { unit, palette, ground, player } = useWorld()
   const avatarMotion = useContext(PlayerMotionContext)
+  // Whoever carries the body can seat it (`PlayerMotion.pose`), over the authored pose.
+  const [carried, setCarried] = useState<'sit' | null>(null)
+  const pose: PersonPose = carried ?? authored
   // A placed figure stands on the world's ground baseline; a bare visual is positioned by
   // whatever parent owns it (a `Player` capsule, a vehicle), so it starts at its own origin.
   const at: Vec3 = position ?? (physics ? [0, ground, 0] : [0, 0, 0])
@@ -717,6 +721,9 @@ export function Person({
       lookPitch: 0,
       legLength: 0,
       height: 0,
+      course: 0,
+      climb: null,
+      position: [0, 0, 0],
     }),
     [],
   )
@@ -799,6 +806,13 @@ export function Person({
     // still tracks the feet.
     const w = walk.current
     const m = avatarMotion?.current
+    // A carrier that holds the body on a seat sits it down, over the authored pose.
+    const seat = (!route && m?.pose) || null
+    if (seat !== carried) {
+      setCarried(seat)
+      // Ease down into the seat from standing. Getting up is a cut, like the step off it.
+      if (seat) blend.current.posed = 0
+    }
     if (!route) {
       if (gait !== undefined) {
         w.speed = gait
@@ -890,6 +904,14 @@ export function Person({
       ctx.lookPitch = m ? m.lookPitch : tracking ? -pitch : 0
       ctx.legLength = marks.hipY
       ctx.height = H
+      ctx.course = m?.course ?? 0
+      ctx.climb = m?.climb ?? null
+      if (root.current) {
+        root.current.getWorldPosition(scratch)
+        ctx.position[0] = scratch.x
+        ctx.position[1] = scratch.y
+        ctx.position[2] = scratch.z
+      }
       resetHumanoidPose(poseOut)
       sourced = source.update(ctx, poseOut)
     }

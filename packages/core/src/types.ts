@@ -69,6 +69,33 @@ export interface PlayerMotion {
   lookYaw: number
   /** The camera's pitch in radians, positive looking up. */
   lookPitch: number
+  /** Which way the body travels, as a turn from `heading` (0 ahead, π straight back, a quarter
+   *  turn toward its left). In first person, below a jog, an avatar that backs up or steps aside
+   *  keeps facing where it looks and its legs carry it the other way. Unset or 0: ahead. */
+  course?: number
+  /** A pose the body takes while it is held (`PlayerControl.pin` with a `pose`). It wins over the
+   *  body's own authored pose while set. */
+  pose?: 'sit' | null
+  /** How far up a ladder a held body has climbed, in world units. Null when it isn't climbing. */
+  climb?: number | null
+  /** How far the capsule has settled under the height its float spring aims for, in world units.
+   *  It grows as the frame rate drops. The feet stand this much higher than the capsule alone
+   *  says, so whoever needs the height of the feet (a save point, the place sent to other
+   *  players) adds it. */
+  sag?: number
+}
+
+/** Where a held avatar is (`PlayerControl.pin`). Whoever holds it may change `feet` and `climb`
+ *  from frame to frame. */
+export interface PlayerPin {
+  /** Where the feet go, in world coordinates. */
+  feet: Vec3
+  /** The way the body faces, in radians (0 faces +z). */
+  yaw: number
+  /** Height climbed up a ladder, which drives the body's climbing cycle. Null when not climbing. */
+  climb?: number | null
+  /** A pose the body takes while held. */
+  pose?: 'sit' | null
 }
 
 /** How `PlayerControl.teleport` lands the avatar. */

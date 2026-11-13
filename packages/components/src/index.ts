@@ -151,6 +151,7 @@ export type {
   HumanoidPose,
   PersonAccessory,
   PersonAge,
+  PersonAnatomy,
   PersonBodySpec,
   PersonBuild,
   PersonDetail,
@@ -178,6 +179,8 @@ export type {
   PoseSourceFactory,
   ResolvedGarment,
   ResolvedPerson,
+  Routed,
+  WalkRoute,
 } from './Person'
 export {
   applyPose,
@@ -191,6 +194,7 @@ export {
   PoseSourceContext,
   resetHumanoidPose,
   resolvePerson,
+  routed,
   tripAt,
 } from './Person'
 export type { PianoProps } from './Piano'
