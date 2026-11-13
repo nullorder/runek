@@ -195,7 +195,7 @@ export function Chandelier({
   const cupR = 0.035 * unit
   const glow = useLight({ color: lightColor, intensity, distance: 14 * unit, decay: 2 }, lit)
   const m = useMaterials({
-    metal: { color: brass, metalness: 0.75, roughness: 0.3 },
+    metal: { slot: 'metal.bare', color: brass, metalness: 0.75, roughness: 0.3 },
     bulb: {
       color: '#fff3d6',
       emissive: lightColor,

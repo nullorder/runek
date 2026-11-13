@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sign
 ```
 
-Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.17.0`, `three@^0.184.0`.
+Pulls `screen`, `@react-three/drei@^10.7.7`, `@runek/core@^0.17.0`, `three@^0.184.0`, `troika-three-text@^0.52.4`.
 
 ## Use it
 
@@ -36,8 +36,8 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
 | `rotation` | `[x, y, z]` | `[0, 0, 0]` | Euler rotation [x, y, z] in radians. |
 | `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
-| `variant` | `"display" \| "body"` | `"display"` | Which world font role to render in (`display` for titles/signage, `body` for labels). The world declares the actual face via `<World fonts>`; an undeclared role falls back to the font bundled in `@runek/core`. (Named `variant`, not `role`, so it doesn't trip JSX a11y linters.) |
-| `font` | `string` |  | Explicit font URL, overriding the world role. |
+| `variant` | `"display" \| "body"` | `"display"` | Which world font role to render in (`display` for titles/signage, `body` for labels). The world declares the actual face via `<World fonts>`; an undeclared role falls back to the font bundled in `@runek/core`. Text the face can't fully draw is drawn in the world's `fallback` font that covers more of it; characters no declared font has draw as boxes. (Named `variant`, not `role`, so it doesn't trip JSX a11y linters.) |
+| `font` | `string` |  | Explicit font URL, overriding the world role. The world's `fallback` fonts still apply. |
 | `size` | `number` | `0.3` | Cap height in units. |
 | `color` | `color` | palette `accent` | Text color. Defaults to the world palette's `accent` slot. |
 | `maxWidth` | `number` |  | Wrap width in units; omit to keep the text on one line. |

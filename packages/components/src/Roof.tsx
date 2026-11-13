@@ -39,8 +39,8 @@ export function Roof({
 }: RoofProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    roof: { color: color ?? palette.roof },
-    end: { color: endColor ?? palette.wall },
+    roof: { slot: 'roofing', color: color ?? palette.roof },
+    end: { slot: 'plaster', color: endColor ?? palette.wall },
   })
   const w = size[0] * unit + overhang * 2 * unit
   const d = size[1] * unit + overhang * 2 * unit

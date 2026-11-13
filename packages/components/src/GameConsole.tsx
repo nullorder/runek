@@ -40,7 +40,7 @@ const SIZES: Record<GameConsoleStyle, [number, number, number]> = {
 
 function Controller({ color, accent, u }: { color: string; accent: string; u: number }) {
   const m = useMaterials({
-    shell: { color, roughness: 0.5 },
+    shell: { slot: 'plastic', color, roughness: 0.5 },
     stick: { color: '#2a2a2e', roughness: 0.8 },
     select: { color: '#2a2a2e' },
     light: { kind: 'basic', color: accent, toneMapped: false },
@@ -139,7 +139,7 @@ export function GameConsole({
   const trim = look.body === '#eceef0' ? '#18191c' : '#3a3d44'
   const m = useMaterials({
     base: { color: trim, roughness: 0.6 },
-    body: { color: look.body, roughness: 0.35, metalness: 0.1 },
+    body: { slot: 'plastic', color: look.body, roughness: 0.35, metalness: 0.1 },
     vent: { color: trim, roughness: 0.8 },
   })
   const power = useMaterial(

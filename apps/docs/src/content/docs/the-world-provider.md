@@ -34,12 +34,14 @@ import { Player } from './runek/Player'
 | `lights` | `boolean` | `true` | Render the default lights. Set `false` to use your own. |
 | `palette` | `Partial<WorldPalette>` | built-in | Override color slots; every component re-themes at once. |
 | `luminance` | `Partial<WorldLuminance>` | all `1` | How bright glowing surfaces are, per kind (`screen`, `sign`, `tube`, `lamp`, `flame`). See [Luminance](#luminance). |
+| `materials` | `MaterialSlots` | none | Materials of your own for named surfaces (`asphalt`, `glass`, `wood`, …). Code only. See [Material slots](#material-slots). |
 | `controls` | `Record<string, string[]>` | built-in | Remap input bindings (action → key codes); serializable. |
 | `fog` | `{ color, near, far }` | off | Linear distance fog; pair the color with the sky's horizon. |
 | `input` | `boolean` | `true` | Read the keyboard. Set `false` to ignore it, e.g. while a modal is open. |
 | `paused` | `boolean` | `false` | Stop rendering and physics until set back to `false`. |
-| `lightBudget` | `number \| { point, spot }` | `{ point: 6, spot: 2 }` | Real lights the world lends to its lamps (`useLight` emitters), each frame to the ones that matter most to the view. |
+| `lightBudget` | `number \| { point, spot }` | `{ point: 6, spot: 2 }` | Real lights the world lends to its lamps (`useLight` emitters), each frame to the ones that matter most to the view. Under `WebGPURenderer` every point lamp gets its own light, up to `point` (default 1024). |
 | `shadowRate` | `number` | `30` | How many times a second shadow maps are redrawn. `Infinity` redraws every frame. |
+| `mirrors` | `number \| { planes, scale }` | `2` planes at `0.5` | Reflection planes for mirror surfaces (a `Floor` with `reflect`, a `Road` with `wet`). See [Reflections](#reflections). |
 | `batching` | `boolean \| { cell }` | `true` | Merge static parts that share a material into one mesh per material per 20 m cell (or `cell` m). Moving parts and anything inside `<Dynamic>` stay as they are. |
 | `dpr` | `number \| [min, max]` | `[1, 1.5]` | Pixel ratio to render at. A range follows the screen's own up to `max` and steps toward `min` while frames run slow. |
 | `now` | `() => number` | `Date.now` | The world's wall clock, in epoch milliseconds. Walking figures, trips, live day/night and `Clock` read it; pass a server-synced clock so every player sees the same world. |
@@ -120,6 +122,81 @@ const { tube } = useLuminance()
 const m = useMaterials({ core: glowLook('#ffffff', tube), sleeve: glowLook(color, tube) })
 ```
 
+## Material slots
+
+A component builds every surface from a look of plain colors and numbers, which keeps it asset-free. A look can also name the surface it stands for, its `slot`: a road deck is `asphalt`, a window pane `glass`, a table top `wood`. `materials` answers slots with materials of your own, so one entry changes every surface of that kind in the world, with no component edits:
+
+```tsx
+import { MeshPhysicalMaterial, MeshStandardMaterial } from 'three'
+import type { MaterialSlots } from '@runek/core'
+
+// Module scope (or useMemo): a new function on every render would make new materials.
+const materials: MaterialSlots = {
+  // One material for every look naming the slot.
+  glass: new MeshPhysicalMaterial({ roughness: 0.05, transparent: true, opacity: 0.3 }),
+  // Or a function of the component's look, called once per distinct look.
+  asphalt: (look) => new MeshStandardMaterial({ color: look.color, roughness: 0.9, map: asphaltTexture }),
+}
+
+<World materials={materials}>…</World>
+```
+
+A slot you leave out draws as the component's look says, so removing an entry puts the component's own surface back, and a world that sets none renders exactly as before. The materials you return are yours: the world shares them like any other (the static batcher merges what they draw unless they're transparent) but never disposes them, and any textures they carry are your app's assets, as with a `Screen`'s `texture`. `materials` holds functions, so it lives in code, not in a world file; `WorldRenderer` and `WorldEditor` pass it through like the other runtime props.
+
+| Slot | Surfaces |
+|---|---|
+| `asphalt` | road decks |
+| `concrete` | slabs, kerbs, plinths |
+| `stone` | masonry, paving, steps, rock |
+| `brick` | brickwork |
+| `plaster` | rendered and painted walls |
+| `floor` | interior floor finishes |
+| `roofing` | roof coverings, thatch |
+| `wood` | timber, joinery, wooden furniture |
+| `glass` | windows, glass walls and rails |
+| `metal.painted` | poles, frames, appliance bodies |
+| `metal.bare` | chrome, steel, brass |
+| `fabric` | upholstery, rugs, canvas, sails |
+| `leather` | leather upholstery |
+| `plastic` | molded plastic: bezels, consoles |
+| `ceramic` | tiles, tableware, pots |
+| `ground` | soil, terrain, dirt paths |
+| `sand` | shores and beaches |
+| `foliage` | leaves, hedges |
+| `bark` | trunks and branches |
+
+The same list is `MATERIAL_SLOTS` in `@runek/core`. In your own components, add the slot that fits to the look and keep the rest of it complete, since that is what draws when the world doesn't answer:
+
+```tsx
+const m = useMaterials({
+  deck: { slot: 'asphalt', color: palette.stone, roughness: 1 },
+  kerb: { slot: 'concrete', color: palette.wall, roughness: 1 },
+})
+```
+
+## Reflections
+
+A polished floor or a wet street reflects the world through `useMirrorMaterial`. Drawing the world again for every reflective patch would multiply the cost of everything else, so the world keeps one reflection per surface height and lends it to every surface there: twenty wet paving slabs on one street cost one extra scene render a frame, not twenty. That render runs at half the screen's size, only in frames where one of the surfaces is in view, and never inside another such pass (a `Rift`'s view). A world with no reflective surfaces pays nothing.
+
+`mirrors` caps how many heights reflect at once (default 2: a ground floor and a terrace, say). A surface at a height past the cap draws without its reflection until a slot frees, which happens a few seconds after every surface on a plane leaves the view. `{ planes, scale }` also sets the reflection's size against the screen's; `0` turns reflections off.
+
+```tsx
+<World mirrors={{ planes: 1, scale: 0.35 }}>
+  <Floor size={[12, 12]} reflect={0.6} />
+  <Road position={[0, 0, 10]} wet={0.8} />
+</World>
+```
+
+In your own components, use it for flat, upward-facing surfaces, with the look you'd give `useMaterial` and a strength from 0 to 1 (at 0 it is `useMaterial(look)`):
+
+```tsx
+import { useMirrorMaterial } from '@runek/core'
+
+const material = useMirrorMaterial({ color: palette.floor, roughness: 0.3 }, reflect)
+```
+
+Reflections need `WebGLRenderer`; under `WebGPURenderer` these surfaces draw without one. Anything else that draws the world again should run inside `scenePass()` and skip when `inScenePass()` is true, so passes never nest.
+
 ## useWorld()
 
 Components read the shared scale from the provider so they size consistently:
@@ -160,6 +237,8 @@ looks relative to it (`lookYaw`, `lookPitch`). It is written in place after ever
 so keep the ref and read it whenever you need it, a network send included. The body `Player`
 carries reads the same record through `PlayerMotionContext` (see [embedding a
 world](/docs/embedding-a-world#several-players-one-world) for feeding a remote copy).
+
+`useWorld().materials` holds the world's slot answers (absent when it gives none); `useMaterial` reads it for you.
 
 `useWorld().luminance` holds the resolved levels; `useLuminance()` reads the same with the defaults filled in under a hand-rolled provider.
 

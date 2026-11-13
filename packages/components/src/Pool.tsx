@@ -37,8 +37,8 @@ export function Pool({
 }: PoolProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    rim: { color: copingColor ?? palette.wall },
-    basin: { color: basinColor },
+    rim: { slot: 'stone', color: copingColor ?? palette.wall },
+    basin: { slot: 'ceramic', color: basinColor },
     water: {
       color: waterColor ?? palette.waterShallow,
       transparent: true,

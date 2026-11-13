@@ -557,3 +557,6 @@ export function Player({
     </Ecctrl>
   )
 }
+
+// Mounted wherever the viewer is when a world streams.
+Player.stream = false

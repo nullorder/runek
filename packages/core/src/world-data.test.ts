@@ -108,6 +108,86 @@ describe('world-data', () => {
     expect(() => parseWorld('{"version":1,"fonts":{"display":42},"nodes":[]}')).toThrow()
   })
 
+  it('round-trips luminance and stream (#64)', () => {
+    const world: WorldData = {
+      version: 1,
+      luminance: { screen: 2 },
+      stream: { radius: 60 },
+      nodes: [],
+    }
+    const text = serializeWorld(world)
+    expect(Object.keys(JSON.parse(text))).toEqual(['version', 'luminance', 'stream', 'nodes'])
+    expect(parseWorld(text)).toEqual(world)
+    expect(parseWorld('{"version":1,"stream":true,"nodes":[]}').stream).toBe(true)
+    expect(() => parseWorld('{"version":1,"stream":{"radius":-1},"nodes":[]}')).toThrow()
+    expect(
+      validateWorld({ version: 1, stream: { radius: 50, size: 3 }, nodes: [] }, {}).map((i) =>
+        i.path.join('.'),
+      ),
+    ).toEqual(['stream'])
+  })
+
+  it('takes one fallback font or a list (#66)', () => {
+    expect(parseWorld('{"version":1,"fonts":{"fallback":"cjk.woff"},"nodes":[]}').fonts).toEqual({
+      fallback: 'cjk.woff',
+    })
+    const world = parseWorld('{"version":1,"fonts":{"fallback":["a.woff","b.ttf"]},"nodes":[]}')
+    expect(world.fonts?.fallback).toEqual(['a.woff', 'b.ttf'])
+    expect(() => parseWorld('{"version":1,"fonts":{"display":["a.woff"]},"nodes":[]}')).toThrow()
+    expect(() => parseWorld('{"version":1,"fonts":{"fallback":["a.woff",1]},"nodes":[]}')).toThrow()
+  })
+
+  it('checks font roles and what the bundled font can draw (#66)', () => {
+    const schema = {
+      Sign: {
+        props: {
+          children: { type: 'string' },
+          variant: { type: 'enum', options: ['display', 'body'] },
+          font: { type: 'string' },
+        },
+      },
+    } as never
+    const sign = (props: object) => ({ type: 'Sign', props })
+    const issues = validateWorld(
+      {
+        version: 1,
+        fonts: { dispaly: 'x.woff', fallback: [1] },
+        nodes: [sign({ children: 'Café → 東京 ❤️' })],
+      },
+      schema,
+    )
+    expect(issues.map((i) => [i.path.join('.'), i.severity])).toEqual([
+      ['fonts.dispaly', 'warning'],
+      ['fonts.fallback', 'error'],
+    ])
+    expect(issues[0].message).toContain('Did you mean "display"?')
+
+    const plain = validateWorld(
+      { version: 1, nodes: [sign({ children: 'Café → 東京 ❤️\nok' }), sign({ children: 'Hi' })] },
+      schema,
+    )
+    expect(plain).toHaveLength(1)
+    expect(plain[0].path).toEqual(['nodes', 0, 'props', 'children'])
+    expect(plain[0].message).toContain('"→", "東", "京", "❤"')
+    expect(plain[0].message).toContain('"display" role')
+
+    const declared = [{ fonts: { display: 'cjk.woff' } }, { fonts: { fallback: 'cjk.woff' } }].map(
+      (world) =>
+        validateWorld({ version: 1, ...world, nodes: [sign({ children: '東京' })] }, schema),
+    )
+    expect(declared).toEqual([[], []])
+    expect(
+      validateWorld(
+        {
+          version: 1,
+          fonts: { display: 'cjk.woff' },
+          nodes: [sign({ children: '東京', variant: 'body' }), sign({ children: '東', font: 'a' })],
+        },
+        schema,
+      ),
+    ).toHaveLength(1)
+  })
+
   it('keeps luminance levels and rejects non-numbers', () => {
     const world = parseWorld('{"version":1,"luminance":{"screen":2,"tube":6},"nodes":[]}')
     expect(world.luminance).toEqual({ screen: 2, tube: 6 })

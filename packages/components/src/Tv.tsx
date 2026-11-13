@@ -113,14 +113,14 @@ export function Tv({
   const top = cy + Hs / 2 + bezel
 
   const m = useMaterials({
-    bezel: { color: frame, roughness: 0.4, metalness: 0.3 },
-    stand: { color: frame, roughness: 0.5, metalness: 0.3 },
+    bezel: { slot: 'plastic', color: frame, roughness: 0.4, metalness: 0.3 },
+    stand: { slot: 'plastic', color: frame, roughness: 0.5, metalness: 0.3 },
     foot: { color: frame, roughness: 0.5 },
     off: { color: OFF, roughness: 0.12, metalness: 0.4 },
     sky: glowLook(look.sky, level),
     ground: glowLook(look.ground, level),
-    console: { color: consoleColor ?? palette.woodDark, roughness: 0.7 },
-    door: { color: consoleColor ?? palette.wood, roughness: 0.6 },
+    console: { slot: 'wood', color: consoleColor ?? palette.woodDark, roughness: 0.7 },
+    door: { slot: 'wood', color: consoleColor ?? palette.wood, roughness: 0.6 },
   })
   const blobMaterials = useMaterials(look.blobs.map((b) => glowLook(b.color, level)))
 

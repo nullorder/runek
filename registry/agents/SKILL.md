@@ -35,7 +35,7 @@ Docs index: https://runek.nullorder.org/llms.txt (every page is also Markdown: a
 
 - `type` is the PascalCase title (`Bookshelf`); `add` takes the lowercase name (`bookshelf`). `Group` is a built-in container for `children`.
 - Node keys are only `type`, `id`, `anchor`, `props`, `children`. Every component prop goes under `props`.
-- World-level keys: `version` (always 1), `meta`, `unit`, `gravity`, `ground`, `time` ("HH:MM"), `timezone`, `avatar` ("first" | "third" | "overhead"), `controls`, `palette`, `fonts`, `luminance` (glow levels `screen`, `sign`, `tube`, `lamp`, `flame`; 1 is face value), `fog`, `nodes`.
+- World-level keys: `version` (always 1), `meta`, `unit`, `gravity`, `ground`, `time` ("HH:MM"), `timezone`, `avatar` ("first" | "third" | "overhead"), `controls`, `palette`, `fonts` (`display`, `body`, and `fallback`: a URL or a list, for text the role font can't draw), `stream` (`true` or `{ radius, cell, build }`: mount only nodes near the viewer, for dense worlds), `luminance` (glow levels `screen`, `sign`, `tube`, `lamp`, `flame`; 1 is face value), `fog`, `nodes`.
 
 ## Conventions
 
@@ -45,7 +45,7 @@ Docs index: https://runek.nullorder.org/llms.txt (every page is also Markdown: a
 - Leave colors unset to follow the world `palette`; set a CSS color string to override.
 - Callbacks, React children, and live three.js objects (a `Screen`'s `texture`) are code only; they cannot appear in JSON.
 - Components are owned source: edit them in `src/runek/` when a prop is not enough. Keep them deterministic (geometry from props and `seed` only, no `Math.random`, no binary assets).
-- When editing or writing a component, follow the world's render rules (`@runek/core`): static materials come from `useMaterial({ color, roughness })` and are shared, so never change one in place; parts moved or reshaped after mount go inside `<Dynamic>`; light comes from `useLight({ color, intensity, distance })` with its `ref` placed where it shines, never a `<pointLight>`. Outside `<World>` (your own `<Canvas>`), wrap the scene in `<LightBudget>` or lamps give no light. Anything that moves or tells time by the wall clock reads `useWorld().now()`, never `Date.now()`, so a world given a shared clock (`<World now>`) stays in sync.
+- When editing or writing a component, follow the world's render rules (`@runek/core`): static materials come from `useMaterial({ color, roughness })` and are shared, so never change one in place (give a recognizable surface its `slot`, e.g. `slot: 'asphalt'`, so an app's `<World materials>` can swap it); parts moved or reshaped after mount go inside `<Dynamic>`; light comes from `useLight({ color, intensity, distance })` with its `ref` placed where it shines, never a `<pointLight>`. A reflective surface uses `useMirrorMaterial(look, strength)`, never its own render of the scene. Outside `<World>` (your own `<Canvas>`), wrap the scene in `<LightBudget>` or lamps give no light, and in `<MirrorPlanes>` for reflections. Anything that moves or tells time by the wall clock reads `useWorld().now()`, never `Date.now()`, so a world given a shared clock (`<World now>`) stays in sync.
 - `<World>` batches static parts onto `BATCHED_LAYER`: a raycaster of your own must `raycaster.layers.enable(BATCHED_LAYER)` to hit them (pointer events already do).
 
 ## Reference

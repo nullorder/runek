@@ -54,7 +54,7 @@ export function Hedge({
     })
   }, [L, H, D, length, foliage, seed, unit])
 
-  const body = useMaterial({ color: foliage, roughness: 0.95, flatShading: true })
+  const body = useMaterial({ slot: 'foliage', color: foliage, roughness: 0.95, flatShading: true })
   const tuftMaterials = useMaterials(
     tufts.map((t) => ({ color: t.color, flatShading: true, roughness: 0.95 })),
   )

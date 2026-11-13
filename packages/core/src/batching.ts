@@ -9,6 +9,7 @@ import {
   type Object3D,
   Vector3,
 } from 'three'
+import { isSharedMaterial } from './material'
 
 /** Marks a subtree the static batcher leaves alone (see `<Dynamic>`). */
 export const DYNAMIC_KEY = 'runekDynamic'
@@ -33,8 +34,7 @@ export function isBatchable(o: Object3D): o is Mesh {
   }
   if (flags.isInstancedMesh || flags.isSkinnedMesh || flags.isBatchedMesh) return false
   const material = mesh.material
-  if (Array.isArray(material) || !material.name.startsWith('runek:') || material.transparent)
-    return false
+  if (Array.isArray(material) || !isSharedMaterial(material) || material.transparent) return false
   if (mesh.onBeforeRender !== MESH_ON_BEFORE_RENDER) return false
   const g = mesh.geometry as BufferGeometry & { isInstancedBufferGeometry?: boolean }
   if (!g?.isBufferGeometry || g.isInstancedBufferGeometry || !g.attributes.position) return false

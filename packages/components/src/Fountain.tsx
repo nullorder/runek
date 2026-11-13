@@ -29,9 +29,9 @@ export function Fountain({
   const stone = color ?? palette.stone
   const water = waterColor ?? palette.waterShallow
   const m = useMaterials({
-    rim: { color: stone, roughness: 0.92, side: DoubleSide },
-    stone: { color: stone, roughness: 0.92 },
-    finial: { color: stone, roughness: 0.9 },
+    rim: { slot: 'stone', color: stone, roughness: 0.92, side: DoubleSide },
+    stone: { slot: 'stone', color: stone, roughness: 0.92 },
+    finial: { slot: 'stone', color: stone, roughness: 0.9 },
     lowWater: { color: water, transparent: true, opacity: 0.8, roughness: 0.2, metalness: 0.1 },
     topWater: { color: water, transparent: true, opacity: 0.85, roughness: 0.2 },
   })

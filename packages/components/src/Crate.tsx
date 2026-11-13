@@ -1,7 +1,5 @@
-import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import { rng, useMaterial, useMaterials, useWorld, type Vec3 } from '@runek/core'
-import { useMemo } from 'react'
-import * as THREE from 'three'
+import { type BuildContext, type Built, BuiltView, rng, useBuilt, type Vec3 } from '@runek/core'
+import { Color } from 'three'
 
 export interface CrateProps {
   position?: Vec3
@@ -13,74 +11,57 @@ export interface CrateProps {
   seed?: number
 }
 
-interface Beam {
-  pos: Vec3
-  size: Vec3
-  color: string
+/** The crate as data: a paneled core inside 12 seeded-shade planks, and one cuboid collider. */
+function buildCrate(
+  { size = 0.8, color, seed = 1 }: CrateProps,
+  { unit, palette }: BuildContext,
+): Built {
+  const s = size * unit
+  const b = 0.09 * s
+  const c = s / 2 - b / 2
+  const mid = s / 2
+  const next = rng(seed)
+  const base = new Color(color ?? palette.wood)
+  const tint = new Color()
+  const plank = (pos: Vec3, box: Vec3): Built['parts'][number] => ({
+    shape: { box },
+    look: {
+      slot: 'wood',
+      color: tint
+        .copy(base)
+        .multiplyScalar(0.82 + next() * 0.32)
+        .getStyle(),
+      roughness: 0.85,
+    },
+    position: [pos[0], pos[1] + mid, pos[2]],
+    castShadow: true,
+    receiveShadow: true,
+  })
+  const parts: Built['parts'] = [
+    {
+      shape: { box: [s * 0.9, s * 0.9, s * 0.9] },
+      look: { slot: 'wood', color: palette.woodDark, roughness: 0.9 },
+      position: [0, mid, 0],
+      castShadow: true,
+      receiveShadow: true,
+    },
+  ]
+  for (const sx of [-1, 1])
+    for (const sz of [-1, 1]) parts.push(plank([sx * c, 0, sz * c], [b, s, b]))
+  for (const sy of [-1, 1])
+    for (const sz of [-1, 1]) parts.push(plank([0, sy * c, sz * c], [s, b, b]))
+  for (const sy of [-1, 1])
+    for (const sx of [-1, 1]) parts.push(plank([sx * c, sy * c, 0], [b, b, s]))
+  return { parts, colliders: [{ cuboid: [mid, mid, mid], position: [0, mid, 0] }] }
 }
 
 /** A slatted wooden crate: a paneled core inside a 12-edge plank frame, each plank
  *  seeded a slightly different shade. A clean cube with a cuboid collider, so it
  *  stacks. The world-building staple (see also Barrel). */
-export function Crate({
-  position = [0, 0, 0],
-  rotation = [0, 0, 0],
-  size = 0.8,
-  color,
-  seed = 1,
-}: CrateProps) {
-  const { unit, palette } = useWorld()
-  const wood = color ?? palette.wood
-  const s = size * unit
-  const b = 0.09 * s
-  const c = s / 2 - b / 2
-
-  const beams = useMemo<Beam[]>(() => {
-    const next = rng(seed)
-    const base = new THREE.Color(wood)
-    const tint = new THREE.Color()
-    const shade = () =>
-      tint
-        .copy(base)
-        .multiplyScalar(0.82 + next() * 0.32)
-        .getStyle()
-    const out: Beam[] = []
-    for (const sx of [-1, 1])
-      for (const sz of [-1, 1])
-        out.push({ pos: [sx * c, 0, sz * c], size: [b, s, b], color: shade() })
-    for (const sy of [-1, 1])
-      for (const sz of [-1, 1])
-        out.push({ pos: [0, sy * c, sz * c], size: [s, b, b], color: shade() })
-    for (const sy of [-1, 1])
-      for (const sx of [-1, 1])
-        out.push({ pos: [sx * c, sy * c, 0], size: [b, b, s], color: shade() })
-    return out
-  }, [s, b, c, wood, seed])
-
-  const core = useMaterial({ color: palette.woodDark, roughness: 0.9 })
-  const beamMaterials = useMaterials(beams.map((bm) => ({ color: bm.color, roughness: 0.85 })))
-
-  return (
-    <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
-      <CuboidCollider args={[s / 2, s / 2, s / 2]} position={[0, s / 2, 0]} />
-      <group position={[0, s / 2, 0]}>
-        <mesh material={core} castShadow receiveShadow>
-          <boxGeometry args={[s * 0.9, s * 0.9, s * 0.9]} />
-        </mesh>
-        {beams.map((bm, i) => (
-          <mesh
-            key={`beam-${bm.pos[0].toFixed(2)}:${bm.pos[1].toFixed(2)}:${bm.pos[2].toFixed(2)}`}
-            material={beamMaterials[i]}
-            castShadow
-            receiveShadow
-            position={bm.pos}
-          >
-            <boxGeometry args={bm.size} />
-          </mesh>
-        ))}
-      </group>
-    </RigidBody>
-  )
+export function Crate(props: CrateProps) {
+  const built = useBuilt(buildCrate, props)
+  return <BuiltView built={built} position={props.position} rotation={props.rotation} />
 }
 
+Crate.build = buildCrate
 Crate.groundSitting = true

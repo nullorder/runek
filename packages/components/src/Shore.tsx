@@ -22,7 +22,7 @@ export function Shore({
   color,
 }: ShoreProps) {
   const { unit, palette } = useWorld()
-  const sand = useMaterial({ color: color ?? palette.sand, roughness: 1 })
+  const sand = useMaterial({ slot: 'sand', color: color ?? palette.sand, roughness: 1 })
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit

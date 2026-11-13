@@ -65,7 +65,7 @@ export function Whiteboard({
   const cy = wall ? 0 : 0.75 * unit + H / 2
   const cz = wall ? t / 2 + 0.01 * unit : 0
   const m = useMaterials({
-    frame: { color: frame, roughness: 0.4, metalness: 0.4 },
+    frame: { slot: 'metal.painted', color: frame, roughness: 0.4, metalness: 0.4 },
     board: { color: BOARD, roughness: 0.25 },
     ink: { kind: 'basic' },
     wheel: { color: '#1c1c1e', roughness: 0.6 },

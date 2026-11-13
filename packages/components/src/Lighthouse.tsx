@@ -55,12 +55,19 @@ export function Lighthouse({
   const lit = !nightOnly || !sun.day
   const lamp = useLight({ color: lightColor, intensity: 30, distance: 40 * unit, decay: 1.4 }, lit)
   const m = useMaterials({
-    plinth: { color: '#8d8a83', roughness: 1 },
-    tower: { color, roughness: 0.8 },
+    plinth: { slot: 'concrete', color: '#8d8a83', roughness: 1 },
+    tower: { slot: 'plaster', color, roughness: 0.8 },
     band: { color: bandColor, roughness: 0.8 },
     door: { color: '#3a2a1e', roughness: 0.8 },
-    iron: { color: IRON, roughness: 0.6, metalness: 0.4 },
-    glass: { color: '#cfe6ee', transparent: true, opacity: 0.3, roughness: 0.05, side: DoubleSide },
+    iron: { slot: 'metal.painted', color: IRON, roughness: 0.6, metalness: 0.4 },
+    glass: {
+      slot: 'glass',
+      color: '#cfe6ee',
+      transparent: true,
+      opacity: 0.3,
+      roughness: 0.05,
+      side: DoubleSide,
+    },
     bulb: lit
       ? { color: lightColor, emissive: lightColor, emissiveIntensity: 3 * glow, toneMapped: false }
       : { color: '#d9d4ca' },

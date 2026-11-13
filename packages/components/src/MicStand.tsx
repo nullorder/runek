@@ -38,7 +38,7 @@ export function MicStand({
   const { unit: u } = useWorld()
   const m = useMaterials({
     dark: { color: '#1d1d1f', roughness: 0.5 },
-    chrome: { color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
+    chrome: { slot: 'metal.bare', color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
   })
   const H = height ?? (boom ? 1.25 : 1.6)
 

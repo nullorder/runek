@@ -610,8 +610,8 @@ function MetaSection({ world }: { world: WorldData }) {
 
 function FontsSection({ world }: { world: WorldData }) {
   const fonts = world.fonts ?? {}
-  const set = (role: 'display' | 'body', value: string | undefined) => {
-    const next = { ...fonts }
+  const set = (role: 'display' | 'body' | 'fallback', value: string | string[] | undefined) => {
+    const next: Record<string, string | string[]> = { ...fonts }
     if (value === undefined) delete next[role]
     else next[role] = value
     setWorldField('fonts', Object.keys(next).length ? next : undefined, `fonts:${role}`)
@@ -630,8 +630,22 @@ function FontsSection({ world }: { world: WorldData }) {
         placeholder="bundled Pixelspace"
         onChange={(v) => set('body', v)}
       />
+      <TextRow
+        label="fallback"
+        multiline
+        value={[fonts.fallback ?? []].flat().join('\n') || undefined}
+        placeholder="one URL per line; without one, missing glyphs draw as boxes"
+        onChange={(v) => {
+          const urls = (v ?? '')
+            .split('\n')
+            .map((url) => url.trim())
+            .filter(Boolean)
+          set('fallback', urls.length > 1 ? urls : urls[0])
+        }}
+      />
       <p className="ws-muted ws-pad">
-        A .woff/.ttf URL per role. Text components (Sign, labels) draw from these.
+        A .woff/.ttf URL per role. Text components (Sign, labels) draw from these; the fallback font
+        fills in characters a role's font lacks.
       </p>
     </Group>
   )

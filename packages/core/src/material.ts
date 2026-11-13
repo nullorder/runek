@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 import {
   Color,
   type ColorRepresentation,
@@ -9,8 +9,38 @@ import {
   type Side,
   SRGBColorSpace,
 } from 'three'
+import { WorldContext } from './context'
 
 export type MaterialKind = 'standard' | 'basic' | 'physical'
+
+/**
+ * The surfaces a component can name in a look's `slot`, so a world can answer them with materials
+ * of its own (`<World materials>`). A component picks the one that fits and still gives a full look,
+ * which is what draws when the world doesn't answer.
+ */
+export const MATERIAL_SLOTS = {
+  asphalt: 'Road decks and other bitumen paving.',
+  concrete: 'Cast concrete: slabs, kerbs, plinths, bare structural walls.',
+  stone: 'Cut and natural stone: masonry, paving, steps, rock.',
+  brick: 'Brickwork.',
+  plaster: 'Rendered or painted walls, inside and out.',
+  floor: 'Interior floor finishes: boards, tiles, screed.',
+  roofing: 'Roof coverings: tiles, shingles, thatch, sheet.',
+  wood: 'Timber, joinery and wooden furniture.',
+  glass: 'Glazing: windows, glass walls, rails.',
+  'metal.painted': 'Painted or powder-coated metal: poles, frames, appliances.',
+  'metal.bare': 'Unpainted metal: steel, chrome, brass, cast iron.',
+  fabric: 'Upholstery, rugs, curtains, canvas.',
+  leather: 'Leather upholstery and goods.',
+  plastic: 'Molded plastic and laminate.',
+  ceramic: 'Glazed ceramic and porcelain: tiles, tableware, sanitaryware.',
+  ground: 'Soil and terrain cover.',
+  sand: 'Beaches, shores and dunes.',
+  foliage: 'Leaves, hedges and grass.',
+  bark: 'Tree trunks and branches.',
+} as const
+
+export type MaterialSlot = keyof typeof MATERIAL_SLOTS
 
 /**
  * How a surface looks, as plain values: everything a shared material is keyed on. Two parts
@@ -20,6 +50,9 @@ export type MaterialKind = 'standard' | 'basic' | 'physical'
 export interface MaterialLook {
   /** `standard` (lit, the default), `basic` (unlit) or `physical` (clearcoat, sheen). */
   kind?: MaterialKind
+  /** The surface this look stands for (one of `MATERIAL_SLOTS`, e.g. `asphalt`), so a world can
+   *  draw it with a material of its own. Unanswered, the look draws as given. */
+  slot?: MaterialSlot | (string & {})
   color?: ColorRepresentation
   emissive?: ColorRepresentation
   emissiveIntensity?: number
@@ -49,6 +82,14 @@ export interface MaterialLook {
   iridescence?: number
 }
 
+/** What a world answers a slot with: one material for every look naming it, or a function that
+ *  makes one from the look (its colors, roughness, `kind`). */
+export type SlotResolver = Material | ((look: MaterialLook) => Material)
+
+/** A world's answers to material slots, by slot name. Slots it leaves out draw as the look says. */
+export type MaterialSlots = Partial<Record<MaterialSlot, SlotResolver>> &
+  Record<string, SlotResolver | undefined>
+
 const COLOR_KEYS = new Set(['color', 'emissive', 'sheenColor'])
 const KINDS = {
   standard: MeshStandardMaterial,
@@ -67,6 +108,9 @@ interface Entry {
 }
 
 const shared = new Map<string, Entry>()
+// Every material handed out through a look, built here or resolved through a slot: what the
+// static batcher may merge.
+const batchable = new WeakSet<Material>()
 const scratch = new Color()
 const srgb = { r: 0, g: 0, b: 0 }
 
@@ -81,9 +125,10 @@ function colorKey(value: ColorRepresentation): string {
 }
 
 /** The cache key for a look: same key, same material. Colors compare by value (including
- *  brightness above 1), key order and unset fields don't matter. */
+ *  brightness above 1), key order and unset fields don't matter. The `slot` is left out: two looks
+ *  that only differ by slot draw the same until a world answers one of them. */
 export function materialKey(look: MaterialLook): string {
-  const { kind = 'standard', ...params } = look
+  const { kind = 'standard', slot: _slot, ...params } = look
   const parts: string[] = []
   for (const name of Object.keys(params).sort()) {
     const value = params[name as keyof typeof params]
@@ -112,9 +157,10 @@ function sweepLater(key: string, entry: Entry) {
 export function sharedMaterial(look: MaterialLook, key = materialKey(look)): Material {
   let entry = shared.get(key)
   if (!entry) {
-    const { kind = 'standard', ...params } = look
+    const { kind = 'standard', slot: _slot, ...params } = look
     const material = new KINDS[kind](params)
     material.name = `runek:${key}`
+    batchable.add(material)
     entry = { material, users: 0, timer: null }
     shared.set(key, entry)
     sweepLater(key, entry)
@@ -145,24 +191,87 @@ export function sharedMaterialCount() {
   return shared.size
 }
 
+/** Whether `material` came from a look (built from it or answered through a slot), so it is
+ *  shared and read-only and the static batcher may merge what it draws. */
+export function isSharedMaterial(material: Material): boolean {
+  return batchable.has(material)
+}
+
+const resolved = new WeakMap<object, Map<string, Material>>()
+
+/** The world's answer to `look.slot` in `slots`, if it has one. */
+export function slotResolver(
+  look: MaterialLook,
+  slots: MaterialSlots | undefined,
+): SlotResolver | undefined {
+  return look.slot === undefined ? undefined : slots?.[look.slot]
+}
+
+/**
+ * The material `resolver` answers `look` with, made once per resolver, slot and look and kept for
+ * as long as the resolver lives. The material belongs to the app that gave the resolver: core
+ * shares it but never disposes it.
+ */
+export function resolveSlot(
+  resolver: SlotResolver,
+  look: MaterialLook,
+  key = materialKey(look),
+): Material {
+  if (typeof resolver !== 'function') {
+    batchable.add(resolver)
+    return resolver
+  }
+  let cache = resolved.get(resolver)
+  if (!cache) {
+    cache = new Map()
+    resolved.set(resolver, cache)
+  }
+  const id = `${look.slot}|${key}`
+  let material = cache.get(id)
+  if (!material) {
+    material = resolver(look)
+    batchable.add(material)
+    cache.set(id, material)
+  }
+  return material
+}
+
+/** The material for `look` in a world answering `slots`: the slot's answer, or the shared
+ *  material built from the look. Hooks retain the second; the first is the app's. */
+export function lookMaterial(
+  look: MaterialLook,
+  slots: MaterialSlots | undefined,
+  key = materialKey(look),
+): Material {
+  const resolver = slotResolver(look, slots)
+  return resolver ? resolveSlot(resolver, look, key) : sharedMaterial(look, key)
+}
+
 /**
  * One shared, read-only material for a static look: every part in the world with the same look
  * draws with the same instance. Use it for anything that doesn't change after mount; a material
  * whose properties animate (a hover highlight, a flicker, a texture you draw into) stays your own.
+ * A look with a `slot` the world answers (`<World materials>`) draws with the world's material.
  *
  * ```tsx
- * const wood = useMaterial({ color: palette.wood, roughness: 0.85 })
+ * const wood = useMaterial({ slot: 'wood', color: palette.wood, roughness: 0.85 })
  * <mesh material={wood}><boxGeometry /></mesh>
  * ```
  */
 export function useMaterial(look: MaterialLook): Material {
+  const resolver = slotResolver(look, useContext(WorldContext).materials)
   const key = materialKey(look)
+  const slot = look.slot
   // Keyed by value: a fresh `look` object with the same values keeps the same material.
-  const material = useMemo(() => sharedMaterial(look, key), [key])
+  const material = useMemo(
+    () => (resolver ? resolveSlot(resolver, look, key) : sharedMaterial(look, key)),
+    [key, slot, resolver],
+  )
   useEffect(() => {
+    if (resolver) return
     retainMaterial(key)
     return () => releaseMaterial(key)
-  }, [key])
+  }, [key, resolver])
   return material
 }
 
@@ -177,24 +286,27 @@ export function useMaterial(look: MaterialLook): Material {
 export function useMaterials<T extends Record<string, MaterialLook> | MaterialLook[]>(
   looks: T,
 ): { [K in keyof T]: Material } {
+  const slots = useContext(WorldContext).materials
   const entries = Object.entries(looks) as [string, MaterialLook][]
   const keys = entries.map(([, look]) => materialKey(look))
-  const signature = keys.join('\n')
+  const signature = entries.map(([, look], i) => `${look.slot ?? ''}|${keys[i]}`).join('\n')
+  // Built-in looks to keep alive; answered slots belong to the app.
+  const held = keys.filter((_, i) => !slotResolver(entries[i][1], slots)).join('\n')
   // Keyed by value, like `useMaterial`.
   const materials = useMemo(() => {
     const out = (Array.isArray(looks) ? [] : {}) as Record<string, Material>
     entries.forEach(([name, look], i) => {
-      out[name] = sharedMaterial(look, keys[i])
+      out[name] = lookMaterial(look, slots, keys[i])
     })
     return out as { [K in keyof T]: Material }
-  }, [signature])
+  }, [signature, slots])
   useEffect(() => {
-    const held = signature.split('\n').filter(Boolean)
-    for (const key of held) retainMaterial(key)
+    const keep = held.split('\n').filter(Boolean)
+    for (const key of keep) retainMaterial(key)
     return () => {
-      for (const key of held) releaseMaterial(key)
+      for (const key of keep) releaseMaterial(key)
     }
-  }, [signature])
+  }, [held])
   return materials
 }
 

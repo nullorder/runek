@@ -4,6 +4,7 @@ import type { WorldFonts } from './font'
 import type { WorldControls } from './keyboard'
 import type { Lens } from './lens'
 import type { WorldLuminance } from './luminance'
+import type { MaterialSlots } from './material'
 import type { WorldPalette } from './palette'
 import type { WorldTime } from './time'
 
@@ -104,6 +105,9 @@ export interface WorldContextValue {
    *  defaults). A hand-rolled provider may leave it out: read it through `useLuminance()`,
    *  which fills the defaults. */
   luminance?: WorldLuminance
+  /** The world's answers to material slots: `useMaterial` draws a look naming one of these slots
+   *  with the world's material instead of building its own. Absent when the world answers none. */
+  materials?: MaterialSlots
   /** Resolved time-of-day. Day/night-aware components (`Sky`, `LightRig`,
    *  `Clock`) read this; defaults to a pinned midday. */
   time: WorldTime

@@ -58,10 +58,10 @@ export function Fridge({
   }, [seed, layout, color])
 
   const m = useMaterials({
-    body: { color: look.body, roughness: 0.35, metalness: 0.15 },
-    door: { color: look.body, roughness: 0.3, metalness: 0.15 },
+    body: { slot: 'metal.painted', color: look.body, roughness: 0.35, metalness: 0.15 },
+    door: { slot: 'metal.painted', color: look.body, roughness: 0.3, metalness: 0.15 },
     kick: { color: '#2a2a2c', roughness: 0.8 },
-    handle: { color: metal, roughness: 0.25, metalness: 0.8 },
+    handle: { slot: 'metal.bare', color: metal, roughness: 0.25, metalness: 0.8 },
   })
 
   const kick = 0.06 * unit

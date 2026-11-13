@@ -60,7 +60,7 @@ export function DeskLamp({
   const shade = useMemo(() => shadeColor ?? pick(rng(sub(seed, 0)), SHADES), [seed, shadeColor])
 
   const m = useMaterials({
-    metal: { color: color ?? palette.accent, metalness: 0.75, roughness: 0.3 },
+    metal: { slot: 'metal.bare', color: color ?? palette.accent, metalness: 0.75, roughness: 0.3 },
     shade: {
       color: shade,
       roughness: 0.15,

@@ -33,13 +33,13 @@ export function Counter({
 }: CounterProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    body: { color: color ?? palette.wood, roughness: 0.8 },
+    body: { slot: 'wood', color: color ?? palette.wood, roughness: 0.8 },
     top: { color: topColor ?? palette.woodDark, roughness: 0.55 },
     hob: { color: '#141416', roughness: 0.12, metalness: 0.3 },
     burner: { color: '#4a4a4f', roughness: 0.4 },
     ovenDoor: { color: '#2a2a2d', roughness: 0.35, metalness: 0.4 },
-    ovenWindow: { color: '#0c0c0e', roughness: 0.1, metalness: 0.5 },
-    handle: { color: '#b9bdc1', roughness: 0.25, metalness: 0.8 },
+    ovenWindow: { slot: 'glass', color: '#0c0c0e', roughness: 0.1, metalness: 0.5 },
+    handle: { slot: 'metal.bare', color: '#b9bdc1', roughness: 0.25, metalness: 0.8 },
   })
   const L = length * unit
   const H = height * unit

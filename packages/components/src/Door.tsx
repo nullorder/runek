@@ -26,8 +26,8 @@ export function Door({
 }: DoorProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    door: { color: color ?? palette.wood },
-    knob: { color: palette.accent, metalness: 0.6, roughness: 0.3 },
+    door: { slot: 'wood', color: color ?? palette.wood },
+    knob: { slot: 'metal.bare', color: palette.accent, metalness: 0.6, roughness: 0.3 },
   })
   const w = width * unit
   const h = height * unit

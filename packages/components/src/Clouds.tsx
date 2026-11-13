@@ -103,3 +103,6 @@ export function Clouds({
     </group>
   )
 }
+
+// Mounted wherever the viewer is when a world streams.
+Clouds.stream = false

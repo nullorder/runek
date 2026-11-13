@@ -254,6 +254,25 @@ function usesSeed(fn) {
   return elements.some((el) => el.dotDotDotToken) && /\bseed\b/.test(body)
 }
 
+/** The function a component assigns as its `build` (`Name.build = buildName`) in its own file. */
+function buildFunctionOf(name, fn) {
+  const file = fn.getSourceFile()
+  let ident
+  for (const s of file.statements) {
+    if (!ts.isExpressionStatement(s) || !ts.isBinaryExpression(s.expression)) continue
+    const { left, right } = s.expression
+    if (
+      ts.isPropertyAccessExpression(left) &&
+      left.expression.getText(file) === name &&
+      left.name.text === 'build' &&
+      ts.isIdentifier(right)
+    )
+      ident = right.text
+  }
+  if (!ident) return undefined
+  return file.statements.find((s) => ts.isFunctionDeclaration(s) && s.name?.text === ident)
+}
+
 function registryObject() {
   let found
   ts.forEachChild(registryFile, function visit(node) {
@@ -275,11 +294,19 @@ for (const prop of registryObject().properties) {
     if (!fn) continue
     const ctx = { component: name, defs: {} }
     const param = fn.parameters[0]
-    const props = param
-      ? describeProps(checker.getTypeAtLocation(param), ctx, 0, destructuredDefaults(fn))
-      : {}
+    // A component with a `build` keeps its defaults there; its React form places the result.
+    const build = buildFunctionOf(name, fn)
+    const defaults = {
+      ...(build && {
+        position: { value: [0, 0, 0] },
+        rotation: { value: [0, 0, 0] },
+        ...destructuredDefaults(build),
+      }),
+      ...destructuredDefaults(fn),
+    }
+    const props = param ? describeProps(checker.getTypeAtLocation(param), ctx, 0, defaults) : {}
     const doc = docOf(symbol)
-    const seeded = usesSeed(fn)
+    const seeded = usesSeed(fn) || (!!build && usesSeed(build))
     if (!seeded && props.seed?.doc === STANDARD_DOCS.seed) props.seed.doc = UNSEEDED_DOC
     components[name] = {
       kind: 'component',

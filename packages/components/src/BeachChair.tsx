@@ -42,8 +42,8 @@ export function BeachChair({
   const cushion = color ?? pick(next, CUSHIONS)
   const frame = frameColor ?? pick(next, FRAMES)
   const m = useMaterials({
-    frame: { color: frame, roughness: 0.75 },
-    cushion: { color: cushion, roughness: 0.95 },
+    frame: { slot: 'wood', color: frame, roughness: 0.75 },
+    cushion: { slot: 'fabric', color: cushion, roughness: 0.95 },
   })
   const L = length * u
   const W = width * u

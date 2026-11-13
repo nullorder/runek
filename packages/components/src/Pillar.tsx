@@ -29,8 +29,8 @@ export function Pillar({
   const { unit, palette } = useWorld()
   const stone = color ?? palette.stone
   const m = useMaterials({
-    stone: { color: stone, roughness: 0.92 },
-    shaft: { color: stone, roughness: 0.92, flatShading: flutes > 0 },
+    stone: { slot: 'stone', color: stone, roughness: 0.92 },
+    shaft: { slot: 'stone', color: stone, roughness: 0.92, flatShading: flutes > 0 },
   })
   const r = radius * unit
   const h = height * unit

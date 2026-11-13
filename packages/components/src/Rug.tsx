@@ -31,9 +31,9 @@ export function Rug({
 }: RugProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    border: { color: borderColor ?? palette.accent },
-    base: { color: baseColor ?? palette.fabric },
-    stripe: { color: accentColor },
+    border: { slot: 'fabric', color: borderColor ?? palette.accent },
+    base: { slot: 'fabric', color: baseColor ?? palette.fabric },
+    stripe: { slot: 'fabric', color: accentColor },
   })
   const w = size[0] * unit
   const d = size[1] * unit

@@ -77,7 +77,7 @@ export function Speaker({
     dark: { color: '#1d1d1f', roughness: 0.5 },
     horn: { color: '#1d1d1f', roughness: 0.5, side: DoubleSide },
     cone: { color: '#1b1b1b', roughness: 0.7 },
-    chrome: { color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
+    chrome: { slot: 'metal.bare', color: '#c9ccd1', roughness: 0.3, metalness: 0.8 },
     cloth: { color: light ? '#b9a27a' : '#3a3632', roughness: 1 },
   })
   const [w, h, d] = SIZES[type]

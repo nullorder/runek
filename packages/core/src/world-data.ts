@@ -4,6 +4,7 @@ import type { WorldControls } from './keyboard.ts'
 import type { WorldLuminance } from './luminance.ts'
 import type { WorldPalette } from './palette.ts'
 import { sub } from './rng.ts'
+import type { StreamSetting } from './stream.ts'
 import type { AvatarView, Vec3, WorldFog } from './types.ts'
 
 export type JsonValue =
@@ -90,6 +91,9 @@ export interface WorldData {
    *  scene-linear units relative to diffuse white. Unset levels stay at 1 (face value). */
   luminance?: Partial<WorldLuminance>
   fog?: WorldFog
+  /** Mount only the nodes near the viewer: `true`, or `{ radius, cell }` in units (default 80
+   *  and 20). For dense worlds; a node's footprint is its composite `bounds` or `size`. */
+  stream?: StreamSetting
   nodes: WorldNode[]
 }
 
@@ -102,7 +106,7 @@ export interface CompositeDef {
   kind: 'composite'
   name?: string
   description?: string
-  /** Reserved for the future streaming/LOD pass: impostor box `[w, h, d]` in units. */
+  /** The arrangement's box `[w, h, d]` in units: its footprint when a world streams (`stream`). */
   bounds?: [number, number, number]
   /** Stands on the ground: the world check flags an instance that is buried or floating. */
   groundSitting?: boolean
@@ -168,7 +172,7 @@ function normalizeNode(node: WorldNode): WorldNode {
 /**
  * Serialize a world to pretty JSON text with a canonical, stable key order
  * (`$schema, version, meta, unit, gravity, ground, time, timezone, avatar, controls,
- * palette, fonts, fog, nodes`; each node `type, id, anchor, props, children`). Stable
+ * palette, fonts, luminance, fog, stream, nodes`; each node `type, id, anchor, props, children`). Stable
  * output means an unchanged node never churns the diff, so PR reviews show only
  * the real change.
  */
@@ -188,7 +192,9 @@ export function serializeWorld(data: WorldData): string {
   if (data.controls !== undefined) out.controls = data.controls
   if (data.palette !== undefined) out.palette = data.palette
   if (data.fonts !== undefined) out.fonts = data.fonts
+  if (data.luminance !== undefined) out.luminance = data.luminance
   if (data.fog !== undefined) out.fog = data.fog
+  if (data.stream !== undefined) out.stream = data.stream
   out.nodes = data.nodes.map(normalizeNode)
   return `${JSON.stringify(out, null, 2)}\n`
 }
@@ -241,11 +247,24 @@ export function parseWorld(json: string): WorldData {
     if (typeof fonts !== 'object' || fonts === null || Array.isArray(fonts)) {
       throw new Error('World "fonts" must be an object of role to font URL')
     }
-    for (const value of Object.values(fonts as Record<string, unknown>)) {
-      if (typeof value !== 'string') {
+    for (const [role, value] of Object.entries(fonts as Record<string, unknown>)) {
+      const urls = role === 'fallback' && Array.isArray(value) ? value : [value]
+      if (urls.some((url) => typeof url !== 'string')) {
         throw new Error('World "fonts" values must be font URL strings')
       }
     }
+  }
+  if (data.stream !== undefined) {
+    const stream = data.stream as unknown
+    const ok =
+      typeof stream === 'boolean' ||
+      (typeof stream === 'object' &&
+        stream !== null &&
+        !Array.isArray(stream) &&
+        Object.entries(stream).every(([k, v]) =>
+          k === 'build' ? typeof v === 'boolean' : typeof v === 'number' && v > 0,
+        ))
+    if (!ok) throw new Error('World "stream" must be true, false or { radius, cell, build }')
   }
   if (data.luminance !== undefined) {
     const luminance = data.luminance as unknown

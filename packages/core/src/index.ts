@@ -1,9 +1,24 @@
+export type { BuiltNode } from './BuiltNodes'
+export { BuiltNodes } from './BuiltNodes'
+export { BuiltView, useBuildContext, useBuilt } from './BuiltView'
 export { BATCHED_LAYER, DYNAMIC_KEY, isBatchable, StaticBatcher } from './batching'
+export type {
+  BuildContext,
+  BuildFunction,
+  Built,
+  BuiltCollider,
+  BuiltLight,
+  BuiltPart,
+  BuiltShape,
+} from './build'
+export { buildOf, cachedBuild, shapeGeometry, shapeGeometryCount, shapeKey } from './build'
 export { GroundContext, PlayerMotionContext, WorldContext } from './context'
 export type { GitHubSource } from './contribute'
 export { editFileUrl, forkUrl, parseGitHubSource } from './contribute'
-export type { WorldFonts } from './font'
-export { DEFAULT_FONT, DEFAULT_FONTS } from './font'
+export type { CodeRanges } from './coverage'
+export { DEFAULT_FONT_COVERAGE, missingGlyphs, readCoverage } from './coverage'
+export type { FontRole, WorldFonts } from './font'
+export { DEFAULT_FONT, DEFAULT_FONTS, FONT_ROLES, fontCoverage, pickFace } from './font'
 export type {
   CheckWorldOptions,
   GroundEntry,
@@ -38,23 +53,45 @@ export {
   resolveControls,
 } from './keyboard'
 export { LightBudget } from './LightBudget'
+export { lastResortFont } from './last-resort'
 export type { Lens } from './lens'
 export { useLensPosition } from './lens'
-export type { LightEmitter, LightKind, LightLook } from './light'
+export type { LightEmitter, LightKind, LightLook, PointLighting } from './light'
 export { LightPool, LightPoolContext, useLight } from './light'
 export type { LuminanceLevel, WorldLuminance } from './luminance'
 export { DEFAULT_LUMINANCE } from './luminance'
-export type { MaterialKind, MaterialLook } from './material'
+export type {
+  MaterialKind,
+  MaterialLook,
+  MaterialSlot,
+  MaterialSlots,
+  SlotResolver,
+} from './material'
 export {
   glowLook,
+  isSharedMaterial,
+  lookMaterial,
+  MATERIAL_SLOTS,
   materialKey,
   releaseMaterial,
+  resolveSlot,
   retainMaterial,
   sharedMaterial,
   sharedMaterialCount,
   useMaterial,
   useMaterials,
 } from './material'
+export {
+  inScenePass,
+  MIRROR_TOLERANCE,
+  MirrorPlane,
+  MirrorPlanes,
+  MirrorPool,
+  MirrorPoolContext,
+  scenePass,
+  useMirrorMaterial,
+} from './mirror'
+export { lazyModule, useNodeRenderer } from './node'
 export type { OrbitKeysOptions } from './orbitKeys'
 export { groundForward, MOVE_KEYS, useOrbitKeys } from './orbitKeys'
 export type { WorldPalette } from './palette'
@@ -71,6 +108,14 @@ export type { Rng } from './rng'
 export { int, pick, range, rng, sub } from './rng'
 export { ShadowRate } from './ShadowRate'
 export { Dynamic, StaticBatching } from './StaticBatching'
+export type { StreamIndex, StreamOptions, StreamSetting } from './stream'
+export {
+  createStreamIndex,
+  DEFAULT_STREAM,
+  nearNodes,
+  STREAM_HYSTERESIS,
+  streamOptions,
+} from './stream'
 export type { SunState, WorldTime } from './time'
 export {
   clockHours,
@@ -94,7 +139,7 @@ export type {
 } from './types'
 export { useGround } from './useGround'
 export { useSun } from './useSun'
-export { useLuminance, useWorld } from './useWorld'
+export { useLuminance, useTextFont, useWorld } from './useWorld'
 export type { JsonPath, ValidationIssue } from './validate'
 export { suggest, validateWorld } from './validate'
 export type { WorldProps } from './World'

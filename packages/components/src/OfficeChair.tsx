@@ -39,9 +39,9 @@ export function OfficeChair({
   const { unit, palette } = useWorld()
   const frame = frameColor ?? palette.metal
   const m = useMaterials({
-    cloth: { color: color ?? palette.fabric, roughness: 0.9 },
-    frame: { color: frame, roughness: 0.4, metalness: 0.5 },
-    column: { color: frame, roughness: 0.3, metalness: 0.7 },
+    cloth: { slot: 'fabric', color: color ?? palette.fabric, roughness: 0.9 },
+    frame: { slot: 'metal.painted', color: frame, roughness: 0.4, metalness: 0.5 },
+    column: { slot: 'metal.bare', color: frame, roughness: 0.3, metalness: 0.7 },
     caster: { color: '#1c1c1e', roughness: 0.6 },
     armPad: { color: '#232326', roughness: 0.7 },
   })

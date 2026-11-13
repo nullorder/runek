@@ -49,6 +49,7 @@ export function Rocks({
 
   const materials = useMaterials(
     rocks.map((r) => ({
+      slot: 'stone',
       color: `hsl(${hue}, 8%, ${r.lightness}%)`,
       flatShading: true,
       roughness: 1,

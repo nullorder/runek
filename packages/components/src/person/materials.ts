@@ -3,6 +3,7 @@
 import {
   BufferAttribute,
   Color,
+  type Material,
   MeshPhysicalMaterial,
   type MeshPhysicalMaterialParameters,
   ShaderChunk,
@@ -55,7 +56,9 @@ const SPECS: Record<Exclude<MaterialKind, 'skin'>, MeshPhysicalMaterialParameter
 
 let shared: Record<MaterialKind | 'eye', MeshPhysicalMaterial> | null = null
 
-export function personMaterials() {
+/** The materials every figure shares; `skinOverride` stands in for the skin (its node twin under
+ *  `WebGPURenderer`, where the GLSL patch doesn't compile). */
+export function personMaterials(skinOverride?: Material) {
   if (!shared) {
     shared = {
       skin: skin(),
@@ -72,7 +75,7 @@ export function personMaterials() {
       }),
     }
   }
-  return shared
+  return skinOverride ? { ...shared, skin: skinOverride as MeshPhysicalMaterial } : shared
 }
 
 /** An eyeball looking down +z: pupil, a streaked iris, a dark limbal ring, warm sclera. */

@@ -39,6 +39,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `thickness` | `number` | `0.2` | Thickness, in units. |
 | `opening` | `FloorOpening` |  | A hole in the slab (stairwell); the slab splits into strips around it. |
 | `color` | `color` | palette `floor` | Defaults to the world palette's `floor` slot. |
+| `reflect` | `number` | `0` | How much of the room the top reflects, 0 (matte, the default) to 1 (a mirror): a polished stone or lacquered floor. Every reflective surface at one height shares the world's mirror for it. |
 
 ### `FloorOpening`
 

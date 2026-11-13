@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add bench
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.17.0`.
+Pulls `@runek/core@^0.17.0`.
 
 ## Use it
 

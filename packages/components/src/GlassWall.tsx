@@ -46,8 +46,8 @@ export function GlassWall({
 }: GlassWallProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    glass: { color: glassColor, transparent: true, opacity, roughness: 0.06 },
-    steel: { color: color ?? palette.metal, roughness: 0.4, metalness: 0.5 },
+    glass: { slot: 'glass', color: glassColor, transparent: true, opacity, roughness: 0.06 },
+    steel: { slot: 'metal.painted', color: color ?? palette.metal, roughness: 0.4, metalness: 0.5 },
   })
   const W = width * unit
   const H = height * unit

@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { useMaterial, useWorld, type Vec3 } from '@runek/core'
+import { useMirrorMaterial, useWorld, type Vec3 } from '@runek/core'
 import { floorSurface } from './surfaces/floor'
 
 /** A rectangular hole in the slab, e.g. a stairwell. */
@@ -24,6 +24,10 @@ export interface FloorProps {
   opening?: FloorOpening
   /** Defaults to the world palette's `floor` slot. */
   color?: string
+  /** How much of the room the top reflects, 0 (matte, the default) to 1 (a mirror): a polished
+   *  stone or lacquered floor. Every reflective surface at one height shares the world's mirror
+   *  for it. */
+  reflect?: number
 }
 
 interface Slab {
@@ -66,9 +70,13 @@ export function Floor({
   thickness = 0.2,
   opening,
   color,
+  reflect = 0,
 }: FloorProps) {
   const { unit, palette, ground } = useWorld()
-  const material = useMaterial({ color: color ?? palette.floor })
+  const material = useMirrorMaterial(
+    { slot: 'floor', color: color ?? palette.floor, ...(reflect > 0 && { roughness: 0.35 }) },
+    reflect,
+  )
   const w = size[0] * unit
   const d = size[1] * unit
   const t = thickness * unit

@@ -88,10 +88,15 @@ export function Umbrella({
 }: UmbrellaProps) {
   const { unit: u, palette } = useWorld()
   const m = useMaterials({
-    canvas: { color: color ?? pick(rng(seed), CANVAS), roughness: 0.9, side: DoubleSide },
-    stripe: { color: stripeColor, roughness: 0.9, side: DoubleSide },
-    wood: { color: palette.wood, roughness: 0.85 },
-    base: { color: palette.stone, roughness: 0.9 },
+    canvas: {
+      slot: 'fabric',
+      color: color ?? pick(rng(seed), CANVAS),
+      roughness: 0.9,
+      side: DoubleSide,
+    },
+    stripe: { slot: 'fabric', color: stripeColor, roughness: 0.9, side: DoubleSide },
+    wood: { slot: 'wood', color: palette.wood, roughness: 0.85 },
+    base: { slot: 'stone', color: palette.stone, roughness: 0.9 },
   })
   const R = radius * u
   const H = height * u

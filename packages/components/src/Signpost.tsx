@@ -38,8 +38,8 @@ export function Signpost({
 }: SignpostProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    post: { color: palette.woodDark, roughness: 0.85 },
-    plank: { color: color ?? palette.wood, roughness: 0.8 },
+    post: { slot: 'wood', color: palette.woodDark, roughness: 0.85 },
+    plank: { slot: 'wood', color: color ?? palette.wood, roughness: 0.8 },
   })
   const ink = textColor ?? palette.sand
   const H = height * unit

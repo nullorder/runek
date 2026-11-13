@@ -1,3 +1,4 @@
+import { missingGlyphs } from './coverage.ts'
 import { DEFAULT_LUMINANCE } from './luminance.ts'
 import { DEFAULT_PALETTE } from './palette.ts'
 import { describeType, isCodeOnly, matches, type SchemaMap } from './prop-schema.ts'
@@ -27,6 +28,7 @@ const WORLD_KEYS = [
   'fonts',
   'luminance',
   'fog',
+  'stream',
   'nodes',
 ]
 const NODE_KEYS = ['type', 'id', 'anchor', 'props', 'children']
@@ -140,6 +142,31 @@ export function validateWorld(
         })
     }
   }
+  const fonts = isObj(data.fonts) ? data.fonts : {}
+  if (isObj(data.fonts)) {
+    const roles = ['display', 'body', 'fallback']
+    for (const [role, value] of Object.entries(data.fonts)) {
+      if (!roles.includes(role))
+        issues.push({
+          path: ['fonts', role],
+          key: true,
+          message: `Unknown font role "${role}".${mean(role, roles)}`,
+          severity: 'warning',
+        })
+      else if (
+        typeof value !== 'string' &&
+        !(role === 'fallback' && Array.isArray(value) && value.every((v) => typeof v === 'string'))
+      )
+        issues.push({
+          path: ['fonts', role],
+          message:
+            role === 'fallback'
+              ? 'Fallback is a font URL or a list of them.'
+              : 'A font role is a font URL.',
+          severity: 'error',
+        })
+    }
+  }
   if (isObj(data.luminance)) {
     const levels = Object.keys(DEFAULT_LUMINANCE)
     for (const [level, value] of Object.entries(data.luminance)) {
@@ -157,6 +184,25 @@ export function validateWorld(
           severity: 'warning',
         })
     }
+  }
+  if (data.stream !== undefined) {
+    const stream = data.stream
+    if (
+      typeof stream !== 'boolean' &&
+      !(
+        isObj(stream) &&
+        Object.entries(stream).every(([k, v]) =>
+          k === 'build'
+            ? typeof v === 'boolean'
+            : ['radius', 'cell'].includes(k) && typeof v === 'number' && v > 0,
+        )
+      )
+    )
+      issues.push({
+        path: ['stream'],
+        message: 'Stream is true, false, or { "radius": n, "cell": n, "build": bool } in units.',
+        severity: 'error',
+      })
   }
   if (data.fog !== undefined) {
     const fog = data.fog
@@ -265,6 +311,28 @@ export function validateWorld(
               severity: 'warning',
             })
           }
+        }
+      }
+      if (
+        node.type === 'Sign' &&
+        isObj(node.props) &&
+        typeof node.props.children === 'string' &&
+        node.props.font === undefined
+      ) {
+        const role = node.props.variant === 'body' ? 'body' : 'display'
+        if (fonts[role] === undefined && fonts.fallback === undefined) {
+          const missing = missingGlyphs(node.props.children)
+          if (missing.length)
+            issues.push({
+              path: [...path, 'props', 'children'],
+              message: `The bundled font has no ${missing
+                .slice(0, 6)
+                .map((ch) => `"${ch}"`)
+                .join(
+                  ', ',
+                )}${missing.length > 6 ? ' (and more)' : ''}: they draw as boxes. Declare a font that has them in "fonts" (the "${role}" role, or "fallback").`,
+              severity: 'warning',
+            })
         }
       }
       if (node.children !== undefined) {

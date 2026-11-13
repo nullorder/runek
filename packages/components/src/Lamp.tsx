@@ -39,7 +39,7 @@ export function Lamp({
   const poleH = h - shadeH
   const glow = useLight({ color: lightColor, intensity, distance: 12 * unit, decay: 2 })
   const m = useMaterials({
-    metal: { color: metalColor, metalness: 0.4, roughness: 0.5 },
+    metal: { slot: 'metal.painted', color: metalColor, metalness: 0.4, roughness: 0.5 },
     shade: {
       color: shadeColor,
       emissive: shadeColor,

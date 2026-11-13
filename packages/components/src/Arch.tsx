@@ -34,7 +34,7 @@ export function Arch({
   color,
 }: ArchProps) {
   const { unit, palette } = useWorld()
-  const stone = useMaterial({ color: color ?? palette.stone, roughness: 0.9 })
+  const stone = useMaterial({ slot: 'stone', color: color ?? palette.stone, roughness: 0.9 })
   const w = width * unit
   const h = height * unit
   const d = depth * unit

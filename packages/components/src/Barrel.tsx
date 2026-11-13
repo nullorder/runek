@@ -26,8 +26,13 @@ export function Barrel({
 }: BarrelProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    wood: { color: color ?? palette.wood, roughness: 0.85, flatShading: true },
-    hoop: { color: hoopColor ?? palette.metal, metalness: 0.5, roughness: 0.5 },
+    wood: { slot: 'wood', color: color ?? palette.wood, roughness: 0.85, flatShading: true },
+    hoop: {
+      slot: 'metal.painted',
+      color: hoopColor ?? palette.metal,
+      metalness: 0.5,
+      roughness: 0.5,
+    },
   })
   const r = radius * unit
   const h = height * unit

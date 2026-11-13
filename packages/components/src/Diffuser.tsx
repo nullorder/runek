@@ -39,8 +39,8 @@ export function Diffuser({
 }: DiffuserProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    back: { color: palette.woodDark, roughness: 0.9 },
-    block: { color: color ?? palette.wood, roughness: 0.75 },
+    back: { slot: 'wood', color: palette.woodDark, roughness: 0.9 },
+    block: { slot: 'wood', color: color ?? palette.wood, roughness: 0.75 },
   })
   const W = width * unit
   const cell = W / cells

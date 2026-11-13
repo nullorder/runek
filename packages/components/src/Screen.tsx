@@ -2,19 +2,24 @@ import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import {
   glowLook,
+  lazyModule,
   pick,
   range,
   rng,
   sub,
   useLuminance,
   useMaterials,
+  useNodeRenderer,
   useWorld,
   type Vec3,
   type WorldComponentProps,
 } from '@runek/core'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Color, ShaderMaterial, type Texture } from 'three'
 import { Sign } from './Sign'
+
+// The WebGPU (TSL) twin of the static shader, loaded only under a node renderer.
+const screenNodes = lazyModule(() => import('./nodes/screen'))
 
 /** Flat on a `wall`, on two floor `stand` posts, on a `desk` foot, or in a wooden picture `frame`
  *  (a digital picture frame, on a wall). */
@@ -190,24 +195,23 @@ export function Screen({
   })
   const shapeMaterials = useMaterials(look.shapes.map((s) => glowLook(s.color, level)))
 
-  const noise = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader: NOISE_VERTEX,
-        fragmentShader: NOISE_FRAGMENT,
-        uniforms: {
-          uTime: { value: 0 },
-          uCells: { value: [160, 160 * (H / W)] },
-          uLevel: { value: 1 },
-        },
-        toneMapped: false,
-      }),
-    [W, H],
-  )
+  const nodes = useNodeRenderer() ? screenNodes() : null
+  const noiseUniforms = useMemo(() => ({ uTime: { value: 0 }, uLevel: { value: 1 } }), [])
+  const noise = useMemo(() => {
+    const cells: [number, number] = [160, 160 * (H / W)]
+    if (nodes) return nodes.staticMaterial(noiseUniforms, cells)
+    return new ShaderMaterial({
+      vertexShader: NOISE_VERTEX,
+      fragmentShader: NOISE_FRAGMENT,
+      uniforms: { ...noiseUniforms, uCells: { value: cells } },
+      toneMapped: false,
+    })
+  }, [W, H, nodes, noiseUniforms])
+  useEffect(() => () => noise.dispose(), [noise])
   useFrame(({ clock }) => {
     if (look.kind !== 'static' || !on || texture) return
-    noise.uniforms.uTime.value = clock.elapsedTime
-    noise.uniforms.uLevel.value = level
+    noiseUniforms.uTime.value = clock.elapsedTime
+    noiseUniforms.uLevel.value = level
   })
 
   // the banner is one line, laid out at full height and then shrunk to fit the width

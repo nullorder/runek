@@ -30,7 +30,7 @@ export function Cave({
 }: CaveProps) {
   const { unit, palette } = useWorld()
   const m = useMaterials({
-    rock: { color: color ?? palette.stone, roughness: 1, flatShading: true },
+    rock: { slot: 'stone', color: color ?? palette.stone, roughness: 1, flatShading: true },
     inside: { color: '#14161a', roughness: 1, side: BackSide },
   })
   const R = radius * unit

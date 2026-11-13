@@ -28,7 +28,7 @@ export function AcousticPanel({
 }: AcousticPanelProps) {
   const { unit } = useWorld()
   const m = useMaterials({
-    fabric: { color: color ?? pick(rng(seed), FABRICS), roughness: 1 },
+    fabric: { slot: 'fabric', color: color ?? pick(rng(seed), FABRICS), roughness: 1 },
     frame: { color: '#1d1d1f', roughness: 0.5 },
   })
   const W = width * unit

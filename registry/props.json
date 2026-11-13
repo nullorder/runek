@@ -2542,6 +2542,12 @@
         "doc": "Defaults to the world palette's `floor` slot.",
         "optional": true,
         "palette": "floor"
+      },
+      "reflect": {
+        "type": "number",
+        "doc": "How much of the room the top reflects, 0 (matte, the default) to 1 (a mirror): a polished\nstone or lacquered floor. Every reflective surface at one height shares the world's mirror\nfor it.",
+        "optional": true,
+        "default": 0
       }
     },
     "defs": {
@@ -6026,6 +6032,12 @@
         "doc": "Kerb color; defaults to the palette's `woodDark`.",
         "optional": true
       },
+      "wet": {
+        "type": "number",
+        "doc": "How wet the deck is, 0 (dry, the default) to 1 (standing water): it darkens and reflects\nthe street, through the world's shared mirror for its height.",
+        "optional": true,
+        "default": 0
+      },
       "position": {
         "type": "vec3",
         "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
@@ -6830,13 +6842,13 @@
           "display",
           "body"
         ],
-        "doc": "Which world font role to render in (`display` for titles/signage, `body`\nfor labels). The world declares the actual face via `<World fonts>`; an\nundeclared role falls back to the font bundled in `@runek/core`. (Named\n`variant`, not `role`, so it doesn't trip JSX a11y linters.)",
+        "doc": "Which world font role to render in (`display` for titles/signage, `body`\nfor labels). The world declares the actual face via `<World fonts>`; an\nundeclared role falls back to the font bundled in `@runek/core`. Text the face\ncan't fully draw is drawn in the world's `fallback` font that covers more of it;\ncharacters no declared font has draw as boxes. (Named `variant`, not `role`, so it\ndoesn't trip JSX a11y linters.)",
         "optional": true,
         "default": "display"
       },
       "font": {
         "type": "string",
-        "doc": "Explicit font URL, overriding the world role.",
+        "doc": "Explicit font URL, overriding the world role. The world's `fallback` fonts still apply.",
         "optional": true
       },
       "size": {

@@ -206,7 +206,7 @@ export function Poster({
   const face = depth + 0.0005 * unit
   const artY = caption / 2
   const mats = useMaterials({
-    frame: { color: frameColor ?? palette.woodDark, roughness: 0.6 },
+    frame: { slot: 'wood', color: frameColor ?? palette.woodDark, roughness: 0.6 },
     paper: { color: paper, roughness: 0.9 },
   })
   const shapeMaterials = useMaterials(

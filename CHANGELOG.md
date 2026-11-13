@@ -9,6 +9,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Material slots: a look can name the surface it stands for (`slot:
+  'asphalt'`, `'glass'`, `'wood'`, …, listed in `MATERIAL_SLOTS`), and
+  `<World materials>` answers slots with an app's own materials, or a
+  function that makes one from the look. One entry changes every such
+  surface in the world with no component edits; slots it leaves out draw
+  as before. Registry components name their slots (`Road` deck `asphalt`,
+  `Wall` `plaster`, `Window` `glass`, furniture `wood`, …).
+  ([#62](https://github.com/nullorder/runek/issues/62))
+- `fonts.fallback`: a font URL, or a list in order of preference, for text
+  a role's font can't fully draw. A `Sign` is drawn in whichever declared
+  face covers most of its text. `runek validate` warns about a `Sign` whose
+  text the bundled font can't draw, and about unknown font roles.
+  ([#66](https://github.com/nullorder/runek/issues/66))
+- Shared reflections: `useMirrorMaterial(look, strength)` gives a flat
+  surface the world's reflection for its height, and `<World mirrors>`
+  caps how many heights reflect (default 2, at half the screen's size).
+  Every reflective surface at one height shares one extra scene render a
+  frame, drawn only while one of them is in view. `Floor` `reflect` and
+  `Road` `wet` use it. `scenePass()`/`inScenePass()` keep passes that draw
+  the scene (mirrors, `Rift`) from nesting.
+  ([#63](https://github.com/nullorder/runek/issues/63))
+- Tiled lighting under `WebGPURenderer`: every `useLight` point lamp gets
+  a light of its own (up to `lightBudget.point`, default 1024 there),
+  shaded by three's `TiledLighting`, so a street of 200 lamps is fully lit
+  with no hand-offs. Spotlights, and `WebGLRenderer`, keep the light pool.
+  ([#65](https://github.com/nullorder/runek/issues/65))
+- Every registry component renders under `WebGPURenderer`: `Lake`,
+  `Ocean`, `Grass`, `Screen`'s static, `Portal`, `Rift` (live far view
+  included), `Sky` and its stars, `Person` skin, `Sign` text, mirror
+  surfaces and the first-person lens each carry a node (TSL) twin of their
+  GLSL, loaded only when the renderer is WebGPU, so WebGL worlds never
+  download `three/webgpu`. `useNodeRenderer()` and `lazyModule()` in
+  `@runek/core` let any component do the same. Under WebGPU a `Rift` skips
+  its cut-away plane and a `Sign` draws no `glow` halo.
+  ([#67](https://github.com/nullorder/runek/issues/67))
+- Streaming for dense worlds: `"stream": true` (or `{ radius, cell }`) in a
+  world file mounts only the top-level nodes near the viewer, from a cell
+  index of their positions and footprints (composite `bounds`, or `size`),
+  with a margin so boundaries don't flicker. 2,000 crates go from 29k
+  meshes to about 300 near the viewer. `Player`, `Sky`, `Ocean`, `Clouds`
+  and `LightRig` stay mounted. `WorldRenderer` takes `stream` to override
+  the file.
+  ([#64](https://github.com/nullorder/runek/issues/64))
+- Component builds: a component can export its geometry as data,
+  `Component.build = (props, ctx) => Built` (parts, colliders, lights),
+  and render it with `<BuiltView>` / `useBuilt`. A streamed world mounts
+  such components straight into the scene and the physics world without a
+  React component per node (`BuiltNodes`), roughly halving the cost of
+  loading a neighbourhood; identical shapes share one geometry and
+  identical nodes build once. `Crate` and `Bench` have builds;
+  `stream.build: false` opts out.
+  ([#64](https://github.com/nullorder/runek/issues/64))
 - `<World now>`: the world's wall clock, in epoch milliseconds (default
   `Date.now`). Walking `Person`s, their `departAt` trips, live day/night
   and `Clock` all read it through `useWorld().now()`, so a multiplayer app
@@ -94,6 +146,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `serializeWorld` keeps a world's `luminance`, which saving from the editor
+  or the workshop used to drop.
+- Text never fetches a font from a CDN: a character no declared font has
+  (an arrow, a CJK character, an emoji) used to send troika-three-text to a
+  public font index. `Sign` now sets troika's default font to a face built
+  in code that draws a box for it, so `runek add sign` now also installs
+  `troika-three-text` (the same version drei already brings).
+  ([#66](https://github.com/nullorder/runek/issues/66))
 - A walking `Person` with its own body strides with the distance its
   drawn body has reached, a frame behind its route, so its feet no longer
   run a frame ahead of where the body is drawn.

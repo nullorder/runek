@@ -102,6 +102,9 @@ catalogs:
     three:
       specifier: ^0.184.0
       version: 0.184.0
+    troika-three-text:
+      specifier: ^0.52.4
+      version: 0.52.4
     tsup:
       specifier: ^8.0.0
       version: 8.5.1
@@ -277,6 +280,9 @@ importers:
       three:
         specifier: 'catalog:'
         version: 0.184.0
+      troika-three-text:
+        specifier: 'catalog:'
+        version: 0.52.4(three@0.184.0)
       vitest:
         specifier: 'catalog:'
         version: 4.1.12(@types/node@24.12.4)(vite@8.3.4(@types/node@24.12.4)(esbuild@0.27.7)(yaml@2.9.1))

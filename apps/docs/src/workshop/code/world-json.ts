@@ -25,7 +25,7 @@ const WORLD_KEYS: KeyInfo[] = [
   ['unit', '1', 'Meters per unit'],
   ['avatar', '"first"', 'Default camera: first, third, overhead'],
   ['controls', '{}', 'Key bindings: action → KeyboardEvent codes'],
-  ['fonts', '{}', 'Font URLs by role (display, body)'],
+  ['fonts', '{}', 'Font URLs by role (display, body) and a fallback'],
   ['luminance', '{}', 'Glow levels: screen, sign, tube, lamp, flame (1 = face value)'],
   ['nodes', '[]', 'The placed components'],
 ]

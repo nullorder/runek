@@ -10,6 +10,8 @@ import { controlsToMap, resolveControls, type WorldControls } from './keyboard'
 import { LightBudget } from './LightBudget'
 import type { Lens } from './lens'
 import { DEFAULT_LUMINANCE, type WorldLuminance } from './luminance'
+import type { MaterialSlots } from './material'
+import { MirrorPlanes } from './mirror'
 import { DEFAULT_PALETTE, type WorldPalette } from './palette'
 import { glProps } from './renderer'
 import { ShadowRate } from './ShadowRate'
@@ -56,6 +58,12 @@ export interface WorldProps {
   /** How bright glowing surfaces are, per kind (`screen`, `sign`, `tube`, `lamp`, `flame`), in
    *  scene-linear units relative to diffuse white. Unset levels stay at 1 (face value). */
   luminance?: Partial<WorldLuminance>
+  /** Materials of your own for named surfaces: wherever a component's look names a slot here
+   *  (`asphalt`, `glass`, `metal.painted`, see `MATERIAL_SLOTS`), it draws with your material, or
+   *  with what your function makes from the look. Slots you leave out draw as the component says.
+   *  Code only (not part of a world file); keep the object stable, since a new function makes new
+   *  materials. You own what you return, textures included. */
+  materials?: MaterialSlots
   /** Linear distance fog. Pair the color with your sky's horizon. */
   fog?: WorldFog
   /** Pin a fixed time-of-day ("HH:MM", 24h) so the world is reproducible. Drives
@@ -94,8 +102,16 @@ export interface WorldProps {
   /** Real lights the world lends to its lamps (`useLight` emitters): a number of point lights,
    *  or `{ point, spot }`. Each frame they go to the emitters that matter most to the view,
    *  fading as they hand off; the count never changes, so nothing recompiles. Default 6 point
-   *  lights and 2 spotlights. */
+   *  lights and 2 spotlights. Under `WebGPURenderer` point lights are shaded in screen tiles, so
+   *  every point emitter gets one of its own and `point` is the most there can be (default
+   *  1024). */
   lightBudget?: number | { point?: number; spot?: number }
+  /** Reflection planes for mirror surfaces (`useMirrorMaterial`: a polished `Floor`, a wet
+   *  `Road`): every reflective surface at one height shares one reflection, drawn once a frame
+   *  while one of them is in view. A number of planes (distinct heights), or `{ planes, scale }`
+   *  with `scale` the reflection's size against the screen's. Surfaces past the limit draw
+   *  without a reflection; `0` turns reflections off. Default 2 planes at half size. */
+  mirrors?: number | { planes?: number; scale?: number }
   /** How many times a second shadow maps are redrawn. Redrawing walks the whole scene for the
    *  light, so a big world saves a millisecond or two by not doing it every frame; moving
    *  shadows still read as smooth at the default 30. `Infinity` redraws every frame. */
@@ -116,6 +132,7 @@ export function World({
   palette,
   fonts,
   luminance,
+  materials,
   fog,
   time,
   timezone,
@@ -126,7 +143,8 @@ export function World({
   now,
   dpr = DEFAULT_DPR,
   batching = true,
-  lightBudget = DEFAULT_LIGHT_BUDGET,
+  lightBudget,
+  mirrors = 2,
   shadowRate = 30,
   debug = false,
   children,
@@ -169,6 +187,7 @@ export function World({
       palette: { ...DEFAULT_PALETTE, ...palette },
       fonts: { ...DEFAULT_FONTS, ...fonts },
       luminance: { ...DEFAULT_LUMINANCE, ...luminance },
+      materials,
       time: resolveWorldTime({ time, timezone }, worldNow()),
       avatar,
       controls: resolvedControls,
@@ -188,6 +207,7 @@ export function World({
       palette,
       fonts,
       luminance,
+      materials,
       time,
       timezone,
       avatar,
@@ -254,14 +274,19 @@ export function World({
             </>
           )}
           <LightBudget
-            point={typeof lightBudget === 'number' ? lightBudget : lightBudget.point}
-            spot={typeof lightBudget === 'number' ? undefined : lightBudget.spot}
+            point={typeof lightBudget === 'number' ? lightBudget : lightBudget?.point}
+            spot={typeof lightBudget === 'number' ? undefined : lightBudget?.spot}
           >
-            {/* Stepped by <FrameStep> below, never by rapier's own loop. */}
-            <Physics gravity={gravity} paused debug={debug} timeStep="vary">
-              <FrameStep />
-              {children}
-            </Physics>
+            <MirrorPlanes
+              planes={typeof mirrors === 'number' ? mirrors : mirrors.planes}
+              scale={typeof mirrors === 'number' ? undefined : mirrors.scale}
+            >
+              {/* Stepped by <FrameStep> below, never by rapier's own loop. */}
+              <Physics gravity={gravity} paused debug={debug} timeStep="vary">
+                <FrameStep />
+                {children}
+              </Physics>
+            </MirrorPlanes>
           </LightBudget>
         </WorldContext.Provider>
       </Canvas>
@@ -270,7 +295,6 @@ export function World({
 }
 
 const DEFAULT_DPR: [number, number] = [1, 1.5]
-const DEFAULT_LIGHT_BUDGET = { point: 6, spot: 2 }
 
 // The longest single physics step. A longer frame (a hitch, a tab coming back into view) is split
 // into sub-steps so nothing moves far enough in one step to pass through a thin collider.

@@ -1,7 +1,8 @@
 import { useFrame, useThree } from '@react-three/fiber'
-import { type Lens, useWorld } from '@runek/core'
+import { type Lens, lazyModule, useNodeRenderer, useWorld } from '@runek/core'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
 import {
+  HalfFloatType,
   LinearMipmapLinearFilter,
   Matrix4,
   Mesh,
@@ -98,19 +99,25 @@ interface View {
   used: boolean
 }
 
-function makeView(): View {
-  const target = new WebGLRenderTarget(1, 1)
-  // Marked as XR so three tone-maps and encodes each material into it exactly as it would onto
-  // the screen (respecting `toneMapped: false`), stored as plain 8-bit sRGB: the stitching pass
-  // then copies pixels rather than redoing the color pipeline.
-  target.texture.colorSpace = SRGBColorSpace
-  target.texture.internalFormat = 'RGBA8'
+// The WebGPU (TSL) twin of the stitching pass, loaded only under a node renderer.
+const lensNodes = lazyModule(() => import('../nodes/lens'))
+
+function makeView(node: boolean): View {
+  const target = new WebGLRenderTarget(1, 1, node ? { type: HalfFloatType } : undefined)
+  if (!node) {
+    // Marked as XR so three tone-maps and encodes each material into it exactly as it would onto
+    // the screen (respecting `toneMapped: false`), stored as plain 8-bit sRGB: the stitching pass
+    // then copies pixels rather than redoing the color pipeline. Under WebGPU the views hold
+    // linear light instead, and the frame's output pass tone-maps the stitched screen once.
+    target.texture.colorSpace = SRGBColorSpace
+    target.texture.internalFormat = 'RGBA8'
+    ;(target as { isXRRenderTarget?: boolean }).isXRRenderTarget = true
+  }
   // Mipmapped and anisotropically filtered, so the periphery blur reads a pre-shrunk footprint in
   // a few taps however stretched the view is there.
   target.texture.generateMipmaps = true
   target.texture.minFilter = LinearMipmapLinearFilter
   target.texture.anisotropy = 16
-  ;(target as { isXRRenderTarget?: boolean }).isXRRenderTarget = true
   const camera = new PerspectiveCamera()
   camera.matrixAutoUpdate = false
   camera.matrixWorldAutoUpdate = false
@@ -207,33 +214,40 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
   const extent = useMemo(() => bounds(fov, size.width / size.height), [fov, size])
   const optics = useMemo(() => panini(extent), [extent])
 
-  const views = useMemo(() => ({ ahead: makeView(), left: makeView(), right: makeView() }), [])
+  const nodes = useNodeRenderer() ? lensNodes() : null
+  const views = useMemo(() => {
+    const node = !!nodes
+    return { ahead: makeView(node), left: makeView(node), right: makeView(node) }
+  }, [nodes])
   const pass = useMemo(() => {
-    const material = new ShaderMaterial({
-      vertexShader: VERTEX,
-      fragmentShader: FRAGMENT,
-      uniforms: {
-        uAhead: { value: views.ahead.target.texture },
-        uLeft: { value: views.left.target.texture },
-        uRight: { value: views.right.target.texture },
-        uAheadM: { value: views.ahead.sample },
-        uLeftM: { value: views.left.sample },
-        uRightM: { value: views.right.sample },
-        uExtent: { value: new Vector2() },
-        uResolution: { value: new Vector2() },
-        uBlur: { value: 0 },
-        uSeam: { value: SEAM },
-      },
-      depthTest: false,
-      depthWrite: false,
-      toneMapped: false,
-    })
+    const uniforms = {
+      uAhead: { value: views.ahead.target.texture },
+      uLeft: { value: views.left.target.texture },
+      uRight: { value: views.right.target.texture },
+      uAheadM: { value: views.ahead.sample },
+      uLeftM: { value: views.left.sample },
+      uRightM: { value: views.right.sample },
+      uExtent: { value: new Vector2() },
+      uResolution: { value: new Vector2() },
+      uBlur: { value: 0 },
+      uSeam: { value: SEAM },
+    }
+    const material = nodes
+      ? nodes.lensPassMaterial(uniforms, CURVE, FOCUS)
+      : new ShaderMaterial({
+          vertexShader: VERTEX,
+          fragmentShader: FRAGMENT,
+          uniforms,
+          depthTest: false,
+          depthWrite: false,
+          toneMapped: false,
+        })
     const quad = new Mesh(new PlaneGeometry(2, 2), material)
     quad.frustumCulled = false
     const scene = new Scene()
     scene.add(quad)
-    return { scene, camera: new OrthographicCamera(), material, quad }
-  }, [views])
+    return { scene, camera: new OrthographicCamera(), material, quad, uniforms }
+  }, [views, nodes])
 
   useEffect(
     () => () => {
@@ -282,7 +296,12 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
     ]
 
     const density = (size.width * dpr) / (2 * extent.x)
-    const limit = gl.capabilities.maxTextureSize
+    // WebGPURenderer keeps no WebGL `capabilities`; 8192 is WebGPU's guaranteed minimum.
+    const limit =
+      (gl as { capabilities?: { maxTextureSize: number } }).capabilities?.maxTextureSize ?? 8192
+    // The views build their own projections: in the renderer's clip space (WebGPU's depth runs
+    // 0..1), and marked so, or the renderer would rebuild them from the camera's `fov`.
+    const system = gl.coordinateSystem
     const turned = new Matrix4()
     for (const span of spans) {
       const { view } = span
@@ -298,6 +317,7 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
       )
       view.camera.near = near
       view.camera.far = far
+      view.camera.coordinateSystem = system
       view.camera.projectionMatrix.makePerspective(
         left * near,
         right * near,
@@ -305,11 +325,12 @@ export function PaniniLens({ fov, blur }: { fov: number; blur: number }) {
         -up * near,
         near,
         far,
+        system,
       )
       view.camera.projectionMatrixInverse.copy(view.camera.projectionMatrix).invert()
       view.sample.copy(view.camera.projectionMatrix).multiply(turned.copy(view.turn).invert())
     }
-    const { uniforms } = pass.material
+    const { uniforms } = pass
     uniforms.uExtent.value.copy(extent)
     uniforms.uResolution.value.set(size.width * dpr, size.height * dpr)
     uniforms.uBlur.value = blur * dpr

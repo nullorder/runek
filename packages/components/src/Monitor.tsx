@@ -110,8 +110,8 @@ export function Monitor({
   const total = cy + Hs / 2 + bezel
 
   const m = useMaterials({
-    bezel: { color: frame, roughness: 0.45, metalness: 0.3 },
-    stand: { color: frame, roughness: 0.5, metalness: 0.3 },
+    bezel: { slot: 'plastic', color: frame, roughness: 0.45, metalness: 0.3 },
+    stand: { slot: 'plastic', color: frame, roughness: 0.5, metalness: 0.3 },
     glow: glowLook(look.glow, level),
     off: { color: OFF, roughness: 0.15, metalness: 0.4 },
   })

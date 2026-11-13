@@ -3,11 +3,13 @@ import { CapsuleCollider, type RapierRigidBody, RigidBody } from '@react-three/r
 import {
   Dynamic,
   type InteractionAction,
+  lazyModule,
   PlayerMotionContext,
   rng,
   sub,
   useInteraction,
   useMaterial,
+  useNodeRenderer,
   useWorld,
   type Vec3,
   type WorldComponentProps,
@@ -61,6 +63,9 @@ import type {
   PersonStyle,
 } from './person/types'
 import { Sign } from './Sign'
+
+// The WebGPU (TSL) twin of the skin's GLSL patch, loaded only under a node renderer.
+const skinNodes = lazyModule(() => import('./nodes/skin'))
 
 export {
   applyPose,
@@ -572,7 +577,13 @@ export function Person({
   const near = useBuild(spec, key, 'near', wantNear, distance)
   const active = near ?? far
 
-  const meshes = useMemo(() => (active ? skinnedMeshes(active, rig) : null), [active, rig])
+  // Under WebGPU the skin's GLSL patch doesn't compile: its node twin stands in.
+  const nodes = useNodeRenderer() ? skinNodes() : null
+  const skinMaterial = nodes?.skinMaterial()
+  const meshes = useMemo(
+    () => (active ? skinnedMeshes(active, rig, skinMaterial) : null),
+    [active, rig, skinMaterial],
+  )
   useEffect(() => {
     if (!meshes) return
     for (const m of meshes.meshes) rig.group.add(m)
@@ -583,8 +594,8 @@ export function Person({
   const { eye, skin: skinColor, metal, wood } = spec.colors
   const attachKey = JSON.stringify([shape.eyes, shape.lidRadius, shape.props])
   const parts = useMemo(
-    () => attach(rig, shape, shape.joints, eye, skinColor, metal, wood),
-    [rig, attachKey, eye, skinColor, metal, wood],
+    () => attach(rig, shape, shape.joints, eye, skinColor, metal, wood, skinMaterial),
+    [rig, attachKey, eye, skinColor, metal, wood, skinMaterial],
   )
   useEffect(() => parts.dispose, [parts])
   const detailed = active?.lod === 'near'
