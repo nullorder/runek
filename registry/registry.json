@@ -1980,6 +1980,73 @@
         "color": "#40332a",
         "lamp": "#b8e8c8"
       }
+    },
+    {
+      "name": "tower",
+      "title": "Tower",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A procedural city tower from a seeded shape grammar: podium, setback, shaft and crown, with street, service, podium, tower and crown bands drawn by one shared facade shader (shop bays, lit windows with rooms behind them, trims, posters and leaks), so towers batch. Four eras (concrete, tenement, glass, makeshift) set the massing and dressing. Faces listed in `frontage` get relief and the facade kit: shop names, blade and roof signs, awnings, shutters, AC units, pipes, vending machines, cables across the street and light pooled on the pavement. Lit after dusk at the world's luminance levels. Colliders over the footprint and along each street face.",
+      "files": [
+        {
+          "path": "packages/components/src/Tower.tsx",
+          "target": "Tower.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerFacade.ts",
+          "target": "city/towerFacade.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerGrammar.ts",
+          "target": "city/towerGrammar.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerKit.ts",
+          "target": "city/towerKit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/tower.ts",
+          "target": "nodes/tower.ts"
+        }
+      ],
+      "example": {
+        "height": 48,
+        "era": "tenement",
+        "frontage": ["+z"],
+        "cableSpan": 12
+      }
     }
   ]
 }

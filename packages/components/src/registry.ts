@@ -103,6 +103,7 @@ import { Tableware } from './Tableware'
 import { Tent } from './Tent'
 import { Terrain } from './Terrain'
 import { TikiTorch } from './TikiTorch'
+import { Tower } from './Tower'
 import { Trees } from './Trees'
 import { Tv } from './Tv'
 import { Umbrella } from './Umbrella'
@@ -222,6 +223,7 @@ export const registry: ComponentRegistry = {
   Tent,
   Terrain,
   TikiTorch,
+  Tower,
   Trees,
   Tv,
   Umbrella,

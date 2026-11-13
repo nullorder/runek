@@ -209,4 +209,9 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   },
   Vent: { camera: [0.9, 1.2, 1.2], target: [0, 1.1, 0], props: { position: [0, 0.9, 0] } },
   VendingMachine: { camera: [1.8, 1.6, 2.6], target: [0, 1, 0.3] },
+  Tower: {
+    camera: [22, 14, 26],
+    target: [0, 8, 0],
+    props: { width: 12, depth: 12, height: 24, frontage: ['+z'] },
+  },
 }
