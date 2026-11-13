@@ -134,6 +134,7 @@ export type {
   Interactor,
   PlayerControl,
   PlayerMotion,
+  PlayerPin,
   TeleportOptions,
   Vec3,
   Walker,

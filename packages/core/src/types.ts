@@ -113,6 +113,14 @@ export interface PlayerControl {
   /** Move the avatar's body to `position`, in world coordinates (where `Player`'s `position` puts
    *  it). The camera moves with it, so the view doesn't sweep across the world. */
   teleport(position: Vec3, options?: TeleportOptions): void
+  /** Hold the avatar at a spot (a seat, a rung of a ladder) with its own movement switched off:
+   *  the body turns kinematic, is carried to `pin.feet` and faces `pin.yaw`, and its motion reads
+   *  as standing still (or sitting, or climbing). Call it again to move the spot. Pass null to
+   *  let go: where it is, or at `to` (as `teleport` takes it). */
+  pin(pin: PlayerPin | null, to?: Vec3): void
+  /** Cap the avatar's speed over the ground while something slows it (deep water, mud, snow), in
+   *  world units per second. Null lifts the cap. Falling is left alone. */
+  limitSpeed(speed: number | null): void
 }
 
 export interface WorldContextValue {
