@@ -10,6 +10,7 @@ import {
   retainMaterial,
   sharedMaterial,
   sharedMaterialCount,
+  shareMaterial,
 } from './material'
 
 describe('materialKey', () => {
@@ -140,3 +141,12 @@ describe('material slots (#62)', () => {
 function wet() {
   return new MeshStandardMaterial({ roughness: 0.1 })
 }
+
+describe('shareMaterial', () => {
+  it('lets the batcher take a material a component made itself', () => {
+    const facade = new MeshBasicMaterial({ name: 'facade' })
+    expect(isSharedMaterial(facade)).toBe(false)
+    expect(shareMaterial(facade)).toBe(facade)
+    expect(isSharedMaterial(facade)).toBe(true)
+  })
+})

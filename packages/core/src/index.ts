@@ -78,17 +78,21 @@ export {
   retainMaterial,
   sharedMaterial,
   sharedMaterialCount,
+  shareMaterial,
   useMaterial,
   useMaterials,
 } from './material'
+export type { MirrorSurface } from './mirror'
 export {
   inScenePass,
+  isMirrorSkipped,
   MIRROR_TOLERANCE,
   MirrorPlane,
   MirrorPlanes,
   MirrorPool,
   MirrorPoolContext,
   scenePass,
+  skipMirrors,
   useMirrorMaterial,
 } from './mirror'
 export { lazyModule, useNodeRenderer } from './node'

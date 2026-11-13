@@ -61,6 +61,7 @@ export function mirrorNodeMaterial(
   params: Record<string, unknown>,
   strength: number,
   borrow: Borrow,
+  surface?: (material: unknown) => unknown,
 ) {
   const material =
     kind === 'physical'
@@ -85,8 +86,10 @@ export function mirrorNodeMaterial(
   const reflection = texture(new Texture(), vec2(uv.x, uv.y.oneMinus()))
   const fadeIn = (x: F) => smoothstep(0, 0.06, x).mul(smoothstep(1, 0.94, x))
   const facing = float(1).sub(clamp(dot(normalView, positionViewDirection), 0, 1))
-  const k = amount
-    .add(pass as unknown as F)
+  // The surface's own per-pixel strength, after its own node edits.
+  const own = surface?.(material) as F | undefined
+  const base = amount.add(pass as unknown as F) as F
+  const k = (own ? base.mul(clamp(own, 0, 1)) : base)
     .mul(mix(0.35, 1, pow(facing, 3)))
     .mul(fadeIn(uv.x))
     .mul(fadeIn(uv.y)) as F

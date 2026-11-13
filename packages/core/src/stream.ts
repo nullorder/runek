@@ -52,7 +52,8 @@ const asVec3 = (value: unknown): Vec3 | undefined =>
     : undefined
 
 /** Half the footprint's side, in world units: a composite's `bounds`, else a `size` prop
- *  (`[w, d]` or `[w, h, d]`), else a point. Square and rotation-proof. */
+ *  (`[w, d]` or `[w, h, d]`), else `width` and `depth` props (a tower, a slab), else a point.
+ *  Square and rotation-proof. */
 function halfExtent(node: WorldNode, registry: ComponentRegistry, unit: number): number {
   const entry = registry[node.type]
   if (isCompositeDef(entry) && entry.bounds) {
@@ -64,6 +65,12 @@ function halfExtent(node: WorldNode, registry: ComponentRegistry, unit: number):
     const [w, a, b] = size as number[]
     const d = size.length === 3 ? b : a
     return (Math.hypot(w, d ?? w) / 2) * unit
+  }
+  const { width, depth } = node.props ?? {}
+  if (typeof width === 'number' || typeof depth === 'number') {
+    const w = typeof width === 'number' ? width : (depth as number)
+    const d = typeof depth === 'number' ? depth : w
+    return (Math.hypot(w, d) / 2) * unit
   }
   return 0
 }
