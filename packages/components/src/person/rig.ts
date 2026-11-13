@@ -18,7 +18,7 @@ import {
   TorusGeometry,
   Vector3,
 } from 'three'
-import type { BuiltFigure } from './build'
+import type { BuiltFigure, BuiltPart } from './build'
 import type { Humanoid, HumanoidBoneName } from './humanoid'
 import {
   drawnEyeGeometry,
@@ -122,6 +122,49 @@ export function createRig(joints: V3[]): Rig {
   return { group, bones, skeleton, humanoid }
 }
 
+/**
+ * The parts of a far figure joined into as few meshes as there are materials among them. Every
+ * part carries its color in its vertices and is skinned to the same skeleton, so parts that share
+ * a material draw as one. A drawn figure's materials differ only in the strength of their rim
+ * light, which is lost at that distance, so all of it goes into one mesh.
+ */
+function mergeParts(parts: BuiltPart[], drawn: boolean): BuiltPart[] {
+  const groups = new Map<BuiltPart['material'], BuiltPart[]>()
+  for (const part of parts) {
+    const key = drawn ? 'cloth' : part.material
+    const list = groups.get(key)
+    if (list) list.push(part)
+    else groups.set(key, [part])
+  }
+  return [...groups.entries()].map(([material, list]) => {
+    if (list.length === 1) return { ...list[0], material }
+    const verts = list.reduce((n, p) => n + p.positions.length / 3, 0)
+    const merged: BuiltPart = {
+      name: 'far',
+      material,
+      positions: new Float32Array(verts * 3),
+      normals: new Float32Array(verts * 3),
+      colors: new Float32Array(verts * 3),
+      skinIndex: new Uint16Array(verts * 4),
+      skinWeight: new Float32Array(verts * 4),
+      indices: new Uint32Array(list.reduce((n, p) => n + p.indices.length, 0)),
+    }
+    let v = 0
+    let i = 0
+    for (const p of list) {
+      merged.positions.set(p.positions, v * 3)
+      merged.normals.set(p.normals, v * 3)
+      merged.colors.set(p.colors, v * 3)
+      merged.skinIndex.set(p.skinIndex, v * 4)
+      merged.skinWeight.set(p.skinWeight, v * 4)
+      for (let k = 0; k < p.indices.length; k++) merged.indices[i + k] = p.indices[k] + v
+      v += p.positions.length / 3
+      i += p.indices.length
+    }
+    return merged
+  })
+}
+
 /** Skinned meshes for one build, bound to the rig's skeleton (the caller adds them to `rig.group`).
  *  Under `WebGPURenderer`, `skin` is the skin's node twin and `toon` makes a drawn figure's. */
 export function skinnedMeshes(built: BuiltFigure, rig: Rig, skin?: Material, toon?: ToonMaker) {
@@ -129,7 +172,9 @@ export function skinnedMeshes(built: BuiltFigure, rig: Rig, skin?: Material, too
   /** The ink lines of a drawn figure, one per mesh: shown and hidden together (see `Person`). */
   const lines: SkinnedMesh[] = []
   const bounds = new Sphere(new Vector3(0, built.height * 0.5, 0), built.height * 0.85)
-  const meshes = built.parts.map((part) => {
+  // A far figure is one mesh for each material, not one for each garment.
+  const parts = built.lod === 'far' ? mergeParts(built.parts, built.drawn) : built.parts
+  const meshes = parts.map((part) => {
     const g = new BufferGeometry()
     g.setAttribute('position', new BufferAttribute(part.positions, 3))
     g.setAttribute('normal', new BufferAttribute(part.normals, 3))

@@ -255,6 +255,9 @@ const CRUISE = 1.3
 /** Full detail builds inside LOD_IN units of the camera and drops past LOD_OUT. */
 const LOD_IN = 10
 const LOD_OUT = 13
+/** Past these distances a figure is posed every third frame, then every sixth. */
+const POSE_THIRD = 22
+const POSE_SIXTH = 45
 /** How far away a drawn figure's ink line is still drawn: past it the line is under a pixel. */
 const INK_RANGE = 32
 /** Seconds between sips for `drink`, and how long a sip takes. */
@@ -750,10 +753,24 @@ export function Person({
     [],
   )
 
-  useFrame((state, dt) => {
+  // Bones don't compose their matrices on every render of their own accord (a street of standing
+  // figures is thousands of bones, recomposed in every pass, moved or not): the frame below
+  // rebuilds them on the frames it poses them.
+  useEffect(() => {
+    for (const bone of rig.skeleton.bones) {
+      bone.matrixAutoUpdate = false
+      bone.updateMatrix()
+    }
+  }, [rig])
+  // Frames a far figure has gone unposed and the time they covered, and which frame of every six
+  // is this figure's, so a crowd doesn't all pose on the same frame.
+  const unposed = useRef({ frame: Math.floor(rng(sub(seed, 3))() * 6), owed: 0 })
+
+  useFrame((state, frameDt) => {
     const t = state.clock.elapsedTime
-    const k = 1 - Math.exp(-7 * dt)
     const b = rig.bones
+    const rest = unposed.current
+    rest.owed += frameDt
 
     if (root.current) {
       distance.current =
@@ -768,6 +785,14 @@ export function Person({
         for (const line of meshes.lines) line.visible = ink
       }
     }
+    // A figure is posed every frame where a face can be read, every third frame further off and
+    // every sixth beyond that, with the time it skipped made up on the frame it is posed.
+    const every = distance.current > POSE_SIXTH ? 6 : distance.current > POSE_THIRD ? 3 : 1
+    rest.frame = (rest.frame + 1) % 6
+    if (rest.frame % every !== 0) return
+    const dt = Math.min(rest.owed, 0.25)
+    rest.owed = 0
+    const k = 1 - Math.exp(-7 * dt)
 
     // Walking speed comes from the route, else an explicit `gait`, else the carrying `Player`
     // (which also says how far it has gone). Otherwise distance is integrated so the stride phase
@@ -892,6 +917,7 @@ export function Person({
         b.root.position.y = layer.has(b.pelvis) ? (p.drop + fm.breath * 0.003 * H) * q : 0
       }
     }
+    for (const bone of rig.skeleton.bones) bone.updateMatrix()
 
     if (p.drink) {
       // Undo the wrist's turn so the mug stays upright, tipping only as it reaches the lips.
@@ -916,6 +942,7 @@ export function Person({
     if (h.rotation.order !== 'YXZ') h.rotation.order = 'YXZ'
     if (sourced) h.quaternion.multiply(tmp.q.setFromEuler(tmp.euler.set(lk.pitch, lk.yaw, 0)))
     else h.rotation.set(lk.pitch, lk.yaw, 0)
+    h.updateMatrix()
     const eyeYaw = tracking ? clamp(wanted - lk.yaw, -EYE_REACH, EYE_REACH) : 0
     for (const e of parts.eyes) {
       // A drawn eye rests turned along the face (`userData.yaw`) and looks about from there.
