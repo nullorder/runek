@@ -3,7 +3,7 @@
 // plain typed arrays, shareable between every figure with the same spec.
 import { clamp01, type Field, lattice, len, noise3, type Prim, surfaceNets, type V3 } from './sdf'
 import { BONES, type PartDef, type Shape, shapeFigure } from './shape'
-import type { FigureSpec, MaterialKind } from './spec'
+import { type FigureSpec, LIT, LIT_GAIN, type MaterialKind } from './spec'
 
 export type Lod = 'near' | 'far'
 
@@ -29,6 +29,8 @@ export interface BuiltFigure {
   props: Shape['props']
   parts: BuiltPart[]
   triangles: number
+  /** Drawn in flat colour with an ink line (see `StyleSpec.drawn`). */
+  drawn: boolean
 }
 
 /** Reference height the part cell sizes are tuned for. */
@@ -54,6 +56,7 @@ export function* buildFigure(spec: FigureSpec, lod: Lod): Generator<void, BuiltF
       def.below,
     )
     const colors = yield* paint(raw.positions, raw.normals, def, shape, spec, scale, occluder)
+    if (spec.st.drawn && def.name === 'head') roundNormals(raw.positions, raw.normals, shape)
     parts.push({ name: def.name, material: def.material, ...raw, colors, skinIndex, skinWeight })
     triangles += raw.indices.length / 3
   }
@@ -67,6 +70,37 @@ export function* buildFigure(spec: FigureSpec, lod: Lod): Generator<void, BuiltF
     props: shape.props,
     parts,
     triangles,
+    drawn: spec.st.drawn,
+  }
+}
+
+/**
+ * A drawn face is lit as one simple form: its normals are turned most of the way toward those
+ * of an egg round the head, so the edge of the shadow crosses the face as one clean curve
+ * instead of catching on the nose, the lips and the rims of the eyes.
+ */
+function roundNormals(positions: Float32Array, normals: Float32Array, shape: Shape) {
+  const hu = shape.marks.headH / 0.265
+  const cy = shape.marks.eyeY + 0.02 * hu
+  const cz = -0.012 * hu
+  for (let i = 0; i < positions.length; i += 3) {
+    // Below the jaw the neck keeps its own.
+    const keep = clamp01((shape.marks.eyeY - 0.1 * hu - positions[i + 1]) / (0.03 * hu))
+    // Across the front the egg is flattened further, so the whole face takes the light as one
+    // plane and the shadow's edge stays off it until the light is well round to the side.
+    const front = clamp01((positions[i + 2] - cz) / (0.06 * hu))
+    const ex = (positions[i] / 0.093 ** 2) * (1 - 0.35 * front)
+    const ey = ((positions[i + 1] - cy) / 0.125 ** 2) * (1 - 0.75 * front)
+    const ez = (positions[i + 2] - cz) / 0.107 ** 2
+    const el = len(ex, ey, ez) || 1
+    const t = 0.88 * (1 - keep)
+    const nx = normals[i] + (ex / el - normals[i]) * t
+    const ny = normals[i + 1] + (ey / el - normals[i + 1]) * t
+    const nz = normals[i + 2] + (ez / el - normals[i + 2]) * t
+    const nl = len(nx, ny, nz) || 1
+    normals[i] = nx / nl
+    normals[i + 1] = ny / nl
+    normals[i + 2] = nz / nl
   }
 }
 
@@ -170,7 +204,11 @@ function* paint(
   const out = new Float32Array(positions.length)
   const n = noise3(spec.seed + 7)
   const isSkin = def.material === 'skin'
+  // A drawn figure is flat colour: no grain, and only the deep creases keep their shade.
+  const flatness = spec.st.drawn ? 0.12 : 1
+  const shadeDepth = spec.st.drawn ? 0.55 : 1
   const lip = linear(spec.colors.lip)
+  const ink = linear(spec.colors.ink)
   const hair = linear(spec.colors.hair)
   const flat = typeof def.paint === 'string' ? linear(def.paint) : null
   for (let i = 0; i < positions.length; i += 3) {
@@ -178,11 +216,23 @@ function* paint(
     const x = positions[i]
     const y = positions[i + 1]
     const z = positions[i + 2]
-    const ao = occlusion(occluder, x, y, z, normals[i], normals[i + 1], normals[i + 2], s)
+    const ao =
+      1 -
+      (1 - occlusion(occluder, x, y, z, normals[i], normals[i + 1], normals[i + 2], s)) * shadeDepth
     let base = flat
     if (!base) {
-      const hex = (def.paint as (x: number, y: number, z: number) => string | null)(x, y, z)
-      base = linear(hex ?? '#808080')
+      const hex =
+        (def.paint as (x: number, y: number, z: number) => string | null)(x, y, z) ?? '#808080'
+      if (hex[0] === LIT) {
+        // A lit seam: its own color, unshaded, written bright enough for the material to know it.
+        const glow = linear(hex.slice(1))
+        const gain = spec.st.drawn ? LIT_GAIN : 1
+        out[i] = glow[0] * gain
+        out[i + 1] = glow[1] * gain
+        out[i + 2] = glow[2] * gain
+        continue
+      }
+      base = linear(hex)
     }
     let r = base[0]
     let g = base[1]
@@ -190,16 +240,23 @@ function* paint(
     const grain =
       1 +
       (n((x * 40) / s, (y * 40) / s, (z * 40) / s) - 0.5) *
-        (isSkin ? 0.05 : def.material === 'hair' ? 0.22 : 0.08)
+        (isSkin ? 0.05 : def.material === 'hair' ? 0.22 : 0.08) *
+        flatness
     if (isSkin) {
       const t = shape.skinPaint(x, y, z)
       r = r * (1 + t.flush * 0.06)
       g = g * (1 - t.flush * 0.14)
       b = b * (1 - t.flush * 0.12)
-      const lw = clamp01(t.lip * 0.85)
+      // A drawn mouth is its inked stroke: the lips keep only a trace of their colour.
+      const lw = clamp01(t.lip * 0.85) * (spec.st.drawn ? 0.3 : 1)
       r += (lip[0] - r) * lw
       g += (lip[1] - g) * lw
       b += (lip[2] - b) * lw
+      if (t.ink) {
+        r += (ink[0] - r) * t.ink
+        g += (ink[1] - g) * t.ink
+        b += (ink[2] - b) * t.ink
+      }
       const sw = t.stubble * 0.35
       r += (hair[0] - r) * sw
       g += (hair[1] - g) * sw

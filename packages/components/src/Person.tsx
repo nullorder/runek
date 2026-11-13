@@ -45,6 +45,7 @@ import { type PersonSkinName, resolveFigure } from './person/spec'
 import type {
   PersonAccessory,
   PersonAge,
+  PersonAnatomy,
   PersonBodySpec,
   PersonBuild,
   PersonDetail,
@@ -64,8 +65,10 @@ import type {
 } from './person/types'
 import { Sign } from './Sign'
 
-// The WebGPU (TSL) twin of the skin's GLSL patch, loaded only under a node renderer.
+// The WebGPU (TSL) twins of the skin's GLSL patch and of a drawn figure's two-tone material,
+// loaded only under a node renderer.
 const skinNodes = lazyModule(() => import('./nodes/skin'))
+const toonNodes = lazyModule(() => import('./nodes/toon'))
 
 export {
   applyPose,
@@ -97,6 +100,7 @@ export { PERSON_COLORS, PERSON_SKINS, type PersonSkinName } from './person/spec'
 export type {
   PersonAccessory,
   PersonAge,
+  PersonAnatomy,
   PersonBodySpec,
   PersonBuild,
   PersonDetail,
@@ -120,8 +124,14 @@ export type {
 export interface PersonProps extends WorldComponentProps {
   /** Proportion and face template: `stylized` (default) is an animated-film look with a big
    *  head and eyes, small features, and slender limbs; `realistic` keeps canonical human
-   *  proportions; `anime` pushes the eyes and legs further. */
+   *  proportions; `anime` pushes the eyes and legs further; `punk` is drawn the way an animator
+   *  would, with long legs, tall flat eyes under a lash line, hair in chunky locks, and flat
+   *  two-tone color inside an ink line (no ink line under `WebGPURenderer`). */
   style?: PersonStyle
+  /** How much of the body is built: `bones` is the bare frame, `muscle` the frame with its
+   *  muscles on, `surface` (default) the finished body. For looking at how a build is put
+   *  together, with `clothes={[]}`. */
+  anatomy?: PersonAnatomy
   /** Role preset: fills `outfit`, `hat`, and `accessories` unless you set them. */
   kind?: PersonKind
   /** Silhouette cues only; every trait it influences stays overridable. Seeded when unset. */
@@ -161,6 +171,10 @@ export interface PersonProps extends WorldComponentProps {
   bottomColor?: string
   /** Footwear color; defaults to the palette's `metal`. */
   shoeColor?: string
+  /** The lit seams and stripes of street clothes (`runner`, `shell`, `rig`, `street`, a hoodie's
+   *  cords) and a visor's slit. Defaults to a lamp color picked by the seed. They shine on a
+   *  `punk` figure and are plain color on the others. */
+  trimColor?: string
   hat?: PersonHat
   accessories?: PersonAccessory[]
   /** What the figure is doing when it isn't walking. `sit` and `type` need a seat under them
@@ -241,6 +255,8 @@ const CRUISE = 1.3
 /** Full detail builds inside LOD_IN units of the camera and drops past LOD_OUT. */
 const LOD_IN = 10
 const LOD_OUT = 13
+/** How far away a drawn figure's ink line is still drawn: past it the line is under a pixel. */
+const INK_RANGE = 32
 /** Seconds between sips for `drink`, and how long a sip takes. */
 const SIP_EVERY = 7
 const SIP = 1.8
@@ -436,6 +452,7 @@ export function Person({
   rotation = [0, 0, 0],
   seed = 1,
   style = 'stylized',
+  anatomy,
   kind = 'villager',
   gender,
   age = 'adult',
@@ -453,6 +470,7 @@ export function Person({
   topColor,
   bottomColor,
   shoeColor,
+  trimColor,
   hat,
   accessories,
   pose = 'stand',
@@ -488,6 +506,7 @@ export function Person({
   const traits = JSON.stringify([
     seed,
     style,
+    anatomy,
     kind,
     gender,
     age,
@@ -505,6 +524,7 @@ export function Person({
     topColor,
     bottomColor,
     shoeColor,
+    trimColor,
     hat,
     accessories,
   ])
@@ -514,6 +534,7 @@ export function Person({
         {
           seed,
           style,
+          anatomy,
           kind,
           gender,
           age,
@@ -531,6 +552,7 @@ export function Person({
           topColor,
           bottomColor,
           shoeColor,
+          trimColor,
           hat,
           accessories,
         },
@@ -577,12 +599,15 @@ export function Person({
   const near = useBuild(spec, key, 'near', wantNear, distance)
   const active = near ?? far
 
-  // Under WebGPU the skin's GLSL patch doesn't compile: its node twin stands in.
-  const nodes = useNodeRenderer() ? skinNodes() : null
+  // Under WebGPU the skin's GLSL patch doesn't compile: its node twin stands in, and a drawn
+  // figure takes three's toon node material.
+  const nodeRenderer = useNodeRenderer()
+  const nodes = nodeRenderer ? skinNodes() : null
   const skinMaterial = nodes?.skinMaterial()
+  const toon = nodeRenderer && spec.st.drawn ? toonNodes()?.toonMaterial : undefined
   const meshes = useMemo(
-    () => (active ? skinnedMeshes(active, rig, skinMaterial) : null),
-    [active, rig, skinMaterial],
+    () => (active ? skinnedMeshes(active, rig, skinMaterial, toon) : null),
+    [active, rig, skinMaterial, toon],
   )
   useEffect(() => {
     if (!meshes) return
@@ -594,8 +619,8 @@ export function Person({
   const { eye, skin: skinColor, metal, wood } = spec.colors
   const attachKey = JSON.stringify([shape.eyes, shape.lidRadius, shape.props])
   const parts = useMemo(
-    () => attach(rig, shape, shape.joints, eye, skinColor, metal, wood, skinMaterial),
-    [rig, attachKey, eye, skinColor, metal, wood, skinMaterial],
+    () => attach(rig, shape, shape.joints, eye, skinColor, metal, wood, skinMaterial, toon),
+    [rig, attachKey, eye, skinColor, metal, wood, skinMaterial, toon],
   )
   useEffect(() => parts.dispose, [parts])
   const detailed = active?.lod === 'near'
@@ -605,6 +630,7 @@ export function Person({
     for (const e of parts.eyes) e.visible = shown
     for (const o of parts.props) o.visible = shown
   }, [parts, detailed, shown])
+  const inked = useRef(true)
 
   const root = useRef<Group>(null)
   const focused = useInteraction(root, {
@@ -735,6 +761,11 @@ export function Person({
       if (detail === 'auto') {
         if (!close && distance.current < LOD_IN) setClose(true)
         else if (close && distance.current > LOD_OUT) setClose(false)
+      }
+      const ink = distance.current < INK_RANGE
+      if (meshes && (ink !== inked.current || meshes.lines[0]?.visible !== ink)) {
+        inked.current = ink
+        for (const line of meshes.lines) line.visible = ink
       }
     }
 
@@ -886,7 +917,11 @@ export function Person({
     if (sourced) h.quaternion.multiply(tmp.q.setFromEuler(tmp.euler.set(lk.pitch, lk.yaw, 0)))
     else h.rotation.set(lk.pitch, lk.yaw, 0)
     const eyeYaw = tracking ? clamp(wanted - lk.yaw, -EYE_REACH, EYE_REACH) : 0
-    for (const e of parts.eyes) e.rotation.y += (eyeYaw - e.rotation.y) * Math.min(1, k * 3)
+    for (const e of parts.eyes) {
+      // A drawn eye rests turned along the face (`userData.yaw`) and looks about from there.
+      const rest = (e.userData.yaw as number | undefined) ?? 0
+      e.rotation.y += (rest + eyeYaw - e.rotation.y) * Math.min(1, k * 3)
+    }
 
     // Keep the name legible from wherever it's read.
     if (nameTag.current?.parent) {

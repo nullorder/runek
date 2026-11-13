@@ -5,6 +5,7 @@ import { Color } from 'three'
 import type {
   PersonAccessory,
   PersonAge,
+  PersonAnatomy,
   PersonBodySpec,
   PersonBuild,
   PersonFaceSpec,
@@ -186,6 +187,13 @@ export interface StyleSpec {
   cheek: number
   brow: number
   nose0: PersonNose
+  /** Neck girth, waist width, and hand and foot size, as multipliers. */
+  neck: number
+  waist: number
+  extremity: number
+  /** Drawn the way an animator would: tall flat eyes under a lash line, a hint of a nose, hair
+   *  in chunky locks, flat colour in two tones with an ink line round it. */
+  drawn: boolean
 }
 
 export const STYLES: Record<PersonStyle, StyleSpec> = {
@@ -203,6 +211,10 @@ export const STYLES: Record<PersonStyle, StyleSpec> = {
     cheek: 1,
     brow: 1,
     nose0: 'button',
+    neck: 1,
+    waist: 1,
+    extremity: 1,
+    drawn: false,
   },
   realistic: {
     heads: 7.5,
@@ -218,6 +230,10 @@ export const STYLES: Record<PersonStyle, StyleSpec> = {
     cheek: 0.8,
     brow: 1.3,
     nose0: 'straight',
+    neck: 1,
+    waist: 1,
+    extremity: 1,
+    drawn: false,
   },
   anime: {
     heads: 6.8,
@@ -233,10 +249,145 @@ export const STYLES: Record<PersonStyle, StyleSpec> = {
     cheek: 0.9,
     brow: 0.8,
     nose0: 'button',
+    neck: 1,
+    waist: 1,
+    extremity: 1,
+    drawn: false,
+  },
+  punk: {
+    heads: 6.5,
+    shoulder: 0.104,
+    mass: 0.9,
+    legs: 0.04,
+    eye: 1,
+    lid: 1.0,
+    nose: 0.55,
+    mouth: 0.72,
+    jaw: 0.8,
+    chin: -0.008,
+    cheek: 1.04,
+    brow: 0.25,
+    nose0: 'button',
+    neck: 0.84,
+    waist: 0.9,
+    extremity: 0.92,
+    drawn: true,
+  },
+}
+
+/**
+ * A build, layer by layer. The skeleton comes first (how tall, how big the head, how long the
+ * legs, how wide the shoulders, ribs and hips, how heavy the bones), then how much muscle sits on
+ * it, then how much soft tissue lies over that and how much of it gathers at the belly.
+ */
+export interface Physique {
+  /** Height against an average adult of the same age, when no height is given. */
+  stature: number
+  /** Heads per body height, as a multiplier: under 1 is a bigger head. */
+  heads: number
+  /** Leg length added, as a fraction of the height below the chin. */
+  legs: number
+  shoulders: number
+  ribs: number
+  hips: number
+  /** Bone thickness: wrists, ankles, knees, the width of the frame's own members. */
+  bone: number
+  /** 1 is an untrained adult. */
+  muscle: number
+  /** 0 is none to speak of, 1 is plenty. */
+  fat: number
+  belly: number
+}
+
+export const PHYSIQUES: Record<PersonBuild, Physique> = {
+  slim: {
+    stature: 1,
+    heads: 1.02,
+    legs: 0.01,
+    shoulders: 0.92,
+    ribs: 0.88,
+    hips: 0.93,
+    bone: 0.92,
+    muscle: 0.75,
+    fat: 0.1,
+    belly: 0,
+  },
+  average: {
+    stature: 1,
+    heads: 1,
+    legs: 0,
+    shoulders: 1,
+    ribs: 1,
+    hips: 1,
+    bone: 1,
+    muscle: 1,
+    fat: 0.35,
+    belly: 0.05,
+  },
+  stocky: {
+    stature: 0.93,
+    heads: 0.95,
+    legs: -0.022,
+    shoulders: 1.16,
+    ribs: 1.22,
+    hips: 1.1,
+    bone: 1.16,
+    muscle: 1.32,
+    fat: 0.8,
+    belly: 0.4,
+  },
+  athletic: {
+    stature: 1.03,
+    heads: 1.02,
+    legs: 0.005,
+    shoulders: 1.2,
+    ribs: 1.1,
+    hips: 0.96,
+    bone: 1.06,
+    muscle: 1.55,
+    fat: 0.1,
+    belly: 0,
+  },
+  heavy: {
+    stature: 0.99,
+    heads: 0.97,
+    legs: -0.014,
+    shoulders: 1.1,
+    ribs: 1.26,
+    hips: 1.28,
+    bone: 1.1,
+    muscle: 1.05,
+    fat: 1.5,
+    belly: 1,
+  },
+  petite: {
+    stature: 0.88,
+    heads: 0.89,
+    legs: -0.012,
+    shoulders: 0.87,
+    ribs: 0.87,
+    hips: 0.95,
+    bone: 0.88,
+    muscle: 0.72,
+    fat: 0.35,
+    belly: 0.04,
+  },
+  lanky: {
+    stature: 1.08,
+    heads: 1.07,
+    legs: 0.028,
+    shoulders: 0.98,
+    ribs: 0.88,
+    hips: 0.9,
+    bone: 0.96,
+    muscle: 0.8,
+    fat: 0.06,
+    belly: 0,
   },
 }
 
 const GENDERS: readonly PersonGender[] = ['feminine', 'masculine', 'neutral']
+// The seeded roll keeps to the first three, so a seed draws the build it always has.
 const BUILDS: readonly PersonBuild[] = ['slim', 'average', 'stocky']
 const NOSES: readonly PersonNose[] = ['button', 'straight', 'broad']
 
@@ -269,6 +420,8 @@ export const PERSON_COLORS = {
     '#7d3320',
   ],
   eyes: ['#4a3424', '#2f2a26', '#3d7ab8', '#3f6a48', '#6b5a2e', '#6b7a85'],
+  /** Dyed hair, in neon and lamp colors. Never rolled by a seed: a figure asks for one. */
+  hairDyed: ['#b967ff', '#39ff88', '#ff6418', '#ffa64d', '#f4f6fb'],
 } as const
 const SKIN_TONES = PERSON_COLORS.skin
 const HAIR_COLORS = PERSON_COLORS.hair
@@ -300,7 +453,7 @@ export const KINDS: Record<PersonKind, KindPreset> = {
 /** What a one-word outfit expands to. `top`/`bottom`/`shoe` mark the layers the flat color
  *  props recolor; `light` is an inner layer in the palette's light `wall` tone. */
 type Slot = 'top' | 'bottom' | 'shoe' | 'light' | 'apron'
-const OUTFITS: Record<PersonOutfit, Array<PersonGarment & { slot: Slot }>> = {
+const OUTFITS: Record<PersonOutfit, Array<PersonGarment & { slot?: Slot }>> = {
   tunic: [
     { type: 'trousers', slot: 'bottom' },
     { type: 'tunic', slot: 'top' },
@@ -364,7 +517,72 @@ const OUTFITS: Record<PersonOutfit, Array<PersonGarment & { slot: Slot }>> = {
     { type: 'blazer', slot: 'top' },
     { type: 'shoes', slot: 'shoe' },
   ],
+  bomber: [
+    { type: 'tshirt', slot: 'light' },
+    { type: 'cargo', slot: 'bottom' },
+    { type: 'jacket', slot: 'top' },
+    { type: 'sneakers', slot: 'shoe' },
+  ],
+  crop: [
+    { type: 'croptop', slot: 'top' },
+    { type: 'cargo', slot: 'bottom' },
+    { type: 'sneakers', slot: 'shoe' },
+  ],
+  tank: [
+    { type: 'tank', slot: 'top' },
+    { type: 'cargo', slot: 'bottom' },
+    { type: 'belt' },
+    { type: 'boots', slot: 'shoe' },
+  ],
+  pleated: [
+    { type: 'shirt', sleeves: 'short', neck: 'collar', slot: 'top' },
+    { type: 'stockings', slot: 'bottom' },
+    { type: 'pleated', slot: 'bottom' },
+    { type: 'shoes', slot: 'shoe' },
+  ],
+  shorts: [
+    { type: 'tshirt', slot: 'top' },
+    { type: 'shorts', slot: 'bottom' },
+    { type: 'sneakers', slot: 'shoe' },
+  ],
+  runner: [
+    { type: 'tshirt', slot: 'light' },
+    { type: 'joggers', slot: 'bottom' },
+    { type: 'runner', slot: 'top' },
+    { type: 'hightops', slot: 'shoe' },
+  ],
+  shell: [
+    { type: 'tshirt', slot: 'light' },
+    { type: 'cargo', slot: 'bottom' },
+    { type: 'shell', slot: 'top' },
+    { type: 'boots', slot: 'shoe' },
+  ],
+  rig: [
+    { type: 'tank', slot: 'light' },
+    { type: 'cargo', slot: 'bottom' },
+    { type: 'belt' },
+    { type: 'techvest', slot: 'top' },
+    { type: 'boots', slot: 'shoe' },
+  ],
+  street: [
+    { type: 'croptop', slot: 'light' },
+    { type: 'stockings', slot: 'bottom', length: 0.92 },
+    { type: 'shorts', slot: 'bottom', length: 0.3 },
+    { type: 'runner', slot: 'top' },
+    { type: 'hightops', slot: 'shoe' },
+  ],
 }
+
+/** What street clothes are trimmed in when nothing says otherwise: lamp colors, one to a figure. */
+export const TRIM_COLORS = ['#ffa64d', '#ff6418', '#39ff88', '#b967ff', '#f4f6fb'] as const
+
+/**
+ * A paint that starts with this mark shines by its own light: `build.ts` writes it into the
+ * vertex colors `LIT_GAIN` times over, and the drawn material reads anything that bright as a
+ * light instead of a surface. Only drawn figures have lit paint. The rest wear it as plain color.
+ */
+export const LIT = '!'
+export const LIT_GAIN = 8
 
 export type GarmentRegion = 'top' | 'bottom' | 'feet' | 'extra'
 export type MaterialKind = 'skin' | 'cloth' | 'knit' | 'denim' | 'leather' | 'hair'
@@ -387,9 +605,21 @@ export const GARMENT_REGION: Record<PersonGarmentType, GarmentRegion> = {
   skirt: 'bottom',
   shoes: 'feet',
   boots: 'feet',
+  jacket: 'top',
+  croptop: 'top',
+  tank: 'top',
+  cargo: 'bottom',
+  pleated: 'bottom',
+  stockings: 'feet',
+  sneakers: 'feet',
   belt: 'extra',
   scarf: 'extra',
   cape: 'extra',
+  runner: 'top',
+  shell: 'top',
+  techvest: 'top',
+  joggers: 'bottom',
+  hightops: 'feet',
 }
 
 export const GARMENT_MATERIAL: Record<PersonGarmentType, MaterialKind> = {
@@ -410,9 +640,22 @@ export const GARMENT_MATERIAL: Record<PersonGarmentType, MaterialKind> = {
   skirt: 'cloth',
   shoes: 'leather',
   boots: 'leather',
+  jacket: 'cloth',
+  croptop: 'cloth',
+  tank: 'cloth',
+  cargo: 'cloth',
+  pleated: 'cloth',
+  stockings: 'knit',
+  sneakers: 'leather',
   belt: 'leather',
   scarf: 'knit',
   cape: 'cloth',
+  // Coated cloth: it takes the leather's sheen.
+  runner: 'leather',
+  shell: 'leather',
+  techvest: 'leather',
+  joggers: 'cloth',
+  hightops: 'leather',
 }
 
 /** Per-type defaults: sleeves, neckline, and reach (0..1, meaning depends on the region). */
@@ -437,9 +680,21 @@ const GARMENT_DEFAULTS: Record<
   skirt: { sleeves: 'none', neck: 'crew', length: 0.55 },
   shoes: { sleeves: 'none', neck: 'crew', length: 0 },
   boots: { sleeves: 'none', neck: 'crew', length: 0.45 },
+  jacket: { sleeves: 'long', neck: 'collar', length: 0.08 },
+  croptop: { sleeves: 'short', neck: 'crew', length: 0.55 },
+  tank: { sleeves: 'none', neck: 'crew', length: 0.3 },
+  cargo: { sleeves: 'none', neck: 'crew', length: 1 },
+  pleated: { sleeves: 'none', neck: 'crew', length: 0.34 },
+  stockings: { sleeves: 'none', neck: 'crew', length: 0.45 },
+  sneakers: { sleeves: 'none', neck: 'crew', length: 0 },
   belt: { sleeves: 'none', neck: 'crew', length: 0 },
   scarf: { sleeves: 'none', neck: 'crew', length: 0.5 },
   cape: { sleeves: 'none', neck: 'crew', length: 0.8 },
+  runner: { sleeves: 'long', neck: 'crew', length: 0.04 },
+  shell: { sleeves: 'long', neck: 'crew', length: 0.82 },
+  techvest: { sleeves: 'none', neck: 'crew', length: 0.1 },
+  joggers: { sleeves: 'none', neck: 'crew', length: 1 },
+  hightops: { sleeves: 'none', neck: 'crew', length: 0 },
 }
 
 /** A garment with every option settled, its place in the stack, and how far it stands off. */
@@ -448,6 +703,8 @@ export interface Layer {
   region: GarmentRegion
   material: MaterialKind
   color: string
+  /** What its lit seams and stripes are colored, where it has any. */
+  trim: string
   sleeves: 'none' | 'short' | 'long'
   neck: 'crew' | 'v' | 'collar'
   length: number
@@ -480,6 +737,10 @@ export interface FigureSpec {
   gender: PersonGender
   age: PersonAge
   build: PersonBuild
+  /** The build, layer by layer. */
+  physique: Physique
+  /** How much of the body is built. */
+  anatomy: PersonAnatomy
   /** Standing height in world units. */
   height: number
   /** Feminine (1) to masculine (0) silhouette blend. */
@@ -498,9 +759,13 @@ export interface FigureSpec {
     eye: string
     brow: string
     hair: string
+    /** The lash line and the ink of a drawn face. */
+    ink: string
     hat: string
     bag: string
     accent: string
+    /** The lit seams and stripes of street clothes, and a visor's slit. */
+    trim: string
     metal: string
     wood: string
   }
@@ -527,6 +792,7 @@ export interface TraitInput {
   kind: PersonKind
   gender?: PersonGender
   age: PersonAge
+  anatomy?: PersonAnatomy
   height?: number
   build?: PersonBuild
   skinTone?: string
@@ -541,6 +807,7 @@ export interface TraitInput {
   topColor?: string
   bottomColor?: string
   shoeColor?: string
+  trimColor?: string
   hat?: PersonHat
   accessories?: PersonAccessory[]
 }
@@ -557,6 +824,18 @@ function tint(hex: string, r: Rng): string {
   const c = new Color(hex)
   c.offsetHSL((r() - 0.5) * 0.05, (r() - 0.5) * 0.14, (r() - 0.5) * 0.16)
   return `#${c.getHexString()}`
+}
+
+/** A near-black that keeps a little of `hex`'s hue: the line a face is drawn in. */
+function ink(hex: string) {
+  const v = Number.parseInt(hex.replace('#', '').padEnd(6, '0').slice(0, 6), 16)
+  const ch = [(v >> 16) & 255, (v >> 8) & 255, v & 255]
+  const top = Math.max(...ch, 1)
+  // The hair's colour taken right down, and half way to grey so no ink is a strong colour.
+  return `#${ch
+    .map((c) => Math.round(14 + ((c / top) * 22 + 11) / 2))
+    .map((c) => c.toString(16).padStart(2, '0'))
+    .join('')}`
 }
 
 function shade(hex: string, h: number, s: number, l: number) {
@@ -617,18 +896,25 @@ export function resolveFigure(
     blinkEvery: range(r, 3.4, 6.5),
     stoop: AGES[t.age].stoop,
   }
+  // Rolled last, so figures made before there were trims keep every other roll.
+  const trim = t.trimColor ?? sk?.trimColor ?? pick(r, TRIM_COLORS)
 
   const st = STYLES[t.style]
   const a = AGES[t.age]
   const preset = KINDS[t.kind]
-  const height = (t.body?.height ?? t.height ?? BASE_HEIGHT[gender] * a.stature) * unit
+  const physique = PHYSIQUES[build]
+  const height =
+    (t.body?.height ?? t.height ?? BASE_HEIGHT[gender] * a.stature * physique.stature) * unit
   const child = t.age === 'child'
   const f = t.face ?? {}
 
   const face: FaceMetrics = {
     eye: st.eye * (child ? 1.12 : 1) * (f.eyes?.size ?? 1) * (1 + jitter[0] * 0.05),
     eyeX: 1 + jitter[1] * 0.035,
-    lid: st.lid,
+    // A drawn man's eyes are narrower than a woman's, and his face a little longer.
+    lid:
+      st.lid *
+      (st.drawn && !child ? (gender === 'masculine' ? 0.82 : gender === 'neutral' ? 0.92 : 1) : 1),
     nose: st.nose * (child ? 0.8 : 1) * (1 + jitter[2] * 0.08),
     noseKind: f.nose ?? (t.style === 'realistic' ? noseRoll : st.nose0),
     mouth: st.mouth * (1 + jitter[3] * 0.06),
@@ -637,7 +923,11 @@ export function resolveFigure(
       st.jaw *
       (gender === 'masculine' ? 1.06 : gender === 'feminine' ? 0.93 : 1) *
       (1 + jitter[4] * 0.04),
-    chin: st.chin + (child ? -0.008 : 0) + jitter[5] * 0.003,
+    chin:
+      st.chin +
+      (child ? -0.008 : 0) +
+      (st.drawn && !child && gender === 'masculine' ? 0.007 : 0) +
+      jitter[5] * 0.003,
     cheek: st.cheek * (child ? 1.1 : 1),
     brow: st.brow * (gender === 'masculine' ? 1.2 : 0.85),
     browWeight: f.brows?.weight ?? (gender === 'feminine' ? 0.7 : 0.85),
@@ -650,9 +940,11 @@ export function resolveFigure(
     eye: f.eyes?.color ?? eyeRoll,
     brow: f.brows?.color ?? hairColor,
     hair: hairColor,
+    ink: ink(hairColor),
     hat: palette.accent,
     bag: palette.wood,
     accent: palette.accent,
+    trim,
     metal: palette.metal,
     wood: palette.wood,
   }
@@ -663,7 +955,7 @@ export function resolveFigure(
     bottom: t.bottomColor ?? sk?.bottomColor ?? bottomRoll,
     shoe: t.shoeColor ?? sk?.shoeColor ?? palette.metal,
   }
-  const layers = resolveLayers(t, sk, preset, palette, slots)
+  const layers = resolveLayers(t, sk, preset, palette, slots, trim)
 
   const outerTop = [...layers].reverse().find((l) => l.region === 'top' && l.type !== 'apron')
   colors.hat =
@@ -677,7 +969,9 @@ export function resolveFigure(
             ? (outerTop?.color ?? palette.fabric)
             : hat === 'chef'
               ? '#f4f2ec'
-              : palette.accent
+              : hat === 'beanie'
+                ? (outerTop?.color ?? palette.fabric)
+                : palette.accent
 
   return {
     spec: {
@@ -686,16 +980,36 @@ export function resolveFigure(
       gender,
       age: t.age,
       build,
+      physique,
+      anatomy: t.anatomy ?? 'surface',
       height,
       fem: gender === 'feminine' ? 1 : gender === 'masculine' ? 0 : 0.5,
       st,
-      headsTall: st.heads * a.heads,
+      // A drawn man stands about seven heads tall, a woman six and a half.
+      headsTall:
+        st.heads *
+        a.heads *
+        physique.heads *
+        (st.drawn && t.age !== 'child'
+          ? gender === 'masculine'
+            ? 1.08
+            : gender === 'neutral'
+              ? 1.04
+              : 1
+          : 1),
       face,
       hair,
       facialHair,
       hat,
       accessories: (t.accessories ?? sk?.accessories ?? preset.accessories).filter(
-        (x) => x === 'bag' || x === 'glasses' || x === 'staff',
+        (x) =>
+          x === 'bag' ||
+          x === 'glasses' ||
+          x === 'staff' ||
+          x === 'headphones' ||
+          x === 'mask' ||
+          x === 'backpack' ||
+          x === 'visor',
       ),
       layers,
       colors,
@@ -711,6 +1025,7 @@ function resolveLayers(
   preset: KindPreset,
   palette: WorldPalette,
   slot: SlotColors,
+  trim: string,
 ): Layer[] {
   const accessories = t.accessories ?? sk?.accessories ?? preset.accessories
   let stack: Array<PersonGarment & { slot?: Slot }>
@@ -736,7 +1051,7 @@ function resolveLayers(
     if (g.type === 'apron') return palette.wall
     if (g.type === 'belt') return palette.woodDark
     if (g.type === 'scarf') return palette.accent
-    if (g.type === 'cape') return slot.bottom
+    if (g.type === 'cape' || g.type === 'stockings') return slot.bottom
     if (region === 'feet') return slot.shoe
     if (region === 'bottom') return slot.bottom
     // The outermost top wears the top color; anything under it a light tone.
@@ -752,6 +1067,7 @@ function resolveLayers(
       material: GARMENT_MATERIAL[g.type],
       // The garment's own color beats the shorthand color props, which beat the defaults.
       color: g.color ?? defaultColor(g, i, region),
+      trim: g.trim ?? trim,
       sleeves: g.sleeves ?? d.sleeves,
       neck: g.neck ?? d.neck,
       length: g.length ?? d.length,
@@ -780,12 +1096,30 @@ function resolveLayers(
     x.region === 'extra' ||
     y.region === 'extra'
   layers.forEach((l, i) => {
-    if (l.region === 'top' && !['dress', 'robe', 'coat', 'blazer', 'apron'].includes(l.type))
-      l.tucked = layers.slice(i + 1).some((o) => o.region === 'bottom' && o.type !== 'skirt')
+    if (
+      l.region === 'top' &&
+      ![
+        'dress',
+        'robe',
+        'coat',
+        'blazer',
+        'apron',
+        'jacket',
+        'croptop',
+        'runner',
+        'shell',
+        'techvest',
+      ].includes(l.type)
+    )
+      l.tucked = layers
+        .slice(i + 1)
+        .some((o) => o.region === 'bottom' && o.type !== 'skirt' && o.type !== 'pleated')
     let off =
       base[l.region] +
       (l.material === 'knit' ? 0.003 : 0) +
-      (l.type === 'coat' || l.type === 'blazer' ? 0.008 : 0)
+      (['coat', 'blazer', 'jacket', 'runner', 'shell', 'techvest'].includes(l.type) ? 0.008 : 0) +
+      (l.type === 'cargo' || l.type === 'joggers' ? 0.003 : 0) -
+      (l.type === 'stockings' ? 0.005 : 0)
     for (let j = 0; j < i; j++)
       if (overlaps(l, layers[j])) off = Math.max(off, layers[j].offset + slack(layers[j]))
     l.offset = off
