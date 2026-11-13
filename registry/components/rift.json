@@ -10,9 +10,7 @@
     "three@^0.184.0"
   ],
   "registryDependencies": [
-    "screen",
-    "sign",
-    "sky"
+    "sign"
   ],
   "files": [
     {

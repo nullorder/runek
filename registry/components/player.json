@@ -11,9 +11,7 @@
     "ecctrl@^1.0.97",
     "three@^0.184.0"
   ],
-  "registryDependencies": [
-    "screen"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Player.tsx",

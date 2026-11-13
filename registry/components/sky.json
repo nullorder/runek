@@ -9,9 +9,7 @@
     "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
-  "registryDependencies": [
-    "screen"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Sky.tsx",
