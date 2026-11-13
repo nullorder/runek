@@ -255,4 +255,5 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     skip: true,
     note: 'Traffic in the air over a whole street, hundreds of units long.',
   },
+  CoffeeGear: { camera: [0.9, 0.8, 1.2], target: [0, 0.2, 0] },
 }

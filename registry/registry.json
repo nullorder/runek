@@ -2337,6 +2337,27 @@
         "cars": 16,
         "levels": [0, 8]
       }
+    },
+    {
+      "name": "coffee-gear",
+      "title": "CoffeeGear",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "What a cafe makes coffee with and shows off: an espresso machine, grinder, pour-over bar, siphon, cold drip tower, batch brewer, taps, a drum roaster, and beans in bags, jars and stocked shelves, one `kind` to a node. Only the roaster has a collider.",
+      "files": [
+        {
+          "path": "packages/components/src/CoffeeGear.tsx",
+          "target": "CoffeeGear.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        }
+      ],
+      "example": {
+        "kind": "pourover",
+        "length": 0.9
+      }
     }
   ]
 }

@@ -26,6 +26,7 @@ import { ChessBoard } from './ChessBoard'
 import { Cliff } from './Cliff'
 import { Clock } from './Clock'
 import { Clouds } from './Clouds'
+import { CoffeeGear } from './CoffeeGear'
 import { CoffeeMachine } from './CoffeeMachine'
 import { Compass } from './Compass'
 import { Counter } from './Counter'
@@ -155,6 +156,7 @@ export const registry: ComponentRegistry = {
   Cliff,
   Clock,
   Clouds,
+  CoffeeGear,
   CoffeeMachine,
   Compass,
   Counter,
