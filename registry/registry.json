@@ -2246,6 +2246,52 @@
         "puffs": 20,
         "rise": 4
       }
+    },
+    {
+      "name": "glow-sky",
+      "title": "GlowSky",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "A night sky that is never black: a dome lit from below by a city, darkest overhead and as bright as the haze at the horizon, with a slow cloud deck catching the district's glow that parts on stars and a moon in its phase. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/GlowSky.tsx",
+          "target": "GlowSky.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/glowSky.ts",
+          "target": "nodes/glowSky.ts"
+        }
+      ],
+      "example": {
+        "clouds": true
+      }
+    },
+    {
+      "name": "skyline",
+      "title": "Skyline",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "A district seen from far off: a band of towers across part of the horizon with a few rooms lit and one landmark (spire, dome or stack) picked out in light, in two draws. Scenery past anywhere a body can reach: no colliders.",
+      "files": [
+        {
+          "path": "packages/components/src/Skyline.tsx",
+          "target": "Skyline.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        }
+      ],
+      "example": {
+        "bearing": 45,
+        "spread": 70,
+        "landmark": "spire"
+      }
     }
   ]
 }

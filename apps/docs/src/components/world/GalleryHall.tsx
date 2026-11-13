@@ -33,7 +33,17 @@ import type { DocMeta } from './LibraryWorld'
  */
 
 /** System components with nothing to put on a pedestal. */
-const EXCLUDE = new Set(['Rain', 'Tower', 'Player', 'LightRig', 'Compass', 'Sky', 'Interactable'])
+const EXCLUDE = new Set([
+  'Skyline',
+  'GlowSky',
+  'Rain',
+  'Tower',
+  'Player',
+  'LightRig',
+  'Compass',
+  'Sky',
+  'Interactable',
+])
 
 /** Per-exhibit props layered over the gallery-preview config. */
 const TUNE: Record<string, Record<string, unknown>> = {

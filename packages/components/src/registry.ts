@@ -48,6 +48,7 @@ import { Fridge } from './Fridge'
 import { GameConsole } from './GameConsole'
 import { GlassRail } from './GlassRail'
 import { GlassWall } from './GlassWall'
+import { GlowSky } from './GlowSky'
 import { Grass } from './Grass'
 import { Guitar } from './Guitar'
 import { Hedge } from './Hedge'
@@ -96,6 +97,7 @@ import { Shore } from './Shore'
 import { Sign } from './Sign'
 import { Signpost } from './Signpost'
 import { Sky } from './Sky'
+import { Skyline } from './Skyline'
 import { Slab } from './Slab'
 import { Sofa } from './Sofa'
 import { Speaker } from './Speaker'
@@ -171,6 +173,7 @@ export const registry: ComponentRegistry = {
   GameConsole,
   GlassRail,
   GlassWall,
+  GlowSky,
   Grass,
   Guitar,
   Hedge,
@@ -223,6 +226,7 @@ export const registry: ComponentRegistry = {
   Sign,
   Signpost,
   Sky,
+  Skyline,
   Slab,
   Sofa,
   Speaker,

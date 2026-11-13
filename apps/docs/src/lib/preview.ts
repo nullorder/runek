@@ -242,4 +242,12 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     props: { strength: 1 },
     background: '#1a1a22',
   },
+  GlowSky: {
+    skip: true,
+    note: 'A sky dome for a whole world: drawn behind everything, wherever the viewer stands.',
+  },
+  Skyline: {
+    skip: true,
+    note: 'Scenery hundreds of units out on the horizon: place it in a world and look out.',
+  },
 }
