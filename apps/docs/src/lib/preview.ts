@@ -189,4 +189,24 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   Speaker: { camera: [1.4, 1.4, 2], target: [0, 0.6, 0] },
   AcousticPanel: { camera: [1, 1.4, 2.2], target: [0, 1, 0], props: { position: [0, 1, 0] } },
   BassTrap: { camera: [2.2, 1.8, 2.4], target: [0, 1, 0], props: { height: 2.4 } },
+  AcUnit: { camera: [1.4, 1.2, 1.8], target: [0, 0.3, 0], props: { position: [0, 0.4, 0] } },
+  Awning: { camera: [3, 2.6, 3.4], target: [0, 2.4, 0], props: { position: [0, 3, 0] } },
+  BladeSign: {
+    camera: [3, 3, 4],
+    target: [0, 2.4, 0],
+    props: { position: [0, 0.6, 0], text: 'NOODLE' },
+  },
+  CableSag: {
+    camera: [5, 3, 1.5],
+    target: [0, 2, 2],
+    props: { position: [0, 2.6, 0], span: 4, sag: 0.4 },
+  },
+  PipeRun: { camera: [1.6, 1.8, 2.4], target: [0, 1, 0], props: { length: 2.2 } },
+  RollerShutter: {
+    camera: [2.6, 1.8, 3.6],
+    target: [0, 1.4, 0],
+    props: { width: 2.4, height: 2.4 },
+  },
+  Vent: { camera: [0.9, 1.2, 1.2], target: [0, 1.1, 0], props: { position: [0, 0.9, 0] } },
+  VendingMachine: { camera: [1.8, 1.6, 2.6], target: [0, 1, 0.3] },
 }

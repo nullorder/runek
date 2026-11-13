@@ -1,17 +1,21 @@
 import type { ComponentRegistry, CompositeDef } from '@runek/core'
 import { AcousticPanel } from './AcousticPanel'
+import { AcUnit } from './AcUnit'
 import { ArcadeCabinet } from './ArcadeCabinet'
 import { Arch } from './Arch'
+import { Awning } from './Awning'
 import { Barrel } from './Barrel'
 import { BassTrap } from './BassTrap'
 import { BeachChair } from './BeachChair'
 import { Bed } from './Bed'
 import { Bench } from './Bench'
 import { Birds } from './Birds'
+import { BladeSign } from './BladeSign'
 import { Book } from './Book'
 import { Bookshelf } from './Bookshelf'
 import { Bridge } from './Bridge'
 import { Bush } from './Bush'
+import { CableSag } from './CableSag'
 import { Campfire } from './Campfire'
 import { Cave } from './Cave'
 import { CeilingLight } from './CeilingLight'
@@ -67,6 +71,7 @@ import { Person } from './Person'
 import { Piano } from './Piano'
 import { PictureLight } from './PictureLight'
 import { Pillar } from './Pillar'
+import { PipeRun } from './PipeRun'
 import { Plant } from './Plant'
 import { Player } from './Player'
 import { Pool } from './Pool'
@@ -76,6 +81,7 @@ import { Poster } from './Poster'
 import { Rift } from './Rift'
 import { Road } from './Road'
 import { Rocks } from './Rocks'
+import { RollerShutter } from './RollerShutter'
 import { Roof } from './Roof'
 import { Rug } from './Rug'
 import { Sailboat } from './Sailboat'
@@ -100,6 +106,8 @@ import { TikiTorch } from './TikiTorch'
 import { Trees } from './Trees'
 import { Tv } from './Tv'
 import { Umbrella } from './Umbrella'
+import { VendingMachine } from './VendingMachine'
+import { Vent } from './Vent'
 import { Wall } from './Wall'
 import { Well } from './Well'
 import { Whiteboard } from './Whiteboard'
@@ -109,18 +117,22 @@ import { Window } from './Window'
 /** The default Runek component registry: name → component, for data-driven rendering. */
 export const registry: ComponentRegistry = {
   AcousticPanel,
+  AcUnit,
   ArcadeCabinet,
   Arch,
+  Awning,
   Barrel,
   BassTrap,
   BeachChair,
   Bed,
   Bench,
   Birds,
+  BladeSign,
   Book,
   Bookshelf,
   Bridge,
   Bush,
+  CableSag,
   Campfire,
   Cave,
   CeilingLight,
@@ -177,6 +189,7 @@ export const registry: ComponentRegistry = {
   Piano,
   PictureLight,
   Pillar,
+  PipeRun,
   Plant,
   Player,
   Pool,
@@ -186,6 +199,7 @@ export const registry: ComponentRegistry = {
   Rift,
   Road,
   Rocks,
+  RollerShutter,
   Roof,
   Room: roomComposite as unknown as CompositeDef,
   Rug,
@@ -211,6 +225,8 @@ export const registry: ComponentRegistry = {
   Trees,
   Tv,
   Umbrella,
+  VendingMachine,
+  Vent,
   Wall,
   Well,
   Whiteboard,

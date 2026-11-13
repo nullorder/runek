@@ -1591,6 +1591,395 @@
       "example": {
         "size": 0.3
       }
+    },
+    {
+      "name": "ac-unit",
+      "title": "AcUnit",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "An outdoor AC unit on a wall bracket with its drain hose, optionally in a wire cage. Drawn by the world's shared facade-kit meshes, so any number cost no extra draws. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/AcUnit.tsx",
+          "target": "AcUnit.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "cage": true
+      }
+    },
+    {
+      "name": "awning",
+      "title": "Awning",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A sloped fabric shop awning with a striped valance and two arms, hung from a wall. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Awning.tsx",
+          "target": "Awning.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "width": 3,
+        "color": "#2f3a2c"
+      }
+    },
+    {
+      "name": "blade-sign",
+      "title": "BladeSign",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A board standing out from a wall with one word stacked down both faces in the world's display font, lit at the world's sign luminance level, with tube edges. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/BladeSign.tsx",
+          "target": "BladeSign.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "text": "TEA",
+        "color": "#39ff88"
+      }
+    },
+    {
+      "name": "cable-sag",
+      "title": "CableSag",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A cable sagging across a street between two anchors: a parabola cut into straight pieces. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/CableSag.tsx",
+          "target": "CableSag.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "span": 12,
+        "sag": 0.8
+      }
+    },
+    {
+      "name": "pipe-run",
+      "title": "PipeRun",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A pipe or conduit run clipped to a wall, up it or along it, with a collar every couple of metres. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/PipeRun.tsx",
+          "target": "PipeRun.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "length": 4,
+        "radius": 0.05
+      }
+    },
+    {
+      "name": "roller-shutter",
+      "title": "RollerShutter",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A slatted roller shutter in its housing and side guides, rolled up as far as `open` says. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/RollerShutter.tsx",
+          "target": "RollerShutter.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "open": 0.4
+      }
+    },
+    {
+      "name": "vent",
+      "title": "Vent",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A louvred wall vent under a small hood. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Vent.tsx",
+          "target": "Vent.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "width": 0.8
+      }
+    },
+    {
+      "name": "vending-machine",
+      "title": "VendingMachine",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A vending machine against a wall: a matte case and a lit window of goods at the world's screen luminance level. Drawn by the world's shared facade-kit meshes. One cuboid collider.",
+      "files": [
+        {
+          "path": "packages/components/src/VendingMachine.tsx",
+          "target": "VendingMachine.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "color": "#40332a",
+        "lamp": "#b8e8c8"
+      }
     }
   ]
 }

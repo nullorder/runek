@@ -37,6 +37,12 @@ const EXCLUDE = new Set(['Player', 'LightRig', 'Compass', 'Sky', 'Interactable']
 
 /** Per-exhibit props layered over the gallery-preview config. */
 const TUNE: Record<string, Record<string, unknown>> = {
+  // Facade parts at a size that fits a pedestal and the storey above it.
+  Awning: { width: 2, position: [0, 2.6, 0] },
+  BladeSign: { text: 'TEA', letter: 0.4, position: [0, 0.6, 0] },
+  CableSag: { span: 2.6, sag: 0.3, position: [0, 2.2, -1.3] },
+  PipeRun: { length: 3 },
+  RollerShutter: { width: 2, height: 2.2 },
   // Ocean defaults to a 400-unit patch that follows the camera — pin a small pond.
   Ocean: { size: [7, 7], follow: false },
   // Bare visual — a dynamic body would roll off the pedestal.
