@@ -34,6 +34,8 @@ import type { DocMeta } from './LibraryWorld'
 
 /** System components with nothing to put on a pedestal. */
 const EXCLUDE = new Set([
+  'FlyingTraffic',
+  'Crowd',
   'Skyline',
   'GlowSky',
   'Rain',

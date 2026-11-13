@@ -2292,6 +2292,51 @@
         "spread": 70,
         "landmark": "spire"
       }
+    },
+    {
+      "name": "crowd",
+      "title": "Crowd",
+      "type": "registry:component",
+      "category": "character",
+      "description": "People on a street in bulk: hooded figures in long coats walking their lanes there and back, each with one small light at the collar, stepping round the player. Where each walks comes from the world clock and `seed` alone, so every viewer sees the same crowd. Three instanced draws however many walk; no colliders.",
+      "files": [
+        {
+          "path": "packages/components/src/Crowd.tsx",
+          "target": "Crowd.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/hash.ts",
+          "target": "city/hash.ts"
+        }
+      ],
+      "example": {
+        "count": 12
+      }
+    },
+    {
+      "name": "flying-traffic",
+      "title": "FlyingTraffic",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Lanes of hovercars over a street, decks of lanes each way, every car placed by the world clock and `seed` so every viewer sees the same traffic. Three instanced draws however many cars; no colliders.",
+      "files": [
+        {
+          "path": "packages/components/src/FlyingTraffic.tsx",
+          "target": "FlyingTraffic.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        }
+      ],
+      "example": {
+        "cars": 16,
+        "levels": [0, 8]
+      }
     }
   ]
 }

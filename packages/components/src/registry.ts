@@ -30,6 +30,7 @@ import { CoffeeMachine } from './CoffeeMachine'
 import { Compass } from './Compass'
 import { Counter } from './Counter'
 import { Crate } from './Crate'
+import { Crowd } from './Crowd'
 import { CurvedWall } from './CurvedWall'
 import houseComposite from './composites/house.json'
 import roomComposite from './composites/room.json'
@@ -43,6 +44,7 @@ import { Fence } from './Fence'
 import { Flag } from './Flag'
 import { Floor } from './Floor'
 import { Flowers } from './Flowers'
+import { FlyingTraffic } from './FlyingTraffic'
 import { Fountain } from './Fountain'
 import { Fridge } from './Fridge'
 import { GameConsole } from './GameConsole'
@@ -157,6 +159,7 @@ export const registry: ComponentRegistry = {
   Compass,
   Counter,
   Crate,
+  Crowd,
   CurvedWall,
   Desk,
   DeskLamp,
@@ -168,6 +171,7 @@ export const registry: ComponentRegistry = {
   Flag,
   Floor,
   Flowers,
+  FlyingTraffic,
   Fountain,
   Fridge,
   GameConsole,

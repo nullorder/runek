@@ -250,4 +250,9 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     skip: true,
     note: 'Scenery hundreds of units out on the horizon: place it in a world and look out.',
   },
+  Crowd: { skip: true, note: 'A crowd walking lanes across a street: give it lanes in a world.' },
+  FlyingTraffic: {
+    skip: true,
+    note: 'Traffic in the air over a whole street, hundreds of units long.',
+  },
 }
