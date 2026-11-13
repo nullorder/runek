@@ -205,6 +205,17 @@ export type { PortalProps } from './Portal'
 export { Portal } from './Portal'
 export type { PosterArt, PosterFrame, PosterProps } from './Poster'
 export { Poster } from './Poster'
+export type { RainProps, RainWeather, WeatherKind, WeatherState } from './Rain'
+export {
+  makeWeather,
+  parseWeatherKind,
+  RAIN_PERIOD,
+  Rain,
+  steadyWeather,
+  WEATHER,
+  WEATHER_KINDS,
+  weatherAt,
+} from './Rain'
 export type { RiftProps } from './Rift'
 export { Rift } from './Rift'
 export type { RoadProps } from './Road'
@@ -242,6 +253,8 @@ export type { SpeakerKind, SpeakerProps } from './Speaker'
 export { Speaker } from './Speaker'
 export type { StaircaseForm, StaircaseProps } from './Staircase'
 export { Staircase } from './Staircase'
+export type { SteamVentProps } from './SteamVent'
+export { SteamVent } from './SteamVent'
 export type { StoolProps } from './Stool'
 export { Stool } from './Stool'
 export type { StreetLampProps } from './StreetLamp'
@@ -274,6 +287,8 @@ export type { WallOpening, WallProps } from './Wall'
 export { Wall } from './Wall'
 export type { WellProps } from './Well'
 export { Well } from './Well'
+export type { StreetCrossing, WetStreetProps } from './WetStreet'
+export { WetStreet } from './WetStreet'
 export type { WhiteboardMount, WhiteboardProps } from './Whiteboard'
 export { Whiteboard } from './Whiteboard'
 export type { WindmillProps } from './Windmill'

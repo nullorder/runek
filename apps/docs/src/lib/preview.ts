@@ -231,4 +231,15 @@ export const PREVIEW: Record<string, PreviewConfig> = {
     target: [0, 3.2, 0],
     props: { height: 4, size: 1.4, radius: 1.2 },
   },
+  WetStreet: { camera: [6, 4, 8], target: [0, 0, 0], props: { length: 10, width: 6 } },
+  Rain: {
+    skip: true,
+    note: 'Weather for a whole world: mount it once inside <World> and it falls around the camera.',
+  },
+  SteamVent: {
+    camera: [2.4, 2, 3.4],
+    target: [0, 1.2, 0],
+    props: { strength: 1 },
+    background: '#1a1a22',
+  },
 }

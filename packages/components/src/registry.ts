@@ -81,6 +81,7 @@ import { Pool } from './Pool'
 import { PoolTable } from './PoolTable'
 import { Portal } from './Portal'
 import { Poster } from './Poster'
+import { Rain } from './Rain'
 import { Rift } from './Rift'
 import { Road } from './Road'
 import { Rocks } from './Rocks'
@@ -99,6 +100,7 @@ import { Slab } from './Slab'
 import { Sofa } from './Sofa'
 import { Speaker } from './Speaker'
 import { Staircase } from './Staircase'
+import { SteamVent } from './SteamVent'
 import { Stool } from './Stool'
 import { StreetLamp } from './StreetLamp'
 import { Table } from './Table'
@@ -115,6 +117,7 @@ import { VendingMachine } from './VendingMachine'
 import { Vent } from './Vent'
 import { Wall } from './Wall'
 import { Well } from './Well'
+import { WetStreet } from './WetStreet'
 import { Whiteboard } from './Whiteboard'
 import { Windmill } from './Windmill'
 import { Window } from './Window'
@@ -204,6 +207,7 @@ export const registry: ComponentRegistry = {
   PoolTable,
   Portal,
   Poster,
+  Rain,
   Rift,
   Road,
   Rocks,
@@ -223,6 +227,7 @@ export const registry: ComponentRegistry = {
   Sofa,
   Speaker,
   Staircase,
+  SteamVent,
   Stool,
   StreetLamp,
   Table,
@@ -239,6 +244,7 @@ export const registry: ComponentRegistry = {
   Vent,
   Wall,
   Well,
+  WetStreet,
   Whiteboard,
   Windmill,
   Window,

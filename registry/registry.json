@@ -2174,6 +2174,78 @@
         "color": "#39ff88",
         "round": 600
       }
+    },
+    {
+      "name": "wet-street",
+      "title": "WetStreet",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A rain-soaked asphalt street with kerbs: puddles from world-space noise and in the gutters, darkened glossy asphalt, lane, edge and centre paint, zebras at crossings, and reflections from the world's shared mirror, full in standing water and faint on damp asphalt. A mounted `Rain` rings the puddles and dries and soaks the street with its weather. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/WetStreet.tsx",
+          "target": "WetStreet.tsx"
+        },
+        {
+          "path": "packages/components/src/city/weather.ts",
+          "target": "city/weather.ts"
+        }
+      ],
+      "example": {
+        "length": 24,
+        "width": 9,
+        "puddles": 0.6
+      }
+    },
+    {
+      "name": "rain",
+      "title": "Rain",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "The weather over a whole world, drawn only around the camera: rain streaks and splashes, snowflakes, and rings on every `WetStreet`'s puddles, as hard as a `weather` function says (`weatherAt` gives the weather as a pure function of a clock). It stays out from under roofs through a depth map of the still world drawn from above in its first seconds. WebGLRenderer only.",
+      "files": [
+        {
+          "path": "packages/components/src/Rain.tsx",
+          "target": "Rain.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/weather.ts",
+          "target": "city/weather.ts"
+        }
+      ],
+      "example": {
+        "streaks": 4000,
+        "splashes": 200
+      }
+    },
+    {
+      "name": "steam-vent",
+      "title": "SteamVent",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Steam off a manhole or out of a wall vent: soft puffs that rise, spread, lean and thin away, each a pure function of the world clock and `seed`. One instanced draw, plus the lid. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/SteamVent.tsx",
+          "target": "SteamVent.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/hash.ts",
+          "target": "city/hash.ts"
+        }
+      ],
+      "example": {
+        "puffs": 20,
+        "rise": 4
+      }
     }
   ]
 }
