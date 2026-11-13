@@ -386,6 +386,67 @@
       },
       "additionalProperties": false
     },
+    "props.AcUnit": {
+      "description": "An outdoor AC unit on a wall bracket with its drain hose, optionally in a wire cage. Drawn by the world's shared facade-kit meshes, so any number cost no extra draws. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Where the bracket meets the wall [x, y, z] in units. The unit hangs out along local +Z.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seeds the case tone and the fan's phase.",
+          "default": 1
+        },
+        "cage": {
+          "type": "boolean",
+          "description": "Wrap it in a wire cage.",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
     "props.ArcadeCabinet": {
       "description": "An upright arcade cabinet cut to the classic profile, with a lit marquee, joystick and buttons, and a screen running a pixel game laid out from the seed: invaders, falling blocks, a maze, a snake, or a paddle duel.",
       "type": "object",
@@ -567,6 +628,89 @@
             "#7a5a40"
           ],
           "description": "Defaults to the world palette's `stone` slot."
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.Awning": {
+      "description": "A sloped fabric shop awning with a striped valance and two arms, hung from a wall. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Middle of the top edge, where it meets the wall [x, y, z] in units.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract. This component has no seeded variation."
+        },
+        "width": {
+          "type": "number",
+          "description": "Width along the wall, in units.",
+          "default": 3.4
+        },
+        "depth": {
+          "type": "number",
+          "description": "How far it reaches over the pavement, in units.",
+          "default": 1.3
+        },
+        "drop": {
+          "type": "number",
+          "description": "How far the outer edge hangs below the wall edge, in units.",
+          "default": 0.45
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Fabric color.",
+          "default": "#5a2a1c"
+        },
+        "stripes": {
+          "type": "boolean",
+          "description": "Paint the fabric in two-tone stripes.",
+          "default": true
         }
       },
       "additionalProperties": false
@@ -973,6 +1117,238 @@
       },
       "additionalProperties": false
     },
+    "props.Billboard": {
+      "description": "A board that runs ads as data: one or two lines of lettering in the world's display font beside a mark drawn in code that moves with the world clock (steam off a bowl, a watch's hands, a cell filling), cut to the next every `hold` seconds through torn strips. Its picture is redrawn only while near the camera. Lit at the world's screen luminance level. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "The middle of the lit face [x, y, z] in units. It faces local +Z.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Shifts which ad is up when, so two boards side by side do not change together.",
+          "default": 1
+        },
+        "size": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "The lit face, [width, height] in units.",
+          "default": [
+            7.2,
+            4.05
+          ]
+        },
+        "ads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Billboard.BillboardAd"
+          },
+          "description": "The ads it runs, in order, round and round. Sample ads when unset.",
+          "default": [
+            {
+              "lines": [
+                "NIGHT",
+                "NOODLE"
+              ],
+              "tagline": "ONE BOWL ALL NIGHT",
+              "mark": "bowl",
+              "background": "#2a120c",
+              "color": "#ffa64d",
+              "accent": "#ff6418"
+            },
+            {
+              "lines": [
+                "CELL",
+                "CHARGE"
+              ],
+              "tagline": "POWER WHEN YOU NEED IT",
+              "mark": "battery",
+              "background": "#1d1f22",
+              "color": "#ece6da",
+              "accent": "#ff8a1f"
+            },
+            {
+              "lines": [
+                "TIME",
+                "KEEPER"
+              ],
+              "tagline": "WATCHES MENDED",
+              "mark": "watch",
+              "background": "#16141c",
+              "color": "#e9e3f5",
+              "accent": "#7a3cff"
+            },
+            {
+              "lines": [
+                "CLEAR+"
+              ],
+              "tagline": "SEE BETTER TONIGHT",
+              "mark": "plus",
+              "background": "#16141c",
+              "color": "#b8c4ff",
+              "accent": "#e9e3f5"
+            },
+            {
+              "lines": [
+                "CHROME",
+                "WORKS"
+              ],
+              "mark": "dial",
+              "background": "#1b1a1f",
+              "color": "#e8e0d4",
+              "accent": "#c47a4e"
+            },
+            {
+              "lines": [
+                "CITY",
+                "TRANSIT"
+              ],
+              "tagline": "EVERY TEN MINUTES",
+              "mark": "clock",
+              "background": "#f4f6fb",
+              "color": "#3d5bff",
+              "accent": "#3d5bff"
+            },
+            {
+              "lines": [
+                "MIND THE GAP"
+              ],
+              "tagline": "PLEASE STAND CLEAR",
+              "mark": "none",
+              "background": "#3d5bff",
+              "color": "#f4f6fb",
+              "accent": "#f4f6fb"
+            }
+          ]
+        },
+        "hold": {
+          "type": "number",
+          "description": "Seconds each ad stays up.",
+          "default": 9
+        },
+        "mount": {
+          "enum": [
+            "wall",
+            "posts"
+          ],
+          "description": "`wall` hangs it on a wall behind it. `posts` stands it on two legs, `stand` units tall.",
+          "default": "wall"
+        },
+        "stand": {
+          "type": "number",
+          "description": "Height of the legs under a board on posts, in units.",
+          "default": 5
+        },
+        "frameColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Frame and leg color. Defaults to the world palette's `metal`."
+        }
+      },
+      "additionalProperties": false
+    },
+    "Billboard.BillboardAd": {
+      "type": "object",
+      "properties": {
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "One or two lines of big lettering."
+        },
+        "tagline": {
+          "type": "string",
+          "description": "A smaller line under them."
+        },
+        "mark": {
+          "enum": [
+            "bowl",
+            "battery",
+            "watch",
+            "plus",
+            "dial",
+            "clock",
+            "none"
+          ],
+          "description": "The mark beside the words."
+        },
+        "background": {
+          "type": "string",
+          "description": "The board's background."
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The first line and the mark."
+        },
+        "accent": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The second line, the tagline and the mark's highlights."
+        }
+      },
+      "required": [
+        "lines"
+      ],
+      "additionalProperties": false
+    },
     "props.Birds": {
       "description": "A loose flock circling overhead, each bird flapping on its own seeded orbit.",
       "type": "object",
@@ -1050,6 +1426,89 @@
           "type": "number",
           "description": "Seed for the deterministic variation: same seed, same result.",
           "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.BladeSign": {
+      "description": "A board standing out from a wall with one word stacked down both faces in the world's display font, lit at the world's sign luminance level, with tube edges. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Bottom of the board at the wall [x, y, z] in units. The board stands out along local +Z.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract. This component has no seeded variation."
+        },
+        "text": {
+          "type": "string",
+          "description": "The word to stack, top to bottom. Spaces are dropped.",
+          "default": "NOODLE"
+        },
+        "letter": {
+          "type": "number",
+          "description": "Letter height in units. 0.3 reads at 20 m, 1.5 at 100 m.",
+          "default": 0.55
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Lamp color of the letters and the edge tubes.",
+          "default": "#ff6418"
+        },
+        "gap": {
+          "type": "number",
+          "description": "Gap between the wall and the board, in units.",
+          "default": 0.3
+        },
+        "tube": {
+          "type": "boolean",
+          "description": "Run a tube down both edges of the board.",
+          "default": true
         }
       },
       "additionalProperties": false
@@ -1472,6 +1931,94 @@
       },
       "additionalProperties": false
     },
+    "props.CableSag": {
+      "description": "A cable sagging across a street between two anchors: a parabola cut into straight pieces. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "The near anchor [x, y, z] in units. The cable crosses along local +Z.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Turn about Y to aim it across the street.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract. This component has no seeded variation."
+        },
+        "span": {
+          "type": "number",
+          "description": "Distance to the far anchor, in units.",
+          "default": 27
+        },
+        "sag": {
+          "type": "number",
+          "description": "How far the middle hangs below the straight line, in units.",
+          "default": 1.4
+        },
+        "drop": {
+          "type": "number",
+          "description": "How much higher (or lower, when negative) the far anchor sits, in units.",
+          "default": 0
+        },
+        "segments": {
+          "type": "number",
+          "description": "Straight pieces the curve is cut into.",
+          "default": 8
+        },
+        "thickness": {
+          "type": "number",
+          "description": "Cable thickness, in units.",
+          "default": 0.04
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Cable color.",
+          "default": "#141110"
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Campfire": {
       "description": "Stone ring, a tepee of logs, and an animated flame with a warm flickering light.",
       "type": "object",
@@ -1637,7 +2184,8 @@
           "enum": [
             "flush",
             "pendant",
-            "spot"
+            "spot",
+            "panel"
           ],
           "description": "Seeded when unset."
         },
@@ -1686,6 +2234,15 @@
           "type": "number",
           "description": "Light strength.",
           "default": 12
+        },
+        "reach": {
+          "type": "number",
+          "description": "How far its light carries, in units. The world lends its few real lights by strength over\nthe square of distance, never nearer than this reach, so a short reach makes a dim fitting\nwin while the viewer is in its room and give the light back once they leave. Keep it near\nthe room's size."
+        },
+        "light": {
+          "type": "boolean",
+          "description": "Ask the world for a real light. Off, it still glows: a big room wants many lit fittings\nand only a few real lights, fewer than the world's light budget.",
+          "default": true
         },
         "on": {
           "type": "boolean",
@@ -2327,6 +2884,99 @@
       },
       "additionalProperties": false
     },
+    "props.CoffeeGear": {
+      "description": "What a cafe makes coffee with and shows off: an espresso machine, grinder, pour-over bar, siphon, cold drip tower, batch brewer, taps, a drum roaster, and beans in bags, jars and stocked shelves, one `kind` to a node. Only the roaster has a collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "The middle of its foot: on the counter it stands on. A shelf's is the middle of its lowest board."
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "The working side is the kind's own +Z.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Picks the bag colors and how high each stack of cups is.",
+          "default": 0
+        },
+        "kind": {
+          "enum": [
+            "espresso",
+            "grinder",
+            "pourover",
+            "chemex",
+            "press",
+            "moka",
+            "siphon",
+            "coldbrew",
+            "kettle",
+            "batch",
+            "ibrik",
+            "taps",
+            "pitchers",
+            "jars",
+            "bags",
+            "cups",
+            "shelf",
+            "roaster"
+          ],
+          "description": "Which piece of gear it is.",
+          "default": "espresso"
+        },
+        "length": {
+          "type": "number",
+          "description": "How long a row is, or how wide an espresso machine, in units.",
+          "default": 0.6
+        },
+        "rows": {
+          "type": "number",
+          "description": "How many boards a shelf has.",
+          "default": 3
+        },
+        "glow": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The color of its pilot lights and flames, lit at the world's `screen` luminance level.",
+          "default": "#ffa64d"
+        }
+      },
+      "additionalProperties": false
+    },
     "props.CoffeeMachine": {
       "description": "A countertop coffee machine, espresso or drip, with a cup or carafe and a few puffs of steam. Sits on a Counter.",
       "type": "object",
@@ -2653,6 +3303,148 @@
           "default": 1
         }
       },
+      "additionalProperties": false
+    },
+    "props.Crowd": {
+      "description": "People on a street in bulk: hooded figures in long coats walking their lanes there and back, each with one small light at the collar, stepping round the player. Where each walks comes from the world clock and `seed` alone, so every viewer sees the same crowd. Three instanced draws however many walk; no colliders.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Where the lanes' origin stands [x, y, z] in units: lanes are in the node's own frame.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians, turning the lanes with it.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Deals out each walker: which lane, where on it, how fast, how tall, what they wear.",
+          "default": 1
+        },
+        "count": {
+          "type": "number",
+          "description": "How many walk.",
+          "default": 24
+        },
+        "lanes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Crowd.CrowdLane"
+          },
+          "description": "The paths they walk, in the node's frame. A walker keeps to one lane, going to its end and\nback. One 16-unit lane along X by default.",
+          "default": [
+            {
+              "y": 0,
+              "points": [
+                [
+                  -8,
+                  0
+                ],
+                [
+                  8,
+                  0
+                ]
+              ]
+            }
+          ]
+        },
+        "speed": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Slowest and fastest a walker goes, in units a second.",
+          "default": [
+            0.9,
+            1.5
+          ]
+        },
+        "spread": {
+          "type": "number",
+          "description": "How far to either side of its lane a walker keeps, in units, so a crowd is not a queue.",
+          "default": 0.9
+        },
+        "berth": {
+          "type": "number",
+          "description": "How far round the player a walker steps aside, in units. 0 for none.",
+          "default": 1.3
+        }
+      },
+      "additionalProperties": false
+    },
+    "Crowd.CrowdLane": {
+      "type": "object",
+      "properties": {
+        "y": {
+          "type": "number",
+          "description": "The ground along it."
+        },
+        "points": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "description": "Its corners, each [x, z]."
+        }
+      },
+      "required": [
+        "y",
+        "points"
+      ],
       "additionalProperties": false
     },
     "props.CurvedWall": {
@@ -3645,6 +4437,112 @@
       },
       "additionalProperties": false
     },
+    "props.FlyingTraffic": {
+      "description": "Lanes of hovercars over a street, decks of lanes each way, every car placed by the world clock and `seed` so every viewer sees the same traffic. Three instanced draws however many cars; no colliders.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "The middle of the lanes [x, y, z] in units, at the height of the lowest one. Lanes run along local Z.",
+          "default": [
+            0,
+            40,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Deals out each car's lane, speed, paint and where on the lane it starts.",
+          "default": 1
+        },
+        "length": {
+          "type": "number",
+          "description": "How long the lanes are, in units. Cars leave one end and come in at the other, so make it\nlonger than the fog lets anyone see.",
+          "default": 480
+        },
+        "cars": {
+          "type": "number",
+          "description": "How many cars fly.",
+          "default": 28
+        },
+        "lanes": {
+          "type": "number",
+          "description": "Lanes side by side going each way.",
+          "default": 2
+        },
+        "spacing": {
+          "type": "number",
+          "description": "How far apart lanes are, side to side, in units.",
+          "default": 7
+        },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Heights of the decks of lanes above `position`, in units.",
+          "default": [
+            0,
+            9,
+            20
+          ]
+        },
+        "speed": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Slowest and fastest a car flies, in units a second.",
+          "default": [
+            16,
+            34
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Fountain": {
       "description": "Two-tier stone fountain with gently rippling water (a per-frame bob, no textures).",
       "type": "object",
@@ -4089,6 +4987,93 @@
       },
       "additionalProperties": false
     },
+    "props.GlowSky": {
+      "description": "A night sky that is never black: a dome lit from below by a city, darkest overhead and as bright as the haze at the horizon, with a slow cloud deck catching the district's glow that parts on stars and a moon in its phase. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract. Shifts the cloud pattern.",
+          "default": 0
+        },
+        "zenith": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Color of the sky overhead.",
+          "default": "#10172e"
+        },
+        "horizon": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Color at the horizon. Match it to the world's fog so the city fades into the sky.",
+          "default": "#1a2238"
+        },
+        "glow": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Color of the city glow on the underside of the cloud deck.",
+          "default": "#9ab8ff"
+        },
+        "clouds": {
+          "type": "boolean",
+          "description": "Draw the low cloud deck lit from below.",
+          "default": true
+        },
+        "night": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Color of the open sky between the clouds.",
+          "default": "#131a3a"
+        },
+        "cloud": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Color of the clouds themselves, away from the city's glow. Cooler than the haze, so the\nglow on their undersides reads as light on something and not as more haze.",
+          "default": "#3a4052"
+        },
+        "moonColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Color of the moon and its light on the clouds.",
+          "default": "#f6f2ea"
+        },
+        "moon": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Where the moon hangs: a direction from the viewer, +Y up.",
+          "default": [
+            0.42,
+            0.62,
+            -0.66
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Grass": {
       "description": "Instanced grass blades (seeded scatter).",
       "type": "object",
@@ -4341,6 +5326,102 @@
           "type": "number",
           "description": "Seed for the deterministic variation: same seed, same result.",
           "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.Hologram": {
+      "description": "A plaza centrepiece: a pedestal, a beam of light with scan lines climbing it, and in it a wire cage turning round three rings that keep time (once a minute, once an hour, once every `round` seconds) off the world clock. The pedestal has a cylinder collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "The middle of the pedestal's foot [x, y, z] in units.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract. Every hologram keeps the same time."
+        },
+        "radius": {
+          "type": "number",
+          "description": "Radius of the pedestal, in units.",
+          "default": 1.6
+        },
+        "height": {
+          "type": "number",
+          "description": "How high the middle of the figure hangs over the pedestal's foot, in units.",
+          "default": 6.5
+        },
+        "size": {
+          "type": "number",
+          "description": "Radius of the figure, in units.",
+          "default": 2.2
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The beam and the figure's cage, lit at the world's `sign` and `tube` levels.",
+          "default": "#3d5bff"
+        },
+        "accent": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The rings that keep time.",
+          "default": "#f4f6fb"
+        },
+        "round": {
+          "type": "number",
+          "description": "Seconds the slow ring takes to go round once: a district's power round, say.",
+          "default": 1440
+        },
+        "light": {
+          "type": "boolean",
+          "description": "Ask the world's light pool for a real light at the figure.",
+          "default": true
         }
       },
       "additionalProperties": false
@@ -5505,6 +6586,117 @@
       },
       "additionalProperties": false
     },
+    "props.NeonSign": {
+      "description": "Words bent out of glass tube on a dark board, at the world's tube luminance level, that flicker: bad tubes buzz and drop out and the whole sign stutters now and then, as a pure function of the world clock and `seed` so every viewer sees the same sign. The tubes are drawn in code from the world's fonts. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "The middle of the sign [x, y, z] in units. It faces local +Z.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Picks which letters are the bad ones, and when everything stutters.",
+          "default": 1
+        },
+        "text": {
+          "type": "string",
+          "description": "The words, on one line. At most 24 characters are drawn.",
+          "default": "OPEN"
+        },
+        "size": {
+          "type": "number",
+          "description": "Cap height in units.",
+          "default": 0.5
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Tube color, lit at the world's `tube` luminance level.",
+          "default": "#ff6418"
+        },
+        "variant": {
+          "enum": [
+            "display",
+            "body"
+          ],
+          "description": "Which of the world's fonts the tubes are bent to.",
+          "default": "display"
+        },
+        "font": {
+          "type": "string",
+          "description": "A font URL to use instead of a world font."
+        },
+        "flicker": {
+          "type": "number",
+          "description": "How badly it flickers, 0 (a new sign) to 1 (one that should be taken down).",
+          "default": 0.4
+        },
+        "faults": {
+          "type": "number",
+          "description": "How many letters have a bad tube of their own.",
+          "default": 1
+        },
+        "board": {
+          "type": "boolean",
+          "description": "Draw the dark board the tubes are mounted on.",
+          "default": true
+        },
+        "light": {
+          "type": "boolean",
+          "description": "Ask the world's light pool for a real light, which flickers with the sign.",
+          "default": false
+        },
+        "intensity": {
+          "type": "number",
+          "description": "Candela of that light with every tube lit.",
+          "default": 60
+        }
+      },
+      "additionalProperties": false
+    },
     "props.NeonStrip": {
       "description": "A neon tube along local X: a white-hot core in a coloured sleeve with a soft halo, glowing at any hour. Decorative; light washes nearby walls in its colour through the world's light pool.",
       "type": "object",
@@ -6051,17 +7243,26 @@
       "additionalProperties": false
     },
     "props.Person": {
-      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body.",
+      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body.",
       "type": "object",
       "properties": {
         "style": {
           "enum": [
             "stylized",
             "realistic",
-            "anime"
+            "anime",
+            "punk"
           ],
-          "description": "Proportion and face template: `stylized` (default) is an animated-film look with a big\nhead and eyes, small features, and slender limbs; `realistic` keeps canonical human\nproportions; `anime` pushes the eyes and legs further.",
+          "description": "Proportion and face template: `stylized` (default) is an animated-film look with a big\nhead and eyes, small features, and slender limbs; `realistic` keeps canonical human\nproportions; `anime` pushes the eyes and legs further; `punk` is drawn the way an animator\nwould, with long legs, tall flat eyes under a lash line, hair in chunky locks, and flat\ntwo-tone color inside an ink line (no ink line under `WebGPURenderer`).",
           "default": "stylized"
+        },
+        "anatomy": {
+          "enum": [
+            "bones",
+            "muscle",
+            "surface"
+          ],
+          "description": "How much of the body is built: `bones` is the bare frame, `muscle` the frame with its\nmuscles on, `surface` (default) the finished body. For looking at how a build is put\ntogether, with `clothes={[]}`."
         },
         "kind": {
           "enum": [
@@ -6117,7 +7318,11 @@
           "enum": [
             "slim",
             "average",
-            "stocky"
+            "stocky",
+            "athletic",
+            "heavy",
+            "petite",
+            "lanky"
           ],
           "description": "Limb thickness and torso depth. Seeded when unset."
         },
@@ -6165,7 +7370,12 @@
                 "ponytail",
                 "braid",
                 "cropped",
-                "bald"
+                "bald",
+                "bob",
+                "twintails",
+                "spiky",
+                "fringe",
+                "curtain"
               ]
             },
             {
@@ -6201,7 +7411,16 @@
             "dress",
             "robe",
             "apron",
-            "uniform"
+            "shorts",
+            "tank",
+            "pleated",
+            "runner",
+            "shell",
+            "uniform",
+            "bomber",
+            "crop",
+            "rig",
+            "street"
           ],
           "description": "One-word outfit; expands to a `clothes` stack (e.g. `tunic`: trousers, tunic, shoes)."
         },
@@ -6226,6 +7445,13 @@
           ],
           "description": "Footwear color; defaults to the palette's `metal`."
         },
+        "trimColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The lit seams and stripes of street clothes (`runner`, `shell`, `rig`, `street`, a hoodie's\ncords) and a visor's slit. Defaults to a lamp color picked by the seed. They shine on a\n`punk` figure and are plain color on the others."
+        },
         "hat": {
           "enum": [
             "none",
@@ -6234,7 +7460,8 @@
             "brim",
             "bandana",
             "hood",
-            "chef"
+            "chef",
+            "beanie"
           ]
         },
         "accessories": {
@@ -6246,7 +7473,11 @@
               "cape",
               "bag",
               "glasses",
-              "staff"
+              "staff",
+              "headphones",
+              "mask",
+              "backpack",
+              "visor"
             ]
           }
         },
@@ -6453,7 +7684,11 @@
           "enum": [
             "slim",
             "average",
-            "stocky"
+            "stocky",
+            "athletic",
+            "heavy",
+            "petite",
+            "lanky"
           ],
           "description": "Limb thickness and torso depth."
         },
@@ -6565,9 +7800,21 @@
             "skirt",
             "shoes",
             "boots",
+            "jacket",
+            "croptop",
+            "tank",
+            "cargo",
+            "pleated",
+            "stockings",
+            "sneakers",
             "belt",
             "scarf",
-            "cape"
+            "cape",
+            "runner",
+            "shell",
+            "techvest",
+            "joggers",
+            "hightops"
           ]
         },
         "color": {
@@ -6576,10 +7823,14 @@
             "#7a5a40"
           ]
         },
+        "trim": {
+          "type": "string",
+          "description": "The color of its lit seams and stripes, where it has any. Defaults to the figure's trim."
+        },
         "sleeves": {
           "enum": [
-            "short",
             "none",
+            "short",
             "long"
           ],
           "description": "Tops only."
@@ -6618,7 +7869,16 @@
             "dress",
             "robe",
             "apron",
-            "uniform"
+            "shorts",
+            "tank",
+            "pleated",
+            "runner",
+            "shell",
+            "uniform",
+            "bomber",
+            "crop",
+            "rig",
+            "street"
           ]
         },
         "clothes": {
@@ -6646,6 +7906,13 @@
             "#7a5a40"
           ]
         },
+        "trimColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The lit seams and stripes of street clothes."
+        },
         "hat": {
           "enum": [
             "none",
@@ -6654,7 +7921,8 @@
             "brim",
             "bandana",
             "hood",
-            "chef"
+            "chef",
+            "beanie"
           ]
         },
         "hair": {
@@ -6666,7 +7934,12 @@
             "ponytail",
             "braid",
             "cropped",
-            "bald"
+            "bald",
+            "bob",
+            "twintails",
+            "spiky",
+            "fringe",
+            "curtain"
           ]
         },
         "hairColor": {
@@ -6684,7 +7957,11 @@
               "cape",
               "bag",
               "glasses",
-              "staff"
+              "staff",
+              "headphones",
+              "mask",
+              "backpack",
+              "visor"
             ]
           }
         }
@@ -6703,7 +7980,12 @@
             "ponytail",
             "braid",
             "cropped",
-            "bald"
+            "bald",
+            "bob",
+            "twintails",
+            "spiky",
+            "fringe",
+            "curtain"
           ]
         },
         "color": {
@@ -6984,6 +8266,84 @@
             "#7a5a40"
           ],
           "description": "Defaults to the world palette's `stone` slot."
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.PipeRun": {
+      "description": "A pipe or conduit run clipped to a wall, up it or along it, with a collar every couple of metres. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Where the run starts on the wall [x, y, z] in units. It climbs along local +Y, or runs along local +X when `horizontal`.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract. This component has no seeded variation."
+        },
+        "length": {
+          "type": "number",
+          "description": "Length of the run, in units.",
+          "default": 6
+        },
+        "horizontal": {
+          "type": "boolean",
+          "description": "Run along the wall instead of up it.",
+          "default": false
+        },
+        "radius": {
+          "type": "number",
+          "description": "Pipe radius, in units.",
+          "default": 0.06
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Pipe color.",
+          "default": "#4a4844"
         }
       },
       "additionalProperties": false
@@ -7550,6 +8910,102 @@
       },
       "additionalProperties": false
     },
+    "props.Rain": {
+      "description": "The weather over a whole world, drawn only around the camera: rain streaks and splashes, snowflakes, and rings on every `WetStreet`'s puddles, as hard as a `weather` function says (`weatherAt` gives the weather as a pure function of a clock). It stays out from under roofs through a depth map of the still world drawn from above in its first seconds. WebGLRenderer only.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Accepted for the component contract. Rain follows the camera, so it has no place of its own."
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Accepted for the component contract."
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seeds where each streak, splash and flake starts."
+        },
+        "streaks": {
+          "type": "number",
+          "description": "Streaks in the air around the camera when it rains its hardest. Lighter rain draws fewer."
+        },
+        "splashes": {
+          "type": "number",
+          "description": "Splashes on the ground around the camera in the heaviest rain, 0 for none."
+        },
+        "flakes": {
+          "type": "number",
+          "description": "Snowflakes in the air around the camera when it snows its hardest, 0 for none."
+        },
+        "ripples": {
+          "type": "boolean",
+          "description": "Ring the puddles of every `WetStreet`."
+        },
+        "bounds": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "The part of the world rain can fall on, [minX, minZ, maxX, maxZ] in units. Outside it, rain falls through everything."
+        },
+        "cover": {
+          "type": "number",
+          "description": "Texels along each side of the cover map, which records the highest surface over every spot."
+        },
+        "floor": {
+          "type": "number",
+          "description": "The lowest anything falls, in units: the surface of a sea, which no cover map holds since\nwater is not a still part of the world. Rain ends there and splashes on it, inside the\nbounds and out. Unset, there is no such floor."
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Rain color. A cool grey by default, lit as if by the street."
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Rift": {
       "description": "A pair of linked rifts torn in the air, ragged and edged in iridescent, glitter-shedding light. Each shows the other end live and in parallax, and walking into either carries you to the other: walkable shortcuts within one world (use Portal for other worlds or pages).",
       "type": "object",
@@ -7819,6 +9275,84 @@
           "type": "number",
           "description": "Seed for the deterministic variation: same seed, same result.",
           "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.RollerShutter": {
+      "description": "A slatted roller shutter in its housing and side guides, rolled up as far as `open` says. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Bottom centre of the opening on the wall [x, y, z] in units.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract. This component has no seeded variation."
+        },
+        "width": {
+          "type": "number",
+          "description": "Width of the opening, in units.",
+          "default": 3.4
+        },
+        "height": {
+          "type": "number",
+          "description": "Height of the opening, in units.",
+          "default": 2.9
+        },
+        "open": {
+          "type": "number",
+          "description": "Share rolled up: 0 is down, 1 is fully open.",
+          "default": 0
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Slat color.",
+          "default": "#6e6a62"
         }
       },
       "additionalProperties": false
@@ -8226,8 +9760,8 @@
         },
         "mount": {
           "enum": [
-            "stand",
             "wall",
+            "stand",
             "desk",
             "frame"
           ],
@@ -8927,6 +10461,129 @@
       },
       "additionalProperties": false
     },
+    "props.Skyline": {
+      "description": "A district seen from far off: a band of towers across part of the horizon with a few rooms lit and one landmark (spire, dome or stack) picked out in light, in two draws. Scenery past anywhere a body can reach: no colliders.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Where the skyline is seen from [x, y, z] in units: the middle of the place it rings.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Accepted for the component contract. Turn a skyline with `bearing`."
+        },
+        "seed": {
+          "type": "number",
+          "description": "Deals out every tower: where it stands, how tall, how wide, which windows are lit.",
+          "default": 1
+        },
+        "bearing": {
+          "type": "number",
+          "description": "Compass bearing of the middle of the district, in degrees: 0 is +Z, 90 is +X.",
+          "default": 180
+        },
+        "spread": {
+          "type": "number",
+          "description": "How many degrees of the horizon it takes up.",
+          "default": 70
+        },
+        "distance": {
+          "type": "number",
+          "description": "How far off its nearest towers stand, in units. Keep it and `depth` under the camera's far plane.",
+          "default": 620
+        },
+        "depth": {
+          "type": "number",
+          "description": "How far back the district goes behind that, in units.",
+          "default": 180
+        },
+        "count": {
+          "type": "number",
+          "description": "How many towers.",
+          "default": 60
+        },
+        "heights": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Shortest and tallest tower, in units.",
+          "default": [
+            50,
+            170
+          ]
+        },
+        "landmark": {
+          "enum": [
+            "dome",
+            "spire",
+            "stack"
+          ],
+          "description": "What stands over the district: a stepped `spire` with a lit collar, a `dome` in rings, or a squat `stack` with chimneys."
+        },
+        "landmarkHeight": {
+          "type": "number",
+          "description": "How tall the landmark is, in units.",
+          "default": 380
+        },
+        "accent": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The color of the landmark's lights.",
+          "default": "#3d5bff"
+        },
+        "haze": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Haze color: the world's fog, so the district sinks into the horizon at its foot.",
+          "default": "#1a2238"
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Slab": {
       "description": "A rounded structural plate (pill or ellipse) for curved-modernist decks, cantilevered roofs, terraces, or a lawn disc. Walkable, with a single convex-hull collider.",
       "type": "object",
@@ -9050,8 +10707,8 @@
         },
         "arms": {
           "enum": [
-            "slim",
             "none",
+            "slim",
             "square",
             "rolled"
           ],
@@ -9308,6 +10965,105 @@
       },
       "additionalProperties": false
     },
+    "props.SteamVent": {
+      "description": "Steam off a manhole or out of a wall vent: soft puffs that rise, spread, lean and thin away, each a pure function of the world clock and `seed`. One instanced draw, plus the lid. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Where the steam comes out [x, y, z] in units: the middle of a manhole, or the mouth of a wall vent.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Sets each puff apart from the next, and this vent from every other.",
+          "default": 1
+        },
+        "puffs": {
+          "type": "number",
+          "description": "How many puffs are in the air at once.",
+          "default": 14
+        },
+        "rise": {
+          "type": "number",
+          "description": "How high a puff rises before it is gone, in units.",
+          "default": 3.2
+        },
+        "spread": {
+          "type": "number",
+          "description": "How far a puff has spread by then, in units.",
+          "default": 1.1
+        },
+        "period": {
+          "type": "number",
+          "description": "Seconds a puff takes to rise and thin out.",
+          "default": 4.5
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Steam color: it takes the color of the light around it.",
+          "default": "#c9d2e6"
+        },
+        "strength": {
+          "type": "number",
+          "description": "How thick it is, 0 (nothing) to 1.",
+          "default": 1
+        },
+        "grate": {
+          "type": "boolean",
+          "description": "Draw the manhole it comes from: a dark lid with a rim, `radius` across.",
+          "default": true
+        },
+        "radius": {
+          "type": "number",
+          "description": "Radius of the lid and of the column of steam at its foot, in units.",
+          "default": 0.42
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Stool": {
       "description": "A round bar stool: a disc seat on three splayed legs; a thin cylinder collider.",
       "type": "object",
@@ -9376,6 +11132,124 @@
         "seed": {
           "type": "number",
           "description": "Accepted for the component contract; this component has no seeded variation yet."
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.StreetLamp": {
+      "description": "A street lamp on an arm: a pole, a hot lens at the world's lamp luminance level, a haze cone under the head and a soft pool of light on the street, every lamp's cone and pool sharing two instanced draws. The real light comes from the world's light pool. One thin collider for the pole.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Base of the pole [x, y, z] in units. The arm reaches along local +X.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract; this component has no seeded variation."
+        },
+        "height": {
+          "type": "number",
+          "description": "Pole height to the arm, in units.",
+          "default": 8
+        },
+        "arm": {
+          "type": "number",
+          "description": "How far the arm reaches out from the pole, in units.",
+          "default": 2.4
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Lamp color. A cool white by default: the city lights its streets like day.",
+          "default": "#dfe8ff"
+        },
+        "poleColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Pole, arm and head color. Defaults to the world palette's `metal`."
+        },
+        "intensity": {
+          "type": "number",
+          "description": "Candela toward the street, when the world lends this lamp a real light.",
+          "default": 350
+        },
+        "light": {
+          "type": "boolean",
+          "description": "Ask the world's light pool for a real light. The lens, cone and pool glow either way.",
+          "default": true
+        },
+        "cone": {
+          "type": "boolean",
+          "description": "Draw the haze cone under the head.",
+          "default": true
+        },
+        "haze": {
+          "type": "number",
+          "description": "Peak luminance of the haze cone (scene-linear), times the world's `lamp` level.",
+          "default": 0.06
+        },
+        "pool": {
+          "type": "boolean",
+          "description": "Draw the soft pool on the street under the head, for lamps the pool has no light for.",
+          "default": true
+        },
+        "poolRadius": {
+          "type": "number",
+          "description": "Radius of that pool, in units.",
+          "default": 6
+        },
+        "poolOn": {
+          "enum": [
+            "ground",
+            "base"
+          ],
+          "description": "What the pool lies on. `ground` is the world's ground, for a lamp on a pavement whose arm\nreaches out over the street below it. `base` is whatever the lamp itself stands on: a plaza,\na lawn, a roof.",
+          "default": "ground"
         }
       },
       "additionalProperties": false
@@ -9572,9 +11446,9 @@
       "properties": {
         "kind": {
           "enum": [
+            "bowl",
             "glass",
             "plate",
-            "bowl",
             "cup",
             "jug",
             "setting"
@@ -9996,6 +11870,150 @@
       },
       "additionalProperties": false
     },
+    "props.Tower": {
+      "description": "A procedural city tower from a seeded shape grammar: podium, setback, shaft and crown, with street, service, podium, tower and crown bands drawn by one shared facade shader (shop bays, lit windows with rooms behind them, trims, posters and leaks), so towers batch. Four eras (concrete, tenement, glass, makeshift) set the massing and dressing. Faces listed in `frontage` get relief and the facade kit: shop names, blade and roof signs, awnings, shutters, AC units, pipes, vending machines, cables across the street and light pooled on the pavement. Lit after dusk at the world's luminance levels. Colliders over the footprint and along each street face.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position of the tower's base centre [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Towers stand upright: only the turn about Y is meant to be used.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seeds the massing, the window pattern, which windows are lit, every prop and sign, and any unset look props.",
+          "default": 1
+        },
+        "width": {
+          "type": "number",
+          "description": "Ground footprint along local X, in units. The podium fills it and the collider matches it.",
+          "default": 16
+        },
+        "depth": {
+          "type": "number",
+          "description": "Ground footprint along local Z, in units.",
+          "default": 16
+        },
+        "height": {
+          "type": "number",
+          "description": "Height to the roof, in units. Rooftop plant and masts stand above it.",
+          "default": 60
+        },
+        "windows": {
+          "enum": [
+            "glass",
+            "office",
+            "grid",
+            "ribbon"
+          ],
+          "description": "Window layout: `grid` (apartments), `office` (small dense panes), `ribbon` (continuous bands) or `glass` (curtain wall). Seeded by era when unset."
+        },
+        "lit": {
+          "type": "number",
+          "description": "Share of windows lit at night, 0 to 1. Seeded when unset."
+        },
+        "trim": {
+          "type": "string",
+          "description": "Neon trim along the parapets and crown, and the color of the tower's main sign, lit at the world's `sign` luminance level. `\"none\"` for a plain tower. Seeded when unset."
+        },
+        "cornerStrips": {
+          "type": "boolean",
+          "description": "Also run the trim colour up the corners."
+        },
+        "shopfronts": {
+          "type": "boolean",
+          "description": "Shop bays along the ground floor.",
+          "default": true
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Wall colour. Defaults to the world palette's `wall`."
+        },
+        "era": {
+          "enum": [
+            "glass",
+            "concrete",
+            "tenement",
+            "makeshift"
+          ],
+          "description": "Which era built it: `concrete` (squat, heavy, stencilled), `tenement` (balconies, sign frames, drum lanterns), `glass` (a thin glass slab with a clock in its crown) or `makeshift` (cages, shacks, cable). Seeded among the first, second and last when unset."
+        },
+        "podium": {
+          "type": "number",
+          "description": "Podium height in units, for a tower tall and wide enough to have a shaft (at least 34 high and 10 across). Seeded between 15 and 25 when unset."
+        },
+        "frontage": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "+z",
+              "+x",
+              "-z",
+              "-x"
+            ]
+          },
+          "description": "The faces that front a street: `+z`, `+x`, `-z`, `-x` in the tower's own frame. Each gets piers, a fascia, signs and the instanced kit props, and the first one listed carries the tower's big sign. Empty by default, so a tower costs one merged mesh until it is told where the street is.",
+          "default": []
+        },
+        "name": {
+          "type": "string",
+          "description": "The shop name on the main sign. Seeded when unset."
+        },
+        "cableSpan": {
+          "type": "number",
+          "description": "Wall to wall distance across the street in units. Above 0, cables sag across it from the first face in `frontage`.",
+          "default": 0
+        },
+        "light": {
+          "type": "boolean",
+          "description": "Ask the world for a real light in front of the main shop. Pooled, so only the ones that matter to the view are lit.",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
     "props.Trees": {
       "description": "L-system trees grown by a 3D turtle, deterministic from seed.",
       "type": "object",
@@ -10091,8 +12109,8 @@
         },
         "mount": {
           "enum": [
-            "stand",
             "wall",
+            "stand",
             "console"
           ],
           "description": "`stand` and `console` are seeded when unset; `wall` must be asked for. On a wall the origin\nis the middle of the screen with its back against the wall (local -Z)."
@@ -10262,6 +12280,143 @@
           "type": "number",
           "description": "Seed for the deterministic variation: same seed, same result.",
           "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.VendingMachine": {
+      "description": "A vending machine against a wall: a matte case and a lit window of goods at the world's screen luminance level. Drawn by the world's shared facade-kit meshes. One cuboid collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Middle of the back of the machine at the ground [x, y, z] in units. It faces local +Z.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Turn about Y so local +Z points away from the wall behind it.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seeds the rows of goods in the window.",
+          "default": 1
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Case color.",
+          "default": "#3a2f45"
+        },
+        "lamp": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Lamp color of the window, lit at the world's `screen` luminance level.",
+          "default": "#ffcf9a"
+        }
+      },
+      "additionalProperties": false
+    },
+    "props.Vent": {
+      "description": "A louvred wall vent under a small hood. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Bottom centre of the vent on the wall [x, y, z] in units.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Accepted for the component contract. This component has no seeded variation."
+        },
+        "width": {
+          "type": "number",
+          "description": "Width along the wall, in units.",
+          "default": 0.6
+        },
+        "height": {
+          "type": "number",
+          "description": "Height, in units.",
+          "default": 0.45
         }
       },
       "additionalProperties": false
@@ -10452,6 +12607,141 @@
       },
       "additionalProperties": false
     },
+    "props.WetStreet": {
+      "description": "A rain-soaked asphalt street with kerbs: puddles from world-space noise and in the gutters, darkened glossy asphalt, lane, edge and centre paint, zebras at crossings, and reflections from the world's shared mirror, full in standing water and faint on damp asphalt. A mounted `Rain` rings the puddles and dries and soaks the street with its weather. Decorative: no collider.",
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "number",
+          "description": "Length along local Z, in units.",
+          "default": 12
+        },
+        "width": {
+          "type": "number",
+          "description": "Width along local X, kerb to kerb, in units.",
+          "default": 7
+        },
+        "color": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Asphalt color; defaults to the palette's `stone`."
+        },
+        "kerbColor": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Kerb color; defaults to the palette's `floor` (the pavement)."
+        },
+        "wetness": {
+          "type": "number",
+          "description": "How wet the street is when the weather has soaked it, 0 (dry) to 1 (soaked).",
+          "default": 0.85
+        },
+        "puddles": {
+          "type": "number",
+          "description": "How much of the street stands in puddles then, 0 to 1.",
+          "default": 0.5
+        },
+        "markings": {
+          "type": "boolean",
+          "description": "Paint lane and edge lines, and a zebra at each crossing.",
+          "default": true
+        },
+        "paint": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "Lane, edge and zebra paint.",
+          "default": "#ece6da"
+        },
+        "centrePaint": {
+          "type": "string",
+          "examples": [
+            "#7a5a40"
+          ],
+          "description": "The centre line.",
+          "default": "#c98a3e"
+        },
+        "crossings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WetStreet.StreetCrossing"
+          },
+          "description": "Cross streets: no kerbs, lines or gutters inside them, a zebra either side. At most four.",
+          "default": []
+        },
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "rotation": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Euler rotation [x, y, z] in radians.",
+          "default": [
+            0,
+            0,
+            0
+          ]
+        },
+        "seed": {
+          "type": "number",
+          "description": "Seed for the deterministic variation: same seed, same result.",
+          "default": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "WetStreet.StreetCrossing": {
+      "type": "object",
+      "properties": {
+        "at": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "at",
+        "width"
+      ],
+      "additionalProperties": false
+    },
     "props.Whiteboard": {
       "description": "A whiteboard on a rolling stand or a wall, with seeded marker diagrams (boxes, arrows, lines of writing) and optional text across the top.",
       "type": "object",
@@ -10468,8 +12758,8 @@
         },
         "mount": {
           "enum": [
-            "stand",
-            "wall"
+            "wall",
+            "stand"
           ],
           "default": "stand"
         },
@@ -10732,19 +13022,24 @@
             {
               "enum": [
                 "Group",
+                "AcUnit",
                 "AcousticPanel",
                 "ArcadeCabinet",
                 "Arch",
+                "Awning",
                 "Barrel",
                 "BassTrap",
                 "BeachChair",
                 "Bed",
                 "Bench",
+                "Billboard",
                 "Birds",
+                "BladeSign",
                 "Book",
                 "Bookshelf",
                 "Bridge",
                 "Bush",
+                "CableSag",
                 "Campfire",
                 "Cave",
                 "CeilingLight",
@@ -10754,10 +13049,12 @@
                 "Cliff",
                 "Clock",
                 "Clouds",
+                "CoffeeGear",
                 "CoffeeMachine",
                 "Compass",
                 "Counter",
                 "Crate",
+                "Crowd",
                 "CurvedWall",
                 "Desk",
                 "DeskLamp",
@@ -10769,14 +13066,17 @@
                 "Flag",
                 "Floor",
                 "Flowers",
+                "FlyingTraffic",
                 "Fountain",
                 "Fridge",
                 "GameConsole",
                 "GlassRail",
                 "GlassWall",
+                "GlowSky",
                 "Grass",
                 "Guitar",
                 "Hedge",
+                "Hologram",
                 "House",
                 "Hut",
                 "Interactable",
@@ -10789,6 +13089,7 @@
                 "MagazineRack",
                 "MicStand",
                 "Monitor",
+                "NeonSign",
                 "NeonStrip",
                 "Newspapers",
                 "Ocean",
@@ -10799,15 +13100,18 @@
                 "Piano",
                 "PictureLight",
                 "Pillar",
+                "PipeRun",
                 "Plant",
                 "Player",
                 "Pool",
                 "PoolTable",
                 "Portal",
                 "Poster",
+                "Rain",
                 "Rift",
                 "Road",
                 "Rocks",
+                "RollerShutter",
                 "Roof",
                 "Room",
                 "Rug",
@@ -10819,22 +13123,29 @@
                 "Sign",
                 "Signpost",
                 "Sky",
+                "Skyline",
                 "Slab",
                 "Sofa",
                 "Speaker",
                 "Staircase",
+                "SteamVent",
                 "Stool",
+                "StreetLamp",
                 "Table",
                 "TableTennis",
                 "Tableware",
                 "Tent",
                 "Terrain",
                 "TikiTorch",
+                "Tower",
                 "Trees",
                 "Tv",
                 "Umbrella",
+                "VendingMachine",
+                "Vent",
                 "Wall",
                 "Well",
+                "WetStreet",
                 "Whiteboard",
                 "Windmill",
                 "Window"
@@ -10868,6 +13179,25 @@
       },
       "additionalProperties": false,
       "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "AcUnit"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.AcUnit"
+              }
+            }
+          }
+        },
         {
           "if": {
             "properties": {
@@ -10921,6 +13251,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Arch"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Awning"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Awning"
               }
             }
           }
@@ -11024,6 +13373,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "Billboard"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Billboard"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Birds"
               }
             },
@@ -11035,6 +13403,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Birds"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "BladeSign"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.BladeSign"
               }
             }
           }
@@ -11111,6 +13498,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Bush"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "CableSag"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.CableSag"
               }
             }
           }
@@ -11290,6 +13696,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "CoffeeGear"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.CoffeeGear"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "CoffeeMachine"
               }
             },
@@ -11358,6 +13783,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Crate"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Crowd"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Crowd"
               }
             }
           }
@@ -11575,6 +14019,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "FlyingTraffic"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.FlyingTraffic"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Fountain"
               }
             },
@@ -11670,6 +14133,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "GlowSky"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.GlowSky"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Grass"
               }
             },
@@ -11719,6 +14201,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Hedge"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Hologram"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Hologram"
               }
             }
           }
@@ -11955,6 +14456,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "NeonSign"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.NeonSign"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "NeonStrip"
               }
             },
@@ -12145,6 +14665,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "PipeRun"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.PipeRun"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Plant"
               }
             },
@@ -12259,6 +14798,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "Rain"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Rain"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Rift"
               }
             },
@@ -12308,6 +14866,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Rocks"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "RollerShutter"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.RollerShutter"
               }
             }
           }
@@ -12525,6 +15102,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "Skyline"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Skyline"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Slab"
               }
             },
@@ -12601,6 +15197,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "SteamVent"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.SteamVent"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Stool"
               }
             },
@@ -12612,6 +15227,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Stool"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "StreetLamp"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.StreetLamp"
               }
             }
           }
@@ -12734,6 +15368,25 @@
           "if": {
             "properties": {
               "type": {
+                "const": "Tower"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Tower"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Trees"
               }
             },
@@ -12791,6 +15444,44 @@
           "if": {
             "properties": {
               "type": {
+                "const": "VendingMachine"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.VendingMachine"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "Vent"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.Vent"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "Wall"
               }
             },
@@ -12821,6 +15512,25 @@
             "properties": {
               "props": {
                 "$ref": "#/$defs/props.Well"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "WetStreet"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "$ref": "#/$defs/props.WetStreet"
               }
             }
           }

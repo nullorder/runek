@@ -28,7 +28,7 @@ const LIGHT_TIMES: Record<StudioLight, string> = {
   dusk: '19:10',
   night: '23:00',
 }
-const HEADS = { stylized: 6.2, realistic: 7.5, anime: 6.8 } as const
+const HEADS = { stylized: 6.2, realistic: 7.5, anime: 6.8, punk: 6.5 } as const
 const ANGLES: Record<StudioAngle, number> = {
   front: 0,
   three: 0.6,

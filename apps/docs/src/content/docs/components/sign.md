@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add sign
 ```
 
-Pulls `screen`, `@react-three/drei@^10.7.7`, `@runek/core@^0.17.0`, `three@^0.184.0`, `troika-three-text@^0.52.4`.
+Pulls `@react-three/drei@^10.7.7`, `@runek/core@^0.17.0`, `three@^0.184.0`, `troika-three-text@^0.52.4`.
 
 ## Use it
 

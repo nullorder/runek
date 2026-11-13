@@ -1,6 +1,6 @@
 ---
 title: "Person"
-summary: "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body."
+summary: "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body."
 category: component
 component: person
 order: 100
@@ -32,7 +32,8 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `style` | `"stylized" \| "realistic" \| "anime"` | `"stylized"` | Proportion and face template: `stylized` (default) is an animated-film look with a big head and eyes, small features, and slender limbs; `realistic` keeps canonical human proportions; `anime` pushes the eyes and legs further. |
+| `style` | `"stylized" \| "realistic" \| "anime" \| "punk"` | `"stylized"` | Proportion and face template: `stylized` (default) is an animated-film look with a big head and eyes, small features, and slender limbs; `realistic` keeps canonical human proportions; `anime` pushes the eyes and legs further; `punk` is drawn the way an animator would, with long legs, tall flat eyes under a lash line, hair in chunky locks, and flat two-tone color inside an ink line (no ink line under `WebGPURenderer`). |
+| `anatomy` | `"bones" \| "muscle" \| "surface"` |  | How much of the body is built: `bones` is the bare frame, `muscle` the frame with its muscles on, `surface` (default) the finished body. For looking at how a build is put together, with `clothes={[]}`. |
 | `kind` | `"villager" \| "merchant" \| "guard" \| "sailor" \| "farmer" \| "noble" \| "scholar" \| "traveler"` | `"villager"` | Role preset: fills `outfit`, `hat`, and `accessories` unless you set them. |
 | `gender` | `"feminine" \| "masculine" \| "neutral"` |  | Silhouette cues only; every trait it influences stays overridable. Seeded when unset. |
 | `age` | `"child" \| "adult" \| "elder"` | `"adult"` | Head-to-body ratio, stature, and (for `elder`) a stooped spine. |
@@ -40,18 +41,19 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `face` | `PersonFaceSpec` |  | The face, part by part: eye color and size, brow color and weight, nose shape, lip color and fullness, blush. |
 | `clothes` | `PersonGarment[]` |  | Clothing layers, inner to outer, each with its own type, color, and options. The order decides the fit: a shirt listed before the jeans is tucked in. Replaces `outfit`; `[]` is the bare base body (a smooth mannequin). |
 | `height` | `number` |  | Standing height, in units. Every other measurement derives from it. |
-| `build` | `"slim" \| "average" \| "stocky"` |  | Limb thickness and torso depth. Seeded when unset. |
+| `build` | `"slim" \| "average" \| "stocky" \| "athletic" \| "heavy" \| "petite" \| "lanky"` |  | Limb thickness and torso depth. Seeded when unset. |
 | `skinTone` | `color` |  | Skin color; seeded from a curated set of tones when unset. |
 | `skin` | `"sailor" \| "hoodie" \| "festival" \| "chef" \| "harvest" \| "winter" \| "voyage" \| "ceremony" \| "atelier" \| "pirate" \| "bartender" \| "office" \| "casual" \| "preppy" \| PersonSkin` |  | Cosmetic loadout: a preset name from `PERSON_SKINS` (e.g. `"winter"`) or a custom `PersonSkin` bundle. Individual props win over it. Plain JSON either way, so an editor or an in-world UI can swap a figure's whole look by writing this one prop. |
-| `hair` | `"short" \| "long" \| "swept" \| "bun" \| "ponytail" \| "braid" \| "cropped" \| "bald" \| PersonHairSpec` |  | A style name, or `{ style, color }`. |
+| `hair` | `"short" \| "long" \| "swept" \| "bun" \| "ponytail" \| "braid" \| "cropped" \| "bald" \| "bob" \| "twintails" \| "spiky" \| "fringe" \| "curtain" \| PersonHairSpec` |  | A style name, or `{ style, color }`. |
 | `hairColor` | `color` |  |  |
 | `facialHair` | `"none" \| "stubble" \| "moustache" \| "beard"` |  |  |
-| `outfit` | `"tshirt" \| "shirt" \| "sweater" \| "hoodie" \| "blazer" \| "vest" \| "tunic" \| "coat" \| "dress" \| "robe" \| "apron" \| "uniform"` |  | One-word outfit; expands to a `clothes` stack (e.g. `tunic`: trousers, tunic, shoes). |
+| `outfit` | `"tshirt" \| "shirt" \| "sweater" \| "hoodie" \| "blazer" \| "vest" \| "tunic" \| "coat" \| "dress" \| "robe" \| "apron" \| "shorts" \| "tank" \| "pleated" \| "runner" \| "shell" \| "uniform" \| "bomber" \| "crop" \| "rig" \| "street"` |  | One-word outfit; expands to a `clothes` stack (e.g. `tunic`: trousers, tunic, shoes). |
 | `topColor` | `color` |  | Outermost top's color; defaults to a seeded shade of a palette slot. A garment's own `color` wins over it. |
 | `bottomColor` | `color` |  | Bottoms' color; defaults to a seeded shade of the palette's `woodDark`, `stone`, or `metal`. |
 | `shoeColor` | `color` |  | Footwear color; defaults to the palette's `metal`. |
-| `hat` | `"none" \| "cap" \| "straw" \| "brim" \| "bandana" \| "hood" \| "chef"` |  |  |
-| `accessories` | `"belt" \| "scarf" \| "cape" \| "bag" \| "glasses" \| "staff"[]` |  |  |
+| `trimColor` | `color` |  | The lit seams and stripes of street clothes (`runner`, `shell`, `rig`, `street`, a hoodie's cords) and a visor's slit. Defaults to a lamp color picked by the seed. They shine on a `punk` figure and are plain color on the others. |
+| `hat` | `"none" \| "cap" \| "straw" \| "brim" \| "bandana" \| "hood" \| "chef" \| "beanie"` |  |  |
+| `accessories` | `"belt" \| "scarf" \| "cape" \| "bag" \| "glasses" \| "staff" \| "headphones" \| "mask" \| "backpack" \| "visor"[]` |  |  |
 | `pose` | `"stand" \| "sit" \| "lean" \| "work" \| "wave" \| "type" \| "play" \| "drink" \| "lie"` | `"stand"` | What the figure is doing when it isn't walking. `sit` and `type` need a seat under them (`type` is seated at a desk, fingers tapping); `work` leans over a counter; `play` works controls at waist height; `drink` holds a mug and sips from it now and then; `lie` lies on its back centered on `position`, head toward local -Z, so it takes a `Bed`'s position and rotation at mattress height. |
 | `patrol` | `[x, y, z][]` |  | Walk these waypoints, relative to `position` and turning with `rotation`, in units. Height follows the ground; a waypoint's y lifts the figure above it. |
 | `wander` | `number` |  | Wander a seeded loop of five points within this radius of `position`, in units. `patrol` wins when both are set. |
@@ -83,7 +85,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `build` | `"slim" \| "average" \| "stocky"` |  | Limb thickness and torso depth. |
+| `build` | `"slim" \| "average" \| "stocky" \| "athletic" \| "heavy" \| "petite" \| "lanky"` |  | Limb thickness and torso depth. |
 | `tone` | `color` |  | Skin color. |
 | `height` | `number` |  | Standing height, in units. |
 
@@ -122,9 +124,10 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `type` | `"tshirt" \| "shirt" \| "sweater" \| "hoodie" \| "blazer" \| "vest" \| "tunic" \| "coat" \| "dress" \| "robe" \| "apron" \| "trousers" \| "jeans" \| "shorts" \| "skirt" \| "shoes" \| "boots" \| "belt" \| "scarf" \| "cape"` | **required** |  |
+| `type` | `"tshirt" \| "shirt" \| "sweater" \| "hoodie" \| "blazer" \| "vest" \| "tunic" \| "coat" \| "dress" \| "robe" \| "apron" \| "trousers" \| "jeans" \| "shorts" \| "skirt" \| "shoes" \| "boots" \| "jacket" \| "croptop" \| "tank" \| "cargo" \| "pleated" \| "stockings" \| "sneakers" \| "belt" \| "scarf" \| "cape" \| "runner" \| "shell" \| "techvest" \| "joggers" \| "hightops"` | **required** |  |
 | `color` | `color` |  |  |
-| `sleeves` | `"short" \| "none" \| "long"` |  | Tops only. |
+| `trim` | `string` |  | The color of its lit seams and stripes, where it has any. Defaults to the figure's trim. |
+| `sleeves` | `"none" \| "short" \| "long"` |  | Tops only. |
 | `neck` | `"crew" \| "v" \| "collar"` |  | Tops only. |
 | `length` | `number` |  | 0 to 1: how far it reaches (a top's hem, a leg's length, a skirt or boot's drop). |
 
@@ -132,21 +135,22 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `outfit` | `"tshirt" \| "shirt" \| "sweater" \| "hoodie" \| "blazer" \| "vest" \| "tunic" \| "coat" \| "dress" \| "robe" \| "apron" \| "uniform"` |  |  |
+| `outfit` | `"tshirt" \| "shirt" \| "sweater" \| "hoodie" \| "blazer" \| "vest" \| "tunic" \| "coat" \| "dress" \| "robe" \| "apron" \| "shorts" \| "tank" \| "pleated" \| "runner" \| "shell" \| "uniform" \| "bomber" \| "crop" \| "rig" \| "street"` |  |  |
 | `clothes` | `PersonGarment[]` |  | Full layer stack; wins over `outfit`. |
 | `topColor` | `color` |  |  |
 | `bottomColor` | `color` |  |  |
 | `shoeColor` | `color` |  |  |
-| `hat` | `"none" \| "cap" \| "straw" \| "brim" \| "bandana" \| "hood" \| "chef"` |  |  |
-| `hair` | `"short" \| "long" \| "swept" \| "bun" \| "ponytail" \| "braid" \| "cropped" \| "bald"` |  |  |
+| `trimColor` | `color` |  | The lit seams and stripes of street clothes. |
+| `hat` | `"none" \| "cap" \| "straw" \| "brim" \| "bandana" \| "hood" \| "chef" \| "beanie"` |  |  |
+| `hair` | `"short" \| "long" \| "swept" \| "bun" \| "ponytail" \| "braid" \| "cropped" \| "bald" \| "bob" \| "twintails" \| "spiky" \| "fringe" \| "curtain"` |  |  |
 | `hairColor` | `color` |  |  |
-| `accessories` | `"belt" \| "scarf" \| "cape" \| "bag" \| "glasses" \| "staff"[]` |  |  |
+| `accessories` | `"belt" \| "scarf" \| "cape" \| "bag" \| "glasses" \| "staff" \| "headphones" \| "mask" \| "backpack" \| "visor"[]` |  |  |
 
 ### `PersonHairSpec`
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `style` | `"short" \| "long" \| "swept" \| "bun" \| "ponytail" \| "braid" \| "cropped" \| "bald"` |  |  |
+| `style` | `"short" \| "long" \| "swept" \| "bun" \| "ponytail" \| "braid" \| "cropped" \| "bald" \| "bob" \| "twintails" \| "spiky" \| "fringe" \| "curtain"` |  |  |
 | `color` | `color` |  |  |
 
 ### `InteractionAction`

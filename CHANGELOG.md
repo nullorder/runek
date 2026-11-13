@@ -114,6 +114,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Sign` `twoSided`: two faces back to back, so a sign standing free of a
   wall reads left to right from both sides and neither face shows through
   the other. ([#69](https://github.com/nullorder/runek/issues/69))
+- A city kit. `Tower`: a procedural tower from a seeded shape grammar
+  (podium, setback, shaft, crown) in four `era`s (`concrete`, `tenement`,
+  `glass`, `makeshift`), with shop bays, lit rooms, trims and decals drawn
+  by one shared facade shader that batches, and a facade kit hung on the
+  faces in `frontage` (lit shops with their names, blade signs, awnings,
+  AC units, pipes, cables, one big sign, light pooled on the pavement).
+  The kit's parts are components too: `AcUnit`, `PipeRun`, `CableSag`,
+  `Vent`, `Awning`, `RollerShutter`, `BladeSign` and `VendingMachine`, each
+  an instance in the world's shared kit meshes, so a street of them is
+  four draws.
+- Street light and signs: `StreetLamp` (a lens, a haze cone and a pool of
+  light on the street, two draws for any number of lamps), `NeonSign`
+  (words bent out of tube that hum, buzz and drop out on the world clock),
+  `Billboard` (ads as data, cut one to the next through torn strips, with
+  `SAMPLE_ADS`) and `Hologram` (a beam and a cage of rings that keep time).
+- Weather and street: `WetStreet` (a rain-soaked `Road` with puddles,
+  paint and crossings, reflecting per pixel through the shared mirror),
+  `Rain` (streaks, splashes, snow and puddle rings around the camera,
+  sheltered under roofs, with `weatherAt(unixMs)` as the weather on a
+  clock) and `SteamVent`.
+- Distance and crowds: `GlowSky` (a night sky lit from below, with a cloud
+  deck that parts on stars and a moon in its phase), `Skyline` (a district
+  on the horizon), `Crowd` (walkers in bulk on node-local lanes, three
+  draws however many) and `FlyingTraffic` (hovercar lanes on the world
+  clock).
+- `CoffeeGear`: what a cafe brews with and shows off, one `kind` to a node
+  (espresso machine, grinder, pour-over bar, siphon, cold drip, roaster
+  and more).
+- Under `WebGPURenderer` the city kit has TSL twins, simpler in places:
+  `Rain` draws nothing, `WetStreet` is damp asphalt with an even
+  reflection, `NeonSign` flickers as one, `Hologram` has no scan lines,
+  `GlowSky`'s deck stays closed, and the tower facade has no interiors or
+  decals.
+- `CeilingLight` `reach` (how far its light carries, so a dim room light
+  wins the light pool while the viewer is in its room), `light` (off, the
+  fitting glows without asking for a real light) and `kind: 'panel'` (a
+  lit strip, never seeded).
+- `skipMirrors(object)` keeps an object out of every mirror plane;
+  `useMirrorMaterial(look, strength, surface)` takes a `MirrorSurface`
+  that varies the reflection per pixel; `shareMaterial(material)` lets the
+  static batcher merge a material a component made itself. A streamed
+  world reads a node's footprint from `width` and `depth` props too.
+- `Person` `style: 'punk'`: a figure drawn the way an animator would,
+  with long legs, tall flat eyes under a lash line, a tick for a nose,
+  hair in chunky locks, and flat two-tone color inside an ink line. Under
+  `WebGPURenderer` it takes three's toon node material, without the rim
+  light and the ink line.
+- `Person` bodies are built in layers (frame, muscle, soft tissue), with
+  four new builds: `athletic`, `heavy`, `petite` and `lanky`. A seed still
+  rolls only `slim`, `average` and `stocky`. `anatomy` builds the bare
+  frame (`bones`), the frame with its muscles (`muscle`) or the finished
+  body (`surface`, the default).
+- `Person` hairstyles `bob`, `twintails`, `spiky`, `fringe` and `curtain`,
+  and a street wardrobe: `jacket`, `croptop`, `tank`, `cargo`, `pleated`,
+  `stockings`, `sneakers`, `runner`, `shell`, `techvest`, `joggers` and
+  `hightops`; outfits `bomber`, `crop`, `tank`, `pleated`, `shorts`,
+  `runner`, `shell`, `rig` and `street`; a `beanie`; and the accessories
+  `headphones`, `mask`, `backpack` and `visor`. Street wear has lit seams
+  in `trimColor`, which shine on a punk figure. `PERSON_COLORS.hairDyed`
+  lists dyed hair colors.
+- `playerControl.pin(spot, to?)` holds the avatar at a spot (a seat, a
+  ladder rung) with its own movement off, carrying it there and facing it
+  `spot.yaw`. Its motion reads as standing still, sitting (`pose: 'sit'`)
+  or climbing (`climb`), and a carried `Person` sits when told to.
+  `pin(null, to)` lets it go.
+- `playerControl.limitSpeed(speed)` caps the avatar's speed over the
+  ground while something slows it (deep water, mud, snow).
+- `PlayerMotion` `course`, `pose`, `climb` and `sag`, and `PoseContext`
+  `course`, `climb` and `position`: in first person, below a jog, an
+  avatar that backs up or steps aside keeps facing where it looks and
+  publishes the way it travels, so a pose source can play a backpedal or
+  a sidestep.
+- `routed`, from `Person`: every figure walking a route, with where it
+  stands now and `where(t)` for where its route has it at any other time.
+- `CAMERA_PASSES`: `collisionGroups` for a collider the third-person
+  camera may pass through (glass, a stool) while bodies still run into it.
 
 ### Changed
 
@@ -143,6 +219,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `Screen` banner's text glows with the screen (at the `screen` level,
   not tone mapped), like its backdrop already did, so it reads a little
   brighter than before. ([#60](https://github.com/nullorder/runek/issues/60))
+- Contract §4: a texture a component computes itself at runtime (a seeded
+  data texture, a canvas painted from the world's fonts, a depth map drawn
+  from the scene) is not a binary asset.
+  ([#61](https://github.com/nullorder/runek/issues/61))
+- The third-person and overhead cameras stop at walls, floors and roofs:
+  a ball the size of the camera's near plane is swept through the physics
+  world from the avatar's head. ecctrl's own wall test missed walls that
+  static batching had merged, and overhead flew over roofs. Thin posts
+  don't stop it.
+- A `slim` or `stocky` `Person` now takes its build's stature and head
+  size in every style (a stocky adult is about 7% shorter, with a slightly
+  larger head). `average` bodies and every face are unchanged.
+- `Person` is posed every frame within 22 units of the camera, every third
+  frame to 45 and every sixth beyond. A far figure's garments draw as one
+  mesh per material, bones rebuild their matrices only when posed, and the
+  figure scheduler builds for at most 3 ms a frame and keeps 8 full-detail
+  builds.
 
 ### Fixed
 
@@ -165,6 +258,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   between its layers (the mat, the picture, a banner's text) grow with the
   screen instead of staying a fraction of a millimetre.
   ([#68](https://github.com/nullorder/runek/issues/68))
+- A helper shared by several registry items (`nodes/uniforms.ts`) no
+  longer makes them depend on one another: `player`, `sky`, `lake` and
+  `grass` depended on `screen`.
+
 
 ## [0.17.0](https://github.com/nullorder/runek/compare/v0.16.0...v0.17.0) - 2026-10-31
 

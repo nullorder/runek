@@ -33,7 +33,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `[number, number]` | `[1.6, 0.9]` | The lit area, [width, height] in units: a phone, a TV, a billboard. |
-| `mount` | `"stand" \| "wall" \| "desk" \| "frame"` | `"wall"` | Where it hangs or stands; `wall` by default. |
+| `mount` | `"wall" \| "stand" \| "desk" \| "frame"` | `"wall"` | Where it hangs or stands; `wall` by default. |
 | `content` | `"picture" \| "windows" \| "banner" \| "static" \| "color"` |  | A seeded `picture` (sky, sun, hills) or desktop `windows`, a `banner` of `text`, animated `static`, or a plain `color`. Seeded between picture and windows when unset. |
 | `text` | `string` | `"Runek"` | The banner's words. |
 | `color` | `color` |  | Background glow, and the tint of the picture and windows. Seeded when unset. |

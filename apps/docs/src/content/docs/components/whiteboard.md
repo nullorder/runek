@@ -34,7 +34,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 |---|---|---|---|
 | `width` | `number` | `1.6` | Board width, in units. |
 | `height` | `number` | `1` | Board height, in units. |
-| `mount` | `"stand" \| "wall"` | `"stand"` |  |
+| `mount` | `"wall" \| "stand"` | `"stand"` |  |
 | `text` | `string` |  | Written across the top of the board in marker. |
 | `doodles` | `boolean` | `true` | Seeded marker diagrams (boxes, arrows, lines). Set false for a clean board. |
 | `color` | `color` |  | Frame and stand; defaults to the palette's `metal`. |

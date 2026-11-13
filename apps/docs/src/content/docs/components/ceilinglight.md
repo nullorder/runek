@@ -32,7 +32,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `kind` | `"flush" \| "pendant" \| "spot"` |  | Seeded when unset. |
+| `kind` | `"flush" \| "pendant" \| "spot" \| "panel"` |  | Seeded when unset. |
 | `shade` | `"dome" \| "cone" \| "drum" \| "globe"` |  | Pendant only; seeded when unset. |
 | `drop` | `number` | `0.6` | Pendant cord length from the ceiling to the shade, in units. |
 | `size` | `number` | `0.36` | Shade size across, in units. |
@@ -40,6 +40,8 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `shadeColor` | `color` |  | The shade. Seeded when unset. |
 | `lightColor` | `color` | `"#ffe2b8"` | The light and the glowing bulb. |
 | `intensity` | `number` | `12` | Light strength. |
+| `reach` | `number` |  | How far its light carries, in units. The world lends its few real lights by strength over the square of distance, never nearer than this reach, so a short reach makes a dim fitting win while the viewer is in its room and give the light back once they leave. Keep it near the room's size. |
+| `light` | `boolean` | `true` | Ask the world for a real light. Off, it still glows: a big room wants many lit fittings and only a few real lights, fewer than the world's light budget. |
 | `on` | `boolean` | `true` | Switched on. |
 | `nightOnly` | `boolean` | `false` | Light only while the world's sun is down. |
 | `position` | `[x, y, z]` | `[0, 0, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |

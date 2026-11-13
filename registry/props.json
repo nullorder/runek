@@ -58,6 +58,48 @@
     "category": "interiors",
     "description": "A fabric-wrapped acoustic absorber panel proud of a slim frame, wall-mounted from its back like Poster, or turned face down as a ceiling cloud. Seeded fabric. Decorative."
   },
+  "AcUnit": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "An outdoor AC unit on a wall bracket with its drain hose. Drawn by the world's shared kit\nmeshes, so any number of them cost no extra draw calls. Left out of the world's mirrors. No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Where the bracket meets the wall [x, y, z] in units. The unit hangs out along local +Z.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seeds the case tone and the fan's phase.",
+        "optional": true,
+        "default": 1
+      },
+      "cage": {
+        "type": "boolean",
+        "doc": "Wrap it in a wire cage.",
+        "optional": true,
+        "default": false
+      }
+    },
+    "name": "ac-unit",
+    "category": "structures",
+    "description": "An outdoor AC unit on a wall bracket with its drain hose, optionally in a wire cage. Drawn by the world's shared facade-kit meshes, so any number cost no extra draws. Decorative: no collider."
+  },
   "ArcadeCabinet": {
     "kind": "component",
     "seeded": true,
@@ -208,6 +250,71 @@
     "name": "arch",
     "category": "structures",
     "description": "Freestanding gateway: two piers and a semicircular arch of voussoirs. Composes with Wall."
+  },
+  "Awning": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A sloped fabric awning with a valance and two arms. Drawn by the world's shared kit meshes.\nThe fabric shows in reflections, the arms do not. No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Middle of the top edge, where it meets the wall [x, y, z] in units.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract. This component has no seeded variation.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width along the wall, in units.",
+        "optional": true,
+        "default": 3.4
+      },
+      "depth": {
+        "type": "number",
+        "doc": "How far it reaches over the pavement, in units.",
+        "optional": true,
+        "default": 1.3
+      },
+      "drop": {
+        "type": "number",
+        "doc": "How far the outer edge hangs below the wall edge, in units.",
+        "optional": true,
+        "default": 0.45
+      },
+      "color": {
+        "type": "color",
+        "doc": "Fabric color.",
+        "optional": true,
+        "default": "#5a2a1c"
+      },
+      "stripes": {
+        "type": "boolean",
+        "doc": "Paint the fabric in two-tone stripes.",
+        "optional": true,
+        "default": true
+      }
+    },
+    "name": "awning",
+    "category": "structures",
+    "description": "A sloped fabric shop awning with a striped valance and two arms, hung from a wall. Drawn by the world's shared facade-kit meshes. Decorative: no collider."
   },
   "Barrel": {
     "kind": "component",
@@ -514,6 +621,218 @@
     "category": "interiors",
     "description": "Slatted bench with an optional backrest; indoor or outdoor seating."
   },
+  "Billboard": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A billboard that runs ads, each a line or two of lettering beside a mark drawn in code that\nmoves with the clock (a bowl's steam, a watch's hands, a cell filling), cut one to the next\nevery `hold` seconds. Ads are data, so a world writes its own. Which ad is up, and where its\nhands and steam are, come from the world clock and `seed`, so every player reads the same\nboard. `Screen` is the still one.\n\nThe picture is a 512 by 288 canvas redrawn ten times a second, and only while the camera is\nwithin 140 units: one texture upload each time, one draw for the face and one for the frame.\nIts white is lit at the world's `screen` luminance level, as a `Screen`'s is. Lettering is in\nthe world's display font (contract §4). No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "The middle of the lit face [x, y, z] in units. It faces local +Z.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Shifts which ad is up when, so two boards side by side do not change together.",
+        "optional": true,
+        "default": 1
+      },
+      "size": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "The lit face, [width, height] in units.",
+        "optional": true,
+        "default": [
+          7.2,
+          4.05
+        ]
+      },
+      "ads": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "BillboardAd"
+        },
+        "doc": "The ads it runs, in order, round and round. Sample ads when unset.",
+        "optional": true,
+        "default": [
+          {
+            "lines": [
+              "NIGHT",
+              "NOODLE"
+            ],
+            "tagline": "ONE BOWL ALL NIGHT",
+            "mark": "bowl",
+            "background": "#2a120c",
+            "color": "#ffa64d",
+            "accent": "#ff6418"
+          },
+          {
+            "lines": [
+              "CELL",
+              "CHARGE"
+            ],
+            "tagline": "POWER WHEN YOU NEED IT",
+            "mark": "battery",
+            "background": "#1d1f22",
+            "color": "#ece6da",
+            "accent": "#ff8a1f"
+          },
+          {
+            "lines": [
+              "TIME",
+              "KEEPER"
+            ],
+            "tagline": "WATCHES MENDED",
+            "mark": "watch",
+            "background": "#16141c",
+            "color": "#e9e3f5",
+            "accent": "#7a3cff"
+          },
+          {
+            "lines": [
+              "CLEAR+"
+            ],
+            "tagline": "SEE BETTER TONIGHT",
+            "mark": "plus",
+            "background": "#16141c",
+            "color": "#b8c4ff",
+            "accent": "#e9e3f5"
+          },
+          {
+            "lines": [
+              "CHROME",
+              "WORKS"
+            ],
+            "mark": "dial",
+            "background": "#1b1a1f",
+            "color": "#e8e0d4",
+            "accent": "#c47a4e"
+          },
+          {
+            "lines": [
+              "CITY",
+              "TRANSIT"
+            ],
+            "tagline": "EVERY TEN MINUTES",
+            "mark": "clock",
+            "background": "#f4f6fb",
+            "color": "#3d5bff",
+            "accent": "#3d5bff"
+          },
+          {
+            "lines": [
+              "MIND THE GAP"
+            ],
+            "tagline": "PLEASE STAND CLEAR",
+            "mark": "none",
+            "background": "#3d5bff",
+            "color": "#f4f6fb",
+            "accent": "#f4f6fb"
+          }
+        ]
+      },
+      "hold": {
+        "type": "number",
+        "doc": "Seconds each ad stays up.",
+        "optional": true,
+        "default": 9
+      },
+      "mount": {
+        "type": "enum",
+        "options": [
+          "wall",
+          "posts"
+        ],
+        "doc": "`wall` hangs it on a wall behind it. `posts` stands it on two legs, `stand` units tall.",
+        "optional": true,
+        "default": "wall"
+      },
+      "stand": {
+        "type": "number",
+        "doc": "Height of the legs under a board on posts, in units.",
+        "optional": true,
+        "default": 5
+      },
+      "frameColor": {
+        "type": "color",
+        "doc": "Frame and leg color. Defaults to the world palette's `metal`.",
+        "optional": true
+      }
+    },
+    "defs": {
+      "BillboardAd": {
+        "props": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "doc": "One or two lines of big lettering."
+          },
+          "tagline": {
+            "type": "string",
+            "doc": "A smaller line under them.",
+            "optional": true
+          },
+          "mark": {
+            "type": "enum",
+            "options": [
+              "bowl",
+              "battery",
+              "watch",
+              "plus",
+              "dial",
+              "clock",
+              "none"
+            ],
+            "doc": "The mark beside the words.",
+            "optional": true
+          },
+          "background": {
+            "type": "string",
+            "doc": "The board's background.",
+            "optional": true
+          },
+          "color": {
+            "type": "color",
+            "doc": "The first line and the mark.",
+            "optional": true
+          },
+          "accent": {
+            "type": "color",
+            "doc": "The second line, the tagline and the mark's highlights.",
+            "optional": true
+          }
+        }
+      }
+    },
+    "name": "billboard",
+    "category": "structures",
+    "description": "A board that runs ads as data: one or two lines of lettering in the world's display font beside a mark drawn in code that moves with the world clock (steam off a bowl, a watch's hands, a cell filling), cut to the next every `hold` seconds through torn strips. Its picture is redrawn only while near the camera. Lit at the world's screen luminance level. Decorative: no collider."
+  },
   "Birds": {
     "kind": "component",
     "seeded": true,
@@ -576,6 +895,71 @@
     "name": "birds",
     "category": "environment",
     "description": "A loose flock circling overhead, each bird flapping on its own seeded orbit."
+  },
+  "BladeSign": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A blade sign: a dark board standing out from a wall with one word stacked down both faces, in\nthe world's display font, lit at the world's `sign` luminance level. Drawn by the world's shared\nkit meshes and shown in reflections. No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Bottom of the board at the wall [x, y, z] in units. The board stands out along local +Z.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract. This component has no seeded variation.",
+        "optional": true
+      },
+      "text": {
+        "type": "string",
+        "doc": "The word to stack, top to bottom. Spaces are dropped.",
+        "optional": true,
+        "default": "NOODLE"
+      },
+      "letter": {
+        "type": "number",
+        "doc": "Letter height in units. 0.3 reads at 20 m, 1.5 at 100 m.",
+        "optional": true,
+        "default": 0.55
+      },
+      "color": {
+        "type": "color",
+        "doc": "Lamp color of the letters and the edge tubes.",
+        "optional": true,
+        "default": "#ff6418"
+      },
+      "gap": {
+        "type": "number",
+        "doc": "Gap between the wall and the board, in units.",
+        "optional": true,
+        "default": 0.3
+      },
+      "tube": {
+        "type": "boolean",
+        "doc": "Run a tube down both edges of the board.",
+        "optional": true,
+        "default": true
+      }
+    },
+    "name": "blade-sign",
+    "category": "structures",
+    "description": "A board standing out from a wall with one word stacked down both faces in the world's display font, lit at the world's sign luminance level, with tube edges. Drawn by the world's shared facade-kit meshes. Decorative: no collider."
   },
   "Book": {
     "kind": "component",
@@ -937,6 +1321,77 @@
     "category": "vegetation",
     "description": "Clustered foliage blobs, seeded; the mid-height density between Grass and Trees."
   },
+  "CableSag": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A cable sagging across a street between two anchors: a parabola cut into straight pieces.\nDrawn by the world's shared kit meshes and left out of the world's mirrors. No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "The near anchor [x, y, z] in units. The cable crosses along local +Z.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Turn about Y to aim it across the street.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract. This component has no seeded variation.",
+        "optional": true
+      },
+      "span": {
+        "type": "number",
+        "doc": "Distance to the far anchor, in units.",
+        "optional": true,
+        "default": 27
+      },
+      "sag": {
+        "type": "number",
+        "doc": "How far the middle hangs below the straight line, in units.",
+        "optional": true,
+        "default": 1.4
+      },
+      "drop": {
+        "type": "number",
+        "doc": "How much higher (or lower, when negative) the far anchor sits, in units.",
+        "optional": true,
+        "default": 0
+      },
+      "segments": {
+        "type": "number",
+        "doc": "Straight pieces the curve is cut into.",
+        "optional": true,
+        "default": 8
+      },
+      "thickness": {
+        "type": "number",
+        "doc": "Cable thickness, in units.",
+        "optional": true,
+        "default": 0.04
+      },
+      "color": {
+        "type": "color",
+        "doc": "Cable color.",
+        "optional": true,
+        "default": "#141110"
+      }
+    },
+    "name": "cable-sag",
+    "category": "structures",
+    "description": "A cable sagging across a street between two anchors: a parabola cut into straight pieces. Drawn by the world's shared facade-kit meshes. Decorative: no collider."
+  },
   "Campfire": {
     "kind": "component",
     "seeded": true,
@@ -1058,14 +1513,15 @@
   "CeilingLight": {
     "kind": "component",
     "seeded": true,
-    "doc": "A ceiling fitting, its origin at the ceiling with the fitting hanging below (local -Y): a\nfrosted `flush` dome, a `pendant` shade on a cord, or a `spot` can throwing a cone of light\ndown. `nightOnly` switches it on with the world's dusk. Decorative: no collider.",
+    "doc": "A ceiling fitting, its origin at the ceiling with the fitting hanging below (local -Y): a\nfrosted `flush` dome, a `pendant` shade on a cord, or a `spot` can throwing a cone of light\ndown, or a `panel` of light `size` long and a quarter as wide (an office strip). `nightOnly`\nswitches it on with the world's dusk. Decorative: no collider.",
     "props": {
       "kind": {
         "type": "enum",
         "options": [
           "flush",
           "pendant",
-          "spot"
+          "spot",
+          "panel"
         ],
         "doc": "Seeded when unset.",
         "optional": true
@@ -1114,6 +1570,17 @@
         "doc": "Light strength.",
         "optional": true,
         "default": 12
+      },
+      "reach": {
+        "type": "number",
+        "doc": "How far its light carries, in units. The world lends its few real lights by strength over\nthe square of distance, never nearer than this reach, so a short reach makes a dim fitting\nwin while the viewer is in its room and give the light back once they leave. Keep it near\nthe room's size.",
+        "optional": true
+      },
+      "light": {
+        "type": "boolean",
+        "doc": "Ask the world for a real light. Off, it still glows: a big room wants many lit fittings\nand only a few real lights, fewer than the world's light budget.",
+        "optional": true,
+        "default": true
       },
       "on": {
         "type": "boolean",
@@ -1615,6 +2082,81 @@
     "category": "environment",
     "description": "Drifting clouds built from clustered soft blobs (no textures); layer above a Sky."
   },
+  "CoffeeGear": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "What a cafe makes coffee with and shows it off in: machines, brewers, a roaster, and the beans\nin bags and jars. One `kind` to a node, standing on whatever is under its `position`. Scenery:\nnothing here is glass, so the whole bar merges into the building's static batch, and only the\nroaster, which stands on the floor, has a collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "The middle of its foot: on the counter it stands on. A shelf's is the middle of its lowest board.",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "The working side is the kind's own +Z.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Picks the bag colors and how high each stack of cups is.",
+        "optional": true,
+        "default": 0
+      },
+      "kind": {
+        "type": "enum",
+        "options": [
+          "espresso",
+          "grinder",
+          "pourover",
+          "chemex",
+          "press",
+          "moka",
+          "siphon",
+          "coldbrew",
+          "kettle",
+          "batch",
+          "ibrik",
+          "taps",
+          "pitchers",
+          "jars",
+          "bags",
+          "cups",
+          "shelf",
+          "roaster"
+        ],
+        "doc": "Which piece of gear it is.",
+        "optional": true,
+        "default": "espresso"
+      },
+      "length": {
+        "type": "number",
+        "doc": "How long a row is, or how wide an espresso machine, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "rows": {
+        "type": "number",
+        "doc": "How many boards a shelf has.",
+        "optional": true,
+        "default": 3
+      },
+      "glow": {
+        "type": "color",
+        "doc": "The color of its pilot lights and flames, lit at the world's `screen` luminance level.",
+        "optional": true,
+        "default": "#ffa64d"
+      }
+    },
+    "name": "coffee-gear",
+    "category": "interiors",
+    "description": "What a cafe makes coffee with and shows off: an espresso machine, grinder, pour-over bar, siphon, cold drip tower, batch brewer, taps, a drum roaster, and beans in bags, jars and stocked shelves, one `kind` to a node. Only the roaster has a collider."
+  },
   "CoffeeMachine": {
     "kind": "component",
     "seeded": true,
@@ -1865,6 +2407,126 @@
     "name": "crate",
     "category": "interiors",
     "description": "Slatted wooden crate with seeded plank shades; stacks via a cuboid collider."
+  },
+  "Crowd": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "People on the street, in bulk: hooded figures in long coats walking their lanes there and back,\neach with one small light at the collar. Where each one is comes from the world clock and\n`seed` alone (contract §2), so every player sees the same crowd and nothing is simulated or\nsent. They are scenery: no collider, nobody to talk to, and the server knows nothing of them.\nA walker steps aside for the player rather than walk through them.\n\nThree instanced draws however many walk (coats, legs, collar lights), left out of the world's\nmirrors.\nLit like any matte surface, so lamps, signs and fog carry them. Built as a far tier: up close\nthey are a shape in a coat with no face under the hood, and a world that wants a face puts a\n`Person` there.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Where the lanes' origin stands [x, y, z] in units: lanes are in the node's own frame.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians, turning the lanes with it.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Deals out each walker: which lane, where on it, how fast, how tall, what they wear.",
+        "optional": true,
+        "default": 1
+      },
+      "count": {
+        "type": "number",
+        "doc": "How many walk.",
+        "optional": true,
+        "default": 24
+      },
+      "lanes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "CrowdLane"
+        },
+        "doc": "The paths they walk, in the node's frame. A walker keeps to one lane, going to its end and\nback. One 16-unit lane along X by default.",
+        "optional": true,
+        "default": [
+          {
+            "y": 0,
+            "points": [
+              [
+                -8,
+                0
+              ],
+              [
+                8,
+                0
+              ]
+            ]
+          }
+        ]
+      },
+      "speed": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Slowest and fastest a walker goes, in units a second.",
+        "optional": true,
+        "default": [
+          0.9,
+          1.5
+        ]
+      },
+      "spread": {
+        "type": "number",
+        "doc": "How far to either side of its lane a walker keeps, in units, so a crowd is not a queue.",
+        "optional": true,
+        "default": 0.9
+      },
+      "berth": {
+        "type": "number",
+        "doc": "How far round the player a walker steps aside, in units. 0 for none.",
+        "optional": true,
+        "default": 1.3
+      }
+    },
+    "defs": {
+      "CrowdLane": {
+        "props": {
+          "y": {
+            "type": "number",
+            "doc": "The ground along it."
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "tuple",
+              "items": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "doc": "Its corners, each [x, z]."
+          }
+        }
+      }
+    },
+    "name": "crowd",
+    "category": "character",
+    "description": "People on a street in bulk: hooded figures in long coats walking their lanes there and back, each with one small light at the collar, stepping round the player. Where each walks comes from the world clock and `seed` alone, so every viewer sees the same crowd. Three instanced draws however many walk; no colliders."
   },
   "CurvedWall": {
     "kind": "component",
@@ -2646,6 +3308,96 @@
     "category": "vegetation",
     "description": "Instanced seeded wildflowers (stem + colored head) scattered over a patch."
   },
+  "FlyingTraffic": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "Lanes of hovercars over a street: decks of lanes going both ways, every car an instance in\nthree shared meshes (bodies, lamps, and the light under each). Where each car is comes\nstraight from the world clock and `seed`, so every player who shares the clock sees the same\ntraffic (contract §2), and nothing is simulated or sent.\n\nThree draws however many cars, left out of the world's mirrors. No colliders: the lanes are\nmeant to fly over anything a body can reach.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "The middle of the lanes [x, y, z] in units, at the height of the lowest one. Lanes run along local Z.",
+        "optional": true,
+        "default": [
+          0,
+          40,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Deals out each car's lane, speed, paint and where on the lane it starts.",
+        "optional": true,
+        "default": 1
+      },
+      "length": {
+        "type": "number",
+        "doc": "How long the lanes are, in units. Cars leave one end and come in at the other, so make it\nlonger than the fog lets anyone see.",
+        "optional": true,
+        "default": 480
+      },
+      "cars": {
+        "type": "number",
+        "doc": "How many cars fly.",
+        "optional": true,
+        "default": 28
+      },
+      "lanes": {
+        "type": "number",
+        "doc": "Lanes side by side going each way.",
+        "optional": true,
+        "default": 2
+      },
+      "spacing": {
+        "type": "number",
+        "doc": "How far apart lanes are, side to side, in units.",
+        "optional": true,
+        "default": 7
+      },
+      "levels": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "doc": "Heights of the decks of lanes above `position`, in units.",
+        "optional": true,
+        "default": [
+          0,
+          9,
+          20
+        ]
+      },
+      "speed": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Slowest and fastest a car flies, in units a second.",
+        "optional": true,
+        "default": [
+          16,
+          34
+        ]
+      }
+    },
+    "name": "flying-traffic",
+    "category": "environment",
+    "description": "Lanes of hovercars over a street, decks of lanes each way, every car placed by the world clock and `seed` so every viewer sees the same traffic. Three instanced draws however many cars; no colliders."
+  },
   "Fountain": {
     "kind": "component",
     "seeded": false,
@@ -2995,6 +3747,79 @@
     "category": "structures",
     "description": "A floor-to-ceiling glass partition: panes between slim mullions in a frame, with an optional doorway and a pane over it. A cuboid collider either side of the doorway."
   },
+  "GlowSky": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A night sky that is never black: a dome lit from below by the city, darkest overhead and as\nbright as the haze at the horizon, with a slow cloud deck catching the district's glow. The\ndeck parts and closes with `state`: through the gaps are stars and a moon in the phase it is\ntold, which lights the cloud round it. (Under `WebGPURenderer` the deck stays closed, with no\nstars or moon.) The clouds drift and the stars twinkle on the world's clock. The horizon is\nmeant to match the world's fog color so the two meet without a seam. Drawn behind everything\nat the far plane, wherever the viewer is. Decorative: no collider.",
+    "props": {
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract. Shifts the cloud pattern.",
+        "optional": true,
+        "default": 0
+      },
+      "zenith": {
+        "type": "color",
+        "doc": "Color of the sky overhead.",
+        "optional": true,
+        "default": "#10172e"
+      },
+      "horizon": {
+        "type": "color",
+        "doc": "Color at the horizon. Match it to the world's fog so the city fades into the sky.",
+        "optional": true,
+        "default": "#1a2238"
+      },
+      "glow": {
+        "type": "color",
+        "doc": "Color of the city glow on the underside of the cloud deck.",
+        "optional": true,
+        "default": "#9ab8ff"
+      },
+      "clouds": {
+        "type": "boolean",
+        "doc": "Draw the low cloud deck lit from below.",
+        "optional": true,
+        "default": true
+      },
+      "night": {
+        "type": "color",
+        "doc": "Color of the open sky between the clouds.",
+        "optional": true,
+        "default": "#131a3a"
+      },
+      "cloud": {
+        "type": "color",
+        "doc": "Color of the clouds themselves, away from the city's glow. Cooler than the haze, so the\nglow on their undersides reads as light on something and not as more haze.",
+        "optional": true,
+        "default": "#3a4052"
+      },
+      "moonColor": {
+        "type": "color",
+        "doc": "Color of the moon and its light on the clouds.",
+        "optional": true,
+        "default": "#f6f2ea"
+      },
+      "moon": {
+        "type": "vec3",
+        "doc": "Where the moon hangs: a direction from the viewer, +Y up.",
+        "optional": true,
+        "default": [
+          0.42,
+          0.62,
+          -0.66
+        ]
+      },
+      "state": {
+        "type": "function",
+        "doc": "How the sky is right now. Asked every frame, and eased toward. Unset, the sky stays\nmostly overcast with a full moon behind it.",
+        "optional": true
+      }
+    },
+    "name": "glow-sky",
+    "category": "environment",
+    "description": "A night sky that is never black: a dome lit from below by a city, darkest overhead and as bright as the haze at the horizon, with a slow cloud deck catching the district's glow that parts on stars and a moon in its phase. Decorative: no collider."
+  },
   "Grass": {
     "kind": "component",
     "seeded": true,
@@ -3195,6 +4020,83 @@
     "name": "hedge",
     "category": "vegetation",
     "description": "A trimmed green wall with seeded surface tufts; blocks like a Wall."
+  },
+  "Hologram": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A hologram on a pedestal: a beam of light up from a ring, and in it a cage that turns slowly\nround three rings that keep time. The fast ring goes round once a minute, the middle one once\nan hour and the slow one once every `round` seconds, all read off the world clock, so it is a\nclock anyone in the city can check and every player sees it at the same angle.\n\nThe pedestal is lit, solid and has a collider. The light parts are unlit, at the world's\nluminance levels, left out of the world's mirrors, and drawn inside a `<Dynamic>`. Under\n`WebGPURenderer` the beam has no scan lines.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "The middle of the pedestal's foot [x, y, z] in units.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract. Every hologram keeps the same time.",
+        "optional": true
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Radius of the pedestal, in units.",
+        "optional": true,
+        "default": 1.6
+      },
+      "height": {
+        "type": "number",
+        "doc": "How high the middle of the figure hangs over the pedestal's foot, in units.",
+        "optional": true,
+        "default": 6.5
+      },
+      "size": {
+        "type": "number",
+        "doc": "Radius of the figure, in units.",
+        "optional": true,
+        "default": 2.2
+      },
+      "color": {
+        "type": "color",
+        "doc": "The beam and the figure's cage, lit at the world's `sign` and `tube` levels.",
+        "optional": true,
+        "default": "#3d5bff"
+      },
+      "accent": {
+        "type": "color",
+        "doc": "The rings that keep time.",
+        "optional": true,
+        "default": "#f4f6fb"
+      },
+      "round": {
+        "type": "number",
+        "doc": "Seconds the slow ring takes to go round once: a district's power round, say.",
+        "optional": true,
+        "default": 1440
+      },
+      "light": {
+        "type": "boolean",
+        "doc": "Ask the world's light pool for a real light at the figure.",
+        "optional": true,
+        "default": true
+      }
+    },
+    "name": "hologram",
+    "category": "structures",
+    "description": "A plaza centrepiece: a pedestal, a beam of light with scan lines climbing it, and in it a wire cage turning round three rings that keep time (once a minute, once an hour, once every `round` seconds) off the world clock. The pedestal has a cylinder collider."
   },
   "House": {
     "kind": "composite",
@@ -4134,6 +5036,105 @@
     "category": "interiors",
     "description": "A desk monitor on a foot, plate, or legs. Switched on, the screen glows in its own color with a few seeded windows and lines of text on it, all geometry, or shows a texture the app hands it."
   },
+  "NeonSign": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A neon sign: words bent out of glass tube on a dark board, lit at the world's `tube` luminance\nlevel, that flicker. Some letters have a bad tube and buzz or drop out, and now and then the\nwhole sign stutters. What is lit when is a pure function of the world clock and `seed`\n(`neonLevels`), so every player sees the same sign. `BladeSign` and `Sign` are the still ones.\n\nThe tubes are drawn in code, at mount, from the world's declared fonts (contract §4): no image\nand no font ships with the component. One draw, never batched, since its light changes every\nframe. No collider. Under `WebGPURenderer` the whole sign flickers as one, since the node\nmaterial has no per-letter levels.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "The middle of the sign [x, y, z] in units. It faces local +Z.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Picks which letters are the bad ones, and when everything stutters.",
+        "optional": true,
+        "default": 1
+      },
+      "text": {
+        "type": "string",
+        "doc": "The words, on one line. At most 24 characters are drawn.",
+        "optional": true,
+        "default": "OPEN"
+      },
+      "size": {
+        "type": "number",
+        "doc": "Cap height in units.",
+        "optional": true,
+        "default": 0.5
+      },
+      "color": {
+        "type": "color",
+        "doc": "Tube color, lit at the world's `tube` luminance level.",
+        "optional": true,
+        "default": "#ff6418"
+      },
+      "variant": {
+        "type": "enum",
+        "options": [
+          "display",
+          "body"
+        ],
+        "doc": "Which of the world's fonts the tubes are bent to.",
+        "optional": true,
+        "default": "display"
+      },
+      "font": {
+        "type": "string",
+        "doc": "A font URL to use instead of a world font.",
+        "optional": true
+      },
+      "flicker": {
+        "type": "number",
+        "doc": "How badly it flickers, 0 (a new sign) to 1 (one that should be taken down).",
+        "optional": true,
+        "default": 0.4
+      },
+      "faults": {
+        "type": "number",
+        "doc": "How many letters have a bad tube of their own.",
+        "optional": true,
+        "default": 1
+      },
+      "board": {
+        "type": "boolean",
+        "doc": "Draw the dark board the tubes are mounted on.",
+        "optional": true,
+        "default": true
+      },
+      "light": {
+        "type": "boolean",
+        "doc": "Ask the world's light pool for a real light, which flickers with the sign.",
+        "optional": true,
+        "default": false
+      },
+      "intensity": {
+        "type": "number",
+        "doc": "Candela of that light with every tube lit.",
+        "optional": true,
+        "default": 60
+      }
+    },
+    "name": "neon-sign",
+    "category": "structures",
+    "description": "Words bent out of glass tube on a dark board, at the world's tube luminance level, that flicker: bad tubes buzz and drop out and the whole sign stutters now and then, as a pure function of the world clock and `seed` so every viewer sees the same sign. The tubes are drawn in code from the world's fonts. Decorative: no collider."
+  },
   "NeonStrip": {
     "kind": "component",
     "seeded": false,
@@ -4570,11 +5571,22 @@
         "options": [
           "stylized",
           "realistic",
-          "anime"
+          "anime",
+          "punk"
         ],
-        "doc": "Proportion and face template: `stylized` (default) is an animated-film look with a big\nhead and eyes, small features, and slender limbs; `realistic` keeps canonical human\nproportions; `anime` pushes the eyes and legs further.",
+        "doc": "Proportion and face template: `stylized` (default) is an animated-film look with a big\nhead and eyes, small features, and slender limbs; `realistic` keeps canonical human\nproportions; `anime` pushes the eyes and legs further; `punk` is drawn the way an animator\nwould, with long legs, tall flat eyes under a lash line, hair in chunky locks, and flat\ntwo-tone color inside an ink line (no ink line under `WebGPURenderer`).",
         "optional": true,
         "default": "stylized"
+      },
+      "anatomy": {
+        "type": "enum",
+        "options": [
+          "bones",
+          "muscle",
+          "surface"
+        ],
+        "doc": "How much of the body is built: `bones` is the bare frame, `muscle` the frame with its\nmuscles on, `surface` (default) the finished body. For looking at how a build is put\ntogether, with `clothes={[]}`.",
+        "optional": true
       },
       "kind": {
         "type": "enum",
@@ -4644,7 +5656,11 @@
         "options": [
           "slim",
           "average",
-          "stocky"
+          "stocky",
+          "athletic",
+          "heavy",
+          "petite",
+          "lanky"
         ],
         "doc": "Limb thickness and torso depth. Seeded when unset.",
         "optional": true
@@ -4697,7 +5713,12 @@
               "ponytail",
               "braid",
               "cropped",
-              "bald"
+              "bald",
+              "bob",
+              "twintails",
+              "spiky",
+              "fringe",
+              "curtain"
             ]
           },
           {
@@ -4736,7 +5757,16 @@
           "dress",
           "robe",
           "apron",
-          "uniform"
+          "shorts",
+          "tank",
+          "pleated",
+          "runner",
+          "shell",
+          "uniform",
+          "bomber",
+          "crop",
+          "rig",
+          "street"
         ],
         "doc": "One-word outfit; expands to a `clothes` stack (e.g. `tunic`: trousers, tunic, shoes).",
         "optional": true
@@ -4756,6 +5786,11 @@
         "doc": "Footwear color; defaults to the palette's `metal`.",
         "optional": true
       },
+      "trimColor": {
+        "type": "color",
+        "doc": "The lit seams and stripes of street clothes (`runner`, `shell`, `rig`, `street`, a hoodie's\ncords) and a visor's slit. Defaults to a lamp color picked by the seed. They shine on a\n`punk` figure and are plain color on the others.",
+        "optional": true
+      },
       "hat": {
         "type": "enum",
         "options": [
@@ -4765,7 +5800,8 @@
           "brim",
           "bandana",
           "hood",
-          "chef"
+          "chef",
+          "beanie"
         ],
         "optional": true
       },
@@ -4779,7 +5815,11 @@
             "cape",
             "bag",
             "glasses",
-            "staff"
+            "staff",
+            "headphones",
+            "mask",
+            "backpack",
+            "visor"
           ]
         },
         "optional": true
@@ -4977,7 +6017,11 @@
             "options": [
               "slim",
               "average",
-              "stocky"
+              "stocky",
+              "athletic",
+              "heavy",
+              "petite",
+              "lanky"
             ],
             "doc": "Limb thickness and torso depth.",
             "optional": true
@@ -5086,20 +6130,37 @@
               "skirt",
               "shoes",
               "boots",
+              "jacket",
+              "croptop",
+              "tank",
+              "cargo",
+              "pleated",
+              "stockings",
+              "sneakers",
               "belt",
               "scarf",
-              "cape"
+              "cape",
+              "runner",
+              "shell",
+              "techvest",
+              "joggers",
+              "hightops"
             ]
           },
           "color": {
             "type": "color",
             "optional": true
           },
+          "trim": {
+            "type": "string",
+            "doc": "The color of its lit seams and stripes, where it has any. Defaults to the figure's trim.",
+            "optional": true
+          },
           "sleeves": {
             "type": "enum",
             "options": [
-              "short",
               "none",
+              "short",
               "long"
             ],
             "doc": "Tops only.",
@@ -5138,7 +6199,16 @@
               "dress",
               "robe",
               "apron",
-              "uniform"
+              "shorts",
+              "tank",
+              "pleated",
+              "runner",
+              "shell",
+              "uniform",
+              "bomber",
+              "crop",
+              "rig",
+              "street"
             ],
             "optional": true
           },
@@ -5163,6 +6233,11 @@
             "type": "color",
             "optional": true
           },
+          "trimColor": {
+            "type": "color",
+            "doc": "The lit seams and stripes of street clothes.",
+            "optional": true
+          },
           "hat": {
             "type": "enum",
             "options": [
@@ -5172,7 +6247,8 @@
               "brim",
               "bandana",
               "hood",
-              "chef"
+              "chef",
+              "beanie"
             ],
             "optional": true
           },
@@ -5186,7 +6262,12 @@
               "ponytail",
               "braid",
               "cropped",
-              "bald"
+              "bald",
+              "bob",
+              "twintails",
+              "spiky",
+              "fringe",
+              "curtain"
             ],
             "optional": true
           },
@@ -5204,7 +6285,11 @@
                 "cape",
                 "bag",
                 "glasses",
-                "staff"
+                "staff",
+                "headphones",
+                "mask",
+                "backpack",
+                "visor"
               ]
             },
             "optional": true
@@ -5223,7 +6308,12 @@
               "ponytail",
               "braid",
               "cropped",
-              "bald"
+              "bald",
+              "bob",
+              "twintails",
+              "spiky",
+              "fringe",
+              "curtain"
             ],
             "optional": true
           },
@@ -5252,7 +6342,7 @@
     },
     "name": "person",
     "category": "character",
-    "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body."
+    "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body."
   },
   "Piano": {
     "kind": "component",
@@ -5447,6 +6537,65 @@
     "name": "pillar",
     "category": "structures",
     "description": "Column with a plinth, a tapered (optionally fluted) shaft, and a capital."
+  },
+  "PipeRun": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A pipe or conduit run clipped to a wall, with a collar every couple of metres. Drawn by the\nworld's shared kit meshes and left out of the world's mirrors. No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Where the run starts on the wall [x, y, z] in units. It climbs along local +Y, or runs along local +X when `horizontal`.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract. This component has no seeded variation.",
+        "optional": true
+      },
+      "length": {
+        "type": "number",
+        "doc": "Length of the run, in units.",
+        "optional": true,
+        "default": 6
+      },
+      "horizontal": {
+        "type": "boolean",
+        "doc": "Run along the wall instead of up it.",
+        "optional": true,
+        "default": false
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Pipe radius, in units.",
+        "optional": true,
+        "default": 0.06
+      },
+      "color": {
+        "type": "color",
+        "doc": "Pipe color.",
+        "optional": true,
+        "default": "#4a4844"
+      }
+    },
+    "name": "pipe-run",
+    "category": "structures",
+    "description": "A pipe or conduit run clipped to a wall, up it or along it, with a collar every couple of metres. Drawn by the world's shared facade-kit meshes. Decorative: no collider."
   },
   "Plant": {
     "kind": "component",
@@ -5927,6 +7076,95 @@
     "category": "interiors",
     "description": "A wall print of seeded flat art (shapes, color bands, a retro sunset, mountain peaks) with an optional caption and a slim or wide frame."
   },
+  "Rain": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "The weather over the whole world, drawn only around the camera: streaks of rain in the air,\nsplashes where they land, rings on the puddles of every `WetStreet`, and snowflakes. Mount it\nonce inside `<World>`.\n\nWhat falls follows `weather`. Rain from a drizzle (a few short, slow streaks) to a downpour\n(all of them, long and fast), slanted by the wind and its gusts. Snow as slow flakes that\nsway and drift. In dry weather nothing is drawn at all. It also tells every `WetStreet` how\nhard the puddles are ringed and how wet the ground is.\n\nIt stays out from under roofs. Shortly after mounting it draws the still parts of the world\nonce from straight above into a depth map (the cover map), and a streak dies where it meets\nthe highest surface over its spot, so an awning, a canopy or a ceiling keeps the ground under\nit dry, and snow stays out the same way. Anything inside a `<Dynamic>` is left out of that\nmap. The map is drawn a few times in the first seconds to catch parts that arrive late, then\nnever again.\n\nStreaks, splashes and flakes are a draw call each, only while there are any to draw: two in\nrain, one in snow, all three for the moments rain turns to snow, none when it is dry. They\nstay out of the world's mirrors. The cover map is the one extra scene render, a few times in\nthe first seconds and never again, inside `scenePass()`.\n\n`WebGLRenderer` only: under `WebGPURenderer` it draws nothing.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Accepted for the component contract. Rain follows the camera, so it has no place of its own.",
+        "optional": true
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Accepted for the component contract.",
+        "optional": true
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seeds where each streak, splash and flake starts.",
+        "optional": true
+      },
+      "streaks": {
+        "type": "number",
+        "doc": "Streaks in the air around the camera when it rains its hardest. Lighter rain draws fewer.",
+        "optional": true
+      },
+      "splashes": {
+        "type": "number",
+        "doc": "Splashes on the ground around the camera in the heaviest rain, 0 for none.",
+        "optional": true
+      },
+      "flakes": {
+        "type": "number",
+        "doc": "Snowflakes in the air around the camera when it snows its hardest, 0 for none.",
+        "optional": true
+      },
+      "ripples": {
+        "type": "boolean",
+        "doc": "Ring the puddles of every `WetStreet`.",
+        "optional": true
+      },
+      "weather": {
+        "type": "function",
+        "doc": "The weather now, asked every frame: `weatherAt` on a clock, most often. Left out, it rains\nhard and steadily and the streets stay soaked. JSX only.",
+        "optional": true
+      },
+      "bounds": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "The part of the world rain can fall on, [minX, minZ, maxX, maxZ] in units. Outside it, rain falls through everything.",
+        "optional": true
+      },
+      "cover": {
+        "type": "number",
+        "doc": "Texels along each side of the cover map, which records the highest surface over every spot.",
+        "optional": true
+      },
+      "floor": {
+        "type": "number",
+        "doc": "The lowest anything falls, in units: the surface of a sea, which no cover map holds since\nwater is not a still part of the world. Rain ends there and splashes on it, inside the\nbounds and out. Unset, there is no such floor.",
+        "optional": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Rain color. A cool grey by default, lit as if by the street.",
+        "optional": true
+      },
+      "onMemory": {
+        "type": "function",
+        "doc": "Called with the GPU bytes the cover map holds, and with 0 when it is let go. JSX only.",
+        "optional": true
+      }
+    },
+    "name": "rain",
+    "category": "environment",
+    "description": "The weather over a whole world, drawn only around the camera: rain streaks and splashes, snowflakes, and rings on every `WetStreet`'s puddles, as hard as a `weather` function says (`weatherAt` gives the weather as a pure function of a clock). It stays out from under roofs through a depth map of the still world drawn from above in its first seconds. WebGLRenderer only."
+  },
   "Rift": {
     "kind": "component",
     "seeded": true,
@@ -6124,6 +7362,65 @@
     "name": "rocks",
     "category": "environment",
     "description": "Faceted rocks with convex-hull colliders (seeded scatter)."
+  },
+  "RollerShutter": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A slatted roller shutter in its housing, with side guides. Drawn by the world's shared kit\nmeshes. No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Bottom centre of the opening on the wall [x, y, z] in units.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract. This component has no seeded variation.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width of the opening, in units.",
+        "optional": true,
+        "default": 3.4
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height of the opening, in units.",
+        "optional": true,
+        "default": 2.9
+      },
+      "open": {
+        "type": "number",
+        "doc": "Share rolled up: 0 is down, 1 is fully open.",
+        "optional": true,
+        "default": 0
+      },
+      "color": {
+        "type": "color",
+        "doc": "Slat color.",
+        "optional": true,
+        "default": "#6e6a62"
+      }
+    },
+    "name": "roller-shutter",
+    "category": "structures",
+    "description": "A slatted roller shutter in its housing and side guides, rolled up as far as `open` says. Drawn by the world's shared facade-kit meshes. Decorative: no collider."
   },
   "Roof": {
     "kind": "component",
@@ -6450,8 +7747,8 @@
       "mount": {
         "type": "enum",
         "options": [
-          "stand",
           "wall",
+          "stand",
           "desk",
           "frame"
         ],
@@ -7046,6 +8343,112 @@
     "category": "environment",
     "description": "Procedural atmosphere (drei Sky)."
   },
+  "Skyline": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A district seen from far off: towers standing in the haze across the water, with a few rooms\nlit and one landmark over them. It is scenery only, out past anywhere a body can reach, and\nit is what tells a small world that it is part of a city.\n\nTwo draws: every tower in one merged mesh, and the landmark's lights in another. Neither takes\nthe scene's fog, since fog would hide them outright. Each tower is tinted toward `haze` at its\nfoot instead, and its dark rooms sit just under the brightness of a night sky's horizon, so it\nreads as a silhouette with windows. Both are left out of the world's mirrors. No colliders.\nPlain `MeshBasicMaterial`s, so it draws the same under `WebGPURenderer`.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Where the skyline is seen from [x, y, z] in units: the middle of the place it rings.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Accepted for the component contract. Turn a skyline with `bearing`.",
+        "optional": true
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Deals out every tower: where it stands, how tall, how wide, which windows are lit.",
+        "optional": true,
+        "default": 1
+      },
+      "bearing": {
+        "type": "number",
+        "doc": "Compass bearing of the middle of the district, in degrees: 0 is +Z, 90 is +X.",
+        "optional": true,
+        "default": 180
+      },
+      "spread": {
+        "type": "number",
+        "doc": "How many degrees of the horizon it takes up.",
+        "optional": true,
+        "default": 70
+      },
+      "distance": {
+        "type": "number",
+        "doc": "How far off its nearest towers stand, in units. Keep it and `depth` under the camera's far plane.",
+        "optional": true,
+        "default": 620
+      },
+      "depth": {
+        "type": "number",
+        "doc": "How far back the district goes behind that, in units.",
+        "optional": true,
+        "default": 180
+      },
+      "count": {
+        "type": "number",
+        "doc": "How many towers.",
+        "optional": true,
+        "default": 60
+      },
+      "heights": {
+        "type": "tuple",
+        "items": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "doc": "Shortest and tallest tower, in units.",
+        "optional": true,
+        "default": [
+          50,
+          170
+        ]
+      },
+      "landmark": {
+        "type": "enum",
+        "options": [
+          "dome",
+          "spire",
+          "stack"
+        ],
+        "doc": "What stands over the district: a stepped `spire` with a lit collar, a `dome` in rings, or a squat `stack` with chimneys.",
+        "optional": true
+      },
+      "landmarkHeight": {
+        "type": "number",
+        "doc": "How tall the landmark is, in units.",
+        "optional": true,
+        "default": 380
+      },
+      "accent": {
+        "type": "color",
+        "doc": "The color of the landmark's lights.",
+        "optional": true,
+        "default": "#3d5bff"
+      },
+      "haze": {
+        "type": "color",
+        "doc": "Haze color: the world's fog, so the district sinks into the horizon at its foot.",
+        "optional": true,
+        "default": "#1a2238"
+      }
+    },
+    "name": "skyline",
+    "category": "environment",
+    "description": "A district seen from far off: a band of towers across part of the horizon with a few rooms lit and one landmark (spire, dome or stack) picked out in light, in two draws. Scenery past anywhere a body can reach: no colliders."
+  },
   "Slab": {
     "kind": "component",
     "seeded": false,
@@ -7157,8 +8560,8 @@
       "arms": {
         "type": "enum",
         "options": [
-          "slim",
           "none",
+          "slim",
           "square",
           "rolled"
         ],
@@ -7358,6 +8761,90 @@
     "category": "structures",
     "description": "Stepped staircase with per-step colliders: solid (a built-in stair on a floor) or floating (thin treads on sloped stringers, open underneath, to span a void)."
   },
+  "SteamVent": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "Steam off a manhole or out of a kitchen vent: a column of soft puffs that rise, spread, lean a\nlittle and thin away. Each puff's place is a pure function of the world clock and `seed`, so\nevery player sees the same plume and nothing is simulated.\n\nOne instanced draw of quads that face the camera, left out of the world's mirrors, plus the lid\nwhen `grate` is set. The steam is added light a little brighter than an unlit wall, so it shows\nwhere a lamp or a sign is behind it and barely at all against the dark. No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Where the steam comes out [x, y, z] in units: the middle of a manhole, or the mouth of a wall vent.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Sets each puff apart from the next, and this vent from every other.",
+        "optional": true,
+        "default": 1
+      },
+      "puffs": {
+        "type": "number",
+        "doc": "How many puffs are in the air at once.",
+        "optional": true,
+        "default": 14
+      },
+      "rise": {
+        "type": "number",
+        "doc": "How high a puff rises before it is gone, in units.",
+        "optional": true,
+        "default": 3.2
+      },
+      "spread": {
+        "type": "number",
+        "doc": "How far a puff has spread by then, in units.",
+        "optional": true,
+        "default": 1.1
+      },
+      "period": {
+        "type": "number",
+        "doc": "Seconds a puff takes to rise and thin out.",
+        "optional": true,
+        "default": 4.5
+      },
+      "color": {
+        "type": "color",
+        "doc": "Steam color: it takes the color of the light around it.",
+        "optional": true,
+        "default": "#c9d2e6"
+      },
+      "strength": {
+        "type": "number",
+        "doc": "How thick it is, 0 (nothing) to 1.",
+        "optional": true,
+        "default": 1
+      },
+      "grate": {
+        "type": "boolean",
+        "doc": "Draw the manhole it comes from: a dark lid with a rim, `radius` across.",
+        "optional": true,
+        "default": true
+      },
+      "radius": {
+        "type": "number",
+        "doc": "Radius of the lid and of the column of steam at its foot, in units.",
+        "optional": true,
+        "default": 0.42
+      }
+    },
+    "name": "steam-vent",
+    "category": "environment",
+    "description": "Steam off a manhole or out of a wall vent: soft puffs that rise, spread, lean and thin away, each a pure function of the world clock and `seed`. One instanced draw, plus the lid. Decorative: no collider."
+  },
   "Stool": {
     "kind": "component",
     "seeded": false,
@@ -7409,6 +8896,110 @@
     "name": "stool",
     "category": "interiors",
     "description": "A round bar stool: a disc seat on three splayed legs; a thin cylinder collider."
+  },
+  "StreetLamp": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A street lamp on an arm: a pole, a hot lens at the world's `lamp` luminance level, a haze cone\nunder the head, and a soft pool on the street. The real light comes only from the world's\nlight pool (`useLight`), which lends it to the lamps that matter most to the view; every other\nlamp still reads through its lens, cone, pool, bloom and fog. The pool fades in with distance\nso it does not double the real light on the nearest lamps. One thin collider for the pole.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Base of the pole [x, y, z] in units. The arm reaches along local +X.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract; this component has no seeded variation.",
+        "optional": true
+      },
+      "height": {
+        "type": "number",
+        "doc": "Pole height to the arm, in units.",
+        "optional": true,
+        "default": 8
+      },
+      "arm": {
+        "type": "number",
+        "doc": "How far the arm reaches out from the pole, in units.",
+        "optional": true,
+        "default": 2.4
+      },
+      "color": {
+        "type": "color",
+        "doc": "Lamp color. A cool white by default: the city lights its streets like day.",
+        "optional": true,
+        "default": "#dfe8ff"
+      },
+      "poleColor": {
+        "type": "color",
+        "doc": "Pole, arm and head color. Defaults to the world palette's `metal`.",
+        "optional": true
+      },
+      "intensity": {
+        "type": "number",
+        "doc": "Candela toward the street, when the world lends this lamp a real light.",
+        "optional": true,
+        "default": 350
+      },
+      "light": {
+        "type": "boolean",
+        "doc": "Ask the world's light pool for a real light. The lens, cone and pool glow either way.",
+        "optional": true,
+        "default": true
+      },
+      "cone": {
+        "type": "boolean",
+        "doc": "Draw the haze cone under the head.",
+        "optional": true,
+        "default": true
+      },
+      "haze": {
+        "type": "number",
+        "doc": "Peak luminance of the haze cone (scene-linear), times the world's `lamp` level.",
+        "optional": true,
+        "default": 0.06
+      },
+      "pool": {
+        "type": "boolean",
+        "doc": "Draw the soft pool on the street under the head, for lamps the pool has no light for.",
+        "optional": true,
+        "default": true
+      },
+      "poolRadius": {
+        "type": "number",
+        "doc": "Radius of that pool, in units.",
+        "optional": true,
+        "default": 6
+      },
+      "poolOn": {
+        "type": "enum",
+        "options": [
+          "ground",
+          "base"
+        ],
+        "doc": "What the pool lies on. `ground` is the world's ground, for a lamp on a pavement whose arm\nreaches out over the street below it. `base` is whatever the lamp itself stands on: a plaza,\na lawn, a roof.",
+        "optional": true,
+        "default": "ground"
+      }
+    },
+    "name": "street-lamp",
+    "category": "structures",
+    "description": "A street lamp on an arm: a pole, a hot lens at the world's lamp luminance level, a haze cone under the head and a soft pool of light on the street, every lamp's cone and pool sharing two instanced draws. The real light comes from the world's light pool. One thin collider for the pole."
   },
   "Table": {
     "kind": "component",
@@ -7567,9 +9158,9 @@
       "kind": {
         "type": "enum",
         "options": [
+          "bowl",
           "glass",
           "plate",
-          "bowl",
           "cup",
           "jug",
           "setting"
@@ -7911,6 +9502,145 @@
     "category": "environment",
     "description": "A bamboo tiki torch with a woven head and a flickering flame and light, for a beach path or a garden. Can burn only after dusk."
   },
+  "Tower": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A procedural city tower: a podium, a setback, a shaft and a crown, emitted by a seeded shape\ngrammar as one mesh. A shader draws every facade band (street, service, podium, tower, crown)\nfrom per-vertex data in wall metres, so all towers share one material and the static batcher\nmerges them. Faces listed in `frontage` also get real relief and the facade kit: signs, AC\nunits, pipes, vents, awnings, shutters, vending machines and cables, all drawn by the world's\nshared instanced meshes. At night every emitter takes its brightness from the world's\nluminance levels (`sign`, `tube`, `screen`). Dark by day. One cuboid collider over the ground footprint, plus one along each street face\nat the pier line and one per vending machine, so nothing a walker can reach stands outside a\ncollider. Relief above the piers (fascia, awnings, balconies, cornices) has none.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Position of the tower's base centre [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Towers stand upright: only the turn about Y is meant to be used.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seeds the massing, the window pattern, which windows are lit, every prop and sign, and any unset look props.",
+        "optional": true,
+        "default": 1
+      },
+      "width": {
+        "type": "number",
+        "doc": "Ground footprint along local X, in units. The podium fills it and the collider matches it.",
+        "optional": true,
+        "default": 16
+      },
+      "depth": {
+        "type": "number",
+        "doc": "Ground footprint along local Z, in units.",
+        "optional": true,
+        "default": 16
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height to the roof, in units. Rooftop plant and masts stand above it.",
+        "optional": true,
+        "default": 60
+      },
+      "windows": {
+        "type": "enum",
+        "options": [
+          "glass",
+          "office",
+          "grid",
+          "ribbon"
+        ],
+        "doc": "Window layout: `grid` (apartments), `office` (small dense panes), `ribbon` (continuous bands) or `glass` (curtain wall). Seeded by era when unset.",
+        "optional": true
+      },
+      "lit": {
+        "type": "number",
+        "doc": "Share of windows lit at night, 0 to 1. Seeded when unset.",
+        "optional": true
+      },
+      "trim": {
+        "type": "string",
+        "doc": "Neon trim along the parapets and crown, and the color of the tower's main sign, lit at the world's `sign` luminance level. `\"none\"` for a plain tower. Seeded when unset.",
+        "optional": true
+      },
+      "cornerStrips": {
+        "type": "boolean",
+        "doc": "Also run the trim colour up the corners.",
+        "optional": true
+      },
+      "shopfronts": {
+        "type": "boolean",
+        "doc": "Shop bays along the ground floor.",
+        "optional": true,
+        "default": true
+      },
+      "color": {
+        "type": "color",
+        "doc": "Wall colour. Defaults to the world palette's `wall`.",
+        "optional": true
+      },
+      "era": {
+        "type": "enum",
+        "options": [
+          "glass",
+          "concrete",
+          "tenement",
+          "makeshift"
+        ],
+        "doc": "Which era built it: `concrete` (squat, heavy, stencilled), `tenement` (balconies, sign frames, drum lanterns), `glass` (a thin glass slab with a clock in its crown) or `makeshift` (cages, shacks, cable). Seeded among the first, second and last when unset.",
+        "optional": true
+      },
+      "podium": {
+        "type": "number",
+        "doc": "Podium height in units, for a tower tall and wide enough to have a shaft (at least 34 high and 10 across). Seeded between 15 and 25 when unset.",
+        "optional": true
+      },
+      "frontage": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "options": [
+            "+z",
+            "+x",
+            "-z",
+            "-x"
+          ]
+        },
+        "doc": "The faces that front a street: `+z`, `+x`, `-z`, `-x` in the tower's own frame. Each gets piers, a fascia, signs and the instanced kit props, and the first one listed carries the tower's big sign. Empty by default, so a tower costs one merged mesh until it is told where the street is.",
+        "optional": true,
+        "default": []
+      },
+      "name": {
+        "type": "string",
+        "doc": "The shop name on the main sign. Seeded when unset.",
+        "optional": true
+      },
+      "cableSpan": {
+        "type": "number",
+        "doc": "Wall to wall distance across the street in units. Above 0, cables sag across it from the first face in `frontage`.",
+        "optional": true,
+        "default": 0
+      },
+      "light": {
+        "type": "boolean",
+        "doc": "Ask the world for a real light in front of the main shop. Pooled, so only the ones that matter to the view are lit.",
+        "optional": true,
+        "default": false
+      }
+    },
+    "name": "tower",
+    "category": "structures",
+    "description": "A procedural city tower from a seeded shape grammar: podium, setback, shaft and crown, with street, service, podium, tower and crown bands drawn by one shared facade shader (shop bays, lit windows with rooms behind them, trims, posters and leaks), so towers batch. Four eras (concrete, tenement, glass, makeshift) set the massing and dressing. Faces listed in `frontage` get relief and the facade kit: shop names, blade and roof signs, awnings, shutters, AC units, pipes, vending machines, cables across the street and light pooled on the pavement. Lit after dusk at the world's luminance levels. Colliders over the footprint and along each street face."
+  },
   "Trees": {
     "kind": "component",
     "seeded": true,
@@ -7990,8 +9720,8 @@
       "mount": {
         "type": "enum",
         "options": [
-          "stand",
           "wall",
+          "stand",
           "console"
         ],
         "doc": "`stand` and `console` are seeded when unset; `wall` must be asked for. On a wall the origin\nis the middle of the screen with its back against the wall (local -Z).",
@@ -8125,6 +9855,101 @@
     "name": "umbrella",
     "category": "environment",
     "description": "A beach umbrella: a weighted base, a wooden pole and a canopy of alternating panels on ribs, sagging a little between them. Leans with tilt; the pole runs up through a Table. One cylinder collider round the pole."
+  },
+  "VendingMachine": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A vending machine standing against a wall: a matte case and a lit window of goods. Drawn by\nthe world's shared kit meshes. The window shows in reflections. One cuboid collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Middle of the back of the machine at the ground [x, y, z] in units. It faces local +Z.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Turn about Y so local +Z points away from the wall behind it.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seeds the rows of goods in the window.",
+        "optional": true,
+        "default": 1
+      },
+      "color": {
+        "type": "color",
+        "doc": "Case color.",
+        "optional": true,
+        "default": "#3a2f45"
+      },
+      "lamp": {
+        "type": "color",
+        "doc": "Lamp color of the window, lit at the world's `screen` luminance level.",
+        "optional": true,
+        "default": "#ffcf9a"
+      }
+    },
+    "name": "vending-machine",
+    "category": "structures",
+    "description": "A vending machine against a wall: a matte case and a lit window of goods at the world's screen luminance level. Drawn by the world's shared facade-kit meshes. One cuboid collider."
+  },
+  "Vent": {
+    "kind": "component",
+    "seeded": false,
+    "doc": "A louvred wall vent under a small hood. Drawn by the world's shared kit meshes and left out of\nthe world's mirrors. No collider.",
+    "props": {
+      "position": {
+        "type": "vec3",
+        "doc": "Bottom centre of the vent on the wall [x, y, z] in units.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Rotation [x, y, z] in radians. Turn about Y so local +Z points out of the wall.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Accepted for the component contract. This component has no seeded variation.",
+        "optional": true
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width along the wall, in units.",
+        "optional": true,
+        "default": 0.6
+      },
+      "height": {
+        "type": "number",
+        "doc": "Height, in units.",
+        "optional": true,
+        "default": 0.45
+      }
+    },
+    "name": "vent",
+    "category": "structures",
+    "description": "A louvred wall vent under a small hood. Drawn by the world's shared facade-kit meshes. Decorative: no collider."
   },
   "Wall": {
     "kind": "component",
@@ -8273,6 +10098,116 @@
     "category": "structures",
     "description": "Stone well with a dark pool, posts, a little pyramid roof, and a bucket on a rope."
   },
+  "WetStreet": {
+    "kind": "component",
+    "seeded": true,
+    "doc": "A wet asphalt street with kerbs, laid in the XZ plane just above the ground, straight along\nlocal Z: a `Road` that reads as rain-soaked. Puddles collect from a world-space noise field\nand in the gutters, wet asphalt darkens and turns glossy (Lagarde's porosity model), paint\nstays drier, and the deck reflects the street through the world's shared mirror for its\nheight: fully in standing water, faintly on damp asphalt. While a `Rain` is mounted, drops ring\nthe puddles, more of them the harder it rains, and the weather it follows dries the street and\nits puddles out and soaks them again. Streets that cross should share a `seed`: their puddles\nthen match where they overlap. Decorative, like `Road`: it owns no collider.\n\nThe puddles, paint and rain rings are `WebGLRenderer` only. Under `WebGPURenderer` the deck is\ndamp asphalt with an even, faint reflection.",
+    "props": {
+      "length": {
+        "type": "number",
+        "doc": "Length along local Z, in units.",
+        "optional": true,
+        "default": 12
+      },
+      "width": {
+        "type": "number",
+        "doc": "Width along local X, kerb to kerb, in units.",
+        "optional": true,
+        "default": 7
+      },
+      "color": {
+        "type": "color",
+        "doc": "Asphalt color; defaults to the palette's `stone`.",
+        "optional": true
+      },
+      "kerbColor": {
+        "type": "color",
+        "doc": "Kerb color; defaults to the palette's `floor` (the pavement).",
+        "optional": true
+      },
+      "wetness": {
+        "type": "number",
+        "doc": "How wet the street is when the weather has soaked it, 0 (dry) to 1 (soaked).",
+        "optional": true,
+        "default": 0.85
+      },
+      "puddles": {
+        "type": "number",
+        "doc": "How much of the street stands in puddles then, 0 to 1.",
+        "optional": true,
+        "default": 0.5
+      },
+      "markings": {
+        "type": "boolean",
+        "doc": "Paint lane and edge lines, and a zebra at each crossing.",
+        "optional": true,
+        "default": true
+      },
+      "paint": {
+        "type": "color",
+        "doc": "Lane, edge and zebra paint.",
+        "optional": true,
+        "default": "#ece6da"
+      },
+      "centrePaint": {
+        "type": "color",
+        "doc": "The centre line.",
+        "optional": true,
+        "default": "#c98a3e"
+      },
+      "crossings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "StreetCrossing"
+        },
+        "doc": "Cross streets: no kerbs, lines or gutters inside them, a zebra either side. At most four.",
+        "optional": true,
+        "default": []
+      },
+      "position": {
+        "type": "vec3",
+        "doc": "Position [x, y, z] in units (1 unit = 1 m, Y-up).",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rotation": {
+        "type": "vec3",
+        "doc": "Euler rotation [x, y, z] in radians.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0
+        ]
+      },
+      "seed": {
+        "type": "number",
+        "doc": "Seed for the deterministic variation: same seed, same result.",
+        "optional": true,
+        "default": 0
+      }
+    },
+    "defs": {
+      "StreetCrossing": {
+        "props": {
+          "at": {
+            "type": "number"
+          },
+          "width": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "name": "wet-street",
+    "category": "structures",
+    "description": "A rain-soaked asphalt street with kerbs: puddles from world-space noise and in the gutters, darkened glossy asphalt, lane, edge and centre paint, zebras at crossings, and reflections from the world's shared mirror, full in standing water and faint on damp asphalt. A mounted `Rain` rings the puddles and dries and soaks the street with its weather. Decorative: no collider."
+  },
   "Whiteboard": {
     "kind": "component",
     "seeded": true,
@@ -8293,8 +10228,8 @@
       "mount": {
         "type": "enum",
         "options": [
-          "stand",
-          "wall"
+          "wall",
+          "stand"
         ],
         "optional": true,
         "default": "stand"
