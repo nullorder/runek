@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  drape,
   ellipsoid,
+  type Field,
   finish,
   len,
   noise3,
@@ -94,5 +96,41 @@ describe('noise3', () => {
       if (v !== c(i * 0.37, i * 0.11, i * 0.53)) differs = true
     }
     expect(differs).toBe(true)
+  })
+})
+
+describe('drape', () => {
+  // A ball worn under a slightly smaller vest, which a level hem cuts off above y = 0.2: the
+  // ball pokes 1 cm through the vest everywhere the vest is.
+  const ball = sphere([0, 0, 0], 0.5)
+  const vest: Field = (x, y, z) => Math.max(sphere([0, 0, 0], 0.49)(x, y, z), y - 0.2)
+  const draped = drape(vest, [{ f: ball, y0: -1, y1: 1 }], 1)
+  const onBall = (y: number, a: number): [number, number, number] => {
+    const r = Math.sqrt(0.25 - y * y)
+    return [r * Math.cos(a), y, r * Math.sin(a)]
+  }
+
+  it('lifts the outer layer over the one under it wherever it covers it', () => {
+    for (const y of [-0.3, -0.1, 0.1])
+      for (let a = 0; a < Math.PI * 2; a += 0.5) {
+        const p = onBall(y, a)
+        expect(vest(...p)).toBeGreaterThan(0)
+        expect(draped(...p)).toBeLessThan(-0.002)
+      }
+  })
+
+  it('leaves what is under it showing past a hem', () => {
+    for (const y of [0.22, 0.3])
+      for (let a = 0; a < Math.PI * 2; a += 0.5) {
+        const p = onBall(y, a)
+        expect(draped(...p)).toBe(vest(...p))
+      }
+  })
+
+  it('changes nothing away from the layers under it', () => {
+    expect(draped(0, 0, 0.8)).toBe(vest(0, 0, 0.8))
+    expect(drape(vest, [{ f: ball, y0: 0.6, y1: 1 }], 1)(...onBall(0, 0))).toBe(
+      vest(...onBall(0, 0)),
+    )
   })
 })

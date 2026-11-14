@@ -16,6 +16,57 @@ export function smin(a: number, b: number, k: number) {
 }
 export const smax = (a: number, b: number, k: number) => -smin(-a, -b, k)
 
+/** A layer worn under another, for `drape`: its field and the heights it spans. */
+export interface Underlayer {
+  f: Field
+  y0: number
+  y1: number
+}
+
+/**
+ * `outer` worn over `under`, so that no layer ever shows through another. Wherever an inner
+ * layer comes within `gap` of the outer surface, or goes through it, the outer surface sits `gap`
+ * over the inner one instead: a hoodie over the seat of the jeans under it, a coat over a thick
+ * sweater. That holds only where the outer garment is there at all. A hem, a neckline, a sleeve
+ * end or an opening cuts it away, and the inner layer shows there as it should. A garment field is
+ * solid down to the body, so whether it is there is read a little way in from the inner surface,
+ * level with it (hems and sleeve ends are level cuts, so looking up or down would see past them):
+ * negative unless a cut removed it.
+ *
+ * The inner layers are only looked at within `band` of the outer surface, and their normals only
+ * where they reach through. Pass them through `lattice`, so a draped field costs little more than
+ * the garment's own.
+ */
+export function drape(outer: Field, under: Underlayer[], unit: number): Field {
+  const gap = 0.003 * unit
+  const k = 0.004 * unit
+  // Nothing reaches through further than this, and the outer field is trusted beyond it.
+  const band = 0.03 * unit
+  // How far in from the inner surface the outer garment is looked for.
+  const look = 0.03 * unit
+  const e = 0.004 * unit
+  return (x, y, z) => {
+    const d = outer(x, y, z)
+    if (d < -band || d > band) return d
+    let out = d
+    for (const layer of under) {
+      if (y < layer.y0 || y > layer.y1) continue
+      const f = layer.f
+      const inner = f(x, y, z) - gap
+      // Past the blend radius the smooth minimum is the outer field itself.
+      if (inner >= out + k) continue
+      // The inner surface's normal, level.
+      const nx = f(x + e, y, z) - f(x - e, y, z)
+      const nz = f(x, y, z + e) - f(x, y, z - e)
+      const n = Math.sqrt(nx * nx + nz * nz)
+      if (n < 1e-9) continue
+      if (outer(x - (nx / n) * look, y, z - (nz / n) * look) >= 0) continue
+      out = smin(out, inner, k)
+    }
+    return out
+  }
+}
+
 /** One tagged piece of a figure: its field, a bounding sphere, and how it blends in. */
 export interface Prim {
   d: Field

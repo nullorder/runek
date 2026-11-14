@@ -587,6 +587,9 @@ export const LIT_GAIN = 8
 export type GarmentRegion = 'top' | 'bottom' | 'feet' | 'extra'
 export type MaterialKind = 'skin' | 'cloth' | 'knit' | 'denim' | 'leather' | 'hair'
 
+/** Tops a belt is worn over. Under any other top that reaches the waist, the belt goes beneath. */
+const BELTED_OVER = new Set<PersonGarmentType>(['tunic', 'coat', 'dress', 'robe'])
+
 export const GARMENT_REGION: Record<PersonGarmentType, GarmentRegion> = {
   tshirt: 'top',
   shirt: 'top',
@@ -1033,9 +1036,18 @@ function resolveLayers(
   if (explicit) stack = explicit.map((g) => ({ ...g }))
   else {
     stack = OUTFITS[t.outfit ?? sk?.outfit ?? preset.outfit].map((g) => ({ ...g }))
-    // Worn accessories that are really clothing become layers on the outside.
-    for (const extra of ['belt', 'scarf', 'cape'] as const)
-      if (accessories.includes(extra)) stack.push({ type: extra })
+    // Worn accessories that are really clothing become layers on the outside. A belt goes on the
+    // bottoms instead: over a top that is worn belted (a tunic, a coat, a dress, a robe), and
+    // under any other that hangs over the waist (a hoodie, a jacket), which drapes over it.
+    for (const extra of ['belt', 'scarf', 'cape'] as const) {
+      if (!accessories.includes(extra)) continue
+      const tops = stack.filter((g) => GARMENT_REGION[g.type] === 'top' && g.type !== 'apron')
+      const outer = tops[tops.length - 1]
+      const lastBottom = stack.findLastIndex((g) => GARMENT_REGION[g.type] === 'bottom')
+      if (extra === 'belt' && lastBottom >= 0 && outer && !BELTED_OVER.has(outer.type))
+        stack.splice(lastBottom + 1, 0, { type: extra })
+      else stack.push({ type: extra })
+    }
   }
 
   // The flat color props (already folded into `slot`) recolor the outermost top, every

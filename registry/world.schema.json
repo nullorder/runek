@@ -7308,7 +7308,7 @@
           "items": {
             "$ref": "#/$defs/Person.PersonGarment"
           },
-          "description": "Clothing layers, inner to outer, each with its own type, color, and options. The order\ndecides the fit: a shirt listed before the jeans is tucked in. Replaces `outfit`; `[]`\nis the bare base body (a smooth mannequin)."
+          "description": "Clothing layers, inner to outer, each with its own type, color, and options. The order\ndecides the fit: a shirt listed before the jeans is tucked in, and each layer drapes over\nthe ones listed before it. Replaces `outfit`; `[]` is the bare base body (a smooth\nmannequin)."
         },
         "height": {
           "type": "number",
@@ -7479,7 +7479,8 @@
               "backpack",
               "visor"
             ]
-          }
+          },
+          "description": "Worn extras. A `belt`, `scarf` or `cape` becomes a clothing layer on the outside of an\n`outfit`, except a belt under a top that hangs over the waist (a hoodie, a jacket), which\ngoes on the bottoms beneath it."
         },
         "pose": {
           "enum": [

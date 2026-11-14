@@ -146,8 +146,9 @@ export interface PersonProps extends WorldComponentProps {
    *  color and fullness, blush. */
   face?: PersonFaceSpec
   /** Clothing layers, inner to outer, each with its own type, color, and options. The order
-   *  decides the fit: a shirt listed before the jeans is tucked in. Replaces `outfit`; `[]`
-   *  is the bare base body (a smooth mannequin). */
+   *  decides the fit: a shirt listed before the jeans is tucked in, and each layer drapes over
+   *  the ones listed before it. Replaces `outfit`; `[]` is the bare base body (a smooth
+   *  mannequin). */
   clothes?: PersonGarment[]
   /** Standing height, in units. Every other measurement derives from it. */
   height?: number
@@ -177,6 +178,9 @@ export interface PersonProps extends WorldComponentProps {
    *  `punk` figure and are plain color on the others. */
   trimColor?: string
   hat?: PersonHat
+  /** Worn extras. A `belt`, `scarf` or `cape` becomes a clothing layer on the outside of an
+   *  `outfit`, except a belt under a top that hangs over the waist (a hoodie, a jacket), which
+   *  goes on the bottoms beneath it. */
   accessories?: PersonAccessory[]
   /** What the figure is doing when it isn't walking. `sit` and `type` need a seat under them
    *  (`type` is seated at a desk, fingers tapping); `work` leans over a counter; `play` works
@@ -422,8 +426,10 @@ function posture(rig: Rig, p: PoseParams, m: FrameMotion, H: number, stoop: numb
  * The body is one continuous surface grown from a few dozen smooth primitives on an 18-bone
  * skeleton (no seams at the joints), with a sculpted face, real eyelids, and eyeballs that
  * follow you. Clothes, hair, and hats are layers over it, each fitted to the body by offsetting
- * its surface, so any garment fits any build, age, or style. Skin weights come from the same
- * primitives, so the whole figure bends as one.
+ * its surface, so any garment fits any build, age, or style. No layer passes through another:
+ * each garment sits a few millimetres over the ones under it wherever it covers them, and shows
+ * them past its hems, necklines and openings. Skin weights come from the same primitives, so the
+ * whole figure bends as one.
  *
  * Every trait resolves the same way: a part object (`body`, `face`, `hair`, `clothes`) wins, then
  * the flat shorthand prop, then the `skin` bundle, then the `kind` preset, then a seeded roll.
