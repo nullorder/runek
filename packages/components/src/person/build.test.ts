@@ -43,6 +43,40 @@ describe('buildFigure', () => {
     expect(hi).toBeGreaterThan(spec.height * 0.95)
   })
 
+  it('builds a drawn punk figure in new hair and clothes', () => {
+    const punk = resolveFigure(
+      {
+        seed: 7,
+        style: 'punk',
+        kind: 'villager',
+        age: 'adult',
+        build: 'athletic',
+        hair: 'twintails',
+        outfit: 'street',
+        accessories: ['headphones'],
+      },
+      DEFAULT_PALETTE,
+      1,
+    ).spec
+    const built = finish(buildFigure(punk, 'far'))
+    expect(built.drawn).toBe(true)
+    expect(far.drawn).toBe(false)
+    const names = built.parts.map((p) => p.name)
+    for (const l of punk.layers) expect(names.some((n) => n.startsWith(`${l.type}#`))).toBe(true)
+    expect(built.triangles).toBeGreaterThan(5000)
+  })
+
+  it('builds the bare frame and the muscled frame', () => {
+    for (const anatomy of ['bones', 'muscle'] as const) {
+      const s = resolveFigure(
+        { seed: 7, style: 'stylized', kind: 'villager', age: 'adult', anatomy, clothes: [] },
+        DEFAULT_PALETTE,
+        1,
+      ).spec
+      expect(finish(buildFigure(s, 'far')).triangles).toBeGreaterThan(1000)
+    }
+  })
+
   it('normalizes skin weights over valid bones', () => {
     for (const p of far.parts) {
       for (let v = 0; v < p.skinWeight.length; v += 4) {

@@ -13,7 +13,15 @@ export type PersonKind =
 /** Silhouette cues only (shoulder-to-hip ratio, jaw, brow, default hair weights). */
 export type PersonGender = 'feminine' | 'masculine' | 'neutral'
 export type PersonAge = 'child' | 'adult' | 'elder'
-export type PersonBuild = 'slim' | 'average' | 'stocky'
+/**
+ * The body's own shape. Each build is a different skeleton (stature, head size, leg length,
+ * shoulder, rib and hip width) with its own amount of muscle and soft tissue over it, so they
+ * differ in outline and not only in scale.
+ */
+export type PersonBuild = 'slim' | 'average' | 'stocky' | 'athletic' | 'heavy' | 'petite' | 'lanky'
+/** How much of the body is built: the bare frame, the frame with its muscles, or all of it. A
+ *  look at how a figure is put together; `surface` is the finished body. */
+export type PersonAnatomy = 'bones' | 'muscle' | 'surface'
 export type PersonHair =
   | 'short'
   | 'swept'
@@ -23,6 +31,11 @@ export type PersonHair =
   | 'braid'
   | 'cropped'
   | 'bald'
+  | 'bob'
+  | 'twintails'
+  | 'spiky'
+  | 'fringe'
+  | 'curtain'
 export type PersonFacialHair = 'none' | 'stubble' | 'moustache' | 'beard'
 /** One-word outfit shorthand; it expands to a `clothes` stack. */
 export type PersonOutfit =
@@ -38,8 +51,32 @@ export type PersonOutfit =
   | 'sweater'
   | 'hoodie'
   | 'blazer'
-export type PersonHat = 'none' | 'cap' | 'straw' | 'brim' | 'bandana' | 'hood' | 'chef'
-export type PersonAccessory = 'bag' | 'belt' | 'scarf' | 'glasses' | 'cape' | 'staff'
+  | 'bomber'
+  | 'crop'
+  | 'tank'
+  | 'pleated'
+  | 'shorts'
+  /** A cropped street jacket with a tall collar, lit down the front and round the sleeves. */
+  | 'runner'
+  /** A long rain shell, zipped off-centre, with lit seams. */
+  | 'shell'
+  /** A padded vest over a tank, cargo trousers and boots. */
+  | 'rig'
+  /** A crop top, shorts over leggings and high-tops under the street jacket. */
+  | 'street'
+export type PersonHat = 'none' | 'cap' | 'straw' | 'brim' | 'bandana' | 'hood' | 'chef' | 'beanie'
+export type PersonAccessory =
+  | 'bag'
+  | 'belt'
+  | 'scarf'
+  | 'glasses'
+  | 'cape'
+  | 'staff'
+  | 'headphones'
+  | 'mask'
+  | 'backpack'
+  /** A dark band across the eyes with a lit slit. */
+  | 'visor'
 export type PersonPose =
   | 'stand'
   | 'sit'
@@ -56,8 +93,10 @@ export type PersonEmote = 'sleep' | 'alert' | 'think' | 'happy' | 'coffee'
 export type PersonDetail = 'auto' | 'high' | 'low'
 /** Proportion and face template: `stylized` is an animated-film look (big head and eyes,
  *  small features, slender limbs), `realistic` keeps canonical human proportions, `anime`
- *  pushes the eyes and legs further and sharpens the chin. */
-export type PersonStyle = 'stylized' | 'realistic' | 'anime'
+ *  pushes the eyes and legs further and sharpens the chin, and `punk` is drawn the way an
+ *  animator would: long legs, tall flat eyes under a lash line, hair in chunky locks, and flat
+ *  two-tone color inside an ink line. */
+export type PersonStyle = 'stylized' | 'realistic' | 'anime' | 'punk'
 
 /** The body itself. Every field is optional and seeded when unset. */
 export interface PersonBodySpec {
@@ -105,9 +144,21 @@ export type PersonGarmentType =
   | 'skirt'
   | 'shoes'
   | 'boots'
+  | 'jacket'
+  | 'croptop'
+  | 'tank'
+  | 'cargo'
+  | 'pleated'
+  | 'stockings'
+  | 'sneakers'
   | 'belt'
   | 'scarf'
   | 'cape'
+  | 'runner'
+  | 'shell'
+  | 'techvest'
+  | 'joggers'
+  | 'hightops'
 
 /**
  * One layer of clothing. Layers are listed inner to outer, and the order decides the fit: a
@@ -116,6 +167,8 @@ export type PersonGarmentType =
 export interface PersonGarment {
   type: PersonGarmentType
   color?: string
+  /** The color of its lit seams and stripes, where it has any. Defaults to the figure's trim. */
+  trim?: string
   /** Tops only. */
   sleeves?: 'none' | 'short' | 'long'
   /** Tops only. */
@@ -137,6 +190,8 @@ export interface PersonSkin {
   topColor?: string
   bottomColor?: string
   shoeColor?: string
+  /** The lit seams and stripes of street clothes. */
+  trimColor?: string
   hat?: PersonHat
   hair?: PersonHair
   hairColor?: string

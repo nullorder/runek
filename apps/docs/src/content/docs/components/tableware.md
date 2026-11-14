@@ -32,7 +32,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `kind` | `"glass" \| "plate" \| "bowl" \| "cup" \| "jug" \| "setting"` | `"plate"` | Which piece; a plate by default. |
+| `kind` | `"bowl" \| "glass" \| "plate" \| "cup" \| "jug" \| "setting"` | `"plate"` | Which piece; a plate by default. |
 | `size` | `number` | `1` | Scale on the piece's true size (a 26 cm plate, an 11 cm glass, a 23 cm jug). |
 | `stack` | `number` | `1` | Plates or bowls stacked on each other. |
 | `fill` | `number` |  | How full a glass, cup, or jug is, 0 to 1. Seeded when unset. |

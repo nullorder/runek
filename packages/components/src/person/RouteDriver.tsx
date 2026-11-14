@@ -17,6 +17,27 @@ export interface GaitState {
   distance: number
 }
 
+/**
+ * A routed figure as anything else in the scene can read it: where it stands, the route time it
+ * is at, and where its route has it at any other time. For an overlay that shows where walkers
+ * are headed, or a camera that waits for one to arrive.
+ */
+export interface Routed {
+  route: WalkRoute
+  /** Where the figure's feet are now, in the world, detours included. Kept current, not a copy. */
+  at: Vector3
+  /** Its waist above its feet, in world units. */
+  waist: number
+  /** The route time it is at, in seconds. It falls behind the clock while the figure is held up. */
+  time: () => number
+  /** Where the route has the figure at route time `t`: writes the world point to `out`, on the
+   *  ground there, and returns the world yaw it faces (0 faces +z). Null before it is placed. */
+  where: (t: number, out: Vector3) => number | null
+}
+
+/** Every figure walking a route in the scene now. */
+export const routed = new Set<Routed>()
+
 /** True when something solid lies within `reach` of `from` along the horizontal (dx, dz). */
 export type SideCheck = (from: Vector3, dx: number, dz: number, reach: number) => boolean
 
@@ -102,6 +123,32 @@ export function RouteDriver({
       walkers.delete(self)
     }
   }, [walkers, self])
+
+  useEffect(() => {
+    const spawn = new Vector3()
+    const dir = new Vector3()
+    const entry: Routed = {
+      route,
+      at: last,
+      waist,
+      time: () => now() / 1000 + route.phase - state.current.lag,
+      where(t, out) {
+        const node = frame.current
+        if (!node || !state.current.started) return null
+        const p = route.sample(t)
+        spawn.setFromMatrixPosition(node.matrixWorld)
+        out.set(p.x, p.y, p.z)
+        node.localToWorld(out)
+        out.y += groundAt(out.x, out.z) - groundAt(spawn.x, spawn.z)
+        dir.set(Math.sin(p.heading), 0, Math.cos(p.heading)).transformDirection(node.matrixWorld)
+        return Math.atan2(dir.x, dir.z)
+      },
+    }
+    routed.add(entry)
+    return () => {
+      routed.delete(entry)
+    }
+  }, [route, frame, last, waist, groundAt, now])
 
   useFrame((_, delta) => {
     const node = frame.current

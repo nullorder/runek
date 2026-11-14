@@ -18,9 +18,18 @@ import {
   TorusGeometry,
   Vector3,
 } from 'three'
-import type { BuiltFigure } from './build'
+import type { BuiltFigure, BuiltPart } from './build'
 import type { Humanoid, HumanoidBoneName } from './humanoid'
-import { eyeGeometry, lidGeometry, personMaterials } from './materials'
+import {
+  drawnEyeGeometry,
+  drawnLidGeometry,
+  drawnMaterials,
+  eyeGeometry,
+  inkMaterial,
+  lidGeometry,
+  personMaterials,
+  type ToonMaker,
+} from './materials'
 import type { V3 } from './sdf'
 import { BONES, type BoneName, PARENT, type Shape } from './shape'
 
@@ -113,11 +122,59 @@ export function createRig(joints: V3[]): Rig {
   return { group, bones, skeleton, humanoid }
 }
 
-/** Skinned meshes for one build, bound to the rig's skeleton (the caller adds them to `rig.group`). */
-export function skinnedMeshes(built: BuiltFigure, rig: Rig, skin?: Material) {
-  const materials = personMaterials(skin)
+/**
+ * The parts of a far figure joined into as few meshes as there are materials among them. Every
+ * part carries its color in its vertices and is skinned to the same skeleton, so parts that share
+ * a material draw as one. A drawn figure's materials differ only in the strength of their rim
+ * light, which is lost at that distance, so all of it goes into one mesh.
+ */
+function mergeParts(parts: BuiltPart[], drawn: boolean): BuiltPart[] {
+  const groups = new Map<BuiltPart['material'], BuiltPart[]>()
+  for (const part of parts) {
+    const key = drawn ? 'cloth' : part.material
+    const list = groups.get(key)
+    if (list) list.push(part)
+    else groups.set(key, [part])
+  }
+  return [...groups.entries()].map(([material, list]) => {
+    if (list.length === 1) return { ...list[0], material }
+    const verts = list.reduce((n, p) => n + p.positions.length / 3, 0)
+    const merged: BuiltPart = {
+      name: 'far',
+      material,
+      positions: new Float32Array(verts * 3),
+      normals: new Float32Array(verts * 3),
+      colors: new Float32Array(verts * 3),
+      skinIndex: new Uint16Array(verts * 4),
+      skinWeight: new Float32Array(verts * 4),
+      indices: new Uint32Array(list.reduce((n, p) => n + p.indices.length, 0)),
+    }
+    let v = 0
+    let i = 0
+    for (const p of list) {
+      merged.positions.set(p.positions, v * 3)
+      merged.normals.set(p.normals, v * 3)
+      merged.colors.set(p.colors, v * 3)
+      merged.skinIndex.set(p.skinIndex, v * 4)
+      merged.skinWeight.set(p.skinWeight, v * 4)
+      for (let k = 0; k < p.indices.length; k++) merged.indices[i + k] = p.indices[k] + v
+      v += p.positions.length / 3
+      i += p.indices.length
+    }
+    return merged
+  })
+}
+
+/** Skinned meshes for one build, bound to the rig's skeleton (the caller adds them to `rig.group`).
+ *  Under `WebGPURenderer`, `skin` is the skin's node twin and `toon` makes a drawn figure's. */
+export function skinnedMeshes(built: BuiltFigure, rig: Rig, skin?: Material, toon?: ToonMaker) {
+  const materials = built.drawn ? drawnMaterials(toon) : personMaterials(skin)
+  /** The ink lines of a drawn figure, one per mesh: shown and hidden together (see `Person`). */
+  const lines: SkinnedMesh[] = []
   const bounds = new Sphere(new Vector3(0, built.height * 0.5, 0), built.height * 0.85)
-  const meshes = built.parts.map((part) => {
+  // A far figure is one mesh for each material, not one for each garment.
+  const parts = built.lod === 'far' ? mergeParts(built.parts, built.drawn) : built.parts
+  const meshes = parts.map((part) => {
     const g = new BufferGeometry()
     g.setAttribute('position', new BufferAttribute(part.positions, 3))
     g.setAttribute('normal', new BufferAttribute(part.normals, 3))
@@ -132,10 +189,24 @@ export function skinnedMeshes(built: BuiltFigure, rig: Rig, skin?: Material) {
     mesh.receiveShadow = true
     mesh.boundingSphere = bounds.clone()
     mesh.bind(rig.skeleton, new Matrix4())
+    // A drawn figure gets an ink line round every part but the brow and lash strokes, which are
+    // ink already. Under WebGPURenderer it does without (the line is a GLSL patch).
+    if (built.drawn && !toon && part.name !== 'brows' && part.name !== 'lashes') {
+      const line = new SkinnedMesh(g, inkMaterial())
+      line.name = 'person:ink'
+      line.castShadow = false
+      line.receiveShadow = false
+      line.boundingSphere = bounds.clone()
+      line.raycast = () => {}
+      line.bind(rig.skeleton, new Matrix4())
+      mesh.add(line)
+      lines.push(line)
+    }
     return mesh
   })
   return {
     meshes,
+    lines,
     dispose: () => {
       for (const m of meshes) {
         m.removeFromParent()
@@ -163,25 +234,36 @@ export function attach(
   metal: string,
   wood: string,
   skin?: Material,
+  toon?: ToonMaker,
 ): Attachments {
   const head = rig.bones.head
   const hj = joints[BONES.indexOf('head')]
   const local = (p: V3): V3 => [p[0] - hj[0], p[1] - hj[1], p[2] - hj[2]]
   const owned: { obj: Object3D; geo: BufferGeometry[]; mat?: MeshPhysicalMaterial }[] = []
   const props: Object3D[] = []
-  const materials = personMaterials(skin)
+  const isDrawn = shape.eyes.some((e) => e.open !== undefined)
+  const materials = isDrawn ? drawnMaterials(toon) : personMaterials(skin)
   const eyes: Object3D[] = []
   const lids: Object3D[] = []
   for (const e of shape.eyes) {
     const pivot = new Object3D()
     pivot.position.set(...local(e.center))
-    const eyeGeo = eyeGeometry(e.radius, eyeColor, 40)
+    // A drawn eye is turned to lie along the face. It looks about from there.
+    pivot.rotation.y = e.yaw ?? 0
+    pivot.userData.yaw = e.yaw ?? 0
+    const eyeGeo = e.open
+      ? drawnEyeGeometry(e.radius, e.open, eyeColor)
+      : eyeGeometry(e.radius, eyeColor, 40)
     pivot.add(new Mesh(eyeGeo, materials.eye))
     head.add(pivot)
     eyes.push(pivot)
     const lidPivot = new Object3D()
     lidPivot.position.set(...local(e.center))
-    const lidGeo = lidGeometry(shape.lidRadius, skinColor)
+    lidPivot.rotation.order = 'YXZ'
+    lidPivot.rotation.y = e.yaw ?? 0
+    const lidGeo = e.open
+      ? drawnLidGeometry(shape.lidRadius, skinColor)
+      : lidGeometry(shape.lidRadius, skinColor)
     lidPivot.add(new Mesh(lidGeo, materials.skin))
     head.add(lidPivot)
     lids.push(lidPivot)

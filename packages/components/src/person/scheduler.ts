@@ -5,10 +5,12 @@
 import { type BuiltFigure, buildFigure, type Lod } from './build'
 import type { FigureSpec } from './spec'
 
-/** Longest stretch of build work before yielding back to the page, in milliseconds. */
-const BUDGET = 6
-/** Finished builds kept for reuse (a full-detail one is ~10 MB of arrays). */
-const KEEP: Record<Lod, number> = { near: 4, far: 48 }
+/** Longest stretch of build work before yielding back to the page, in milliseconds: at 6, a frame
+ *  with a build in it ran half as long again as one without. */
+const BUDGET = 3
+/** Finished builds kept for reuse (a full-detail one is ~10 MB of arrays). A street holds more
+ *  than four people near the camera, and walking back past one would build them again. */
+const KEEP: Record<Lod, number> = { near: 8, far: 48 }
 
 type Listener = (built: BuiltFigure) => void
 

@@ -9,9 +9,7 @@
     "three@^0.184.0",
     "troika-three-text@^0.52.4"
   ],
-  "registryDependencies": [
-    "screen"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Sign.tsx",

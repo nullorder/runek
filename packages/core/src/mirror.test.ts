@@ -1,6 +1,14 @@
-import { Matrix4, PerspectiveCamera, Vector3, Vector4 } from 'three'
+import { Matrix4, Object3D, PerspectiveCamera, Vector3, Vector4 } from 'three'
 import { describe, expect, it } from 'vitest'
-import { aimMirror, inScenePass, MIRROR_TOLERANCE, MirrorPool, scenePass } from './mirror'
+import {
+  aimMirror,
+  inScenePass,
+  isMirrorSkipped,
+  MIRROR_TOLERANCE,
+  MirrorPool,
+  scenePass,
+  skipMirrors,
+} from './mirror'
 
 describe('MirrorPool (#63)', () => {
   it('gives surfaces at one height one plane', () => {
@@ -98,5 +106,19 @@ describe('aimMirror', () => {
     expect(u).toBeLessThan(1)
     expect(v).toBeGreaterThan(0)
     expect(v).toBeLessThan(1)
+  })
+})
+
+describe('skipMirrors', () => {
+  it('marks an object until its cleanup runs', () => {
+    const object = new Object3D()
+    const restore = skipMirrors(object)
+    expect(isMirrorSkipped(object)).toBe(true)
+    restore()
+    expect(isMirrorSkipped(object)).toBe(false)
+  })
+
+  it('takes a missing object', () => {
+    expect(() => skipMirrors(null)()).not.toThrow()
   })
 })

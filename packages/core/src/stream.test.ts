@@ -67,6 +67,17 @@ describe('createStreamIndex / nearNodes', () => {
     expect([...index.cells.values()].filter((list) => list.includes(1)).length).toBeGreaterThan(4)
   })
 
+  it('measures a width and depth footprint, as a tower or slab gives', () => {
+    const index = createStreamIndex(
+      [at(0, 100, 'Lamp', { width: 80, depth: 80 })],
+      registry,
+      options,
+    )
+    expect(nearNodes(index, 0, 0)).toEqual([0])
+    const narrow = createStreamIndex([at(0, 100, 'Lamp', { width: 2 })], registry, options)
+    expect(nearNodes(narrow, 0, 0)).toEqual([])
+  })
+
   it('reads an anchored node from the ground index', () => {
     const ground = { position: (path: string) => (path === '0' ? [300, 2, 0] : undefined) }
     const index = createStreamIndex(

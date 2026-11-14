@@ -35,7 +35,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `seats` | `number` | `3` | Seats across, 1 to 4. |
 | `depth` | `number` | `0.9` | Depth along local Z, in units. Seats face +Z. |
 | `seatHeight` | `number` | `0.44` | Top of the seat cushions, in units. |
-| `arms` | `"slim" \| "none" \| "square" \| "rolled"` |  | Seeded when unset. |
+| `arms` | `"none" \| "slim" \| "square" \| "rolled"` |  | Seeded when unset. |
 | `cushions` | `"split" \| "bench"` |  | Seeded when unset. |
 | `legs` | `"pegs" \| "plinth"` |  | Seeded when unset. |
 | `pillows` | `number` |  | Throw pillows, 0 to 2. Seeded when unset. |

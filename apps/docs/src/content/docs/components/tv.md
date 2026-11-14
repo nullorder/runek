@@ -33,7 +33,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `width` | `number` | `1.2` | Screen width, in units. |
-| `mount` | `"stand" \| "wall" \| "console"` |  | `stand` and `console` are seeded when unset; `wall` must be asked for. On a wall the origin is the middle of the screen with its back against the wall (local -Z). |
+| `mount` | `"wall" \| "stand" \| "console"` |  | `stand` and `console` are seeded when unset; `wall` must be asked for. On a wall the origin is the middle of the screen with its back against the wall (local -Z). |
 | `on` | `boolean` | `true` | Showing a seeded picture (a sky, a sun, hills) in this tint, or dark glass when off. |
 | `screen` | `color` |  | Picture tint. Seeded when unset. |
 | `color` | `color` |  | Bezel and stand; defaults to the palette's `metal`. |

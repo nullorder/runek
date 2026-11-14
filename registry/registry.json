@@ -1275,7 +1275,7 @@
       "title": "Person",
       "type": "registry:component",
       "category": "character",
-      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in three style templates (stylized by default, realistic, anime). Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, dresses, robes, trousers, jeans, skirts, shoes, boots, belts, scarves, capes) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body.",
+      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body.",
       "files": [
         {
           "path": "packages/components/src/Person.tsx",
@@ -1288,6 +1288,10 @@
         {
           "path": "packages/components/src/nodes/skin.ts",
           "target": "nodes/skin.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/toon.ts",
+          "target": "nodes/toon.ts"
         }
       ]
     },
@@ -1590,6 +1594,773 @@
       ],
       "example": {
         "size": 0.3
+      }
+    },
+    {
+      "name": "ac-unit",
+      "title": "AcUnit",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "An outdoor AC unit on a wall bracket with its drain hose, optionally in a wire cage. Drawn by the world's shared facade-kit meshes, so any number cost no extra draws. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/AcUnit.tsx",
+          "target": "AcUnit.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "cage": true
+      }
+    },
+    {
+      "name": "awning",
+      "title": "Awning",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A sloped fabric shop awning with a striped valance and two arms, hung from a wall. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Awning.tsx",
+          "target": "Awning.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "width": 3,
+        "color": "#2f3a2c"
+      }
+    },
+    {
+      "name": "blade-sign",
+      "title": "BladeSign",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A board standing out from a wall with one word stacked down both faces in the world's display font, lit at the world's sign luminance level, with tube edges. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/BladeSign.tsx",
+          "target": "BladeSign.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "text": "TEA",
+        "color": "#39ff88"
+      }
+    },
+    {
+      "name": "cable-sag",
+      "title": "CableSag",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A cable sagging across a street between two anchors: a parabola cut into straight pieces. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/CableSag.tsx",
+          "target": "CableSag.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "span": 12,
+        "sag": 0.8
+      }
+    },
+    {
+      "name": "pipe-run",
+      "title": "PipeRun",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A pipe or conduit run clipped to a wall, up it or along it, with a collar every couple of metres. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/PipeRun.tsx",
+          "target": "PipeRun.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "length": 4,
+        "radius": 0.05
+      }
+    },
+    {
+      "name": "roller-shutter",
+      "title": "RollerShutter",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A slatted roller shutter in its housing and side guides, rolled up as far as `open` says. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/RollerShutter.tsx",
+          "target": "RollerShutter.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "open": 0.4
+      }
+    },
+    {
+      "name": "vent",
+      "title": "Vent",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A louvred wall vent under a small hood. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Vent.tsx",
+          "target": "Vent.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "width": 0.8
+      }
+    },
+    {
+      "name": "vending-machine",
+      "title": "VendingMachine",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A vending machine against a wall: a matte case and a lit window of goods at the world's screen luminance level. Drawn by the world's shared facade-kit meshes. One cuboid collider.",
+      "files": [
+        {
+          "path": "packages/components/src/VendingMachine.tsx",
+          "target": "VendingMachine.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        }
+      ],
+      "example": {
+        "color": "#40332a",
+        "lamp": "#b8e8c8"
+      }
+    },
+    {
+      "name": "tower",
+      "title": "Tower",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A procedural city tower from a seeded shape grammar: podium, setback, shaft and crown, with street, service, podium, tower and crown bands drawn by one shared facade shader (shop bays, lit windows with rooms behind them, trims, posters and leaks), so towers batch. Four eras (concrete, tenement, glass, makeshift) set the massing and dressing. Faces listed in `frontage` get relief and the facade kit: shop names, blade and roof signs, awnings, shutters, AC units, pipes, vending machines, cables across the street and light pooled on the pavement. Lit after dusk at the world's luminance levels. Colliders over the footprint and along each street face.",
+      "files": [
+        {
+          "path": "packages/components/src/Tower.tsx",
+          "target": "Tower.tsx"
+        },
+        {
+          "path": "packages/components/src/city/kit.ts",
+          "target": "city/kit.ts"
+        },
+        {
+          "path": "packages/components/src/city/kitParts.ts",
+          "target": "city/kitParts.ts"
+        },
+        {
+          "path": "packages/components/src/city/useKit.ts",
+          "target": "city/useKit.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerLight.ts",
+          "target": "city/towerLight.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/kit.ts",
+          "target": "nodes/kit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/city.ts",
+          "target": "nodes/city.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerFacade.ts",
+          "target": "city/towerFacade.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerGrammar.ts",
+          "target": "city/towerGrammar.ts"
+        },
+        {
+          "path": "packages/components/src/city/towerKit.ts",
+          "target": "city/towerKit.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/tower.ts",
+          "target": "nodes/tower.ts"
+        }
+      ],
+      "example": {
+        "height": 48,
+        "era": "tenement",
+        "frontage": ["+z"],
+        "cableSpan": 12
+      }
+    },
+    {
+      "name": "street-lamp",
+      "title": "StreetLamp",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A street lamp on an arm: a pole, a hot lens at the world's lamp luminance level, a haze cone under the head and a soft pool of light on the street, every lamp's cone and pool sharing two instanced draws. The real light comes from the world's light pool. One thin collider for the pole.",
+      "files": [
+        {
+          "path": "packages/components/src/StreetLamp.tsx",
+          "target": "StreetLamp.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/city/instances.ts",
+          "target": "city/instances.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/haze.ts",
+          "target": "nodes/haze.ts"
+        }
+      ],
+      "example": {
+        "height": 6,
+        "arm": 1.8,
+        "color": "#ffa64d"
+      }
+    },
+    {
+      "name": "neon-sign",
+      "title": "NeonSign",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "Words bent out of glass tube on a dark board, at the world's tube luminance level, that flicker: bad tubes buzz and drop out and the whole sign stutters now and then, as a pure function of the world clock and `seed` so every viewer sees the same sign. The tubes are drawn in code from the world's fonts. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/NeonSign.tsx",
+          "target": "NeonSign.tsx"
+        },
+        {
+          "path": "packages/components/src/city/fontFace.ts",
+          "target": "city/fontFace.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/hash.ts",
+          "target": "city/hash.ts"
+        },
+        {
+          "path": "packages/components/src/city/haze.ts",
+          "target": "city/haze.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/neon.ts",
+          "target": "nodes/neon.ts"
+        }
+      ],
+      "example": {
+        "text": "OPEN LATE",
+        "color": "#39ff88",
+        "flicker": 0.6
+      }
+    },
+    {
+      "name": "billboard",
+      "title": "Billboard",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A board that runs ads as data: one or two lines of lettering in the world's display font beside a mark drawn in code that moves with the world clock (steam off a bowl, a watch's hands, a cell filling), cut to the next every `hold` seconds through torn strips. Its picture is redrawn only while near the camera. Lit at the world's screen luminance level. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Billboard.tsx",
+          "target": "Billboard.tsx"
+        },
+        {
+          "path": "packages/components/src/city/fontFace.ts",
+          "target": "city/fontFace.ts"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/hash.ts",
+          "target": "city/hash.ts"
+        }
+      ],
+      "example": {
+        "mount": "posts",
+        "stand": 3,
+        "hold": 6
+      }
+    },
+    {
+      "name": "hologram",
+      "title": "Hologram",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A plaza centrepiece: a pedestal, a beam of light with scan lines climbing it, and in it a wire cage turning round three rings that keep time (once a minute, once an hour, once every `round` seconds) off the world clock. The pedestal has a cylinder collider.",
+      "files": [
+        {
+          "path": "packages/components/src/Hologram.tsx",
+          "target": "Hologram.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/hologram.ts",
+          "target": "nodes/hologram.ts"
+        }
+      ],
+      "example": {
+        "color": "#39ff88",
+        "round": 600
+      }
+    },
+    {
+      "name": "wet-street",
+      "title": "WetStreet",
+      "type": "registry:component",
+      "category": "structures",
+      "description": "A rain-soaked asphalt street with kerbs: puddles from world-space noise and in the gutters, darkened glossy asphalt, lane, edge and centre paint, zebras at crossings, and reflections from the world's shared mirror, full in standing water and faint on damp asphalt. A mounted `Rain` rings the puddles and dries and soaks the street with its weather. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/WetStreet.tsx",
+          "target": "WetStreet.tsx"
+        },
+        {
+          "path": "packages/components/src/city/weather.ts",
+          "target": "city/weather.ts"
+        }
+      ],
+      "example": {
+        "length": 24,
+        "width": 9,
+        "puddles": 0.6
+      }
+    },
+    {
+      "name": "rain",
+      "title": "Rain",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "The weather over a whole world, drawn only around the camera: rain streaks and splashes, snowflakes, and rings on every `WetStreet`'s puddles, as hard as a `weather` function says (`weatherAt` gives the weather as a pure function of a clock). It stays out from under roofs through a depth map of the still world drawn from above in its first seconds. WebGLRenderer only.",
+      "files": [
+        {
+          "path": "packages/components/src/Rain.tsx",
+          "target": "Rain.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/weather.ts",
+          "target": "city/weather.ts"
+        }
+      ],
+      "example": {
+        "streaks": 4000,
+        "splashes": 200
+      }
+    },
+    {
+      "name": "steam-vent",
+      "title": "SteamVent",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Steam off a manhole or out of a wall vent: soft puffs that rise, spread, lean and thin away, each a pure function of the world clock and `seed`. One instanced draw, plus the lid. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/SteamVent.tsx",
+          "target": "SteamVent.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/hash.ts",
+          "target": "city/hash.ts"
+        }
+      ],
+      "example": {
+        "puffs": 20,
+        "rise": 4
+      }
+    },
+    {
+      "name": "glow-sky",
+      "title": "GlowSky",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "A night sky that is never black: a dome lit from below by a city, darkest overhead and as bright as the haze at the horizon, with a slow cloud deck catching the district's glow that parts on stars and a moon in its phase. Decorative: no collider.",
+      "files": [
+        {
+          "path": "packages/components/src/GlowSky.tsx",
+          "target": "GlowSky.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/nodes/glowSky.ts",
+          "target": "nodes/glowSky.ts"
+        }
+      ],
+      "example": {
+        "clouds": true
+      }
+    },
+    {
+      "name": "skyline",
+      "title": "Skyline",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "A district seen from far off: a band of towers across part of the horizon with a few rooms lit and one landmark (spire, dome or stack) picked out in light, in two draws. Scenery past anywhere a body can reach: no colliders.",
+      "files": [
+        {
+          "path": "packages/components/src/Skyline.tsx",
+          "target": "Skyline.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        }
+      ],
+      "example": {
+        "bearing": 45,
+        "spread": 70,
+        "landmark": "spire"
+      }
+    },
+    {
+      "name": "crowd",
+      "title": "Crowd",
+      "type": "registry:component",
+      "category": "character",
+      "description": "People on a street in bulk: hooded figures in long coats walking their lanes there and back, each with one small light at the collar, stepping round the player. Where each walks comes from the world clock and `seed` alone, so every viewer sees the same crowd. Three instanced draws however many walk; no colliders.",
+      "files": [
+        {
+          "path": "packages/components/src/Crowd.tsx",
+          "target": "Crowd.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        },
+        {
+          "path": "packages/components/src/city/hash.ts",
+          "target": "city/hash.ts"
+        }
+      ],
+      "example": {
+        "count": 12
+      }
+    },
+    {
+      "name": "flying-traffic",
+      "title": "FlyingTraffic",
+      "type": "registry:component",
+      "category": "environment",
+      "description": "Lanes of hovercars over a street, decks of lanes each way, every car placed by the world clock and `seed` so every viewer sees the same traffic. Three instanced draws however many cars; no colliders.",
+      "files": [
+        {
+          "path": "packages/components/src/FlyingTraffic.tsx",
+          "target": "FlyingTraffic.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        }
+      ],
+      "example": {
+        "cars": 16,
+        "levels": [0, 8]
+      }
+    },
+    {
+      "name": "coffee-gear",
+      "title": "CoffeeGear",
+      "type": "registry:component",
+      "category": "interiors",
+      "description": "What a cafe makes coffee with and shows off: an espresso machine, grinder, pour-over bar, siphon, cold drip tower, batch brewer, taps, a drum roaster, and beans in bags, jars and stocked shelves, one `kind` to a node. Only the roaster has a collider.",
+      "files": [
+        {
+          "path": "packages/components/src/CoffeeGear.tsx",
+          "target": "CoffeeGear.tsx"
+        },
+        {
+          "path": "packages/components/src/city/glow.ts",
+          "target": "city/glow.ts"
+        }
+      ],
+      "example": {
+        "kind": "pourover",
+        "length": 0.9
       }
     }
   ]

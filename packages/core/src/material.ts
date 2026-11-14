@@ -191,10 +191,22 @@ export function sharedMaterialCount() {
   return shared.size
 }
 
-/** Whether `material` came from a look (built from it or answered through a slot), so it is
- *  shared and read-only and the static batcher may merge what it draws. */
+/** Whether `material` came from a look (built from it or answered through a slot), or was
+ *  marked with `shareMaterial`, so it is shared and read-only and the static batcher may merge
+ *  what it draws. */
 export function isSharedMaterial(material: Material): boolean {
   return batchable.has(material)
+}
+
+/**
+ * Mark a material a component made itself as shared: one instance used by every part that draws
+ * that way and never changed per part (a facade `ShaderMaterial` whose per-building look rides
+ * in vertex attributes), so the static batcher merges what it draws like any look's material.
+ * The component still owns it. A material that changes after mount must not be marked.
+ */
+export function shareMaterial<M extends Material>(material: M): M {
+  batchable.add(material)
+  return material
 }
 
 const resolved = new WeakMap<object, Map<string, Material>>()

@@ -45,6 +45,7 @@ import { type PersonSkinName, resolveFigure } from './person/spec'
 import type {
   PersonAccessory,
   PersonAge,
+  PersonAnatomy,
   PersonBodySpec,
   PersonBuild,
   PersonDetail,
@@ -64,8 +65,10 @@ import type {
 } from './person/types'
 import { Sign } from './Sign'
 
-// The WebGPU (TSL) twin of the skin's GLSL patch, loaded only under a node renderer.
+// The WebGPU (TSL) twins of the skin's GLSL patch and of a drawn figure's two-tone material,
+// loaded only under a node renderer.
 const skinNodes = lazyModule(() => import('./nodes/skin'))
+const toonNodes = lazyModule(() => import('./nodes/toon'))
 
 export {
   applyPose,
@@ -85,6 +88,7 @@ export {
   PoseSourceContext,
   type PoseSourceFactory,
 } from './person/pose'
+export { type Routed, routed, type WalkRoute } from './person/RouteDriver'
 export {
   type PersonTrait,
   type PersonTraitSource,
@@ -97,6 +101,7 @@ export { PERSON_COLORS, PERSON_SKINS, type PersonSkinName } from './person/spec'
 export type {
   PersonAccessory,
   PersonAge,
+  PersonAnatomy,
   PersonBodySpec,
   PersonBuild,
   PersonDetail,
@@ -120,8 +125,14 @@ export type {
 export interface PersonProps extends WorldComponentProps {
   /** Proportion and face template: `stylized` (default) is an animated-film look with a big
    *  head and eyes, small features, and slender limbs; `realistic` keeps canonical human
-   *  proportions; `anime` pushes the eyes and legs further. */
+   *  proportions; `anime` pushes the eyes and legs further; `punk` is drawn the way an animator
+   *  would, with long legs, tall flat eyes under a lash line, hair in chunky locks, and flat
+   *  two-tone color inside an ink line (no ink line under `WebGPURenderer`). */
   style?: PersonStyle
+  /** How much of the body is built: `bones` is the bare frame, `muscle` the frame with its
+   *  muscles on, `surface` (default) the finished body. For looking at how a build is put
+   *  together, with `clothes={[]}`. */
+  anatomy?: PersonAnatomy
   /** Role preset: fills `outfit`, `hat`, and `accessories` unless you set them. */
   kind?: PersonKind
   /** Silhouette cues only; every trait it influences stays overridable. Seeded when unset. */
@@ -161,6 +172,10 @@ export interface PersonProps extends WorldComponentProps {
   bottomColor?: string
   /** Footwear color; defaults to the palette's `metal`. */
   shoeColor?: string
+  /** The lit seams and stripes of street clothes (`runner`, `shell`, `rig`, `street`, a hoodie's
+   *  cords) and a visor's slit. Defaults to a lamp color picked by the seed. They shine on a
+   *  `punk` figure and are plain color on the others. */
+  trimColor?: string
   hat?: PersonHat
   accessories?: PersonAccessory[]
   /** What the figure is doing when it isn't walking. `sit` and `type` need a seat under them
@@ -241,6 +256,11 @@ const CRUISE = 1.3
 /** Full detail builds inside LOD_IN units of the camera and drops past LOD_OUT. */
 const LOD_IN = 10
 const LOD_OUT = 13
+/** Past these distances a figure is posed every third frame, then every sixth. */
+const POSE_THIRD = 22
+const POSE_SIXTH = 45
+/** How far away a drawn figure's ink line is still drawn: past it the line is under a pixel. */
+const INK_RANGE = 32
 /** Seconds between sips for `drink`, and how long a sip takes. */
 const SIP_EVERY = 7
 const SIP = 1.8
@@ -436,6 +456,7 @@ export function Person({
   rotation = [0, 0, 0],
   seed = 1,
   style = 'stylized',
+  anatomy,
   kind = 'villager',
   gender,
   age = 'adult',
@@ -453,9 +474,10 @@ export function Person({
   topColor,
   bottomColor,
   shoeColor,
+  trimColor,
   hat,
   accessories,
-  pose = 'stand',
+  pose: authored = 'stand',
   patrol,
   wander,
   speed,
@@ -481,6 +503,9 @@ export function Person({
 }: PersonProps) {
   const { unit, palette, ground, player } = useWorld()
   const avatarMotion = useContext(PlayerMotionContext)
+  // Whoever carries the body can seat it (`PlayerMotion.pose`), over the authored pose.
+  const [carried, setCarried] = useState<'sit' | null>(null)
+  const pose: PersonPose = carried ?? authored
   // A placed figure stands on the world's ground baseline; a bare visual is positioned by
   // whatever parent owns it (a `Player` capsule, a vehicle), so it starts at its own origin.
   const at: Vec3 = position ?? (physics ? [0, ground, 0] : [0, 0, 0])
@@ -488,6 +513,7 @@ export function Person({
   const traits = JSON.stringify([
     seed,
     style,
+    anatomy,
     kind,
     gender,
     age,
@@ -505,6 +531,7 @@ export function Person({
     topColor,
     bottomColor,
     shoeColor,
+    trimColor,
     hat,
     accessories,
   ])
@@ -514,6 +541,7 @@ export function Person({
         {
           seed,
           style,
+          anatomy,
           kind,
           gender,
           age,
@@ -531,6 +559,7 @@ export function Person({
           topColor,
           bottomColor,
           shoeColor,
+          trimColor,
           hat,
           accessories,
         },
@@ -577,12 +606,15 @@ export function Person({
   const near = useBuild(spec, key, 'near', wantNear, distance)
   const active = near ?? far
 
-  // Under WebGPU the skin's GLSL patch doesn't compile: its node twin stands in.
-  const nodes = useNodeRenderer() ? skinNodes() : null
+  // Under WebGPU the skin's GLSL patch doesn't compile: its node twin stands in, and a drawn
+  // figure takes three's toon node material.
+  const nodeRenderer = useNodeRenderer()
+  const nodes = nodeRenderer ? skinNodes() : null
   const skinMaterial = nodes?.skinMaterial()
+  const toon = nodeRenderer && spec.st.drawn ? toonNodes()?.toonMaterial : undefined
   const meshes = useMemo(
-    () => (active ? skinnedMeshes(active, rig, skinMaterial) : null),
-    [active, rig, skinMaterial],
+    () => (active ? skinnedMeshes(active, rig, skinMaterial, toon) : null),
+    [active, rig, skinMaterial, toon],
   )
   useEffect(() => {
     if (!meshes) return
@@ -594,8 +626,8 @@ export function Person({
   const { eye, skin: skinColor, metal, wood } = spec.colors
   const attachKey = JSON.stringify([shape.eyes, shape.lidRadius, shape.props])
   const parts = useMemo(
-    () => attach(rig, shape, shape.joints, eye, skinColor, metal, wood, skinMaterial),
-    [rig, attachKey, eye, skinColor, metal, wood, skinMaterial],
+    () => attach(rig, shape, shape.joints, eye, skinColor, metal, wood, skinMaterial, toon),
+    [rig, attachKey, eye, skinColor, metal, wood, skinMaterial, toon],
   )
   useEffect(() => parts.dispose, [parts])
   const detailed = active?.lod === 'near'
@@ -605,6 +637,7 @@ export function Person({
     for (const e of parts.eyes) e.visible = shown
     for (const o of parts.props) o.visible = shown
   }, [parts, detailed, shown])
+  const inked = useRef(true)
 
   const root = useRef<Group>(null)
   const focused = useInteraction(root, {
@@ -688,6 +721,9 @@ export function Person({
       lookPitch: 0,
       legLength: 0,
       height: 0,
+      course: 0,
+      climb: null,
+      position: [0, 0, 0],
     }),
     [],
   )
@@ -724,10 +760,24 @@ export function Person({
     [],
   )
 
-  useFrame((state, dt) => {
+  // Bones don't compose their matrices on every render of their own accord (a street of standing
+  // figures is thousands of bones, recomposed in every pass, moved or not): the frame below
+  // rebuilds them on the frames it poses them.
+  useEffect(() => {
+    for (const bone of rig.skeleton.bones) {
+      bone.matrixAutoUpdate = false
+      bone.updateMatrix()
+    }
+  }, [rig])
+  // Frames a far figure has gone unposed and the time they covered, and which frame of every six
+  // is this figure's, so a crowd doesn't all pose on the same frame.
+  const unposed = useRef({ frame: Math.floor(rng(sub(seed, 3))() * 6), owed: 0 })
+
+  useFrame((state, frameDt) => {
     const t = state.clock.elapsedTime
-    const k = 1 - Math.exp(-7 * dt)
     const b = rig.bones
+    const rest = unposed.current
+    rest.owed += frameDt
 
     if (root.current) {
       distance.current =
@@ -736,13 +786,33 @@ export function Person({
         if (!close && distance.current < LOD_IN) setClose(true)
         else if (close && distance.current > LOD_OUT) setClose(false)
       }
+      const ink = distance.current < INK_RANGE
+      if (meshes && (ink !== inked.current || meshes.lines[0]?.visible !== ink)) {
+        inked.current = ink
+        for (const line of meshes.lines) line.visible = ink
+      }
     }
+    // A figure is posed every frame where a face can be read, every third frame further off and
+    // every sixth beyond that, with the time it skipped made up on the frame it is posed.
+    const every = distance.current > POSE_SIXTH ? 6 : distance.current > POSE_THIRD ? 3 : 1
+    rest.frame = (rest.frame + 1) % 6
+    if (rest.frame % every !== 0) return
+    const dt = Math.min(rest.owed, 0.25)
+    rest.owed = 0
+    const k = 1 - Math.exp(-7 * dt)
 
     // Walking speed comes from the route, else an explicit `gait`, else the carrying `Player`
     // (which also says how far it has gone). Otherwise distance is integrated so the stride phase
     // still tracks the feet.
     const w = walk.current
     const m = avatarMotion?.current
+    // A carrier that holds the body on a seat sits it down, over the authored pose.
+    const seat = (!route && m?.pose) || null
+    if (seat !== carried) {
+      setCarried(seat)
+      // Ease down into the seat from standing. Getting up is a cut, like the step off it.
+      if (seat) blend.current.posed = 0
+    }
     if (!route) {
       if (gait !== undefined) {
         w.speed = gait
@@ -834,6 +904,14 @@ export function Person({
       ctx.lookPitch = m ? m.lookPitch : tracking ? -pitch : 0
       ctx.legLength = marks.hipY
       ctx.height = H
+      ctx.course = m?.course ?? 0
+      ctx.climb = m?.climb ?? null
+      if (root.current) {
+        root.current.getWorldPosition(scratch)
+        ctx.position[0] = scratch.x
+        ctx.position[1] = scratch.y
+        ctx.position[2] = scratch.z
+      }
       resetHumanoidPose(poseOut)
       sourced = source.update(ctx, poseOut)
     }
@@ -861,6 +939,7 @@ export function Person({
         b.root.position.y = layer.has(b.pelvis) ? (p.drop + fm.breath * 0.003 * H) * q : 0
       }
     }
+    for (const bone of rig.skeleton.bones) bone.updateMatrix()
 
     if (p.drink) {
       // Undo the wrist's turn so the mug stays upright, tipping only as it reaches the lips.
@@ -885,8 +964,13 @@ export function Person({
     if (h.rotation.order !== 'YXZ') h.rotation.order = 'YXZ'
     if (sourced) h.quaternion.multiply(tmp.q.setFromEuler(tmp.euler.set(lk.pitch, lk.yaw, 0)))
     else h.rotation.set(lk.pitch, lk.yaw, 0)
+    h.updateMatrix()
     const eyeYaw = tracking ? clamp(wanted - lk.yaw, -EYE_REACH, EYE_REACH) : 0
-    for (const e of parts.eyes) e.rotation.y += (eyeYaw - e.rotation.y) * Math.min(1, k * 3)
+    for (const e of parts.eyes) {
+      // A drawn eye rests turned along the face (`userData.yaw`) and looks about from there.
+      const rest = (e.userData.yaw as number | undefined) ?? 0
+      e.rotation.y += (rest + eyeYaw - e.rotation.y) * Math.min(1, k * 3)
+    }
 
     // Keep the name legible from wherever it's read.
     if (nameTag.current?.parent) {

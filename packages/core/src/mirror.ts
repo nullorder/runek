@@ -16,6 +16,7 @@ import {
   Vector2,
   Vector3,
   Vector4,
+  type WebGLProgramParametersWithUniforms,
   type WebGLRenderer,
   WebGLRenderTarget,
   WebGPUCoordinateSystem,
@@ -46,6 +47,30 @@ export function scenePass(draw: () => void) {
 
 /** Surfaces whose tops are closer than this (in world units) share one mirror. */
 export const MIRROR_TOLERANCE = 0.02
+
+const skipped = new Set<Object3D>()
+
+/**
+ * Leave `object` out of every mirror: hidden while a reflection draws, drawn as usual otherwise.
+ * For what a reflection would only muddy or cost: rain in the air, traffic overhead, small wall
+ * detail. Returns the function that puts it back.
+ *
+ * ```tsx
+ * useEffect(() => skipMirrors(mesh.current), [])
+ * ```
+ */
+export function skipMirrors(object: Object3D | null | undefined): () => void {
+  if (!object) return () => {}
+  skipped.add(object)
+  return () => {
+    skipped.delete(object)
+  }
+}
+
+/** Whether `object` is left out of mirrors (see `skipMirrors`). */
+export function isMirrorSkipped(object: Object3D): boolean {
+  return skipped.has(object)
+}
 
 // Shifts the mirror's near plane just past the surface, so what lies on it isn't reflected.
 const CLIP_BIAS = 0.003
@@ -156,10 +181,12 @@ export class MirrorPlane {
     if (this.target.width !== w || this.target.height !== h) this.target.setSize(w, h)
 
     const hidden: Object3D[] = []
-    for (const o of this.borrowers) {
-      if (o.visible) {
-        o.visible = false
-        hidden.push(o)
+    for (const set of [this.borrowers, skipped]) {
+      for (const o of set) {
+        if (o.visible) {
+          o.visible = false
+          hidden.push(o)
+        }
       }
     }
     // `WebGLRenderer` keeps state a nested render disturbs; `WebGPURenderer` draws each render
@@ -275,14 +302,36 @@ const FRAGMENT_HEAD = /* glsl */ `
 uniform sampler2D uMirror;
 uniform float uMirrorStrength;
 varying vec4 vMirrorUv;`
-const FRAGMENT_BODY = /* glsl */ `
+const fragmentBody = (strength: string) => /* glsl */ `
 if ( uMirrorStrength > 0.0 ) {
   vec2 mirrorUv = vMirrorUv.xy / vMirrorUv.w;
   vec2 mirrorEdge = smoothstep( 0.0, 0.06, mirrorUv ) * smoothstep( 1.0, 0.94, mirrorUv );
   float facing = 1.0 - saturate( dot( normal, normalize( vViewPosition ) ) );
-  float mirrorMix = uMirrorStrength * mix( 0.35, 1.0, pow( facing, 3.0 ) ) * mirrorEdge.x * mirrorEdge.y;
+  float mirrorMix = uMirrorStrength * saturate( ${strength} ) * mix( 0.35, 1.0, pow( facing, 3.0 ) ) * mirrorEdge.x * mirrorEdge.y;
   outgoingLight = mix( outgoingLight, texture2D( uMirror, mirrorUv ).rgb, mirrorMix );
 }`
+
+/**
+ * A surface's own say over its reflection, for `useMirrorMaterial`: shader edits of its own (a
+ * wet street's puddles, paint and rain rings) and how strongly each pixel reflects, so standing
+ * water mirrors fully and damp asphalt only a little.
+ */
+export interface MirrorSurface {
+  /** Names the edits below, so three compiles one program for every surface of this kind
+   *  (per-surface values belong in uniforms). */
+  key: string
+  /** `WebGLRenderer`: the surface's own edits to the material's shader, made before the
+   *  mirror's. With it the material is built even where no mirror is drawn (no `<World>`, or
+   *  past the plane limit), so the surface keeps its look. */
+  compile?: (shader: WebGLProgramParametersWithUniforms) => void
+  /** `WebGLRenderer`: a GLSL float expression, in scope once the lit color is final, that scales
+   *  the reflection per pixel (0 to 1). A local `compile` declared earlier in `main` works. */
+  strength?: string
+  /** `WebGPURenderer`: given the node material, make the surface's own node edits and return a
+   *  float node that scales the reflection per pixel, or nothing. Load the code that builds it
+   *  with `lazyModule()`, so a WebGL world never downloads it. */
+  node?: (material: unknown) => unknown
+}
 
 /** Borrow the plane for `object`'s height for one draw, drawing it first if nothing has this
  *  frame. Null inside another scene pass (it draws plain there and claims no plane: only what
@@ -311,26 +360,39 @@ function borrow(
  * strength 0, or past the world's plane limit, it draws as `useMaterial(look)`.
  *
  * Use it on flat, upward-facing surfaces. The material is the component's own (it changes per
- * draw), so its parts aren't batched.
+ * draw), so its parts aren't batched. A `surface` adds the component's own shader edits and a
+ * per-pixel strength (see `MirrorSurface`); memoize it, since a new one builds a new material.
  *
  * ```tsx
  * const material = useMirrorMaterial({ color: palette.floor, roughness: 0.3 }, reflect)
  * ```
  */
-export function useMirrorMaterial(look: MaterialLook, strength: number): Material {
+export function useMirrorMaterial(
+  look: MaterialLook,
+  strength: number,
+  surface?: MirrorSurface,
+): Material {
   const pool = useContext(MirrorPoolContext)
   const plain = useMaterial(look)
   const gl = useThree((s) => s.gl) as { isWebGLRenderer?: boolean; isWebGPURenderer?: boolean }
   const kind = look.kind === 'physical' ? 'physical' : 'standard'
   const { kind: _kind, slot: _slot, ...params } = look
   const key = JSON.stringify(params)
-  const wanted = !!pool && strength > 0 && look.kind !== 'basic'
-  const nodes = wanted && gl.isWebGPURenderer ? mirrorNodes() : null
+  const reflects = !!pool && strength > 0 && look.kind !== 'basic'
+  // A surface with shader edits of its own keeps them where no mirror is drawn.
+  const custom = !!surface?.compile && look.kind !== 'basic' && !!gl.isWebGLRenderer
+  const wanted = reflects || custom
+  const nodes = reflects && gl.isWebGPURenderer ? mirrorNodes() : null
+  const surfaceKey = surface?.key ?? ''
   const reflective = useMemo(() => {
-    if (!pool || !wanted) return null
-    if (nodes) {
-      const material = nodes.mirrorNodeMaterial(kind, params, strength, (o, r, s, c) =>
-        borrow(pool, o, r, s, c),
+    if (!wanted) return null
+    if (nodes && pool) {
+      const material = nodes.mirrorNodeMaterial(
+        kind,
+        params,
+        strength,
+        (o, r, s, c) => borrow(pool, o, r, s, c),
+        surface?.node,
       )
       return { material }
     }
@@ -342,18 +404,21 @@ export function useMirrorMaterial(look: MaterialLook, strength: number): Materia
       uMirrorMatrix: { value: new Matrix4() },
       uMirrorStrength: { value: 0 },
     }
+    const body = fragmentBody(surface?.strength ?? '1.0')
     material.onBeforeCompile = (shader) => {
+      surface?.compile?.(shader)
       Object.assign(shader.uniforms, uniforms)
       shader.vertexShader = shader.vertexShader
         .replace('#include <common>', `#include <common>${VERTEX_HEAD}`)
         .replace('#include <project_vertex>', `#include <project_vertex>${VERTEX_BODY}`)
       shader.fragmentShader = shader.fragmentShader
         .replace('#include <common>', `#include <common>${FRAGMENT_HEAD}`)
-        .replace('#include <opaque_fragment>', `${FRAGMENT_BODY}\n#include <opaque_fragment>`)
+        .replace('#include <opaque_fragment>', `${body}\n#include <opaque_fragment>`)
     }
-    material.customProgramCacheKey = () => 'runek-mirror'
+    material.customProgramCacheKey = () => `runek-mirror:${surfaceKey}`
     material.onBeforeRender = (renderer, scene, camera, _geometry, object) => {
       uniforms.uMirrorStrength.value = 0
+      if (!pool || !reflects) return
       const plane = borrow(pool, object, renderer, scene, camera)
       if (!plane) return
       uniforms.uMirror.value = plane.texture
@@ -361,7 +426,7 @@ export function useMirrorMaterial(look: MaterialLook, strength: number): Materia
       uniforms.uMirrorStrength.value = strength
     }
     return { material }
-  }, [pool, gl, kind, key, strength, wanted, nodes])
+  }, [pool, gl, kind, key, strength, wanted, reflects, nodes, surface, surfaceKey])
 
   useEffect(() => {
     if (!reflective) return

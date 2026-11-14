@@ -31,12 +31,14 @@ const coreVersion = JSON.parse(
 ).version
 const CORE_DEP = `@runek/core@^${coreVersion}`
 
-// Map a source file's basename (no extension) → item name, so a sibling import
-// like `./Door` resolves to the `door` registry item.
+// Map a component file's basename (no extension) → item name, so a sibling import
+// like `./Door` resolves to the `door` registry item. Only PascalCase component
+// files count: a lower-case helper (`nodes/uniforms.ts`, `city/kit.ts`) ships with
+// every item that lists it, so importing it depends on no other item.
 const basenameToItem = new Map()
 for (const item of index.items) {
   for (const file of item.files) {
-    if (file.path.endsWith('.tsx') || file.path.endsWith('.ts')) {
+    if (/\.tsx?$/.test(file.path) && /^[A-Z]/.test(baseNoExt(file.path))) {
       basenameToItem.set(baseNoExt(file.path), item.name)
     }
   }

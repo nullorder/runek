@@ -8,10 +8,7 @@
     "@runek/core@^0.17.0",
     "three@^0.184.0"
   ],
-  "registryDependencies": [
-    "ocean",
-    "screen"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "Lake.tsx",

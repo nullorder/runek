@@ -78,4 +78,41 @@ describe('resolveFigure', () => {
     expect(s.layers.map((l) => l.type)).toEqual(['shirt', 'vest', 'jeans', 'belt', 'shoes'])
     expect(resolve({ skin: 'winter' }).hat).toBe('hood')
   })
+
+  it('draws only the punk style, and leaves the other styles undrawn', () => {
+    expect(resolve({ style: 'punk' }).st.drawn).toBe(true)
+    for (const style of ['stylized', 'realistic', 'anime'] as const)
+      expect(resolve({ style }).st.drawn).toBe(false)
+    // A drawn man stands taller in heads than a drawn woman.
+    const man = resolve({ style: 'punk', gender: 'masculine' })
+    const woman = resolve({ style: 'punk', gender: 'feminine' })
+    expect(man.headsTall).toBeGreaterThan(woman.headsTall)
+  })
+
+  it('rolls only the original builds from a seed, and takes the new ones when asked', () => {
+    for (let seed = 1; seed < 40; seed++)
+      expect(['slim', 'average', 'stocky']).toContain(resolve({ seed }).build)
+    for (const build of ['athletic', 'heavy', 'petite', 'lanky'] as const)
+      expect(resolve({ build }).physique).toBeDefined()
+    expect(resolve({ build: 'lanky' }).height).toBeGreaterThan(resolve({ build: 'petite' }).height)
+    expect(resolve({}).anatomy).toBe('surface')
+    expect(resolve({ anatomy: 'bones' }).anatomy).toBe('bones')
+  })
+
+  it('dresses the street outfits, trimmed in one color a figure keeps', () => {
+    expect(resolve({ outfit: 'bomber', accessories: [] }).layers.map((l) => l.type)).toEqual([
+      'tshirt',
+      'cargo',
+      'jacket',
+      'sneakers',
+    ])
+    const trimmed = resolve({ outfit: 'runner' })
+    expect(new Set(trimmed.layers.map((l) => l.trim)).size).toBe(1)
+    expect(resolve({ outfit: 'runner', trimColor: '#00ff00' }).colors.trim).toBe('#00ff00')
+    // The trim is rolled last, so it reshuffles nothing a seed already chose.
+    const plain = resolve({})
+    const dyed = resolve({ trimColor: '#00ff00' })
+    expect(dyed.hair).toBe(plain.hair)
+    expect(dyed.colors.skin).toBe(plain.colors.skin)
+  })
 })

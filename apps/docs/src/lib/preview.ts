@@ -189,4 +189,71 @@ export const PREVIEW: Record<string, PreviewConfig> = {
   Speaker: { camera: [1.4, 1.4, 2], target: [0, 0.6, 0] },
   AcousticPanel: { camera: [1, 1.4, 2.2], target: [0, 1, 0], props: { position: [0, 1, 0] } },
   BassTrap: { camera: [2.2, 1.8, 2.4], target: [0, 1, 0], props: { height: 2.4 } },
+  AcUnit: { camera: [1.4, 1.2, 1.8], target: [0, 0.3, 0], props: { position: [0, 0.4, 0] } },
+  Awning: { camera: [3, 2.6, 3.4], target: [0, 2.4, 0], props: { position: [0, 3, 0] } },
+  BladeSign: {
+    camera: [3, 3, 4],
+    target: [0, 2.4, 0],
+    props: { position: [0, 0.6, 0], text: 'NOODLE' },
+  },
+  CableSag: {
+    camera: [5, 3, 1.5],
+    target: [0, 2, 2],
+    props: { position: [0, 2.6, 0], span: 4, sag: 0.4 },
+  },
+  PipeRun: { camera: [1.6, 1.8, 2.4], target: [0, 1, 0], props: { length: 2.2 } },
+  RollerShutter: {
+    camera: [2.6, 1.8, 3.6],
+    target: [0, 1.4, 0],
+    props: { width: 2.4, height: 2.4 },
+  },
+  Vent: { camera: [0.9, 1.2, 1.2], target: [0, 1.1, 0], props: { position: [0, 0.9, 0] } },
+  VendingMachine: { camera: [1.8, 1.6, 2.6], target: [0, 1, 0.3] },
+  Tower: {
+    camera: [22, 14, 26],
+    target: [0, 8, 0],
+    props: { width: 12, depth: 12, height: 24, frontage: ['+z'] },
+  },
+  StreetLamp: { camera: [6, 4, 7], target: [1, 3, 0], props: { height: 5, arm: 1.6 } },
+  NeonSign: {
+    camera: [0, 1.4, 3.2],
+    target: [0, 1.4, 0],
+    props: { position: [0, 1.4, 0] },
+    background: '#1a1a22',
+  },
+  Billboard: {
+    camera: [0, 2.4, 8],
+    target: [0, 2.4, 0],
+    props: { position: [0, 2.4, 0], size: [4.8, 2.7] },
+  },
+  Hologram: {
+    camera: [6, 5, 9],
+    target: [0, 3.2, 0],
+    props: { height: 4, size: 1.4, radius: 1.2 },
+  },
+  WetStreet: { camera: [6, 4, 8], target: [0, 0, 0], props: { length: 10, width: 6 } },
+  Rain: {
+    skip: true,
+    note: 'Weather for a whole world: mount it once inside <World> and it falls around the camera.',
+  },
+  SteamVent: {
+    camera: [2.4, 2, 3.4],
+    target: [0, 1.2, 0],
+    props: { strength: 1 },
+    background: '#1a1a22',
+  },
+  GlowSky: {
+    skip: true,
+    note: 'A sky dome for a whole world: drawn behind everything, wherever the viewer stands.',
+  },
+  Skyline: {
+    skip: true,
+    note: 'Scenery hundreds of units out on the horizon: place it in a world and look out.',
+  },
+  Crowd: { skip: true, note: 'A crowd walking lanes across a street: give it lanes in a world.' },
+  FlyingTraffic: {
+    skip: true,
+    note: 'Traffic in the air over a whole street, hundreds of units long.',
+  },
+  CoffeeGear: { camera: [0.9, 0.8, 1.2], target: [0, 0.2, 0] },
 }

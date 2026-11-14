@@ -124,6 +124,7 @@ export function resolvePerson(
       spec.layers.map((l) => ({
         type: l.type,
         color: l.color,
+        trim: l.trim,
         sleeves: l.sleeves,
         neck: l.neck,
         length: l.length,

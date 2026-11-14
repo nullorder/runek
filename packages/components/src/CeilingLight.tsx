@@ -13,8 +13,9 @@ import {
 import { useMemo } from 'react'
 import { DoubleSide } from 'three'
 
-/** Close to the ceiling (`flush`), hanging on a cord (`pendant`), or an aimed can (`spot`). */
-export type CeilingLightKind = 'flush' | 'pendant' | 'spot'
+/** Close to the ceiling (`flush`), hanging on a cord (`pendant`), an aimed can (`spot`), or a
+ *  flat lit panel (`panel`, never seeded). */
+export type CeilingLightKind = 'flush' | 'pendant' | 'spot' | 'panel'
 /** The pendant's shade. */
 export type CeilingLightShade = 'dome' | 'cone' | 'drum' | 'globe'
 
@@ -35,6 +36,14 @@ export interface CeilingLightProps extends WorldComponentProps {
   lightColor?: string
   /** Light strength. */
   intensity?: number
+  /** How far its light carries, in units. The world lends its few real lights by strength over
+   *  the square of distance, never nearer than this reach, so a short reach makes a dim fitting
+   *  win while the viewer is in its room and give the light back once they leave. Keep it near
+   *  the room's size. */
+  reach?: number
+  /** Ask the world for a real light. Off, it still glows: a big room wants many lit fittings
+   *  and only a few real lights, fewer than the world's light budget. */
+  light?: boolean
   /** Switched on. */
   on?: boolean
   /** Light only while the world's sun is down. */
@@ -48,7 +57,8 @@ const SHADE_COLORS = ['#e9e4d8', '#2f3a35', '#b8743f', '#d9c27a', '#1f2a44']
 /**
  * A ceiling fitting, its origin at the ceiling with the fitting hanging below (local -Y): a
  * frosted `flush` dome, a `pendant` shade on a cord, or a `spot` can throwing a cone of light
- * down. `nightOnly` switches it on with the world's dusk. Decorative: no collider.
+ * down, or a `panel` of light `size` long and a quarter as wide (an office strip). `nightOnly`
+ * switches it on with the world's dusk. Decorative: no collider.
  */
 export function CeilingLight({
   position = [0, 0, 0],
@@ -62,6 +72,8 @@ export function CeilingLight({
   shadeColor,
   lightColor = '#ffe2b8',
   intensity = 12,
+  reach,
+  light = true,
   on = true,
   nightOnly = false,
 }: CeilingLightProps) {
@@ -107,12 +119,12 @@ export function CeilingLight({
       kind: spot ? 'spot' : 'point',
       color: lightColor,
       intensity: spot ? intensity * 2 : intensity,
-      distance: (spot ? 12 : 10) * unit,
+      distance: (reach ?? (spot ? 12 : 10)) * unit,
       decay: 2,
       angle: 0.5,
       penumbra: 0.6,
     },
-    lit,
+    lit && light,
   )
   const canopy = (
     <mesh material={m.metal} position={[0, -0.015 * unit, 0]}>
@@ -135,6 +147,22 @@ export function CeilingLight({
           <sphereGeometry args={[R, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
         </mesh>
         <object3D ref={glow.ref} position={[0, -R * 0.6, 0]} />
+      </group>
+    )
+  }
+
+  if (look.kind === 'panel') {
+    return (
+      <group position={position} rotation={rotation}>
+        <mesh material={m.metal} position={[0, -0.015 * unit, 0]}>
+          <boxGeometry
+            args={[size * unit + 0.04 * unit, 0.03 * unit, size * 0.25 * unit + 0.04 * unit]}
+          />
+        </mesh>
+        <mesh material={m.bulb} position={[0, -0.032 * unit, 0]}>
+          <boxGeometry args={[size * unit, 0.006 * unit, size * 0.25 * unit]} />
+        </mesh>
+        <object3D ref={glow.ref} position={[0, -0.3 * unit, 0]} />
       </group>
     )
   }

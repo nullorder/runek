@@ -35,6 +35,7 @@ The keywords **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are
 
 - A component **MUST NOT** depend on binary assets: no `.glb`/`.gltf`, no image textures, no HDR environment maps.
 - A component **MUST NOT** fetch anything at runtime or require a CDN. Geometry, color, and materials come from code.
+- A texture a component **draws in code** at runtime is not a binary asset: a `DataTexture` filled by a seeded function, a `CanvasTexture` it paints (a glyph atlas from the world's fonts, an ad board it redraws), or a depth map it renders from the scene. Such a texture **MUST** be a pure function of props, `seed`, the world's fonts and clock (§2), ship no file and fetch nothing. It **SHOULD** be built once per distinct input and shared between instances that would draw the same one, **SHOULD** stay at or under 1024 px a side (2048 for one shared by a whole world), and a material that holds it is the component's own (§7). One that is redrawn after mount **SHOULD** redraw only while it is near enough to be seen, and no more often than it visibly changes.
 - A look **MAY** name a material slot (`slot`, from `MATERIAL_SLOTS` in `@runek/core`) that a world answers with a material of its own. The component still gives a complete look, which draws when the world doesn't answer; an app that answers a slot with textures owns those assets, as it does for any texture it passes a component.
 - **Text is the one carve-out.** A component that renders text uses a font drawn only from `world.fonts` (declared by the world) or the single default font bundled in `@runek/core`. It still **MUST NOT** ship its own font file or fetch a font from a CDN, including through its renderer's fallback for characters its fonts lack: troika-three-text's default font is set to `lastResortFont()` from `@runek/core`, which draws a box for anything the world's fonts don't have. Every other component stays asset-free.
 
@@ -122,7 +123,7 @@ The ground is queryable: `groundAt(x, z)` (and `useGround()` inside a world) ret
 - [ ] Accepts `position`, `rotation`, `seed`; all props default and are JSON-serializable
 - [ ] Pure & deterministic; randomness only via `rng`/`sub` from `@runek/core`
 - [ ] Geometry built in `useMemo` keyed on geometry props (incl. `seed`)
-- [ ] No binary assets, no runtime fetch / CDN
+- [ ] No binary assets, no runtime fetch / CDN; any texture is drawn in code, shared, and capped in size
 - [ ] Registers colliders proportional to gameplay surface (or none, if decorative)
 - [ ] Respects `unit` from `useWorld()` (meters, Y-up, radians)
 - [ ] Color props default to world-palette slots; explicit colors still win

@@ -163,6 +163,21 @@ const [x, y, z] = remote.eye
 </group>
 ```
 
+## Seats, ladders and wading
+
+To sit the player down or put them on a ladder, hold the avatar with `pin`. The body turns kinematic, is carried to `feet` and faces `yaw`, and its own movement is off until you let go. Move the spot from frame to frame (up a ladder, say) by calling `pin` again. A carried `Person` sits when the pin says `pose: 'sit'`, and `climb` (the height climbed) reaches a pose source as `PoseContext.climb` for a climbing cycle:
+
+```tsx
+const { playerControl } = useWorld()
+playerControl?.current?.pin({ feet: [2, 0.45, 1], yaw: Math.PI, pose: 'sit' })
+// later: stand up in front of the seat
+playerControl?.current?.pin(null, [2, 1.2, 1.6])
+```
+
+`limitSpeed` caps how fast the avatar crosses the ground while something slows it (deep water, mud, snow); `null` lifts the cap. In first person, below a jog, an avatar that backs up or steps aside keeps facing where it looks and publishes the way it travels as `playerMotion.course`, so its body (and other players' copies of it) can backpedal or sidestep. `playerMotion.sag` is how far the capsule has settled under its float spring: add it to the capsule's height when you need where the feet are.
+
+Outside first person the camera stops at walls, floors and roofs, swept through the physics world from the avatar's head. Give a collider `collisionGroups={CAMERA_PASSES}` (from `@runek/components`) to let the camera through it (glass, a stool) while bodies still run into it.
+
 ## Your own animation
 
 A `Person` animates itself with a procedural walk cycle. To drive it with something else (a clip library, motion matching, poses off the network), give it a `poseSource`, or put a `PoseSourceContext` around many figures. Each frame the source gets what the figure knows about its motion (`speed`, `distance` walked, `heading`, `grounded`, `vertical`, look direction, `legLength`) and a pose reset to the T-pose, fills it, and returns `true`:
