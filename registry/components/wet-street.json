@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A rain-soaked asphalt street with kerbs: puddles from world-space noise and in the gutters, darkened glossy asphalt, lane, edge and centre paint, zebras at crossings, and reflections from the world's shared mirror, full in standing water and faint on damp asphalt. A mounted `Rain` rings the puddles and dries and soaks the street with its weather. Decorative: no collider.",
   "dependencies": [
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

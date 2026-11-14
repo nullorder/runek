@@ -5,7 +5,7 @@
   "description": "A sloped fabric shop awning with a striped valance and two arms, hung from a wall. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

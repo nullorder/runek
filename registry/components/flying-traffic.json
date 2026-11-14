@@ -5,7 +5,7 @@
   "description": "Lanes of hovercars over a street, decks of lanes each way, every car placed by the world clock and `seed` so every viewer sees the same traffic. Three instanced draws however many cars; no colliders.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nullorder/runek/compare/v0.17.0...HEAD)
+## [Unreleased](https://github.com/nullorder/runek/compare/v0.18.0...HEAD)
+
+## [0.18.0](https://github.com/nullorder/runek/compare/v0.17.0...v0.18.0) - 2026-11-14
 
 ### Added
 
@@ -203,15 +205,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   measures the whole gallery instead of one still hiding its exhibits.
 - Contract §2: wall-clock motion and time of day read the world's clock
   (`useWorld().now()`), not `Date.now()` or `new Date()` directly.
-- `Player` publishes a fuller `PlayerMotion` (speed, distance, vertical
-  speed, grounded, heading, and where the camera looks relative to the
-  body) after every physics step in every view, so the body it carries
-  strides with the same frame's distance. The body turns to face the way
-  it travels and holds that heading when it stops, instead of strafing
-  square to the camera; in first person at rest it turns to the camera.
-  A `Person` body looks where the camera looks, and a teleport's `yaw`
-  turns the body too. A hand-made `PlayerMotionContext` value must fill
-  the new fields. ([#58](https://github.com/nullorder/runek/issues/58))
+- **Breaking:** `PlayerMotion` has six new required fields (`distance`,
+  `vertical`, `grounded`, `heading`, `lookYaw`, `lookPitch`), so a
+  `PlayerMotionContext` value you build yourself must fill them. `Player`
+  publishes the fuller motion after every physics step in every view, so
+  the body it carries strides with the same frame's distance. The body
+  turns to face the way it travels and holds that heading when it stops,
+  instead of strafing square to the camera; in first person at rest it
+  turns to the camera. A `Person` body looks where the camera looks, and
+  a teleport's `yaw` turns the body too.
+  ([#58](https://github.com/nullorder/runek/issues/58))
 - Changing a `Person`'s look without changing its proportions (a shirt
   color, a hat) keeps its skeleton, so a walking figure no longer snaps
   back to its bind pose and restarts its stride.
@@ -261,7 +264,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A helper shared by several registry items (`nodes/uniforms.ts`) no
   longer makes them depend on one another: `player`, `sky`, `lake` and
   `grass` depended on `screen`.
-
 
 ## [0.17.0](https://github.com/nullorder/runek/compare/v0.16.0...v0.17.0) - 2026-10-31
 

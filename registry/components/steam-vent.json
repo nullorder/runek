@@ -5,7 +5,7 @@
   "description": "Steam off a manhole or out of a wall vent: soft puffs that rise, spread, lean and thin away, each a pure function of the world clock and `seed`. One instanced draw, plus the lid. Decorative: no collider.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

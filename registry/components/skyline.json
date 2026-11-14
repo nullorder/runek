@@ -4,7 +4,7 @@
   "type": "registry:component",
   "description": "A district seen from far off: a band of towers across part of the horizon with a few rooms lit and one landmark (spire, dome or stack) picked out in light, in two draws. Scenery past anywhere a body can reach: no colliders.",
   "dependencies": [
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

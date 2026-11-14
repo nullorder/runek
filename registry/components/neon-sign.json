@@ -5,7 +5,7 @@
   "description": "Words bent out of glass tube on a dark board, at the world's tube luminance level, that flicker: bad tubes buzz and drop out and the whole sign stutters now and then, as a pure function of the world clock and `seed` so every viewer sees the same sign. The tubes are drawn in code from the world's fonts. Decorative: no collider.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

@@ -5,7 +5,7 @@
   "description": "A pipe or conduit run clipped to a wall, up it or along it, with a collar every couple of metres. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

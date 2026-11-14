@@ -5,7 +5,7 @@
   "description": "In-world text rendered in a world font (the one font-using component); falls back to the default bundled in @runek/core. Can glow at a world luminance level, and read from both sides.",
   "dependencies": [
     "@react-three/drei@^10.7.7",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0",
     "troika-three-text@^0.52.4"
   ],

@@ -5,7 +5,7 @@
   "description": "What a cafe makes coffee with and shows off: an espresso machine, grinder, pour-over bar, siphon, cold drip tower, batch brewer, taps, a drum roaster, and beans in bags, jars and stocked shelves, one `kind` to a node. Only the roaster has a collider.",
   "dependencies": [
     "@react-three/rapier@^2.2.0",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

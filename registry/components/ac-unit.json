@@ -5,7 +5,7 @@
   "description": "An outdoor AC unit on a wall bracket with its drain hose, optionally in a wire cage. Drawn by the world's shared facade-kit meshes, so any number cost no extra draws. Decorative: no collider.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

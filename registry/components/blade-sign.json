@@ -5,7 +5,7 @@
   "description": "A board standing out from a wall with one word stacked down both faces in the world's display font, lit at the world's sign luminance level, with tube edges. Drawn by the world's shared facade-kit meshes. Decorative: no collider.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

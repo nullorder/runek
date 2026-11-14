@@ -5,7 +5,7 @@
   "description": "The weather over a whole world, drawn only around the camera: rain streaks and splashes, snowflakes, and rings on every `WetStreet`'s puddles, as hard as a `weather` function says (`weatherAt` gives the weather as a pure function of a clock). It stays out from under roofs through a depth map of the still world drawn from above in its first seconds. WebGLRenderer only.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

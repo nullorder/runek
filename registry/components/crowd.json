@@ -5,7 +5,7 @@
   "description": "People on a street in bulk: hooded figures in long coats walking their lanes there and back, each with one small light at the collar, stepping round the player. Where each walks comes from the world clock and `seed` alone, so every viewer sees the same crowd. Three instanced draws however many walk; no colliders.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

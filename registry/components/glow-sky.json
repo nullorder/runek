@@ -5,7 +5,7 @@
   "description": "A night sky that is never black: a dome lit from below by a city, darkest overhead and as bright as the haze at the horizon, with a slow cloud deck catching the district's glow that parts on stars and a moon in its phase. Decorative: no collider.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],

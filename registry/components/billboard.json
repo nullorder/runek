@@ -5,7 +5,7 @@
   "description": "A board that runs ads as data: one or two lines of lettering in the world's display font beside a mark drawn in code that moves with the world clock (steam off a bowl, a watch's hands, a cell filling), cut to the next every `hold` seconds through torn strips. Its picture is redrawn only while near the camera. Lit at the world's screen luminance level. Decorative: no collider.",
   "dependencies": [
     "@react-three/fiber@^9.6.1",
-    "@runek/core@^0.17.0",
+    "@runek/core@^0.18.0",
     "three@^0.184.0"
   ],
   "registryDependencies": [],
