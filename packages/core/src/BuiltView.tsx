@@ -39,7 +39,6 @@ export function BuiltView({
   const materials = useMaterials(built.parts.map((part) => part.look))
   const parts = built.parts.map((part, i) => (
     <mesh
-      // biome-ignore lint/suspicious/noArrayIndexKey: a build's parts are a fixed list
       key={i}
       geometry={shapeGeometry(part.shape)}
       material={materials[i]}
@@ -49,10 +48,7 @@ export function BuiltView({
       receiveShadow={part.receiveShadow}
     />
   ))
-  const lights = built.lights?.map((light, i) => (
-    // biome-ignore lint/suspicious/noArrayIndexKey: a build's lights are a fixed list
-    <BuiltLightView key={i} light={light} />
-  ))
+  const lights = built.lights?.map((light, i) => <BuiltLightView key={i} light={light} />)
   if (!built.colliders?.length) {
     return (
       <group position={position} rotation={rotation}>
@@ -64,7 +60,6 @@ export function BuiltView({
   return (
     <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
       {built.colliders.map((c, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: a build's colliders are a fixed list
         <CuboidCollider key={i} args={c.cuboid} position={c.position} rotation={c.rotation} />
       ))}
       {parts}
@@ -84,6 +79,6 @@ export function useBuilt<P extends object>(build: BuildFunction<P>, props: P): B
   const ctx = useBuildContext()
   const { position: _p, rotation: _r, children: _c, ...shape } = props as Record<string, unknown>
   const key = JSON.stringify(shape)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed by value, like useMaterial
+  // Keyed by value, like useMaterial: a fresh props object with the same shape keeps its build.
   return useMemo(() => build(props, ctx), [build, key, ctx])
 }
