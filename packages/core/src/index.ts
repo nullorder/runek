@@ -135,6 +135,7 @@ export type {
   PlayerControl,
   PlayerMotion,
   PlayerPin,
+  PlayerSwim,
   TeleportOptions,
   Vec3,
   Walker,
@@ -157,6 +158,8 @@ export type { WorldNodesProps } from './WorldNodes'
 export { nodePath, WorldNodes } from './WorldNodes'
 export type { WorldRendererProps } from './WorldRenderer'
 export { useGroundIndex, WorldRenderer } from './WorldRenderer'
+export type { PlaneWaterOptions, WaterBody, WaterSample } from './water'
+export { planeWater, useWater, waterAt } from './water'
 export type {
   ComponentRegistry,
   CompositeDef,

@@ -1,6 +1,6 @@
 ---
 title: "Person"
-summary: "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body."
+summary: "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. In open water it swims: a figure placed in deep water treads at the surface, a walker swims the stretch of its route that crosses it, and a Player's body treads, swims breaststroke or a front crawl, and dives with the avatar. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body."
 category: component
 component: person
 order: 100
@@ -39,7 +39,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `age` | `"child" \| "adult" \| "elder"` | `"adult"` | Head-to-body ratio, stature, and (for `elder`) a stooped spine. |
 | `body` | `PersonBodySpec` |  | The body: `build`, skin `tone`, and `height`. The flat props below are shorthands for the same fields; when both are set, this object wins. |
 | `face` | `PersonFaceSpec` |  | The face, part by part: eye color and size, brow color and weight, nose shape, lip color and fullness, blush. |
-| `clothes` | `PersonGarment[]` |  | Clothing layers, inner to outer, each with its own type, color, and options. The order decides the fit: a shirt listed before the jeans is tucked in. Replaces `outfit`; `[]` is the bare base body (a smooth mannequin). |
+| `clothes` | `PersonGarment[]` |  | Clothing layers, inner to outer, each with its own type, color, and options. The order decides the fit: a shirt listed before the jeans is tucked in, and each layer drapes over the ones listed before it. Replaces `outfit`; `[]` is the bare base body (a smooth mannequin). |
 | `height` | `number` |  | Standing height, in units. Every other measurement derives from it. |
 | `build` | `"slim" \| "average" \| "stocky" \| "athletic" \| "heavy" \| "petite" \| "lanky"` |  | Limb thickness and torso depth. Seeded when unset. |
 | `skinTone` | `color` |  | Skin color; seeded from a curated set of tones when unset. |
@@ -53,7 +53,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `shoeColor` | `color` |  | Footwear color; defaults to the palette's `metal`. |
 | `trimColor` | `color` |  | The lit seams and stripes of street clothes (`runner`, `shell`, `rig`, `street`, a hoodie's cords) and a visor's slit. Defaults to a lamp color picked by the seed. They shine on a `punk` figure and are plain color on the others. |
 | `hat` | `"none" \| "cap" \| "straw" \| "brim" \| "bandana" \| "hood" \| "chef" \| "beanie"` |  |  |
-| `accessories` | `"belt" \| "scarf" \| "cape" \| "bag" \| "glasses" \| "staff" \| "headphones" \| "mask" \| "backpack" \| "visor"[]` |  |  |
+| `accessories` | `"belt" \| "scarf" \| "cape" \| "bag" \| "glasses" \| "staff" \| "headphones" \| "mask" \| "backpack" \| "visor"[]` |  | Worn extras. A `belt`, `scarf` or `cape` becomes a clothing layer on the outside of an `outfit`, except a belt under a top that hangs over the waist (a hoodie, a jacket), which goes on the bottoms beneath it. |
 | `pose` | `"stand" \| "sit" \| "lean" \| "work" \| "wave" \| "type" \| "play" \| "drink" \| "lie"` | `"stand"` | What the figure is doing when it isn't walking. `sit` and `type` need a seat under them (`type` is seated at a desk, fingers tapping); `work` leans over a counter; `play` works controls at waist height; `drink` holds a mug and sips from it now and then; `lie` lies on its back centered on `position`, head toward local -Z, so it takes a `Bed`'s position and rotation at mattress height. |
 | `patrol` | `[x, y, z][]` |  | Walk these waypoints, relative to `position` and turning with `rotation`, in units. Height follows the ground; a waypoint's y lifts the figure above it. |
 | `wander` | `number` |  | Wander a seeded loop of five points within this radius of `position`, in units. `patrol` wins when both are set. |
@@ -64,7 +64,8 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `departAt` | `number` | `0` | When the `route` trip sets off, in epoch milliseconds on the world's clock (`useWorld().now()`, which is `Date.now()` unless the world is given a clock). Plain data, so every viewer sees the figure at the same point of its trip. Unset, the trip is long over. |
 | `onArrive` | `function` (code only) |  | Called once per trip (`route` + `departAt`) when the figure has arrived, on the first frame it has, so a trip that ended while the world was paused or unmounted still reports. |
 | `gait` | `number` |  | Walk-cycle speed, in units per second, for a figure something else moves (a cart, a script). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed. |
-| `poseSource` | `PoseSource` (code only) |  | Motion from outside the built-in gait (a clip library, motion matching, poses off the network): each frame it fills a canonical humanoid pose from the figure's speed, distance walked and heading, in place of the walk cycle and idle. The authored `pose` and the head turning to look still play over it. A `PoseSourceContext` gives every figure below it one; this wins. |
+| `poseSource` | `PoseSource` (code only) |  | Motion from outside the built-in gait (a clip library, motion matching, poses off the network): each frame it fills a canonical humanoid pose from the figure's speed, distance walked and heading, in place of the walk cycle and idle. The authored `pose` and the head turning to look still play over it. In water its `swim` is asked for the stroke instead, when it has one. A `PoseSourceContext` gives every figure below it one; this wins. |
+| `swim` | `boolean` | `true` | Swim in open water (an `Ocean`, a `Lake`, a `Pool`): where the water is over half its height a standing figure treads water at the surface, and a walking one swims that stretch of its route. False keeps it on its feet under the water (a diver on the seabed, a figure in a hull below the waterline). A `Player`'s body swims when the `Player` does. |
 | `idle` | `boolean` | `true` | Breathing, weight shift, and blinking. |
 | `lookAt` | `boolean` | `true` | Turn the head (and eyes) toward the player's avatar (or the camera, when no `Player` is mounted) when it comes within `lookRadius`. |
 | `lookRadius` | `number` | `5` | How close the avatar must be for `lookAt` to engage, in units. |
@@ -162,6 +163,31 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `control` | `string` | **required** | The world `controls` action that triggers it (declare `talk: ['KeyT']` in the world's `controls`). The prompt shows the key bound to it, so a remap relabels it. |
 
 ## Migrate
+
+**v0.18.0 → v0.19.0.** A `Person` placed in water over half its height deep now treads water at the surface, and a walker swims the stretch of its route that crosses water. Pass `swim={false}` to keep one on its feet under it (a diver on the seabed, a figure in a hull below the waterline).
+
+<div class="migration">
+<div class="migration__col">
+<div class="migration__tag">v0.18.0</div>
+
+```tsx
+<Person />
+```
+
+</div>
+<div class="migration__col migration__col--after">
+<div class="migration__tag">v0.19.0</div>
+
+```tsx
+// On its feet under the water, as in 0.18
+<Person swim={false} />
+```
+
+</div>
+</div>
+
+- An authored `pose` other than `stand` (sitting, lying, typing) is never taken over by swimming.
+- A pose source is not asked for a pose while its figure is in the water unless it has a `swim(ctx, out)` method; the built-in strokes play instead.
 
 **v0.13.0 → v0.14.0.** The figure is rebuilt as one sculpted, skinned body with clothes as layers, and the default `style` is now `stylized`. No prop was removed: every flat prop still works, and the new part objects (`body`, `face`, `hair`, `clothes`) are optional.
 

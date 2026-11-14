@@ -5,6 +5,7 @@ import {
   type InteractionAction,
   lazyModule,
   PlayerMotionContext,
+  type PlayerSwim,
   rng,
   sub,
   useInteraction,
@@ -13,6 +14,7 @@ import {
   useWorld,
   type Vec3,
   type WorldComponentProps,
+  waterAt,
 } from '@runek/core'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -29,7 +31,13 @@ import {
 import { InteractionPrompt } from './Interactable'
 import { Emote, SpeechBubble } from './person/Bubble'
 import type { BuiltFigure, Lod } from './person/build'
-import { applyPose, createHumanoidPose, resetHumanoidPose } from './person/humanoid'
+import {
+  applyPose,
+  createHumanoidPose,
+  HUMANOID_BONES,
+  type HumanoidPose,
+  resetHumanoidPose,
+} from './person/humanoid'
 import { type PoseContext, type PoseSource, PoseSourceContext } from './person/pose'
 import {
   type GaitState,
@@ -42,6 +50,18 @@ import { buildRoute, type RouteLoop, wanderPoints } from './person/route'
 import { figureKey, requestFigure } from './person/scheduler'
 import { ARM_SPREAD, BONES, type BoneName, type Shape, shapeFigure } from './person/shape'
 import { type PersonSkinName, resolveFigure } from './person/spec'
+import {
+  divePitch,
+  STAND_AT,
+  STROKE_TRIM,
+  STROKES,
+  type Stroke,
+  SWIM_AT,
+  SWIM_CLEARANCE,
+  SWIM_PIVOT,
+  strokeFor,
+  strokePose,
+} from './person/swim'
 import type {
   PersonAccessory,
   PersonAge,
@@ -98,6 +118,7 @@ export {
 } from './person/resolve'
 export { tripAt } from './person/route'
 export { PERSON_COLORS, PERSON_SKINS, type PersonSkinName } from './person/spec'
+export { type Stroke, strokePose } from './person/swim'
 export type {
   PersonAccessory,
   PersonAge,
@@ -218,9 +239,14 @@ export interface PersonProps extends WorldComponentProps {
   /** Motion from outside the built-in gait (a clip library, motion matching, poses off the
    *  network): each frame it fills a canonical humanoid pose from the figure's speed, distance
    *  walked and heading, in place of the walk cycle and idle. The authored `pose` and the head
-   *  turning to look still play over it. A `PoseSourceContext` gives every figure below it one;
-   *  this wins. */
+   *  turning to look still play over it. In water its `swim` is asked for the stroke instead, when
+   *  it has one. A `PoseSourceContext` gives every figure below it one; this wins. */
   poseSource?: PoseSource
+  /** Swim in open water (an `Ocean`, a `Lake`, a `Pool`): where the water is over half its
+   *  height a standing figure treads water at the surface, and a walking one swims that stretch
+   *  of its route. False keeps it on its feet under the water (a diver on the seabed, a figure in
+   *  a hull below the waterline). A `Player`'s body swims when the `Player` does. */
+  swim?: boolean
   /** Breathing, weight shift, and blinking. */
   idle?: boolean
   /** Turn the head (and eyes) toward the player's avatar (or the camera, when no `Player` is
@@ -273,6 +299,12 @@ const MAX_PITCH = 0.4
 const EYE_REACH = 0.35
 
 const NO_ACTIONS: InteractionAction[] = []
+
+/** Turn every bone of `pose` toward `other`'s by `weight`. */
+function mixPose(pose: HumanoidPose, other: HumanoidPose, weight: number) {
+  for (const name of HUMANOID_BONES) pose.rotations[name].slerp(other.rotations[name], weight)
+  pose.hips.lerp(other.hips, weight)
+}
 
 const isInside = (o: Object3D, ancestor: Object3D) => {
   for (let p = o.parent; p; p = p.parent) if (p === ancestor) return true
@@ -494,6 +526,7 @@ export function Person({
   onArrive,
   gait,
   poseSource,
+  swim = true,
   idle = true,
   lookAt = true,
   lookRadius = 5,
@@ -507,7 +540,7 @@ export function Person({
   physics = true,
   detail = 'auto',
 }: PersonProps) {
-  const { unit, palette, ground, player } = useWorld()
+  const { unit, palette, ground, player, waters } = useWorld()
   const avatarMotion = useContext(PlayerMotionContext)
   // Whoever carries the body can seat it (`PlayerMotion.pose`), over the authored pose.
   const [carried, setCarried] = useState<'sit' | null>(null)
@@ -729,6 +762,8 @@ export function Person({
       height: 0,
       course: 0,
       climb: null,
+      swim: null,
+      submerged: 0,
       position: [0, 0, 0],
     }),
     [],
@@ -745,6 +780,27 @@ export function Person({
     return { bones, quats: bones.map(() => new Quaternion()), hips: new Vector3() }
   }, [rig])
   const lastDistance = useRef<number | null>(null)
+  // In water: the stroke being swum and the eased weight of each, the stroke clock (set off by
+  // the seed, so swimmers don't stroke in time), how far into the water the body has settled
+  // (`weight`) and onto the surface (`afloat`), and how it lies.
+  const swimmer = useMemo(
+    () => ({
+      stroke: 'tread' as Stroke,
+      weights: { tread: 0, breast: 0, crawl: 0, streamline: 0 } as Record<Stroke, number>,
+      clock: motion.phase,
+      weight: 0,
+      afloat: 0,
+      pitch: 0,
+      rise: 0,
+      swimming: false,
+      pose: createHumanoidPose(),
+      other: createHumanoidPose(),
+      sample: { level: 0, swell: 0 },
+    }),
+    [motion.phase],
+  )
+  const floaters = useRef<Group>(null)
+  const headRest = shape.joints[BONES.indexOf('head')]
   const look = useRef({ yaw: 0, pitch: 0 })
   const tmp = useMemo(
     () => ({ q: new Quaternion(), euler: new Euler(0, 0, 0, 'YXZ'), dir: new Vector3() }),
@@ -893,9 +949,29 @@ export function Person({
       }
     }
 
+    // In water: a carried body does what its carrier does; one on its own swims where the still
+    // water is over half of it, while it stands or walks. `surface` is the water over it, swell
+    // included, for placing it.
+    const sw = swimmer
+    let swimPhase: PlayerSwim | null = null
+    let surface: number | null = null
+    if (swim && root.current && (m ? m.swim : waters?.size && (pose === 'stand' || moving))) {
+      root.current.getWorldPosition(scratch)
+      const water = waterAt(waters, scratch.x, scratch.y + H, scratch.z, sw.sample)
+      if (water) surface = water.level + water.swell
+      if (m) swimPhase = m.swim ?? null
+      else {
+        const immersion = water ? (water.level - scratch.y) / H : 0
+        sw.swimming = immersion > (sw.swimming ? STAND_AT : SWIM_AT)
+        if (sw.swimming) swimPhase = 'swim'
+      }
+    } else sw.swimming = false
+    const submerged = (m && swimPhase && m.submerged) || 0
+
+    // On land a source's `update` is asked; in water its `swim`, if it has one.
     const source = poseSource ?? made.current
     let sourced = false
-    if (source) {
+    if (source && (!swimPhase || source.swim)) {
       ctx.dt = dt
       ctx.speed = w.speed
       ctx.distance = drawn
@@ -912,6 +988,8 @@ export function Person({
       ctx.height = H
       ctx.course = m?.course ?? 0
       ctx.climb = m?.climb ?? null
+      ctx.swim = swimPhase
+      ctx.submerged = submerged
       if (root.current) {
         root.current.getWorldPosition(scratch)
         ctx.position[0] = scratch.x
@@ -919,7 +997,7 @@ export function Person({
         ctx.position[2] = scratch.z
       }
       resetHumanoidPose(poseOut)
-      sourced = source.update(ctx, poseOut)
+      sourced = swimPhase ? (source.swim?.(ctx, poseOut) ?? false) : source.update(ctx, poseOut)
     }
 
     if (!sourced) posture(rig, p, fm, H, motion.stoop)
@@ -945,6 +1023,64 @@ export function Person({
         b.root.position.y = layer.has(b.pelvis) ? (p.drop + fm.breath * 0.003 * H) * q : 0
       }
     }
+
+    // Swimming plays over whatever the body was doing: the strokes blended by their weights, the
+    // whole figure tipped about its middle and kept at the surface.
+    sw.weight += ((swimPhase ? 1 : 0) - sw.weight) * (1 - Math.exp(-6 * dt))
+    if (!swimPhase && sw.weight < 0.002) sw.weight = 0
+    if (sw.weight > 0) {
+      const pace = w.speed / unit
+      if (swimPhase) {
+        const next = swimPhase === 'swim' ? strokeFor(pace, sw.stroke) : 'streamline'
+        // Straight into the first stroke: there is nothing to ease from.
+        if (sw.weight < 0.05) for (const stroke of STROKES) sw.weights[stroke] = 0
+        sw.stroke = next
+      }
+      sw.clock += (dt * Math.PI * 2) / STROKE_TRIM[sw.stroke].period(pace)
+      const ease = 1 - Math.exp(-5 * dt)
+      let total = 0
+      let pitch = 0
+      let depth = 0
+      for (const stroke of STROKES) {
+        const weights = sw.weights
+        weights[stroke] += ((stroke === sw.stroke ? 1 : 0) - weights[stroke]) * ease
+        const weight = stroke === sw.stroke ? Math.max(weights[stroke], 0.001) : weights[stroke]
+        if (weight < 0.001) continue
+        const trim = STROKE_TRIM[stroke]
+        pitch +=
+          weight *
+          (stroke === 'streamline' ? divePitch(w.speed, m?.vertical ?? 0, unit) : trim.pitch)
+        depth += weight * trim.depth
+        const into = total === 0 ? sw.pose : sw.other
+        resetHumanoidPose(into)
+        strokePose(stroke, sw.clock, into)
+        total += weight
+        if (into === sw.other) mixPose(sw.pose, sw.other, weight / total)
+      }
+      pitch /= total
+      depth /= total
+      sw.pitch += (pitch - sw.pitch) * (sw.weight < 0.05 ? 1 : 1 - Math.exp(-8 * dt))
+      if (!(sourced && swimPhase)) applyPose(rig, sw.pose, sw.weight)
+      b.root.position.y *= 1 - sw.weight
+
+      const tip = sw.pitch * sw.weight
+      const pivot = SWIM_PIVOT * H
+      // Afloat, the body's middle rides `depth` under the surface, wherever its carrier is, but
+      // never lower than it would stand: in chest-deep water a still figure stands and sculls.
+      const floating = surface !== null && (swimPhase === 'swim' || swimPhase === 'glide')
+      sw.afloat += ((floating ? 1 : 0) - sw.afloat) * (1 - Math.exp(-5 * dt))
+      if (surface !== null && root.current) {
+        const feet = root.current.getWorldPosition(scratch).y
+        const lowest = feet + Math.max(pivot * Math.cos(tip), SWIM_CLEARANCE * H)
+        sw.rise = Math.max(surface - depth * H - submerged, lowest) - (feet + pivot)
+      }
+      rig.group.rotation.x = tip
+      rig.group.position.set(
+        0,
+        pivot * (1 - Math.cos(tip)) + sw.rise * sw.afloat,
+        -pivot * Math.sin(tip),
+      )
+    } else sw.afloat = 0
     for (const bone of rig.skeleton.bones) bone.updateMatrix()
 
     if (p.drink) {
@@ -968,8 +1104,12 @@ export function Person({
     lk.yaw += (yaw - lk.yaw) * k
     lk.pitch += (pitch - 0.25 * sip - lk.pitch) * k
     if (h.rotation.order !== 'YXZ') h.rotation.order = 'YXZ'
-    if (sourced) h.quaternion.multiply(tmp.q.setFromEuler(tmp.euler.set(lk.pitch, lk.yaw, 0)))
-    else h.rotation.set(lk.pitch, lk.yaw, 0)
+    // Over a pose that set the head (a source's, a stroke's) the turn is added to it, and it
+    // fades as the body lies down: prone, a turn about the neck would roll the face.
+    const turn = 1 - sw.weight * clamp(sw.pitch / 1.2, 0, 1)
+    if (sourced || sw.weight > 0) {
+      h.quaternion.multiply(tmp.q.setFromEuler(tmp.euler.set(lk.pitch * turn, lk.yaw * turn, 0)))
+    } else h.rotation.set(lk.pitch, lk.yaw, 0)
     h.updateMatrix()
     const eyeYaw = tracking ? clamp(wanted - lk.yaw, -EYE_REACH, EYE_REACH) : 0
     for (const e of parts.eyes) {
@@ -977,6 +1117,13 @@ export function Person({
       const rest = (e.userData.yaw as number | undefined) ?? 0
       e.rotation.y += (rest + eyeYaw - e.rotation.y) * Math.min(1, k * 3)
     }
+
+    // What floats over the head goes where a swimmer's head is.
+    const over = floaters.current
+    if (over && root.current && sw.weight > 0) {
+      root.current.worldToLocal(h.getWorldPosition(scratch))
+      over.position.set(scratch.x - headRest[0], scratch.y - headRest[1], scratch.z - headRest[2])
+    } else if (over && over.position.lengthSq() > 0) over.position.set(0, 0, 0)
 
     // Keep the name legible from wherever it's read.
     if (nameTag.current?.parent) {
@@ -997,27 +1144,29 @@ export function Person({
   const figure = (
     <group ref={root}>
       <primitive object={rig.group} />
-      {label && (
-        <group ref={nameTag} position={overhead}>
-          <Sign variant="body" size={0.13} color={palette.accent}>
-            {label}
-          </Sign>
-        </group>
-      )}
-      {bubble && (
-        <SpeechBubble
-          text={bubble}
-          position={above(bubbleY)}
-          onHeight={(h) => setBubbleH((prev) => (Math.abs(prev - h) > 0.002 ? h : prev))}
-        />
-      )}
-      {emote && <Emote kind={emote} position={above(emoteY)} />}
-      {focused && actions && (
-        <InteractionPrompt
-          actions={actions}
-          position={above(bubble || emote ? promptY : (label ? 0.26 : 0.08) * unit)}
-        />
-      )}
+      <group ref={floaters}>
+        {label && (
+          <group ref={nameTag} position={overhead}>
+            <Sign variant="body" size={0.13} color={palette.accent}>
+              {label}
+            </Sign>
+          </group>
+        )}
+        {bubble && (
+          <SpeechBubble
+            text={bubble}
+            position={above(bubbleY)}
+            onHeight={(h) => setBubbleH((prev) => (Math.abs(prev - h) > 0.002 ? h : prev))}
+          />
+        )}
+        {emote && <Emote kind={emote} position={above(emoteY)} />}
+        {focused && actions && (
+          <InteractionPrompt
+            actions={actions}
+            position={above(bubble || emote ? promptY : (label ? 0.26 : 0.08) * unit)}
+          />
+        )}
+      </group>
     </group>
   )
 
