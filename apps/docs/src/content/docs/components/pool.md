@@ -35,7 +35,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `size` | `[number, number]` | `[6, 3.5]` | Water surface `[width, depth]`, in units. |
 | `depth` | `number` | `1.6` | Basin depth below the deck, in units. |
 | `coping` | `number` | `0.35` | Coping ledge width around the rim, in units. |
-| `steps` | `boolean` | `true` | Build exit steps into one corner of the basin. |
+| `steps` | `boolean` | `true` | Build exit steps into one corner of the basin, walkable from the floor up onto the coping. |
 | `copingColor` | `color` | palette `wall` | Coping color; defaults to the world palette's `wall` slot. |
 | `basinColor` | `color` | `"#bfe0e6"` | Basin plaster color. |
 | `waterColor` | `color` | palette `waterShallow` | Defaults to the world palette's `waterShallow` slot. |
