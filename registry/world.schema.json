@@ -5773,7 +5773,7 @@
       "additionalProperties": false
     },
     "props.Lake": {
-      "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level.",
+      "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level. A Player or a Person swims in it where the ground under it leaves the water over half their height.",
       "type": "object",
       "properties": {
         "position": {
@@ -6847,7 +6847,7 @@
       "additionalProperties": false
     },
     "props.Ocean": {
-      "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground.",
+      "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground. A Player or a Person wades in, swims and dives in it, riding the swell that is drawn.",
       "type": "object",
       "properties": {
         "position": {
@@ -7243,7 +7243,7 @@
       "additionalProperties": false
     },
     "props.Person": {
-      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body.",
+      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. In open water it swims: a figure placed in deep water treads at the surface, a walker swims the stretch of its route that crosses it, and a Player's body treads, swims breaststroke or a front crawl, and dives with the avatar. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body.",
       "type": "object",
       "properties": {
         "style": {
@@ -7566,6 +7566,11 @@
         "gait": {
           "type": "number",
           "description": "Walk-cycle speed, in units per second, for a figure something else moves (a cart, a\nscript). Unset, a route drives it, and a `Player`'s body walks at the avatar's speed."
+        },
+        "swim": {
+          "type": "boolean",
+          "description": "Swim in open water (an `Ocean`, a `Lake`, a `Pool`): where the water is over half its\nheight a standing figure treads water at the surface, and a walking one swims that stretch\nof its route. False keeps it on its feet under the water (a diver on the seabed, a figure in\na hull below the waterline). A `Player`'s body swims when the `Player` does.",
+          "default": true
         },
         "idle": {
           "type": "boolean",
@@ -8425,7 +8430,7 @@
       "additionalProperties": false
     },
     "props.Player": {
-      "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. The body it carries turns to face the way it walks, and its motion (speed, distance, heading, jumps, where the camera looks) is published every frame for that body and for net code. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings.",
+      "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. The body it carries turns to face the way it walks, and its motion (speed, distance, heading, jumps, where the camera looks) is published every frame for that body and for net code. In open water (an Ocean, a Lake, a Pool) it wades, swims where the water is over half its height, dives when it leaves the ground over deep water, and climbs out onto a bank or a low ledge. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings.",
       "type": "object",
       "properties": {
         "position": {
@@ -8491,6 +8496,21 @@
           "description": "Top speed while the `run` key is held, in meters per second.",
           "default": 5
         },
+        "swim": {
+          "type": "boolean",
+          "description": "Swim in open water (an `Ocean`, a `Lake`, a `Pool`). Water slows a walk from the knee up;\nwhere it is over half the avatar's height the avatar floats at the surface and swims, and\nleaving the ground over deep water is a dive. False leaves water as something to look at:\nthe avatar walks the bed under it.",
+          "default": true
+        },
+        "swimSpeed": {
+          "type": "number",
+          "description": "Top swimming speed, in meters per second. Never faster than `speed`.",
+          "default": 1.5
+        },
+        "swimSprintSpeed": {
+          "type": "number",
+          "description": "Top swimming speed while the `run` key is held, in meters per second: a front crawl on a\n`Person` body. Never faster than `sprintSpeed`.",
+          "default": 2.6
+        },
         "cameraDistance": {
           "type": "number",
           "description": "How far behind the avatar the third-person camera starts, in meters; scrolling zooms from\nthere.",
@@ -8510,7 +8530,7 @@
       "additionalProperties": false
     },
     "props.Pool": {
-      "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner exit steps, and a translucent water surface.",
+      "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner steps, and a translucent water surface. A Player or a Person swims in it and climbs out at the rim.",
       "type": "object",
       "properties": {
         "size": {

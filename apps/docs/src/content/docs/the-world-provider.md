@@ -234,9 +234,27 @@ the avatar through the same call.
 `useWorld().playerMotion?.current` is what the avatar is doing, in every view: ground `speed`,
 `distance` covered, `vertical` speed, `grounded`, the body's `heading`, and where the camera
 looks relative to it (`lookYaw`, `lookPitch`). It is written in place after every physics step,
-so keep the ref and read it whenever you need it, a network send included. The body `Player`
-carries reads the same record through `PlayerMotionContext` (see [embedding a
+so keep the ref and read it whenever you need it, a network send included. In water it also
+says what the body is doing (`swim`: `'swim'`, `'dive'`, `'glide'` or `null`), how much of it is
+under (`immersion`, 0 to 1) and how far it is below where it floats (`submerged`). The body
+`Player` carries reads the same record through `PlayerMotionContext` (see [embedding a
 world](/docs/embedding-a-world#several-players-one-world) for feeding a remote copy).
+
+`useWorld().waters` is every body of water a figure can get into: an `Ocean`, a `Lake` and a
+`Pool` each publish themselves with `useWater` while mounted. `waterAt(waters, x, top, z)`
+answers with the water over a point (its still `level` and the `swell` on it now) for something
+whose highest point is `top`, or `null` where there is none. `Player` and `Person` ask it every
+frame, which is all it takes for them to wade, swim and dive; your own floating crate or boat
+can ask the same way. A water component of your own joins in with one call:
+
+```tsx
+import { planeWater, useWater } from '@runek/core'
+
+const mesh = useRef<Mesh>(null)
+// A flat sheet in the mesh's local X-Y plane, 8 by 5, with a floor 1.2 below it.
+const water = useMemo(() => planeWater(() => mesh.current, [8, 5], { depth: 1.2 }), [])
+useWater(water)
+```
 
 `useWorld().materials` holds the world's slot answers (absent when it gives none); `useMaterial` reads it for you.
 

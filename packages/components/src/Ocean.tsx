@@ -1,8 +1,9 @@
 import { useFrame } from '@react-three/fiber'
-import { lazyModule, useNodeRenderer, useWorld, type Vec3 } from '@runek/core'
+import { lazyModule, planeWater, useNodeRenderer, useWater, useWorld, type Vec3 } from '@runek/core'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { WaterShape } from './nodes/water'
+import { swellAt } from './surfaces/water'
 
 // The WebGPU (TSL) twin of the shader below, loaded only under a node renderer.
 const waterNodes = lazyModule(() => import('./nodes/water'))
@@ -118,10 +119,11 @@ const FRAGMENT = /* glsl */ `
   }
 `
 
-/** Procedural animated ocean (no textures), decorative (no collider). It follows the camera
- *  horizontally so it reads as open sea to the horizon, with world-space swells that stay put
- *  as it moves and a fog blend that melts the far water into the sky. The surface sits at the
- *  world ground baseline by default (CONTRACT §10); an explicit `position` height wins. */
+/** Procedural animated ocean (no textures, no collider). It follows the camera horizontally so
+ *  it reads as open sea to the horizon, with world-space swells that stay put as it moves and a
+ *  fog blend that melts the far water into the sky. The surface sits at the world ground
+ *  baseline by default (CONTRACT §10); an explicit `position` height wins. It is water a
+ *  `Player` or a `Person` swims in, riding the swell that is drawn. */
 export function Ocean({
   position,
   rotation = [0, 0, 0],
@@ -163,6 +165,18 @@ export function Ocean({
     [nodes, uniforms],
   )
   useEffect(() => () => nodeMaterial?.dispose(), [nodeMaterial])
+
+  // The sea as figures find it: everywhere while it follows the camera, else its own patch.
+  const water = useMemo(
+    () =>
+      planeWater(() => meshRef.current, follow ? null : [w, d], {
+        wave: (_lx, _ly, x, z) =>
+          swellAt(WATER, x, z, uniforms.uTime.value * uniforms.uWaveSpeed.value) *
+          uniforms.uWaveHeight.value,
+      }),
+    [follow, w, d, uniforms],
+  )
+  useWater(water)
 
   useFrame((state, delta) => {
     uniforms.uTime.value += delta

@@ -35,7 +35,34 @@ const pooledLight = (title, props = '', extraNotes = []) => ({
   ],
 })
 
+// 0.19.0: open water is something figures get into. Same opt-out for both.
+const swims = (title, summary, notes) => ({
+  from: '0.18.0',
+  to: '0.19.0',
+  summary,
+  before: {
+    lang: 'tsx',
+    code: `<${title} />`,
+  },
+  after: {
+    lang: 'tsx',
+    code: `// On its feet under the water, as in 0.18
+<${title} swim={false} />`,
+  },
+  notes,
+})
+
 export const MIGRATIONS = {
+  player: [
+    swims(
+      'Player',
+      'Open water (`Ocean`, `Lake`, `Pool`) is no longer only something to look at. The avatar slows as it wades in from the knee up, swims where the water is over half its height, dives when it leaves the ground over deep water, and is lifted out onto a bank or a low ledge it swims into. Pass `swim={false}` to walk the bed under the water as before.',
+      [
+        'A world that calls `playerControl.limitSpeed` to slow the avatar in water can stop: published water does it.',
+        'A `Player` vendored before 0.19 never swims, and its body stays on its feet, whatever the water does.',
+      ],
+    ),
+  ],
   lamp: [pooledLight('Lamp', ' flicker={0.3}')],
   desklamp: [pooledLight('DeskLamp')],
   ceilinglight: [pooledLight('CeilingLight', ' kind="spot"')],
@@ -168,6 +195,14 @@ import { registry } from './runek/registry'
   ],
 
   person: [
+    swims(
+      'Person',
+      'A `Person` placed in water over half its height deep now treads water at the surface, and a walker swims the stretch of its route that crosses water. Pass `swim={false}` to keep one on its feet under it (a diver on the seabed, a figure in a hull below the waterline).',
+      [
+        'An authored `pose` other than `stand` (sitting, lying, typing) is never taken over by swimming.',
+        'A pose source is not asked for a pose while its figure is in the water unless it has a `swim(ctx, out)` method; the built-in strokes play instead.',
+      ],
+    ),
     {
       from: '0.13.0',
       to: '0.14.0',

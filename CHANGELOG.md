@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.18.0...HEAD)
 
+### Added
+
+- Swimming. Open water is something you get into: `Ocean`, `Lake` and
+  `Pool` publish where their surface is, and the `Player` wades (slowing
+  from the knee up), swims where the still water is over half its height,
+  and stands again a little shallower. Afloat it rides the swell the water
+  draws, with its eye just over the surface. New `Player` props:
+  `swimSpeed` (1.5), `swimSprintSpeed` (2.6, with the `run` key) and
+  `swim` (`false` turns it all off).
+- Diving. Leaving the ground over water at least a body deep, moving, with
+  the feet 0.3 m or more over the surface, is a dive: head first, a glide
+  under the surface, then up. From a standstill the avatar drops in feet
+  first.
+- Climbing out. A swimmer pushed into a bank, a step, or a ledge up to
+  0.6 m over the water (a pool's rim, a low dock) is lifted onto it, so a
+  shore too steep for the controller's ground spring still lets you out.
+- `Person` swims. Strokes are built in as canonical humanoid poses: it
+  treads water when still, swims breaststroke up to 1.9 m/s and a front
+  crawl above, and makes an arrow of itself in a dive. A `Player`'s body
+  follows the avatar; a figure placed in water over half its height treads
+  at the surface, and a walker swims the stretch of its route that crosses
+  water. Names, bubbles, emotes and prompts ride over a swimmer's head.
+  New prop `swim` (`false` keeps a figure on its feet under water).
+  `strokePose(stroke, phase, pose)` and the `Stroke` type are exported.
+- `PlayerMotion.swim` (`'swim' | 'dive' | 'glide' | null`), `immersion`
+  and `submerged`, so a remote copy of a player swims as they do.
+  `PoseContext` carries `swim` and `submerged`; a `PoseSource` with a
+  `swim(ctx, out)` method is asked for the stroke in the water, and one
+  without it leaves the built-in strokes to play.
+- `useWater(body)`, `waterAt(waters, x, top, z)`, `planeWater(object, size,
+  { wave, depth })` and `useWorld().waters` in `@runek/core`: the registry
+  of water a figure can get into. A water component of your own joins with
+  one `useWater` call.
+
+### Changed
+
+- **Breaking:** a `Player` no longer walks the bed under an `Ocean`, a
+  `Lake` or a `Pool`: it floats and swims, and water from the knee up slows
+  its walk. A `Person` placed in water over half its height floats up to
+  the surface. Pass `swim={false}` to either for the old behavior.
+
 ### Fixed
 
 - `Person`: no clothing layer passes through another. Each garment sits a

@@ -1,6 +1,11 @@
 import { useKeyboardControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
-import { type RapierCollider, useAfterPhysicsStep, useRapier } from '@react-three/rapier'
+import {
+  type RapierCollider,
+  useAfterPhysicsStep,
+  useBeforePhysicsStep,
+  useRapier,
+} from '@react-three/rapier'
 import {
   type AvatarView,
   Dynamic,
@@ -12,8 +17,9 @@ import {
   useMaterial,
   useWorld,
   type Vec3,
+  waterAt,
 } from '@runek/core'
-import Ecctrl, { type CustomEcctrlRigidBody } from 'ecctrl'
+import Ecctrl, { type CustomEcctrlRigidBody, useJoystickControls } from 'ecctrl'
 import {
   type ReactNode,
   type RefObject,
@@ -32,6 +38,7 @@ import {
   Vector3,
 } from 'three'
 import { PaniniLens } from './player/PaniniLens'
+import { CLIMB_REACH, createSwimState, type SwimShape, stepSwim } from './player/swim'
 
 export type PlayerView = AvatarView
 
@@ -151,7 +158,8 @@ function MotionProbe({
     const cameraYaw = camera?.rotation.y ?? m.heading
     const ease = 1 - Math.exp(-BODY_TURN * dt)
     const going = Math.atan2(v.x, v.z)
-    const stepping = faceCamera && !pin && m.speed > TURNS_AT && m.speed < STEPS_BELOW
+    // A swimmer always turns to face the way it goes.
+    const stepping = faceCamera && !pin && !m.swim && m.speed > TURNS_AT && m.speed < STEPS_BELOW
     if (pin) m.heading += wrap(pin.yaw - m.heading) * ease
     else if (stepping) m.heading += wrap(cameraYaw - m.heading) * ease
     else if (m.speed > TURNS_AT) m.heading += wrap(going - m.heading) * ease
@@ -238,6 +246,138 @@ function SpeedLimit({
     if (speed <= most) return
     const k = most / speed
     rb.setLinvel({ x: v.x * k, y: v.y, z: v.z * k }, true)
+  })
+  return null
+}
+
+// How far under the surface the bed is looked for, in body heights: past it the water is deep,
+// whatever lies below.
+const BED_REACH = 1.5
+const DOWN = { x: 0, y: -1, z: 0 }
+
+/**
+ * Water the avatar gets into (an `Ocean`, a `Lake`, a `Pool`): it slows a walk from the knee up,
+ * and where it is over half the body the avatar swims, held at the surface and riding the swell.
+ * Leaving the ground over deep water is a dive, and swimming into a bank, a step or a low ledge
+ * climbs out onto it. Runs before every physics step, after ecctrl has pushed the body, so it has
+ * the last word on the step's velocity; what the body is doing goes out on its motion (`swim`,
+ * `immersion`, `submerged`). See `player/swim.ts`.
+ */
+function Swim({
+  body,
+  motion,
+  held,
+  shape,
+}: {
+  body: RefObject<CustomEcctrlRigidBody | null>
+  motion: { current: PlayerMotion }
+  held: RefObject<PlayerPin | null>
+  shape: SwimShape
+}) {
+  const { waters } = useWorld()
+  const { world, rapier } = useRapier()
+  const scene = useThree((three) => three.scene)
+  const [, getKeys] = useKeyboardControls()
+  const [s] = useState(() => ({
+    state: createSwimState(),
+    capsule: { y: 0, vx: 0, vy: 0, vz: 0 },
+    sense: {
+      dt: 0,
+      level: null as number | null,
+      swell: 0,
+      bed: Number.NEGATIVE_INFINITY,
+      ahead: Number.NEGATIVE_INFINITY,
+      grounded: false,
+      pushing: false,
+      sprinting: false,
+    },
+    sample: { level: 0, swell: 0 },
+    ray: new rapier.Ray({ x: 0, y: 0, z: 0 }, DOWN),
+    pivot: null as Object3D | null,
+  }))
+  /** How far down `from` the ground is, within `reach`; null when there is none, or `from` is
+   *  inside something solid. */
+  const groundUnder = (
+    rb: NonNullable<CustomEcctrlRigidBody['group']>,
+    from: Vec3,
+    reach: number,
+  ) => {
+    s.ray.origin = { x: from[0], y: from[1], z: from[2] }
+    const flags = rapier.QueryFilterFlags.EXCLUDE_SENSORS
+    const hit = world.castRay(s.ray, reach, true, flags, undefined, undefined, rb)
+    return hit && hit.timeOfImpact > 1e-3 ? hit.timeOfImpact : null
+  }
+
+  useBeforePhysicsStep(() => {
+    const rb = body.current?.group
+    const m = motion.current
+    const { state, capsule, sense } = s
+    if (!rb || held.current || !rb.isDynamic() || !waters?.size) {
+      state.phase = null
+      state.line = null
+      state.climbing = false
+      m.swim = null
+      m.immersion = 0
+      m.submerged = 0
+      return
+    }
+    const at = rb.translation()
+    const v = rb.linvel()
+    const water = waterAt(waters, at.x, at.y + shape.top, at.z, s.sample)
+    const grounded = (rb.userData as { canJump?: boolean } | undefined)?.canJump === true
+    sense.dt = world.timestep
+    sense.level = water?.level ?? null
+    sense.swell = water?.swell ?? 0
+    sense.grounded = grounded
+    sense.bed = Number.NEGATIVE_INFINITY
+    sense.ahead = Number.NEGATIVE_INFINITY
+    // Which way the avatar is pushed, as ecctrl reads it: the keys or the stick, from the
+    // camera's side.
+    const keys = getKeys() as Record<string, boolean>
+    const stick = useJoystickControls.getState()
+    const across = (keys.leftward ? 1 : 0) - (keys.rightward ? 1 : 0)
+    const along = (keys.forward ? 1 : 0) - (keys.backward ? 1 : 0)
+    const push =
+      stick.curJoystickDis > 0
+        ? stick.curJoystickAng - Math.PI / 2
+        : across || along
+          ? Math.atan2(across, along)
+          : null
+    sense.pushing = push !== null
+    sense.sprinting = keys.run || stick.curRunState
+    // The bed matters to a body in the water or in the air over it, not to one standing dry.
+    const dry =
+      grounded && state.phase === null && water !== null && at.y - shape.feet > water.level
+    if (water && !dry) {
+      const floor = water.level - BED_REACH * shape.height
+      const under = at.y > floor ? groundUnder(rb, [at.x, at.y, at.z], at.y - floor) : null
+      if (under !== null) sense.bed = at.y - under
+      // What a swimmer is pushed into, a little past the capsule: a ledge within reach over the
+      // water is climbed onto.
+      if (push !== null && state.phase !== 'dive' && state.phase !== 'glide') {
+        if (!s.pivot?.parent) s.pivot = findPivot(scene)
+        const yaw = (s.pivot?.rotation.y ?? m.heading) + push
+        const out = shape.radius + 0.1 * shape.unit
+        const top = water.level + water.swell + CLIMB_REACH * shape.unit
+        const from: Vec3 = [at.x + Math.sin(yaw) * out, top, at.z + Math.cos(yaw) * out]
+        const ledge = groundUnder(rb, from, top - floor)
+        if (ledge !== null) sense.ahead = top - ledge
+      }
+    }
+
+    capsule.y = at.y
+    capsule.vx = v.x
+    capsule.vy = v.y
+    capsule.vz = v.z
+    const carried = stepSwim(state, shape, capsule, sense)
+    if (capsule.vx !== v.x || capsule.vy !== v.y || capsule.vz !== v.z) {
+      rb.setLinvel({ x: capsule.vx, y: capsule.vy, z: capsule.vz }, true)
+    }
+    // ecctrl sets the gravity it wants every frame; this is the last word before the step.
+    if (carried) rb.setGravityScale(0, true)
+    m.swim = state.phase
+    m.immersion = state.immersion
+    m.submerged = state.submerged
   })
   return null
 }
@@ -490,6 +630,16 @@ export interface PlayerProps {
   speed?: number
   /** Top speed while the `run` key is held, in meters per second. */
   sprintSpeed?: number
+  /** Swim in open water (an `Ocean`, a `Lake`, a `Pool`). Water slows a walk from the knee up;
+   *  where it is over half the avatar's height the avatar floats at the surface and swims, and
+   *  leaving the ground over deep water is a dive. False leaves water as something to look at:
+   *  the avatar walks the bed under it. */
+  swim?: boolean
+  /** Top swimming speed, in meters per second. Never faster than `speed`. */
+  swimSpeed?: number
+  /** Top swimming speed while the `run` key is held, in meters per second: a front crawl on a
+   *  `Person` body. Never faster than `sprintSpeed`. */
+  swimSprintSpeed?: number
   /** How far behind the avatar the third-person camera starts, in meters; scrolling zooms from
    *  there. */
   cameraDistance?: number
@@ -511,8 +661,9 @@ export interface PlayerProps {
    *  (`height` tall, centered at the character origin, so feet go at y = -height / 2: -0.65 at
    *  the default size); the Player lowers it onto the ground beneath the floating capsule and
    *  turns it to face the way it travels (in first person, the camera's way when it stops). It is
-   *  hidden in first-person view. A `Person` here walks in step with the avatar and looks where
-   *  the camera looks. In world JSON, nest it as a child node of the Player. */
+   *  hidden in first-person view. A `Person` here walks in step with the avatar, swims and dives
+   *  with it, and looks where the camera looks. In world JSON, nest it as a child node of the
+   *  Player. */
   children?: ReactNode
 }
 
@@ -613,12 +764,16 @@ export function Player({
   eyeHeight,
   speed = 2.5,
   sprintSpeed = 5,
+  swim = true,
+  swimSpeed = 1.5,
+  swimSprintSpeed = 2.6,
   cameraDistance = 5,
   fov = 140,
   peripheralBlur = 4,
   children,
 }: PlayerProps) {
-  const { avatar, player, playerControl, playerMotion, keyboard, controls, gravity } = useWorld()
+  const { avatar, player, playerControl, playerMotion, keyboard, controls, gravity, unit } =
+    useWorld()
   const scene = useThree((s) => s.scene)
   const camera = useThree((s) => s.camera)
   const wanted = view ?? avatar ?? 'first'
@@ -670,6 +825,20 @@ export function Player({
   const camTarget = useMemo(
     () => ({ x: 0, y: eyeOffset - halfHeight - capsuleRadius / 2, z: 0 }),
     [eyeOffset, halfHeight, capsuleRadius],
+  )
+  const swimShape = useMemo<SwimShape>(
+    () => ({
+      feet: halfHeight + capsuleRadius + FLOAT_HEIGHT,
+      top: halfHeight + capsuleRadius,
+      radius: capsuleRadius,
+      height: (halfHeight + capsuleRadius) * 2,
+      unit,
+      walk: speed,
+      sprint: sprintSpeed,
+      swim: swimSpeed,
+      swimSprint: swimSprintSpeed,
+    }),
+    [halfHeight, capsuleRadius, unit, speed, sprintSpeed, swimSpeed, swimSprintSpeed],
   )
 
   // ecctrl reads its camera and capsule setup once, at mount, so a new view or size remounts it:
@@ -843,6 +1012,7 @@ export function Player({
       <StandOnGround body={body} lift={lift} motion={motion} held={pin} />
       {!grounded && <GroundGuard body={body} onGrounded={() => setGrounded(true)} />}
       <PinDriver body={body} held={pin} centre={halfHeight + capsuleRadius + FLOAT_HEIGHT} />
+      {swim && <Swim body={body} motion={motion} held={pin} shape={swimShape} />}
       <SpeedLimit body={body} limit={speedLimit} held={pin} />
     </Ecctrl>
   )

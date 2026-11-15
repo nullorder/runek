@@ -1,5 +1,6 @@
 // Outside motion for a figure: a source that fills a canonical pose each frame in place of the
 // built-in gait (a clip library, motion matching, poses off the network).
+import type { PlayerSwim } from '@runek/core'
 import { createContext } from 'react'
 import type { HumanoidPose } from './humanoid'
 
@@ -35,6 +36,13 @@ export interface PoseContext {
   /** How far up a ladder the body has climbed, in world units, while a carrier holds it on one
    *  (`PlayerControl.pin`). The climbing cycle follows it. Null when not climbing. */
   climb: number | null
+  /** What the figure is doing in water: `swim` afloat, `dive` in the air head first on its way
+   *  in, `glide` under the surface after a dive. Null on land and while it wades. The figure
+   *  lies down and keeps to the surface by itself; a source's `swim` fills the stroke. */
+  swim: PlayerSwim | null
+  /** How far a swimming figure is under the height it rests at, in world units: more than 0
+   *  after a dive or a drop into the water, less while it is over it (climbing out). */
+  submerged: number
   /** Where the figure stands in the world this frame, for a source that places footfalls. */
   position: [number, number, number]
 }
@@ -43,10 +51,14 @@ export interface PoseContext {
  * Motion for a `Person` from outside its built-in gait. Each frame `update` gets the figure's
  * motion and a pose reset to the T-pose; fill it and return true, or return false to leave the
  * figure to its own gait that frame. An authored `pose` (sitting, waving, drinking) and the head
- * turning to look still play over it.
+ * turning to look still play over it. In water `swim` is called instead, when the source has one.
  */
 export interface PoseSource {
   update(ctx: PoseContext, out: HumanoidPose): boolean
+  /** `update` for a figure in water, called in its place while `ctx.swim` is set: fill the
+   *  stroke and return true, or return false for the built-in one. A source without it is not
+   *  asked while its figure swims or dives. */
+  swim?(ctx: PoseContext, out: HumanoidPose): boolean
   /** Called when a figure lets go of a source it made with a `PoseSourceContext` factory. */
   dispose?(): void
 }

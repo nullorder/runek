@@ -1,6 +1,6 @@
 ---
 title: "Ocean"
-summary: "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground."
+summary: "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground. A Player or a Person wades in, swims and dives in it, riding the swell that is drawn."
 category: component
 component: ocean
 order: 100

@@ -7,6 +7,7 @@ import type { WorldLuminance } from './luminance'
 import type { MaterialSlots } from './material'
 import type { WorldPalette } from './palette'
 import type { WorldTime } from './time'
+import type { WaterBody } from './water'
 
 export type Vec3 = [number, number, number]
 
@@ -83,7 +84,21 @@ export interface PlayerMotion {
    *  says, so whoever needs the height of the feet (a save point, the place sent to other
    *  players) adds it. */
   sag?: number
+  /** What the body is doing in water, or null out of it and while it wades. `dive`: in the air,
+   *  head first, on its way into water deep enough to take it. `glide`: under the surface after a
+   *  dive, on its way back up. `swim`: afloat, in water over half its height. Unset on a `Player`
+   *  vendored before swimming. */
+  swim?: PlayerSwim | null
+  /** How much of the body is under the still water, feet to crown: 0 dry, 1 covered. */
+  immersion?: number
+  /** How far a swimming body is under the height it rests at (afloat, or standing where the
+   *  water is too shallow to float), in world units: 0 at rest, more after a dive or a drop into
+   *  the water, less than 0 while it is over it (dropping in, climbing out). */
+  submerged?: number
 }
+
+/** What a body is doing in water (`PlayerMotion.swim`). */
+export type PlayerSwim = 'dive' | 'glide' | 'swim'
 
 /** Where a held avatar is (`PlayerControl.pin`). Whoever holds it may change `feet` and `climb`
  *  from frame to frame. */
@@ -177,6 +192,10 @@ export interface WorldContextValue {
   /** Everything currently offering the player actions; the nearest in range is focused. Mutable,
    *  like `walkers`. Absent under a hand-rolled provider. */
   interactions?: Set<Interactor>
+  /** Every body of water a figure can get into (`useWater`): an `Ocean`, a `Lake`, a `Pool`.
+   *  Mutable, like `walkers`; ask `waterAt(waters, x, top, z)` for the water at a point. Absent
+   *  under a hand-rolled provider, where nothing swims. */
+  waters?: Set<WaterBody>
   /** The world's keyboard: window key events the world reads, so none aimed at a text field and
    *  none while `input` is off or the world is paused. Listen for `keydown` / `keyup`. Absent
    *  under a hand-rolled provider. */
