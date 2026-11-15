@@ -26,6 +26,7 @@ import type {
   Walker,
   WorldFog,
 } from './types'
+import type { WaterBody } from './water'
 
 export interface WorldProps {
   unit?: number
@@ -178,6 +179,7 @@ export function World({
   const lens = useRef<Lens | null>(null)
   const walkers = useMemo(() => new Set<Walker>(), [])
   const interactions = useMemo(() => new Set<Interactor>(), [])
+  const waters = useMemo(() => new Set<WaterBody>(), [])
 
   const context = useMemo(
     () => ({
@@ -197,6 +199,7 @@ export function World({
       lens,
       walkers,
       interactions,
+      waters,
       keyboard: keySource,
       now: worldNow,
     }),
@@ -214,6 +217,7 @@ export function World({
       resolvedControls,
       walkers,
       interactions,
+      waters,
       keySource,
       worldNow,
     ],

@@ -8,7 +8,7 @@
       "title": "Player",
       "type": "registry:component",
       "category": "character",
-      "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. The body it carries turns to face the way it walks, and its motion (speed, distance, heading, jumps, where the camera looks) is published every frame for that body and for net code. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings.",
+      "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. The body it carries turns to face the way it walks, and its motion (speed, distance, heading, jumps, where the camera looks) is published every frame for that body and for net code. In open water (an Ocean, a Lake, a Pool) it wades, swims where the water is over half its height, dives when it leaves the ground over deep water, and climbs out onto a bank or a low ledge. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings.",
       "files": [
         {
           "path": "packages/components/src/Player.tsx",
@@ -510,7 +510,7 @@
       "title": "Lake",
       "type": "registry:component",
       "category": "water",
-      "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level.",
+      "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level. A Player or a Person swims in it where the ground under it leaves the water over half their height.",
       "files": [
         {
           "path": "packages/components/src/Lake.tsx",
@@ -519,6 +519,10 @@
         {
           "path": "packages/components/src/surfaces/lake.ts",
           "target": "surfaces/lake.ts"
+        },
+        {
+          "path": "packages/components/src/surfaces/water.ts",
+          "target": "surfaces/water.ts"
         },
         {
           "path": "packages/components/src/nodes/water.ts",
@@ -535,7 +539,7 @@
       "title": "Pool",
       "type": "registry:component",
       "category": "water",
-      "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner exit steps, and a translucent water surface.",
+      "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner steps, and a translucent water surface. A Player or a Person swims in it and climbs out at the rim.",
       "files": [
         {
           "path": "packages/components/src/Pool.tsx",
@@ -548,11 +552,15 @@
       "title": "Ocean",
       "type": "registry:component",
       "category": "water",
-      "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground.",
+      "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground. A Player or a Person wades in, swims and dives in it, riding the swell that is drawn.",
       "files": [
         {
           "path": "packages/components/src/Ocean.tsx",
           "target": "Ocean.tsx"
+        },
+        {
+          "path": "packages/components/src/surfaces/water.ts",
+          "target": "surfaces/water.ts"
         },
         {
           "path": "packages/components/src/nodes/water.ts",
@@ -1275,7 +1283,7 @@
       "title": "Person",
       "type": "registry:component",
       "category": "character",
-      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body.",
+      "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. In open water it swims: a figure placed in deep water treads at the surface, a walker swims the stretch of its route that crosses it, and a Player's body treads, swims breaststroke or a front crawl, and dives with the avatar. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body.",
       "files": [
         {
           "path": "packages/components/src/Person.tsx",

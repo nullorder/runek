@@ -42,6 +42,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `frequency` | `number` | `0.04` | Noise frequency. |
 | `flatRadius` | `number` | `0` | Radius from center kept flat (for a build pad), in units. |
 | `falloff` | `number` | `0` | Radial island falloff (0 = off). When set, the ground domes up toward the center and sinks below the world ground at its rim, so the mesh reads as a landmass surrounded by water. The value is the fraction of the half-extent that stays land before the coast (e.g. 0.8 = land out to 80% of the radius, then a shoreline into the sea). |
+| `shore` | `number` | `0` | Width of a beach around an island, in units (0 = off; needs `falloff`). Past the land's edge the ground falls 2 units across this band at one slope, from 0.4 above the world ground to wading depth, then drops to the deep; land near the coast is lowered to meet it. So the beach is as gentle as it is wide: 6 slopes at about 18°, which an avatar walks up out of the sea, where a small island's bare coast is close to a cliff. It widens the island, so leave room for it inside `size`. |
 | `collider` | `boolean` | `true` | Register a collider (default true). Set false for distant/backdrop terrain the player never walks, to skip a large trimesh collider. |
 | `seed` | `number` | `1` | Seed for the deterministic variation: same seed, same result. |
 

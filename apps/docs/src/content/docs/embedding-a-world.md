@@ -128,7 +128,7 @@ const { playerControl } = useWorld()
 socket.on('correct', ({ x, y, z }) => playerControl?.current?.teleport([x, y, z]))
 ```
 
-`Player` takes the body's size and speeds as props (`height`, `radius`, `eyeHeight`, `speed`, `sprintSpeed`, and `cameraDistance` for third person), so an avatar can match the scale of your world and of the `Person` figures in it:
+`Player` takes the body's size and speeds as props (`height`, `radius`, `eyeHeight`, `speed`, `sprintSpeed`, `swimSpeed`, `swimSprintSpeed`, and `cameraDistance` for third person), so an avatar can match the scale of your world and of the `Person` figures in it:
 
 ```tsx
 <Player height={1.75} eyeHeight={1.62} speed={4} sprintSpeed={6.5}>
@@ -136,7 +136,7 @@ socket.on('correct', ({ x, y, z }) => playerControl?.current?.teleport([x, y, z]
 </Player>
 ```
 
-The body turns to face the way the avatar travels and holds that heading when it stops (in first person, it turns to the camera at rest). What it is doing is published every physics step in every view as `useWorld().playerMotion`: ground `speed`, `distance` covered, `vertical` speed, `grounded`, the body's `heading`, and where the camera looks relative to it (`lookYaw`, `lookPitch`). It's plain numbers written in place, so send it with the position:
+The body turns to face the way the avatar travels and holds that heading when it stops (in first person, it turns to the camera at rest). What it is doing is published every physics step in every view as `useWorld().playerMotion`: ground `speed`, `distance` covered, `vertical` speed, `grounded`, the body's `heading`, where the camera looks relative to it (`lookYaw`, `lookPitch`), and in water what it is doing there (`swim`, `immersion`, `submerged`). It's plain numbers written in place, so send it with the position:
 
 ```tsx
 const { player, playerMotion } = useWorld()
@@ -149,7 +149,7 @@ setInterval(() => {
 }, 100)
 ```
 
-On the other side, hand a remote player's latest motion to a `Person` through `PlayerMotionContext`, and turn it by the `heading`. It strides from the same `distance` and looks where that player looks, so it matches what they see of their own body:
+On the other side, hand a remote player's latest motion to a `Person` through `PlayerMotionContext`, and turn it by the `heading`. It strides from the same `distance`, swims and dives when that player does, and looks where that player looks, so it matches what they see of their own body:
 
 ```tsx
 import { PlayerMotionContext } from '@runek/core'
@@ -163,6 +163,21 @@ const [x, y, z] = remote.eye
 </group>
 ```
 
+## Swimming
+
+Open water needs no wiring: an `Ocean`, a `Lake` and a `Pool` publish where their surface is, and the `Player` reads it.
+
+- **Wading.** From the knee up the water slows a walk, easing down to the swimming speed at the waist.
+- **Swimming.** Where the still water is over half the avatar's height it floats, its eye just over the surface, riding the swell the water draws. `swimSpeed` (1.5 m/s) is the cruise and `swimSprintSpeed` (2.6 m/s) the pace with the `run` key. It stands again where the water is a little shallower than it started swimming in, so a sloping beach doesn't flip it back and forth.
+- **Diving.** Leaving the ground over water at least a body deep, moving, with the feet 0.3 m or more over the surface, is a dive: head first, a glide under the surface, then up. From a standstill the avatar drops in feet first.
+- **Getting out.** A beach walks out. Swimming into a bank, a step or a ledge up to 0.6 m over the surface (a pool's rim, a low dock) lifts the avatar onto it.
+
+A `Person` body does the strokes: it treads water when still, swims breaststroke at a cruise and a front crawl at a sprint, and makes an arrow of itself for a dive. Every other `Person` follows the same half-height rule on its own: one placed in deep water treads at the surface, and a walker swims the stretch of its route that crosses water. `swim={false}` on a `Player` or a `Person` leaves water as something to look at.
+
+`playerMotion.swim` is `'swim'`, `'dive'`, `'glide'` or `null`; `immersion` is how much of the body is under the still water (0 to 1); `submerged` is how far it is below where it floats. A pose source that wants to do the strokes itself adds a `swim(ctx, out)` method beside `update` and reads `ctx.swim`; without one it isn't asked while its figure is in the water, and the built-in strokes play.
+
+Not yet: swimming down under the surface on purpose, an underwater view, and splashes.
+
 ## Seats, ladders and wading
 
 To sit the player down or put them on a ladder, hold the avatar with `pin`. The body turns kinematic, is carried to `feet` and faces `yaw`, and its own movement is off until you let go. Move the spot from frame to frame (up a ladder, say) by calling `pin` again. A carried `Person` sits when the pin says `pose: 'sit'`, and `climb` (the height climbed) reaches a pose source as `PoseContext.climb` for a climbing cycle:
@@ -174,7 +189,7 @@ playerControl?.current?.pin({ feet: [2, 0.45, 1], yaw: Math.PI, pose: 'sit' })
 playerControl?.current?.pin(null, [2, 1.2, 1.6])
 ```
 
-`limitSpeed` caps how fast the avatar crosses the ground while something slows it (deep water, mud, snow); `null` lifts the cap. In first person, below a jog, an avatar that backs up or steps aside keeps facing where it looks and publishes the way it travels as `playerMotion.course`, so its body (and other players' copies of it) can backpedal or sidestep. `playerMotion.sag` is how far the capsule has settled under its float spring: add it to the capsule's height when you need where the feet are.
+`limitSpeed` caps how fast the avatar crosses the ground while something slows it (mud, snow, water of your own); `null` lifts the cap. Published water slows a wader by itself. In first person, below a jog, an avatar that backs up or steps aside keeps facing where it looks and publishes the way it travels as `playerMotion.course`, so its body (and other players' copies of it) can backpedal or sidestep. `playerMotion.sag` is how far the capsule has settled under its float spring: add it to the capsule's height when you need where the feet are.
 
 Outside first person the camera stops at walls, floors and roofs, swept through the physics world from the avatar's head. Give a collider `collisionGroups={CAMERA_PASSES}` (from `@runek/components`) to let the camera through it (glass, a stool) while bodies still run into it.
 

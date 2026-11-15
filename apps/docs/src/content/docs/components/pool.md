@@ -1,6 +1,6 @@
 ---
 title: "Pool"
-summary: "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner exit steps, and a translucent water surface."
+summary: "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner steps, and a translucent water surface. A Player or a Person swims in it and climbs out at the rim."
 category: component
 component: pool
 order: 100
@@ -12,7 +12,7 @@ order: 100
 npx @runek/cli add pool
 ```
 
-Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.18.0`.
+Pulls `@react-three/rapier@^2.2.0`, `@runek/core@^0.18.0`, `three@^0.184.0`.
 
 ## Use it
 

@@ -9,6 +9,7 @@ export interface TerrainShape {
   frequency?: number
   flatRadius?: number
   falloff?: number
+  shore?: number
   seed?: number
 }
 
@@ -19,8 +20,15 @@ export const TERRAIN_DEFAULTS = {
   frequency: 0.04,
   flatRadius: 0,
   falloff: 0,
+  shore: 0,
   seed: 1,
 }
+
+// Fraction of the half-extent an island's coast takes to fall from the land to the deep.
+const COAST = 0.18
+// A beach runs from this far above the world ground down to this far below it, in units.
+const BEACH_TOP = 0.4
+const BEACH_DEPTH = 1.6
 
 function valueNoise(seed: number) {
   const hash = (x: number, y: number) => {
@@ -69,19 +77,38 @@ export function terrainHeight(shape: TerrainShape, unit: number): (x: number, z:
     frequency = TERRAIN_DEFAULTS.frequency,
     flatRadius = TERRAIN_DEFAULTS.flatRadius,
     falloff = TERRAIN_DEFAULTS.falloff,
+    shore = TERRAIN_DEFAULTS.shore,
     seed = TERRAIN_DEFAULTS.seed,
   } = shape
   const noise = valueNoise(seed)
   const fr = flatRadius * unit
   const half = (Math.min(size[0], size[1]) * unit) / 2
   const sink = (relief + 4) * unit
+  if (falloff > 0 && shore > 0) {
+    // Island with a beach: past the land's edge the ground is a cone of one slope down to
+    // wading depth, then drops to the deep. The land may not rise above that cone, so nothing
+    // steeper stands behind the beach. The pad flattens the land alone (scaling the sea bed
+    // would steepen it), and a pad wider than the land pushes the beach out to its edge.
+    const top = BEACH_TOP * unit
+    const shelf = BEACH_DEPTH * unit
+    const width = shore * unit
+    const start = Math.max((falloff - COAST) * half, fr)
+    const end = start + width
+    return (x, z) => {
+      const r = Math.hypot(x, z)
+      let land = fbm(noise, x * frequency, z * frequency) * relief * unit
+      if (fr > 0) land *= smoothstep(r, fr, fr + 8 * unit)
+      const beach = Math.max(top - ((r - start) / width) * (top + shelf), -shelf)
+      return Math.min(land, beach) - (sink - shelf) * smoothstep(r, end, end + COAST * half)
+    }
+  }
   return (x, z) => {
     let h: number
     if (falloff > 0) {
       // Island mode: gentle land above the waterline, masked down to the deep at the rim.
       const land = fbm(noise, x * frequency, z * frequency) * relief * unit
       const rn = Math.hypot(x, z) / half
-      const mask = 1 - smoothstep(rn, falloff - 0.18, falloff)
+      const mask = 1 - smoothstep(rn, falloff - COAST, falloff)
       h = land * mask - (1 - mask) * sink
     } else {
       h = (fbm(noise, x * frequency, z * frequency) - 0.5) * 2 * relief * unit

@@ -1,6 +1,7 @@
 import { ConvexHullCollider, CuboidCollider, RigidBody } from '@react-three/rapier'
-import { useMaterials, useWorld, type WorldComponentProps } from '@runek/core'
-import { useMemo } from 'react'
+import { planeWater, useMaterials, useWater, useWorld, type WorldComponentProps } from '@runek/core'
+import { useMemo, useRef } from 'react'
+import type { Mesh } from 'three'
 
 export interface PoolProps extends WorldComponentProps {
   /** Water surface `[width, depth]`, in units. */
@@ -23,7 +24,8 @@ export interface PoolProps extends WorldComponentProps {
  * A built swimming pool, flush with the deck: a raised coping rim, a plastered basin you can
  * walk (and jump) into, and a still translucent water surface just below the lip. The rim's top
  * ledge sits at the component origin, so it drops into any `Slab`/`Floor` terrace at deck Y.
- * For natural water, use `Lake`; for open sea, `Ocean`.
+ * A `Player` or a `Person` swims in it where it is over half their height deep, and a swimmer
+ * climbs out at the rim. For natural water, use `Lake`; for open sea, `Ocean`.
  */
 export function Pool({
   position = [0, 0, 0],
@@ -55,6 +57,15 @@ export function Pool({
   const wallT = 0.12 * unit
   const halfW = w / 2
   const halfD = d / 2
+  const surface = 0.14 * unit
+
+  const waterRef = useRef<Mesh>(null)
+  const water = useMemo(
+    () =>
+      planeWater(() => waterRef.current, [w - wallT * 2, d - wallT * 2], { depth: dep - surface }),
+    [w, d, wallT, dep, surface],
+  )
+  useWater(water)
 
   // The exit flight climbs one wall from the floor to the coping. Its treads are a riser apart
   // down from the coping, each standing on the floor so it doubles as its own riser. One wedge
@@ -131,7 +142,12 @@ export function Pool({
         <boxGeometry args={[w, wallT, d]} />
       </mesh>
       {/* water, just under the lip */}
-      <mesh material={m.water} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.14 * unit, 0]}>
+      <mesh
+        ref={waterRef}
+        material={m.water}
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, -surface, 0]}
+      >
         <planeGeometry args={[w - wallT * 2, d - wallT * 2]} />
       </mesh>
       {flight?.treads.map((t) => (
