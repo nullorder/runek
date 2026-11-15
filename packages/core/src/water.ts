@@ -15,12 +15,18 @@ export interface WaterBody {
   /** How deep the water goes below its surface (a pool's basin). Whatever is wholly under that
    *  is not in this water. Leave it out for water with no floor of its own. */
   depth?: number
+  /** The water's color seen from inside it: what a camera under the surface is fogged with. */
+  color?: string
+  /** How far one sees through the water from inside it, in world units. */
+  clarity?: number
 }
 
 /** The water at a point: its still surface and the swell on it now. */
 export interface WaterSample {
   level: number
   swell: number
+  /** The body of water it is, for what else it says of itself (its `color`, its `clarity`). */
+  body?: WaterBody
 }
 
 /**
@@ -47,6 +53,7 @@ export function waterAt(
   }
   if (!found) return null
   out.swell = found.swell?.(x, z) ?? 0
+  out.body = found
   return out
 }
 
@@ -56,6 +63,9 @@ export interface PlaneWaterOptions {
   wave?: (localX: number, localY: number, x: number, z: number) => number
   /** How deep the water goes below the plane, in world units. */
   depth?: number
+  /** The water's color and how far one sees through it from inside (`WaterBody`). */
+  color?: string
+  clarity?: number
 }
 
 /**
@@ -67,7 +77,7 @@ export interface PlaneWaterOptions {
 export function planeWater(
   object: () => Object3D | null,
   size: [number, number] | null,
-  { wave, depth }: PlaneWaterOptions = {},
+  { wave, depth, color, clarity }: PlaneWaterOptions = {},
 ): WaterBody {
   const at = new Matrix4()
   const inverse = new Matrix4()
@@ -94,6 +104,8 @@ export function planeWater(
     !size || (Math.abs(point.x) <= size[0] / 2 && Math.abs(point.y) <= size[1] / 2)
   return {
     depth,
+    color,
+    clarity,
     level: (x, z) => {
       const y = locate(x, z)
       return y !== null && inside() ? y : null

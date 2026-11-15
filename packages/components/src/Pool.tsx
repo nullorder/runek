@@ -1,7 +1,7 @@
 import { ConvexHullCollider, CuboidCollider, RigidBody } from '@react-three/rapier'
 import { planeWater, useMaterials, useWater, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo, useRef } from 'react'
-import type { Mesh } from 'three'
+import { DoubleSide, type Mesh } from 'three'
 
 export interface PoolProps extends WorldComponentProps {
   /** Water surface `[width, depth]`, in units. */
@@ -19,6 +19,9 @@ export interface PoolProps extends WorldComponentProps {
   /** Defaults to the world palette's `waterShallow` slot. */
   waterColor?: string
 }
+
+/** How far a camera under the pool's water sees through it, in units: clear to the far wall. */
+const CLARITY = 40
 
 /**
  * A built swimming pool, flush with the deck: a raised coping rim, a plastered basin you can
@@ -39,14 +42,17 @@ export function Pool({
   waterColor,
 }: PoolProps) {
   const { unit, palette } = useWorld()
+  const tint = waterColor ?? palette.waterShallow
   const m = useMaterials({
     rim: { slot: 'stone', color: copingColor ?? palette.wall },
     basin: { slot: 'ceramic', color: basinColor },
     water: {
-      color: waterColor ?? palette.waterShallow,
+      color: tint,
       transparent: true,
       opacity: 0.55,
       roughness: 0.05,
+      // Seen from under it too, by a swimmer who has gone down.
+      side: DoubleSide,
     },
   })
   const w = size[0] * unit
@@ -62,8 +68,12 @@ export function Pool({
   const waterRef = useRef<Mesh>(null)
   const water = useMemo(
     () =>
-      planeWater(() => waterRef.current, [w - wallT * 2, d - wallT * 2], { depth: dep - surface }),
-    [w, d, wallT, dep, surface],
+      planeWater(() => waterRef.current, [w - wallT * 2, d - wallT * 2], {
+        depth: dep - surface,
+        color: tint,
+        clarity: CLARITY * unit,
+      }),
+    [w, d, wallT, dep, surface, tint, unit],
   )
   useWater(water)
 

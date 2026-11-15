@@ -3,7 +3,7 @@ import { lazyModule, planeWater, useNodeRenderer, useWater, useWorld, type Vec3 
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { WaterShape } from './nodes/water'
-import { swellAt } from './surfaces/water'
+import { swellAt, UNDERSIDE } from './surfaces/water'
 
 // The WebGPU (TSL) twin of the shader below, loaded only under a node renderer.
 const waterNodes = lazyModule(() => import('./nodes/water'))
@@ -18,6 +18,8 @@ const WATER: WaterShape = {
   alpha: [0.86, 0.14],
   fog: true,
 }
+/** How far a camera under the sea sees through it, in units. */
+const CLARITY = 30
 
 export interface OceanProps {
   position?: Vec3
@@ -88,7 +90,7 @@ const FRAGMENT = /* glsl */ `
   varying vec3 vWorldPos;
   varying vec3 vNormal;
   varying float vWave;
-
+  ${UNDERSIDE}
   void main() {
     vec3 n = normalize(vNormal);
     vec3 viewDir = normalize(cameraPosition - vWorldPos);
@@ -111,11 +113,12 @@ const FRAGMENT = /* glsl */ `
     float alpha = 0.86 + fresnel * 0.14;
 
     // Blend into the world's distance fog so the far sea melts into the sky/horizon.
-    float fogF = smoothstep(uFogNear, uFogFar, distance(cameraPosition, vWorldPos));
+    float far = distance(cameraPosition, vWorldPos);
+    float fogF = smoothstep(uFogNear, uFogFar, far);
     col = mix(col, uFogColor, fogF);
     alpha = mix(alpha, 1.0, fogF);
 
-    gl_FragColor = vec4(col, alpha);
+    gl_FragColor = gl_FrontFacing ? vec4(col, alpha) : underside(n, viewDir, m, far);
   }
 `
 
@@ -123,7 +126,8 @@ const FRAGMENT = /* glsl */ `
  *  it reads as open sea to the horizon, with world-space swells that stay put as it moves and a
  *  fog blend that melts the far water into the sky. The surface sits at the world ground
  *  baseline by default (CONTRACT §10); an explicit `position` height wins. It is water a
- *  `Player` or a `Person` swims in, riding the swell that is drawn. */
+ *  `Player` or a `Person` swims in, riding the swell that is drawn, and it has an underside: from
+ *  below, the sky shows through a bright window overhead. */
 export function Ocean({
   position,
   rotation = [0, 0, 0],
@@ -144,6 +148,8 @@ export function Ocean({
   const d = size[1] * unit
   const meshRef = useRef<THREE.Mesh>(null)
 
+  // By its numbers: the default is a new array every render, and new uniforms restart the waves.
+  const [sunX, sunY, sunZ] = sunPosition
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
@@ -151,20 +157,32 @@ export function Ocean({
       uWaveSpeed: { value: waveSpeed },
       uColorDeep: { value: new THREE.Color(deep) },
       uColorShallow: { value: new THREE.Color(shallow) },
-      uSunDir: { value: new THREE.Vector3(...sunPosition).normalize() },
+      uSunDir: { value: new THREE.Vector3(sunX, sunY, sunZ).normalize() },
       uFogColor: { value: new THREE.Color('#ffffff') },
       uFogNear: { value: 1e6 },
       uFogFar: { value: 1e7 },
     }),
-    [waveHeight, waveSpeed, deep, shallow, sunPosition, unit],
+    [waveHeight, waveSpeed, deep, shallow, sunX, sunY, sunZ, unit],
   )
 
+  // Built here, not as a `<shaderMaterial>`: react-three-fiber copies the uniforms it is handed
+  // into the material, so the clock and the fog range written each frame would never reach it.
   const nodes = useNodeRenderer() ? waterNodes() : null
-  const nodeMaterial = useMemo(
-    () => nodes?.waterMaterial(uniforms, WATER) ?? null,
+  const material = useMemo(
+    () =>
+      nodes?.waterMaterial(uniforms, WATER) ??
+      new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader: VERTEX,
+        fragmentShader: FRAGMENT,
+        transparent: true,
+        // Both sides in one draw: from below it is the surface a diver looks up at.
+        side: THREE.DoubleSide,
+        forceSinglePass: true,
+      }),
     [nodes, uniforms],
   )
-  useEffect(() => () => nodeMaterial?.dispose(), [nodeMaterial])
+  useEffect(() => () => material.dispose(), [material])
 
   // The sea as figures find it: everywhere while it follows the camera, else its own patch.
   const water = useMemo(
@@ -173,8 +191,10 @@ export function Ocean({
         wave: (_lx, _ly, x, z) =>
           swellAt(WATER, x, z, uniforms.uTime.value * uniforms.uWaveSpeed.value) *
           uniforms.uWaveHeight.value,
+        color: deep,
+        clarity: CLARITY * unit,
       }),
-    [follow, w, d, uniforms],
+    [follow, w, d, uniforms, deep, unit],
   )
   useWater(water)
 
@@ -204,16 +224,7 @@ export function Ocean({
       rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}
     >
       <planeGeometry args={[w, d, segments, segments]} />
-      {nodeMaterial ? (
-        <primitive object={nodeMaterial} attach="material" />
-      ) : (
-        <shaderMaterial
-          uniforms={uniforms}
-          vertexShader={VERTEX}
-          fragmentShader={FRAGMENT}
-          transparent
-        />
-      )}
+      <primitive object={material} attach="material" />
     </mesh>
   )
 }

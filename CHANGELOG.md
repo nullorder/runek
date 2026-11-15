@@ -40,6 +40,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   { wave, depth })` and `useWorld().waters` in `@runek/core`: the registry
   of water a figure can get into. A water component of your own joins with
   one `useWater` call.
+- Swimming down. Hold the new `dive` control (C by default) and a swimmer
+  goes under at the swimming speed, as far as the bed; let go and it floats
+  back up. A dive carries on down while it is held. `PlayerMotion.swim`
+  gains `'under'`, and a `Person` swims it with a long pull and a frog
+  kick, lying along the way it moves. `dive` is a world control like the
+  rest: remap it in `controls`, or bind it to `[]` to turn it off.
+- The view from under water. While a `Player`'s camera is below the
+  surface, the world's fog becomes the water (its color, and a range as
+  short as the water is clear) and a backdrop of that color stands in for
+  the sky and everything further off; back above, the world's fog is as it
+  was. `Ocean` and `Lake` are drawn from below too: the sky's light through
+  a window overhead, the sun where it comes down through the surface, a
+  shade of the deep past that, fading out with distance. `Pool`'s water is
+  drawn on both sides. New `Player` prop `underwater` (`false` leaves the
+  view as it is above); `player/Underwater.tsx` can be mounted beside a
+  camera of your own. Works under `WebGLRenderer` and `WebGPURenderer`.
+- `WaterBody.color` and `clarity` (what the water looks like from inside),
+  set by `Ocean`, `Lake` and `Pool` and accepted by `planeWater`. The
+  sample `waterAt` returns now carries the `body` it found.
+- A climbing pose. Getting out over a wall (a pool's rim, a dock: a ledge
+  over the water whose top stands 0.9 m or more over the bed) is published
+  as `PlayerMotion.swim: 'climb'`, with `submerged` counting down the
+  height the feet still have to rise. A `Person` reaches for the top,
+  presses up on its hands, brings a knee up and stands. Banks and steps are
+  still a plain lift. `Stroke` gains `'under'` and `'climb'`.
+- Splashes, ripples and a wake. A body in water leaves rings that spread
+  and fade: a line of them behind a swimmer opens into a wake, a slow one
+  now and then round a figure treading water or wading, and going in is a
+  splash sized by the fall, with drops thrown up from a dive. Drawn for the
+  `Player` (in first person too) and for every `Person` in water, as two
+  instanced draws that exist only once a body has been in water.
+  `Player`'s `seed` sets how its splashes scatter. `water/trail.tsx`
+  exports `WaterTrail` for a body of your own.
 - `Terrain` gains `shore`: the width, in units, of a beach around an
   island (one with `falloff`). Past the land's edge the ground falls 2
   units across it at one slope, from just above the world ground to
@@ -56,9 +89,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Lake` or a `Pool`: it floats and swims, and water from the knee up slows
   its walk. A `Person` placed in water over half its height floats up to
   the surface. Pass `swim={false}` to either for the old behavior.
+- The third-person camera rides higher behind a swimmer: at least 20
+  degrees over an avatar afloat at the surface, looking down at it, where
+  it used to skim the water at the swimmer's eye level. The mouse and the
+  look keys still raise it further, and under water it follows level.
+- The default controls bind `KeyC` to `dive`. A world that already uses C
+  for an action of its own will also dive on it in water: move one of the
+  two, or bind `dive: []`.
 
 ### Fixed
 
+- `Ocean` and `Lake` stood still under `WebGLRenderer`, and the `Ocean`'s
+  horizon ignored the range of the world's fog: react-three-fiber copies
+  the uniforms it is handed for a `<shaderMaterial>`, so the clock and the
+  fog range written each frame never reached the shader. The waves move
+  again, and a swimmer rides the swell that is drawn. Both now build their
+  material themselves.
 - `Person`: no clothing layer passes through another. Each garment sits a
   few millimetres over the layers under it wherever it covers them, so a
   hoodie no longer shows the seat of the jeans as two dark ovals and a coat

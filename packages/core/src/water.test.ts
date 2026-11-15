@@ -45,14 +45,26 @@ describe('waterAt', () => {
     const sea: WaterBody = { ...flat(0), swell: () => 0.3 }
     const out = { level: 0, swell: 0 }
     expect(waterAt([sea, calm], 9, 3, 0, out)).toBe(out)
-    expect(out).toEqual({ level: 0, swell: 0.3 })
-    expect(waterAt([sea, calm], 0, 3, 0, out)).toEqual({ level: 2, swell: 0 })
+    expect(out).toMatchObject({ level: 0, swell: 0.3 })
+    expect(waterAt([sea, calm], 0, 3, 0, out)).toMatchObject({ level: 2, swell: 0 })
+  })
+
+  it('says which water it is, for what it looks like from inside', () => {
+    const lake: WaterBody = { ...flat(2, 4), color: '#2a6f7f', clarity: 16 }
+    const sea = flat(0)
+    expect(waterAt([sea, lake], 0, 3, 0)?.body).toBe(lake)
+    expect(waterAt([sea, lake], 9, 3, 0)?.body).toBe(sea)
   })
 })
 
 describe('planeWater', () => {
   it('has no water until its object exists', () => {
     expect(planeWater(() => null, [4, 4]).level(0, 0)).toBeNull()
+  })
+
+  it('carries the look it is given', () => {
+    const water = planeWater(() => null, null, { color: '#1b5f8a', clarity: 30 })
+    expect(water).toMatchObject({ color: '#1b5f8a', clarity: 30 })
   })
 
   it('bounds a sheet by its size, in its own frame', () => {

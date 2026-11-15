@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { WaterShape } from './nodes/water'
 import { lakeSurface } from './surfaces/lake'
-import { swellAt } from './surfaces/water'
+import { swellAt, UNDERSIDE } from './surfaces/water'
 
 // The WebGPU (TSL) twin of the shader below, loaded only under a node renderer.
 const waterNodes = lazyModule(() => import('./nodes/water'))
@@ -19,6 +19,8 @@ const WATER: WaterShape = {
   alpha: [0.78, 0.18],
   fog: false,
 }
+/** How far a camera under the lake sees through it, in units: murkier than the sea. */
+const CLARITY = 16
 
 export interface LakeProps {
   position?: Vec3
@@ -76,10 +78,12 @@ const FRAGMENT = /* glsl */ `
   uniform vec3 uColorDeep;
   uniform vec3 uColorShallow;
   uniform vec3 uSunDir;
+  uniform float uFogNear;
+  uniform float uFogFar;
   varying vec3 vWorldPos;
   varying vec3 vNormal;
   varying float vWave;
-
+  ${UNDERSIDE}
   void main() {
     vec3 n = normalize(vNormal);
     vec3 viewDir = normalize(cameraPosition - vWorldPos);
@@ -99,14 +103,18 @@ const FRAGMENT = /* glsl */ `
     // crest brighten, as before
     col += pow(max(m - 0.6, 0.0), 2.0) * 0.4;
 
-    gl_FragColor = vec4(col, 0.78 + fresnel * 0.18);
+    float alpha = 0.78 + fresnel * 0.18;
+
+    gl_FragColor = gl_FrontFacing
+      ? vec4(col, alpha)
+      : underside(n, viewDir, m, distance(cameraPosition, vWorldPos));
   }
 `
 
 /** Procedural animated water (no textures, no collider). The local origin is the water
  *  surface: place it at or below the surrounding ground so it fills a depression rather than
  *  floating (CONTRACT §10). It is water a `Player` or a `Person` swims in wherever the ground
- *  under it leaves the water over half their height. */
+ *  under it leaves the water over half their height, and it is drawn from below too. */
 export function Lake({
   position,
   rotation = [0, 0, 0],
@@ -125,6 +133,8 @@ export function Lake({
   const pos = position ?? [0, ground, 0]
   const w = size[0] * unit
   const d = size[1] * unit
+  // By its numbers: the default is a new array every render, and new uniforms restart the waves.
+  const [sunX, sunY, sunZ] = sunPosition
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
@@ -132,17 +142,32 @@ export function Lake({
       uWaveSpeed: { value: waveSpeed },
       uColorDeep: { value: new THREE.Color(deep) },
       uColorShallow: { value: new THREE.Color(shallow) },
-      uSunDir: { value: new THREE.Vector3(...sunPosition).normalize() },
+      uSunDir: { value: new THREE.Vector3(sunX, sunY, sunZ).normalize() },
+      // The fog's range, for the underside: from below, the surface is gone where the fog closes.
+      uFogNear: { value: 1e6 },
+      uFogFar: { value: 1e7 },
     }),
-    [waveHeight, waveSpeed, deep, shallow, sunPosition, unit],
+    [waveHeight, waveSpeed, deep, shallow, sunX, sunY, sunZ, unit],
   )
 
+  // Built here, not as a `<shaderMaterial>`: react-three-fiber copies the uniforms it is handed
+  // into the material, so the clock and the fog range written each frame would never reach it.
   const nodes = useNodeRenderer() ? waterNodes() : null
-  const nodeMaterial = useMemo(
-    () => nodes?.waterMaterial(uniforms, WATER) ?? null,
+  const material = useMemo(
+    () =>
+      nodes?.waterMaterial(uniforms, WATER) ??
+      new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader: VERTEX,
+        fragmentShader: FRAGMENT,
+        transparent: true,
+        // Both sides in one draw: from below it is the surface a diver looks up at.
+        side: THREE.DoubleSide,
+        forceSinglePass: true,
+      }),
     [nodes, uniforms],
   )
-  useEffect(() => () => nodeMaterial?.dispose(), [nodeMaterial])
+  useEffect(() => () => material.dispose(), [material])
 
   const meshRef = useRef<THREE.Mesh>(null)
   const water = useMemo(
@@ -151,13 +176,21 @@ export function Lake({
         wave: (lx, ly) =>
           swellAt(WATER, lx, ly, uniforms.uTime.value * uniforms.uWaveSpeed.value) *
           uniforms.uWaveHeight.value,
+        color: deep,
+        clarity: CLARITY * unit,
       }),
-    [w, d, uniforms],
+    [w, d, uniforms, deep, unit],
   )
   useWater(water)
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     uniforms.uTime.value += delta
+    const fog = state.scene.fog
+    if (fog && 'near' in fog) {
+      const linear = fog as THREE.Fog
+      uniforms.uFogNear.value = linear.near
+      uniforms.uFogFar.value = linear.far
+    }
   })
 
   return (
@@ -167,16 +200,7 @@ export function Lake({
       rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}
     >
       <planeGeometry args={[w, d, segments, segments]} />
-      {nodeMaterial ? (
-        <primitive object={nodeMaterial} attach="material" />
-      ) : (
-        <shaderMaterial
-          uniforms={uniforms}
-          vertexShader={VERTEX}
-          fragmentShader={FRAGMENT}
-          transparent
-        />
-      )}
+      <primitive object={material} attach="material" />
     </mesh>
   )
 }

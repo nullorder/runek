@@ -84,6 +84,8 @@ import type {
   PersonStyle,
 } from './person/types'
 import { Sign } from './Sign'
+import { WaterTrail } from './water/trail'
+import type { WakeBody } from './water/wake'
 
 // The WebGPU (TSL) twins of the skin's GLSL patch and of a drawn figure's two-tone material,
 // loaded only under a node renderer.
@@ -119,6 +121,7 @@ export {
 export { tripAt } from './person/route'
 export { PERSON_COLORS, PERSON_SKINS, type PersonSkinName } from './person/spec'
 export { type Stroke, strokePose } from './person/swim'
+
 export type {
   PersonAccessory,
   PersonAge,
@@ -786,7 +789,7 @@ export function Person({
   const swimmer = useMemo(
     () => ({
       stroke: 'tread' as Stroke,
-      weights: { tread: 0, breast: 0, crawl: 0, streamline: 0 } as Record<Stroke, number>,
+      weights: Object.fromEntries(STROKES.map((stroke) => [stroke, 0])) as Record<Stroke, number>,
       clock: motion.phase,
       weight: 0,
       afloat: 0,
@@ -799,6 +802,13 @@ export function Person({
     }),
     [motion.phase],
   )
+  // The rings and splashes it leaves on water, mounted the first time it is in any. The local
+  // avatar's are its `Player`'s.
+  const wake = useMemo<{ current: WakeBody }>(
+    () => ({ current: { wet: false, x: 0, y: 0, z: 0, fall: 0 } }),
+    [],
+  )
+  const [wakes, setWakes] = useState(false)
   const floaters = useRef<Group>(null)
   const headRest = shape.joints[BONES.indexOf('head')]
   const look = useRef({ yaw: 0, pitch: 0 })
@@ -955,7 +965,10 @@ export function Person({
     const sw = swimmer
     let swimPhase: PlayerSwim | null = null
     let surface: number | null = null
-    if (swim && root.current && (m ? m.swim : waters?.size && (pose === 'stand' || moving))) {
+    const mark = wake.current
+    mark.wet = false
+    const wetted = m ? m.swim || (!self && (m.immersion ?? 0) > 0) : false
+    if (swim && root.current && (m ? wetted : waters?.size && (pose === 'stand' || moving))) {
       root.current.getWorldPosition(scratch)
       const water = waterAt(waters, scratch.x, scratch.y + H, scratch.z, sw.sample)
       if (water) surface = water.level + water.swell
@@ -965,8 +978,22 @@ export function Person({
         sw.swimming = immersion > (sw.swimming ? STAND_AT : SWIM_AT)
         if (sw.swimming) swimPhase = 'swim'
       }
+      if (water && surface !== null && !self) {
+        // Feet in the water and the head not far under it; one swimming on its own is drawn at
+        // the surface however deep it stands.
+        const crown = sw.swimming ? surface : scratch.y + H
+        mark.wet = scratch.y < water.level - 0.05 * H && crown > surface - 0.15 * unit
+        mark.x = scratch.x
+        mark.y = surface
+        mark.z = scratch.z
+        mark.fall = Math.max(-(m?.vertical ?? 0), 0)
+        if (mark.wet && !wakes) setWakes(true)
+      }
     } else sw.swimming = false
     const submerged = (m && swimPhase && m.submerged) || 0
+    // Climbing out, that is the height of the wall still over the feet, not a depth: the body
+    // is drawn where its carrier has it.
+    const sunk = swimPhase === 'climb' ? 0 : submerged
 
     // On land a source's `update` is asked; in water its `swim`, if it has one.
     const source = poseSource ?? made.current
@@ -1031,13 +1058,19 @@ export function Person({
     if (sw.weight > 0) {
       const pace = w.speed / unit
       if (swimPhase) {
-        const next = swimPhase === 'swim' ? strokeFor(pace, sw.stroke) : 'streamline'
+        const next =
+          swimPhase === 'swim'
+            ? strokeFor(pace, sw.stroke)
+            : swimPhase === 'under' || swimPhase === 'climb'
+              ? swimPhase
+              : 'streamline'
         // Straight into the first stroke: there is nothing to ease from.
         if (sw.weight < 0.05) for (const stroke of STROKES) sw.weights[stroke] = 0
         sw.stroke = next
       }
       sw.clock += (dt * Math.PI * 2) / STROKE_TRIM[sw.stroke].period(pace)
-      const ease = 1 - Math.exp(-5 * dt)
+      // Quicker into the climb, which is over in a second.
+      const ease = 1 - Math.exp(-(sw.stroke === 'climb' ? 12 : 5) * dt)
       let total = 0
       let pitch = 0
       let depth = 0
@@ -1047,13 +1080,14 @@ export function Person({
         const weight = stroke === sw.stroke ? Math.max(weights[stroke], 0.001) : weights[stroke]
         if (weight < 0.001) continue
         const trim = STROKE_TRIM[stroke]
-        pitch +=
-          weight *
-          (stroke === 'streamline' ? divePitch(w.speed, m?.vertical ?? 0, unit) : trim.pitch)
+        const along = stroke === 'streamline' || stroke === 'under'
+        pitch += weight * (along ? divePitch(w.speed, m?.vertical ?? 0, unit) : trim.pitch)
         depth += weight * trim.depth
         const into = total === 0 ? sw.pose : sw.other
         resetHumanoidPose(into)
-        strokePose(stroke, sw.clock, into)
+        // The climb follows the wall's top, measured from where the feet are drawn.
+        const climbed = (submerged - sw.rise * sw.afloat) / H
+        strokePose(stroke, stroke === 'climb' ? climbed : sw.clock, into)
         total += weight
         if (into === sw.other) mixPose(sw.pose, sw.other, weight / total)
       }
@@ -1067,12 +1101,13 @@ export function Person({
       const pivot = SWIM_PIVOT * H
       // Afloat, the body's middle rides `depth` under the surface, wherever its carrier is, but
       // never lower than it would stand: in chest-deep water a still figure stands and sculls.
-      const floating = surface !== null && (swimPhase === 'swim' || swimPhase === 'glide')
+      const floating =
+        surface !== null && (swimPhase === 'swim' || swimPhase === 'glide' || swimPhase === 'under')
       sw.afloat += ((floating ? 1 : 0) - sw.afloat) * (1 - Math.exp(-5 * dt))
       if (surface !== null && root.current) {
         const feet = root.current.getWorldPosition(scratch).y
         const lowest = feet + Math.max(pivot * Math.cos(tip), SWIM_CLEARANCE * H)
-        sw.rise = Math.max(surface - depth * H - submerged, lowest) - (feet + pivot)
+        sw.rise = Math.max(surface - depth * H - sunk, lowest) - (feet + pivot)
       }
       rig.group.rotation.x = tip
       rig.group.position.set(
@@ -1144,6 +1179,7 @@ export function Person({
   const figure = (
     <group ref={root}>
       <primitive object={rig.group} />
+      {wakes && <WaterTrail source={wake} seed={sub(seed, 4)} />}
       <group ref={floaters}>
         {label && (
           <group ref={nameTag} position={overhead}>

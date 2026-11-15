@@ -4376,7 +4376,7 @@
   "Lake": {
     "kind": "component",
     "seeded": false,
-    "doc": "Procedural animated water (no textures, no collider). The local origin is the water\nsurface: place it at or below the surrounding ground so it fills a depression rather than\nfloating (CONTRACT §10). It is water a `Player` or a `Person` swims in wherever the ground\nunder it leaves the water over half their height.",
+    "doc": "Procedural animated water (no textures, no collider). The local origin is the water\nsurface: place it at or below the surrounding ground so it fills a depression rather than\nfloating (CONTRACT §10). It is water a `Player` or a `Person` swims in wherever the ground\nunder it leaves the water over half their height, and it is drawn from below too.",
     "props": {
       "position": {
         "type": "vec3",
@@ -4455,7 +4455,7 @@
     },
     "name": "lake",
     "category": "water",
-    "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level. A Player or a Person swims in it where the ground under it leaves the water over half their height."
+    "description": "Procedural animated-shader water surface (no textures); place its surface at or below ground level. A Player or a Person swims in it where the ground under it leaves the water over half their height, and it is drawn from below for a swimmer who goes under."
   },
   "Lamp": {
     "kind": "component",
@@ -5251,7 +5251,7 @@
   "Ocean": {
     "kind": "component",
     "seeded": false,
-    "doc": "Procedural animated ocean (no textures, no collider). It follows the camera horizontally so\nit reads as open sea to the horizon, with world-space swells that stay put as it moves and a\nfog blend that melts the far water into the sky. The surface sits at the world ground\nbaseline by default (CONTRACT §10); an explicit `position` height wins. It is water a\n`Player` or a `Person` swims in, riding the swell that is drawn.",
+    "doc": "Procedural animated ocean (no textures, no collider). It follows the camera horizontally so\nit reads as open sea to the horizon, with world-space swells that stay put as it moves and a\nfog blend that melts the far water into the sky. The surface sits at the world ground\nbaseline by default (CONTRACT §10); an explicit `position` height wins. It is water a\n`Player` or a `Person` swims in, riding the swell that is drawn, and it has an underside: from\nbelow, the sky shows through a bright window overhead.",
     "props": {
       "position": {
         "type": "vec3",
@@ -5336,7 +5336,7 @@
     },
     "name": "ocean",
     "category": "water",
-    "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground. A Player or a Person wades in, swims and dives in it, riding the swell that is drawn."
+    "description": "Camera-following animated-shader ocean that reaches the world fog horizon (no textures); sits at the world ground. A Player or a Person wades in, swims and dives in it, riding the swell that is drawn, and from under it the surface shows the sky's light through a window overhead."
   },
   "OfficeChair": {
     "kind": "component",
@@ -6349,7 +6349,7 @@
     },
     "name": "person",
     "category": "character",
-    "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. In open water it swims: a figure placed in deep water treads at the surface, a walker swims the stretch of its route that crosses it, and a Player's body treads, swims breaststroke or a front crawl, and dives with the avatar. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body."
+    "description": "A sculpted, clothed, skinned figure generated from a seed: one continuous body with a sculpted face, lidded eyes that follow you, and hands with fingers, in four style templates (stylized by default, realistic, anime, and punk, drawn in flat two-tone color inside an ink line). Bodies are built in layers (frame, muscle, soft tissue) in seven builds. Every part is configurable as plain JSON: the body (build, tone, height), the face (eyes, brows, nose, lips, blush), hair, and clothing as ordered layers (shirts, sweaters, vests, coats, jackets, crop tops, tanks, dresses, robes, trousers, jeans, cargos, skirts, pleated skirts, stockings, shoes, boots, sneakers, belts, scarves, capes, and street wear with lit trims) that fit any body. Role presets, swappable cosmetic skins, hats and accessories, poses, idle breathing and blinking. Give it a patrol or a wander radius and it walks: a route that is a pure function of the clock, following the ground, with a walk cycle and a step aside for the player and other walkers. A route with a departure time is a one-way trip (to a desk, to bed) that reports its arrival, and actions put a key prompt over it (Talk, Info) when the player comes near. In open water it swims: a figure placed in deep water treads at the surface, a walker swims the stretch of its route that crosses it, and a Player's body treads, swims breaststroke or a front crawl, dives, swims under water and climbs out over a wall with the avatar. A figure in water leaves ripples and a wake. Meshes build in the background, coarse first, with full detail near the camera. Its skeleton answers to the VRM humanoid bone names, so a pose source (a clip library, poses off the network) can drive it in place of the walk cycle. Place one at a spawn point, or use it as the Player's third-person body."
   },
   "Piano": {
     "kind": "component",
@@ -6660,7 +6660,7 @@
   },
   "Player": {
     "kind": "component",
-    "seeded": false,
+    "seeded": true,
     "props": {
       "position": {
         "type": "vec3",
@@ -6674,8 +6674,9 @@
       },
       "seed": {
         "type": "number",
-        "doc": "Accepted for the component contract; this component has no seeded variation yet.",
-        "optional": true
+        "doc": "Sets how the avatar's splashes scatter.",
+        "optional": true,
+        "default": 1
       },
       "view": {
         "type": "enum",
@@ -6724,7 +6725,7 @@
       },
       "swim": {
         "type": "boolean",
-        "doc": "Swim in open water (an `Ocean`, a `Lake`, a `Pool`). Water slows a walk from the knee up;\nwhere it is over half the avatar's height the avatar floats at the surface and swims, and\nleaving the ground over deep water is a dive. False leaves water as something to look at:\nthe avatar walks the bed under it.",
+        "doc": "Swim in open water (an `Ocean`, a `Lake`, a `Pool`). Water slows a walk from the knee up;\nwhere it is over half the avatar's height the avatar floats at the surface and swims,\nleaving the ground over deep water is a dive, and holding the world's `dive` control (C)\nswims down under the surface. False leaves water as something to look at: the avatar walks\nthe bed under it.",
         "optional": true,
         "default": true
       },
@@ -6739,6 +6740,12 @@
         "doc": "Top swimming speed while the `run` key is held, in meters per second: a front crawl on a\n`Person` body. Never faster than `sprintSpeed`.",
         "optional": true,
         "default": 2.6
+      },
+      "underwater": {
+        "type": "boolean",
+        "doc": "The view from under water: while the camera is below the surface of an `Ocean`, a `Lake`\nor a `Pool`, the world is fogged with the water's color, as far as the water is clear.\nFalse leaves the view as it is above.",
+        "optional": true,
+        "default": true
       },
       "cameraDistance": {
         "type": "number",
@@ -6766,7 +6773,7 @@
     },
     "name": "player",
     "category": "character",
-    "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. The body it carries turns to face the way it walks, and its motion (speed, distance, heading, jumps, where the camera looks) is published every frame for that body and for net code. In open water (an Ocean, a Lake, a Pool) it wades, swims where the water is over half its height, dives when it leaves the ground over deep water, and climbs out onto a bank or a low ledge. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings."
+    "description": "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. The body it carries turns to face the way it walks, and its motion (speed, distance, heading, jumps, where the camera looks) is published every frame for that body and for net code. In open water (an Ocean, a Lake, a Pool) it wades, swims where the water is over half its height, dives when it leaves the ground over deep water, swims down under the surface while the `dive` control is held, and climbs out onto a bank or a low ledge. Its third-person camera rides higher over a swimmer, the view turns to the water's color and fog while the camera is under the surface, and it leaves splashes, ripples and a wake. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings."
   },
   "Pool": {
     "kind": "component",
@@ -6854,7 +6861,7 @@
     },
     "name": "pool",
     "category": "water",
-    "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner steps, and a translucent water surface. A Player or a Person swims in it and climbs out at the rim."
+    "description": "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner steps, and a translucent water surface. A Player or a Person swims in it and climbs out at the rim; its water is drawn from below too."
   },
   "PoolTable": {
     "kind": "component",

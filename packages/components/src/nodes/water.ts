@@ -1,17 +1,21 @@
-import type { Color, Vector3 } from 'three'
+import { type Color, DoubleSide, type Vector3 } from 'three'
 import {
   cameraPosition,
   cos,
   distance,
   dot,
   float,
+  frontFacing,
   max,
+  min,
   mix,
   modelWorldMatrix,
   normalize,
   positionLocal,
   pow,
   reflect,
+  refract,
+  select,
   sin,
   smoothstep,
   sRGBTransferEOTF,
@@ -101,15 +105,38 @@ export function waterMaterial(record: WaterUniforms, shape: WaterShape) {
   color = color.add(vec3(1, 0.95, 0.85).mul(glint).mul(shape.glint[1])) as Node<'vec3'>
   color = color.add(pow(max(m.sub(0.6), 0), 2).mul(shape.crest)) as Node<'vec3'>
   let alpha = float(shape.alpha[0]).add(fresnel.mul(shape.alpha[1])) as Node<'float'>
-  if (shape.fog && record.uFogColor && record.uFogNear && record.uFogFar) {
-    const near = follow<Node<'float'>>(record.uFogNear)
-    const far = follow<Node<'float'>>(record.uFogFar)
-    const fog = smoothstep(near, far, distance(cameraPosition, worldPos))
+  const far = distance(cameraPosition, worldPos)
+  const fog =
+    record.uFogNear && record.uFogFar
+      ? smoothstep(
+          follow<Node<'float'>>(record.uFogNear),
+          follow<Node<'float'>>(record.uFogFar),
+          far,
+        )
+      : null
+  if (shape.fog && fog && record.uFogColor) {
     color = mix(color, follow<Node<'vec3'>>(record.uFogColor), fog) as Node<'vec3'>
     alpha = mix(alpha, float(1), fog) as Node<'float'>
   }
 
-  const material = new MeshBasicNodeMaterial({ transparent: true })
+  // From below (`UNDERSIDE` in `surfaces/water.ts`): the sky's light through a window straight
+  // overhead, a shade of the deep water past it, the sun where its light comes down through
+  // the surface, and nothing by the distance the fog closes at.
+  const window = smoothstep(0.6, 0.8, max(dot(viewDir.negate(), normal), 0))
+  const sun = pow(max(dot(viewDir, refract(sunDir.negate(), normal, 0.75)), 0), 60)
+  const under = mix(deep.mul(0.5), mix(shallow, vec3(0.62, 0.78, 0.9), 0.7), window)
+    .mul(m.mul(0.2).add(0.9))
+    .add(vec3(1, 0.95, 0.85).mul(sun).mul(0.7))
+  const shown = min(mix(float(0.4), float(0.8), window).add(sun.mul(0.2)), 1)
+  color = select(frontFacing, color, under) as Node<'vec3'>
+  alpha = select(frontFacing, alpha, fog ? shown.mul(float(1).sub(fog)) : shown) as Node<'float'>
+
+  // Both sides in one draw.
+  const material = new MeshBasicNodeMaterial({
+    transparent: true,
+    side: DoubleSide,
+    forceSinglePass: true,
+  })
   material.positionNode = displaced
   // The GLSL shader writes its color as is (no tone mapping, no output conversion); undoing the
   // node pipeline's sRGB output conversion here shows the same color.

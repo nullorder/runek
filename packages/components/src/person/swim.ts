@@ -9,9 +9,17 @@ import { Quaternion, Vector3 } from 'three'
 import type { HumanoidBoneName, HumanoidPose } from './humanoid'
 
 /** `tread` holds a still body upright; `breast` and `crawl` carry it along; `streamline` is the
- *  arrow a diver makes, in the air and under the surface. */
-export type Stroke = 'tread' | 'breast' | 'crawl' | 'streamline'
-export const STROKES: readonly Stroke[] = ['tread', 'breast', 'crawl', 'streamline']
+ *  arrow a diver makes, in the air and under the surface; `under` is the long pull and kick of a
+ *  swimmer staying down; `climb` gets it out over a wall, hands first. */
+export type Stroke = 'tread' | 'breast' | 'crawl' | 'streamline' | 'under' | 'climb'
+export const STROKES: readonly Stroke[] = [
+  'tread',
+  'breast',
+  'crawl',
+  'streamline',
+  'under',
+  'climb',
+]
 
 /** How a body lies in the water for a stroke, and how fast the stroke turns over. */
 export interface StrokeTrim {
@@ -33,6 +41,11 @@ export const STROKE_TRIM: Record<Stroke, StrokeTrim> = {
   // Flat, face in the water.
   crawl: { pitch: 1.47, depth: 0.1, period: (v) => clamp(1.6 - 0.2 * v, 0.9, 1.4) },
   streamline: { pitch: Math.PI / 2, depth: 0.1, period: () => 1.5 },
+  // Like the streamline, it lies along the way it moves (`divePitch`). A slow stroke: most of it
+  // is glide.
+  under: { pitch: Math.PI / 2, depth: 0.1, period: (v) => clamp(2.6 - 0.4 * v, 1.8, 2.6) },
+  // Up against the wall, leaning over its top.
+  climb: { pitch: 0.2, depth: 0.3, period: () => 1.5 },
 }
 
 // A figure on its own swims where the still water is over this much of its height, and stands
@@ -76,6 +89,7 @@ const t = {
   upper: new Vector3(),
   fore: new Vector3(),
   toward: new Vector3(),
+  pole: new Vector3(),
   local: new Vector3(),
   q: new Quaternion(),
 }
@@ -240,11 +254,96 @@ function streamline(pose: HumanoidPose) {
   pose.rotations.head.setFromAxisAngle(X, 0.1)
 }
 
-/** Write `stroke` at `phase` (radians, one cycle per turn) over `pose`. `pose` must come in
- *  reset to the T-pose: a stroke sets only the bones it moves. */
+function under(pose: HumanoidPose, phase: number) {
+  const u = (((phase / (Math.PI * 2)) % 1) + 1) % 1
+  // A glide with the arms ahead, one long pull out and round to the thighs, a glide with them
+  // there, then the hands slide back up under the chest as the legs kick.
+  const recovering = u > 0.62
+  const sweep = (smooth((u - 0.15) / 0.3) - smooth((u - 0.62) / 0.3)) * Math.PI
+  const sin = Math.sin(sweep)
+  const cos = Math.cos(sweep)
+  const draw = bump(u, 0.66, 0.8, 0.94)
+  const wide = bump(u, 0.72, 0.86, 0.98)
+  for (const side of [1, -1] as const) {
+    if (recovering) {
+      // Close to the body, elbows bent, the hands leading up the middle.
+      t.upper.set(side * (0.12 + 0.33 * sin), cos, 0.08 + 0.47 * sin)
+      t.fore.set(side * (0.05 - 0.3 * sin), cos + 0.9 * sin, 0.05 + 0.45 * sin)
+    } else {
+      // Wide, the arms nearly straight.
+      t.upper.set(side * (0.12 + 0.88 * sin), cos, 0.08 + 0.2 * sin)
+      t.fore.set(side * (0.05 + 0.7 * sin), cos - 0.25 * sin, 0.05 + 0.45 * sin)
+    }
+    arm(pose, side, t.upper, t.fore, recovering ? 0 : 0.5 * sin)
+    leg(pose, side, 0.55 * draw, 0.03 + 0.5 * wide, 1.8 * draw, 0.9 - 1.25 * draw)
+  }
+  // Looking the way it goes.
+  pose.rotations.chest.setFromAxisAngle(X, -0.08)
+  pose.rotations.head.setFromAxisAngle(X, -0.3)
+}
+
+// A figure's rough proportions, as parts of its height: enough to put its hands on a ledge.
+const SHOULDER = 0.81
+const UPPER_ARM = 0.16
+const FORE_ARM = 0.21
+/** How far ahead of the body its hands come down on the top of a wall, as a part of its height. */
+const HANDS_OUT = 0.26
+
+/** Getting out over a wall whose top is `left` body heights over the feet: the arms reach up for
+ *  it, the hands stay on it and press down as the body rises past, a knee comes up onto it, and
+ *  the body stands. */
+function climb(pose: HumanoidPose, left: number) {
+  const up = clamp(left, 0, 1.6)
+  // The hands let go as the feet come level with the top.
+  const hold = smooth(up / 0.3)
+  const reach = smooth((up - 0.9) / 0.4)
+  const press = bump(up, 0.2, 0.55, 1)
+  const knee = bump(up, 0.04, 0.3, 0.62)
+  // Still in the water, the legs hang with the knees a little bent.
+  const hang = smooth((up - 0.6) / 0.3)
+  // The back bends over the wall as the arms press; the hands are found in the frame of the
+  // chest, which leans with it.
+  const lean = STROKE_TRIM.climb.pitch + 0.3 * press
+  const sin = Math.sin(lean)
+  const cos = Math.cos(lean)
+  const y = up - SHOULDER
+  const ty = y * cos + HANDS_OUT * sin
+  const tz = HANDS_OUT * cos - y * sin
+  for (const side of [1, -1] as const) {
+    // Shoulder to hand, bent at the elbow by what the two bones leave over, the elbow out to
+    // the side and back.
+    const far = Math.hypot(0.02, ty, tz)
+    const d = clamp(far, FORE_ARM - UPPER_ARM + 0.01, UPPER_ARM + FORE_ARM - 0.005)
+    t.toward.set(side * 0.02, ty, tz).divideScalar(far)
+    t.pole.set(side * 0.7, -0.4, -0.6)
+    t.pole.addScaledVector(t.toward, -t.pole.dot(t.toward)).normalize()
+    const bend = Math.acos(
+      clamp((UPPER_ARM ** 2 + d * d - FORE_ARM ** 2) / (2 * UPPER_ARM * d), -1, 1),
+    )
+    t.upper.copy(t.toward).multiplyScalar(Math.cos(bend)).addScaledVector(t.pole, Math.sin(bend))
+    t.fore.copy(t.toward).multiplyScalar(d).addScaledVector(t.upper, -UPPER_ARM)
+    // Let go, the arms come down to the sides.
+    t.upper.lerp(t.local.set(side * 0.14, -1, 0.05), 1 - hold)
+    t.fore.normalize().lerp(t.local.set(side * 0.05, -1, 0.18), 1 - hold)
+    arm(pose, side, t.upper, t.fore, 0.4 * hold * (1 - reach))
+  }
+  // The left knee goes up onto the top; the right leg trails and pushes.
+  leg(pose, 1, 1.45 * knee + 0.2 * hang, 0.1 * knee, 1.9 * knee + 0.4 * hang, 0.2 + 0.6 * hang)
+  leg(pose, -1, 0.1 * hang - 0.15 * knee, 0.03, 0.3 * knee + 0.25 * hang, 0.3 + 0.5 * hang)
+  pose.rotations.spine.setFromAxisAngle(X, 0.12 * press)
+  pose.rotations.chest.setFromAxisAngle(X, 0.18 * press)
+  // Up at the top it is reaching for, then down at where the knee is going.
+  pose.rotations.head.setFromAxisAngle(X, 0.2 * press - 0.4 * reach)
+}
+
+/** Write `stroke` at `phase` (radians, one cycle per turn) over `pose`. `climb` is not a cycle:
+ *  its `phase` is how far the top of the wall still is over the feet, in body heights. `pose`
+ *  must come in reset to the T-pose: a stroke sets only the bones it moves. */
 export function strokePose(stroke: Stroke, phase: number, pose: HumanoidPose) {
   if (stroke === 'tread') tread(pose, phase)
   else if (stroke === 'breast') breast(pose, phase)
   else if (stroke === 'crawl') crawl(pose, phase)
+  else if (stroke === 'under') under(pose, phase)
+  else if (stroke === 'climb') climb(pose, phase)
   else streamline(pose)
 }

@@ -8,6 +8,8 @@ import {
   type SwimSense,
   type SwimShape,
   stepSwim,
+  submersion,
+  swimming,
 } from './swim'
 
 // The default avatar: a 1.3 m capsule floating 0.3 m off the ground.
@@ -34,6 +36,7 @@ const sense = (over: Partial<SwimSense> = {}): SwimSense => ({
   grounded: false,
   pushing: false,
   sprinting: false,
+  diving: false,
   ...over,
 })
 const body = (over: Partial<SwimBody> = {}): SwimBody => ({ y: 0, vx: 0, vy: 0, vz: 0, ...over })
@@ -259,6 +262,159 @@ describe('stepSwim', () => {
       stepSwim(state, shape, b, sense(ledge))
       expect(state.phase).toBe('dive')
       expect(state.climbing).toBe(false)
+    })
+
+    it('shows the climb out onto a wall, counting down the height left', () => {
+      const state = createSwimState()
+      const b = body({ y: floatLine(shape, 0) })
+      stepSwim(state, shape, b, sense())
+      expect(swimming(state)).toBe('swim')
+      stepSwim(state, shape, b, sense(ledge))
+      // From afloat, the feet have the ledge's height and most of the body's to rise.
+      expect(swimming(state)).toBe('climb')
+      const first = submersion(state)
+      expect(first).toBeCloseTo(0.2 + shape.feet - floatLine(shape, 0), 1)
+      let last = first
+      for (let t = 0; t < 1.5; t += DT) {
+        run(state, b, DT, ledge)
+        expect(submersion(state)).toBeLessThanOrEqual(last + 1e-9)
+        last = submersion(state)
+      }
+      // Still a climb once it is out of the water, with nothing left to rise.
+      expect(state.phase).toBeNull()
+      expect(swimming(state)).toBe('climb')
+      expect(last).toBeLessThan(0.05)
+      // The ledge underfoot ends it.
+      run(state, b, DT, { bed: 0.2, ahead: 0.2, grounded: true, pushing: true })
+      expect(swimming(state)).toBeNull()
+      expect(submersion(state)).toBe(0)
+    })
+
+    it('hauls out over a wall slower than it is lifted up a step', () => {
+      const fastest = (bed: number) => {
+        const state = createSwimState()
+        const b = body({ y: floatLine(shape, 0) })
+        stepSwim(state, shape, b, sense({ bed }))
+        let most = 0
+        for (let t = 0; t < 1; t += DT) {
+          run(state, b, DT, { bed, ...ledge })
+          most = Math.max(most, b.vy)
+        }
+        return most
+      }
+      // Deep water at a dock, then a step up from a bed half a meter under it.
+      expect(fastest(Number.NEGATIVE_INFINITY)).toBeCloseTo(1.4, 1)
+      expect(fastest(-0.6)).toBeGreaterThan(1.4)
+    })
+
+    it('shows no climb up a step, a bank or a ledge under the water', () => {
+      // A step 0.4 m over the bed the body stands on.
+      const step = createSwimState()
+      stepSwim(step, shape, standing(0.4), sense({ bed: -0.4, grounded: true, ...ledge }))
+      expect(step.climbing).toBe(true)
+      expect(swimming(step)).toBeNull()
+      // A bank: the ground ahead a little higher than the ground underneath.
+      const bank = createSwimState()
+      const b = body({ y: floatLine(shape, 0) })
+      stepSwim(bank, shape, b, sense({ bed: -1.2 }))
+      stepSwim(bank, shape, b, sense({ bed: -0.7, ahead: 0.1, pushing: true }))
+      expect(bank.climbing).toBe(true)
+      expect(swimming(bank)).toBe('swim')
+      // A shelf that stops short of the surface.
+      const shelf = createSwimState()
+      const c = body({ y: floatLine(shape, 0) })
+      stepSwim(shelf, shape, c, sense())
+      stepSwim(shelf, shape, c, sense({ ahead: -0.6, pushing: true }))
+      expect(shelf.climbing).toBe(true)
+      expect(swimming(shelf)).toBe('swim')
+    })
+  })
+
+  describe('going under', () => {
+    const afloat = () => {
+      const state = createSwimState()
+      const b = body({ y: floatLine(shape, 0) })
+      stepSwim(state, shape, b, sense())
+      return { state, b }
+    }
+
+    it('swims down while the control is held, at the swimming speed', () => {
+      const { state, b } = afloat()
+      run(state, b, 2, { diving: true })
+      expect(state.phase).toBe('under')
+      expect(b.vy).toBeCloseTo(-shape.swim, 1)
+      expect(state.submerged).toBeGreaterThan(2)
+      // Faster with the run key.
+      run(state, b, 1, { diving: true, sprinting: true })
+      expect(b.vy).toBeCloseTo(-shape.swimSprint, 1)
+    })
+
+    it('floats back up when let go, and swims again at the surface', () => {
+      const { state, b } = afloat()
+      run(state, b, 2, { diving: true })
+      const phases: (string | null)[] = []
+      for (let t = 0; t < 4; t += DT) {
+        run(state, b, DT)
+        if (phases[phases.length - 1] !== state.phase) phases.push(state.phase)
+      }
+      expect(phases).toEqual(['under', 'swim'])
+      expect(b.y).toBeCloseTo(floatLine(shape, 0), 1)
+      expect(state.submerged).toBeLessThan(0.02)
+    })
+
+    it('stops at standing height over the bed', () => {
+      const { state, b } = afloat()
+      run(state, b, 4, { diving: true, bed: -4 })
+      expect(state.phase).toBe('under')
+      expect(b.y).toBeCloseTo(-4 + shape.feet, 1)
+      expect(Math.abs(b.vy)).toBeLessThan(0.05)
+    })
+
+    it('comes back up in a pool no deeper than the body, where it can only lie down', () => {
+      const state = createSwimState()
+      const floor = { bed: floatLine(shape, 0) - shape.feet, grounded: true }
+      const b = body({ y: floatLine(shape, 0) })
+      stepSwim(state, shape, b, sense(floor))
+      run(state, b, 1, { ...floor, diving: true })
+      expect(state.phase).toBe('under')
+      expect(b.y).toBeCloseTo(floatLine(shape, 0), 2)
+      // Let go while the capsule is still settling onto the floor.
+      b.vy = -0.02
+      stepSwim(state, shape, b, sense(floor))
+      expect(state.phase).toBe('swim')
+    })
+
+    it('keeps to the swimming speeds under water', () => {
+      const { state, b } = afloat()
+      run(state, b, 1, { diving: true })
+      b.vx = 4
+      stepSwim(state, shape, b, sense({ diving: true, pushing: true }))
+      expect(Math.hypot(b.vx, b.vz)).toBeCloseTo(shape.swim)
+    })
+
+    it('carries a dive on down', () => {
+      const state = createSwimState()
+      const b = body({ y: 2, vx: 2.5, vy: 1 })
+      const phases: (string | null)[] = []
+      for (let t = 0; t < 2.5; t += DT) {
+        run(state, b, DT, { diving: true, pushing: true })
+        if (phases[phases.length - 1] !== state.phase) phases.push(state.phase)
+      }
+      expect(phases).toEqual(['dive', 'glide', 'under'])
+    })
+
+    it('does nothing for a body on its feet, in the air or climbing out', () => {
+      const wader = createSwimState()
+      stepSwim(wader, shape, standing(0.4), sense({ bed: -0.4, grounded: true, diving: true }))
+      expect(wader.phase).toBeNull()
+      const air = createSwimState()
+      stepSwim(air, shape, body({ y: 2, vx: 0.2 }), sense({ diving: true }))
+      expect(air.phase).toBeNull()
+      const { state, b } = afloat()
+      run(state, b, 0.2, { ahead: 0.2, pushing: true })
+      run(state, b, 0.2, { ahead: 0.2, pushing: true, diving: true })
+      expect(state.phase).toBe('swim')
+      expect(state.climbing).toBe(true)
     })
   })
 

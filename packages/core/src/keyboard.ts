@@ -3,8 +3,9 @@ import type { KeyboardControlsEntry } from '@react-three/drei'
 /**
  * World-remappable input bindings: action name → `KeyboardEvent.code`s. The
  * standard actions are the movement set ecctrl reads (`forward`, `backward`,
- * `leftward`, `rightward`, `jump`, `run`) and the camera-look set `Player`
- * consumes (`turnLeft`, `turnRight`, `lookUp`, `lookDown`). Unknown action
+ * `leftward`, `rightward`, `jump`, `run`), the camera-look set `Player`
+ * consumes (`turnLeft`, `turnRight`, `lookUp`, `lookDown`), and `dive`, held
+ * to swim down under the surface of water. Unknown action
  * names are allowed: they become extra `KeyboardControls` entries readable by
  * any component via drei's `useKeyboardControls` (e.g. `interact: ["KeyE"]`).
  * Mapping an action to `[]` disables it.
@@ -14,7 +15,8 @@ export type WorldControls = Record<string, string[]>
 /**
  * Default bindings. WASD drives movement so the arrow keys are free to steer
  * the camera — Left/Right turn (yaw), Up/Down look (pitch) — alongside
- * mouse-drag, in both first- and third-person views.
+ * mouse-drag, in both first- and third-person views. C dives: a Control key
+ * would close the tab the moment it met W.
  */
 export const DEFAULT_CONTROLS: WorldControls = {
   forward: ['KeyW'],
@@ -23,6 +25,7 @@ export const DEFAULT_CONTROLS: WorldControls = {
   rightward: ['KeyD'],
   jump: ['Space'],
   run: ['ShiftLeft', 'ShiftRight'],
+  dive: ['KeyC'],
   turnLeft: ['ArrowLeft'],
   turnRight: ['ArrowRight'],
   lookUp: ['ArrowUp'],

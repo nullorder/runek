@@ -20,6 +20,12 @@ describe('resolveControls', () => {
     expect(controls.jump).toEqual(DEFAULT_CONTROLS.jump)
   })
 
+  it('binds a key to dive, which a world can move or take away', () => {
+    expect(resolveControls().dive).toEqual(['KeyC'])
+    expect(resolveControls({ dive: ['KeyQ'] }).dive).toEqual(['KeyQ'])
+    expect(resolveControls({ dive: [] }).dive).toEqual([])
+  })
+
   it('passes unknown actions through as custom bindings and [] disables', () => {
     const controls = resolveControls({ interact: ['KeyE'], run: [] })
     expect(controls.interact).toEqual(['KeyE'])

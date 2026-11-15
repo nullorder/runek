@@ -1,6 +1,6 @@
 ---
 title: "Pool"
-summary: "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner steps, and a translucent water surface. A Player or a Person swims in it and climbs out at the rim."
+summary: "A built swimming pool flush with the deck: coping rim, walkable plastered basin with corner steps, and a translucent water surface. A Player or a Person swims in it and climbs out at the rim; its water is drawn from below too."
 category: component
 component: pool
 order: 100
