@@ -41,6 +41,13 @@ describe('resolveFigure', () => {
     expect(s.layers.map((l) => l.type)).toEqual(['trousers', 'tunic', 'shoes', 'belt', 'scarf'])
   })
 
+  it('puts a belt under a top that hangs over the waist, and over one worn belted', () => {
+    const hoodie = resolve({ outfit: 'hoodie', accessories: ['belt'] })
+    expect(hoodie.layers.map((l) => l.type)).toEqual(['jeans', 'belt', 'hoodie', 'shoes'])
+    const coat = resolve({ outfit: 'coat', accessories: ['belt'] })
+    expect(coat.layers.map((l) => l.type).at(-1)).toBe('belt')
+  })
+
   it('takes an explicit clothes stack verbatim, and [] is the bare body', () => {
     const s = resolve({ clothes: [{ type: 'tshirt', color: '#ff0000' }, { type: 'shorts' }] })
     expect(s.layers.map((l) => l.type)).toEqual(['tshirt', 'shorts'])

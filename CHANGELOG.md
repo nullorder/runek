@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.18.0...HEAD)
 
+### Fixed
+
+- `Person`: no clothing layer passes through another. Each garment sits a
+  few millimetres over the layers under it wherever it covers them, so a
+  hoodie no longer shows the seat of the jeans as two dark ovals and a coat
+  clears a thick sweater, while hems, necklines, sleeve ends and open
+  fronts still show what is under them.
+- `Person`: a hoodie reads as one, with its hood lying on the upper back
+  and a pouch across the belly, each a fold shade of the hoodie's color.
+- `Person`: a `belt` accessory goes on the bottoms under a top that hangs
+  over the waist (a hoodie, a jacket) instead of round it, and stays over
+  a tunic, coat, dress or robe.
+
 ## [0.18.0](https://github.com/nullorder/runek/compare/v0.17.0...v0.18.0) - 2026-11-14
 
 ### Added

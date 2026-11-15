@@ -3,8 +3,10 @@
 import {
   box,
   clamp01,
+  drape,
   ellipsoid,
   type Field,
+  lattice,
   len,
   noise3,
   type Prim,
@@ -14,6 +16,7 @@ import {
   smax,
   smin,
   sphere,
+  type Underlayer,
   type V3,
 } from './sdf'
 import { type FigureSpec, type Layer, LIT, type MaterialKind } from './spec'
@@ -1121,6 +1124,10 @@ export function shapeFigure(spec: FigureSpec): Shape {
               ? 0.012
               : 0.006
       const quilted = l.type === 'techvest'
+      // A hoodie's pouch: a pocket across the belly, standing a little proud of the cloth.
+      const pouch = l.type === 'hoodie'
+      const pouchY = Math.max(hem + 0.075 * u, waistY - 0.035 * u)
+      const pouchW = 0.085 * u * W
       const vBottom = shoulderY - 0.095 * u
       const f: Field = (x, yy, z) => {
         const inArm = Math.abs(x) > armX
@@ -1136,6 +1143,15 @@ export function shapeFigure(spec: FigureSpec): Shape {
         if (knit && (yy < hem + 0.035 * u || (inArm && yy < sleeve + 0.03 * u)))
           rib = Math.sin(Math.atan2(x, z - zc) * 48) * 0.0012 * u
         let d = F(x, yy, z) - ease - rib + folds(x, yy, z, knit ? 0.002 : 0.005)
+        if (pouch && z > 0) {
+          // Narrower at the top, where the hands go in at a slant.
+          const panel = smax(
+            smax(d - 0.007 * u, Math.abs(x) - pouchW + (yy - pouchY) * 0.45, 0.01 * u),
+            Math.abs(yy - pouchY) - 0.055 * u,
+            0.01 * u,
+          )
+          d = smin(d, panel, 0.002 * u)
+        }
         // Padding, stitched across in rolls.
         if (quilted)
           d -= (0.5 + 0.5 * Math.cos(((yy - hem) / (0.052 * u)) * Math.PI * 2)) * 0.0055 * u
@@ -1162,15 +1178,27 @@ export function shapeFigure(spec: FigureSpec): Shape {
       const y0 = (long ? hem : Math.min(hem, inArmMin(l))) - 0.02 * u
       // A fold-down collar: a band that flares as it drops, open at the front in a V so its two
       // points lie on the chest. Thin, so it meshes as its own finer part.
-      // A hoodie's hood, down: a thick soft roll lying round the back of the neck, open at the
-      // front where the drawstrings would hang.
+      // A hoodie's hood, down: a thick soft rim round the back and sides of the neck, open at the
+      // front where the drawstrings hang, and the hood itself lying in a soft heap on the upper back.
       const hood: Field | null =
         l.type === 'hoodie'
-          ? (x, yy, z) => {
-              const r = neckR + 0.03 * u + off
-              const ring = len(len(x, (z + 0.02 * u) * 1.1) - r, (yy - (neckTop - 0.012 * u)) * 1.3)
-              return Math.max(ring - 0.024 * u, z - 0.03 * u + Math.abs(x) * 0.35)
-            }
+          ? (() => {
+              const backY = neckTop - 0.085 * u
+              const backZ = -frontZ((x, y, z) => F(x, y, -z), backY, off)
+              const heap = ellipsoid(
+                [0, backY, backZ - 0.004 * u],
+                [0.1 * u * W, 0.075 * u, 0.026 * u],
+              )
+              return (x: number, yy: number, z: number) => {
+                const r = neckR + 0.034 * u + off
+                const ring = len(
+                  len(x, (z + 0.02 * u) * 1.1) - r,
+                  (yy - (neckTop - 0.008 * u)) * 1.3,
+                )
+                const rim = Math.max(ring - 0.028 * u, z - 0.03 * u + Math.abs(x) * 0.35)
+                return smin(rim, heap(x, yy, z) + folds(x, yy, z, 0.004), 0.025 * u)
+              }
+            })()
           : null
       // Street clothes stand their collar up: a funnel round the neck, highest at the back, open
       // down the front on anything worn open.
@@ -1212,10 +1240,13 @@ export function shapeFigure(spec: FigureSpec): Shape {
       return {
         f,
         collar,
-        // The rim of a stood-up collar is lit.
+        // The rim of a stood-up collar is lit. A hood lying down is a shade of its own, so it reads
+        // as a hood against the back it lies on.
         collarPaint: funnel
           ? (_x, yy, z) => (yy > funnelTop(z) - 0.009 * u ? lit(l.trim) : null)
-          : undefined,
+          : hood
+            ? () => foldOf(l.color)
+            : undefined,
         y0,
         y1: neckTop + 0.03 * u,
         weightBy: [...torsoPrims, ...arms],
@@ -1449,17 +1480,28 @@ export function shapeFigure(spec: FigureSpec): Shape {
         // A lit zip, and the shoulders in the second tone.
         return (x, yy, z) =>
           z > 0 && Math.abs(x) < 0.0075 * u ? glow : yy > shoulderY - 0.03 * u ? panel : null
-      case 'hoodie':
-        // The cords light up, and so does a ring round each upper arm.
+      case 'hoodie': {
+        // The cords light up, and so does a ring round each upper arm. The pouch across the belly
+        // is a shade of its own.
+        const pouchY = Math.max(hem + 0.075 * u, waistY - 0.035 * u)
+        const pouchW = 0.085 * u * W
+        const fold = foldOf(l.color)
         return (x, yy, z) => {
           if (Math.abs(x) > armX) return Math.abs(yy - band) < 0.008 * u ? glow : null
-          return z > 0 &&
+          if (
+            z > 0 &&
             Math.abs(Math.abs(x) - 0.024 * u) < 0.0065 * u &&
             yy < neckTop - 0.025 * u &&
             yy > neckTop - 0.115 * u
-            ? glow
+          )
+            return glow
+          return z > 0.02 * u &&
+            Math.abs(x) < pouchW - (yy - pouchY) * 0.45 &&
+            Math.abs(yy - pouchY) < 0.055 * u
+            ? fold
             : null
         }
+      }
       case 'joggers': {
         // A lit stripe down the outside of each leg, to a cuff in the second tone.
         const end = legEnd(l)
@@ -1477,11 +1519,15 @@ export function shapeFigure(spec: FigureSpec): Shape {
   }
 
   // Layers render from the stack; colors are flat apart from shoe soles, belt buckles and the
-  // stripes of street clothes.
-  const garmentFields: Field[] = []
+  // stripes of street clothes. None passes through another: each garment drapes over every layer
+  // under it that shares its heights (`drape`), the inner ones already draped in turn.
+  const worn: Underlayer[] = []
   spec.layers.forEach((l, i) => {
     const g = garmentField(l)
-    garmentFields.push(g.f)
+    const under = worn.filter((w) => w.y1 > g.y0 && w.y0 < g.y1)
+    const field = under.length ? drape(g.f, under, u) : g.f
+    // What lies over it reads it from a coarse cached copy, which is plenty to keep clear of.
+    worn.push({ f: lattice(field, 0.01 * u), y0: g.y0, y1: g.y1 })
     const thickSole = l.type === 'sneakers' || l.type === 'hightops'
     const sole = thickSole
       ? SOLE
@@ -1494,7 +1540,7 @@ export function shapeFigure(spec: FigureSpec): Shape {
     parts.push({
       name: `${l.type}#${i}`,
       material: l.material,
-      field: g.f,
+      field,
       ...span(-wideX - pad, wideX + pad, Math.max(-0.01, g.y0), g.y1, -deepZ - pad, deepZ + pad),
       // The ink line shows every step in an edge, so a drawn garment is meshed a little finer.
       near:
@@ -1520,13 +1566,19 @@ export function shapeFigure(spec: FigureSpec): Shape {
     })
     parts[parts.length - 1].paint = paintWith(l.color, parts[parts.length - 1].paint)
     if (g.collar) {
+      // A hood lies down the upper back, so its box reaches further down and back.
+      const hooded = l.type === 'hoodie'
       parts.push({
         name: `${l.type}#${i}.collar`,
         material: l.material,
         field: g.collar,
-        min: [-0.12 * u, neckTop - 0.04 * u, -0.12 * u],
-        max: [0.12 * u, neckTop + (g.collarPaint ? 0.06 : 0.02) * u, 0.12 * u],
-        near: 0.0022,
+        min: [
+          -(hooded ? 0.15 : 0.12) * u,
+          neckTop - (hooded ? 0.18 : 0.04) * u,
+          -(hooded ? 0.2 : 0.12) * u,
+        ],
+        max: [(hooded ? 0.15 : 0.12) * u, neckTop + (g.collarPaint ? 0.06 : 0.02) * u, 0.12 * u],
+        near: hooded ? 0.0035 : 0.0022,
         far: null,
         nearOnly: true,
         weightBy: [...torsoPrims, ...body.filter((p) => p.bone === B('neck'))],
@@ -1966,6 +2018,15 @@ function panelOf(hex: string) {
   const lum = (0.2126 * ((v >> 16) & 255) + 0.7152 * ((v >> 8) & 255) + 0.0722 * (v & 255)) / 255
   if (lum < 0.3) return lighten(hex, 0.2)
   const c = (s: number) => Math.round(((v >> s) & 255) * 0.62)
+  return `#${((c(16) << 16) | (c(8) << 8) | c(0)).toString(16).padStart(6, '0')}`
+}
+
+/** A gentler second tone than `panelOf`: the shade of a fold or a pocket in the same cloth. */
+function foldOf(hex: string) {
+  const v = Number.parseInt(hex.slice(1), 16)
+  const lum = (0.2126 * ((v >> 16) & 255) + 0.7152 * ((v >> 8) & 255) + 0.0722 * (v & 255)) / 255
+  if (lum < 0.3) return lighten(hex, 0.12)
+  const c = (s: number) => Math.round(((v >> s) & 255) * 0.8)
   return `#${((c(16) << 16) | (c(8) << 8) | c(0)).toString(16).padStart(6, '0')}`
 }
 
