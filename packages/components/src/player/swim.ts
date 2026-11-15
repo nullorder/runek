@@ -1,5 +1,5 @@
-// What water does to the avatar: when it wades, swims and dives, and the buoyancy and drag that
-// carry it. Plain numbers in and out, so it is tested without a physics world; `Player` feeds it
+// What water does to the avatar: when it wades, swims, dives and goes under, and the buoyancy and
+// drag that carry it. Plain numbers in and out, so it is tested without a physics world; `Player` feeds it
 // the capsule before every physics step.
 import type { PlayerSwim } from '@runek/core'
 
@@ -21,6 +21,8 @@ const DIVE_DEPTH = 1
 const DIVE_SPEED = 1
 /** A glide ends when the body has risen to this close under its floating height (meters). */
 const SURFACED = 0.15
+/** A body moving down slower than this is taken as at rest (meters per second). */
+const SETTLING = 0.1
 // Buoyancy as a spring to the floating height (1/s² and 1/s), a little under critical damping,
 // so a body bobs once as it comes up. It pulls as if the body were no deeper than `PULL`
 // (meters), so a deep plunge comes up at a swim, not a shot.
@@ -33,9 +35,21 @@ const BAND = 0.05
 // `CLIMB` (meters per second).
 const RISE = 8
 const CLIMB = 2.5
+/** Hauling out over a wall is slower (meters per second): about a second from afloat to on top,
+ *  time enough to see it done. */
+const HAUL = 1.4
 /** The highest ledge over the surface a swimmer is lifted onto (meters): a pool's rim, a low
  *  dock, a step. */
 export const CLIMB_REACH = 0.6
+/** A ledge is a wall to climb out onto, with a climb to show (`SwimState.climb`), when its top
+ *  stands this far over the bed under the body (meters). Lower, it is a step or a bank, and the
+ *  body is lifted up it on its feet. */
+const WALL = 0.9
+// A body held under takes up its speed down at the first rate, and comes to rest at standing
+// height over the bed at the second (1/s): slow enough against the first that it settles there
+// without bouncing.
+const SINK = 6
+const SETTLE = 2
 // Water drag on the speed over the ground (1/s): while a direction is held, and the stronger one
 // that ends a glide when none is.
 const DRAG = 0.5
@@ -89,10 +103,16 @@ export interface SwimSense {
   pushing: boolean
   /** The `run` key is held. */
   sprinting: boolean
+  /** The `dive` control is held: swim down. */
+  diving: boolean
 }
 
+/** What the water has the body doing. Climbing out is told apart from these (`SwimState.climb`):
+ *  it starts as a swim and ends on dry feet. */
+export type SwimPhase = Exclude<PlayerSwim, 'climb'>
+
 export interface SwimState {
-  phase: PlayerSwim | null
+  phase: SwimPhase | null
   /** How much of the body is under the still water, 0 to 1. */
   immersion: number
   /** How far the body is under the height it rests at here (afloat, or standing on a bed that
@@ -102,6 +122,9 @@ export interface SwimState {
   line: number | null
   /** Being lifted out onto a ledge ahead. */
   climbing: boolean
+  /** While that ledge is a wall (a pool's rim, a dock, not a step or a bank): how far the feet
+   *  still are under its top, in world units. Null otherwise. */
+  climb: number | null
 }
 
 export const createSwimState = (): SwimState => ({
@@ -110,7 +133,15 @@ export const createSwimState = (): SwimState => ({
   submerged: 0,
   line: null,
   climbing: false,
+  climb: null,
 })
+
+/** What a body in `state` is doing in water, as its motion says it (`PlayerMotion.swim`). */
+export const swimming = (state: SwimState): PlayerSwim | null =>
+  state.climb === null ? state.phase : 'climb'
+
+/** How far under the height it is going to a body in `state` is (`PlayerMotion.submerged`). */
+export const submersion = (state: SwimState) => state.climb ?? state.submerged
 
 const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1)
 const smooth = (v: number) => v * v * (3 - 2 * v)
@@ -127,8 +158,8 @@ function nextPhase(
   body: SwimBody,
   sense: SwimSense,
   below: number,
-): PlayerSwim | null {
-  const { level, grounded } = sense
+): SwimPhase | null {
+  const { level, grounded, diving } = sense
   if (level === null) return null
   const { height, unit } = shape
   const depth = level - sense.bed
@@ -139,10 +170,18 @@ function nextPhase(
       return state.immersion > SWIM_AT ? 'glide' : 'dive'
     case 'glide':
       if (grounded && depth < STAND_AT * height) return null
+      if (diving) return 'under'
       // Over once the body has gone under, turned, and come back up to where it floats.
       return body.vy >= 0 && below < SURFACED * unit ? 'swim' : 'glide'
+    case 'under':
+      if (depth < STAND_AT * height) return null
+      // Held under for as long as the control is. Let go, it is over once the body is back up
+      // where it floats and no longer on its way down: one resting on a pool's floor never
+      // quite stops settling.
+      return !diving && body.vy > -SETTLING * unit && below < SURFACED * unit ? 'swim' : 'under'
     case 'swim':
-      return depth < STAND_AT * height || state.immersion <= 0 ? null : 'swim'
+      if (depth < STAND_AT * height || state.immersion <= 0) return null
+      return diving && !state.climbing ? 'under' : 'swim'
     default:
       // A body on its feet is judged by the water's depth, as it will be to stand again, so the
       // little its capsule settles can't flip it back and forth.
@@ -163,12 +202,14 @@ function nextPhase(
  * carrying the body this step, so gravity should be left out of it.
  *
  * From the knee up the water takes the body's weight. Afloat, a damped spring holds the capsule
- * at its floating height and follows the swell. Where the bed comes up under it, or a ledge stands
- * ahead of the way it is pushed, the water raises it to standing height over that instead, so a
- * swimmer gets up a bank too steep for the controller's ground spring, up steps, and out onto a
- * pool's rim or a low dock. Wading, the speed over the ground is held to a cap that eases from
- * the land speeds at the knee to the swimming speeds at the waist. Swimming, drag ends a glide
- * and the same cap holds the speed; what a dive carries in over it is shed gradually.
+ * at its floating height and follows the swell. Held under (`sense.diving`), it swims down at the
+ * swimming speed as far as the bed, and floats back up when let go. Where the bed comes up under
+ * it, or a ledge stands ahead of the way it is pushed, the water raises it to standing height
+ * over that instead, so a swimmer gets up a bank too steep for the controller's ground spring, up
+ * steps, and out onto a pool's rim or a low dock. Wading, the speed over the ground is held to a
+ * cap that eases from the land speeds at the knee to the swimming speeds at the waist. Swimming,
+ * drag ends a glide and the same cap holds the speed; what a dive carries in over it is shed
+ * gradually.
  */
 export function stepSwim(state: SwimState, shape: SwimShape, body: SwimBody, sense: SwimSense) {
   const { dt, level } = sense
@@ -179,6 +220,7 @@ export function stepSwim(state: SwimState, shape: SwimShape, body: SwimBody, sen
     state.submerged = 0
     state.line = null
     state.climbing = false
+    state.climb = null
     return false
   }
   // Where the body rests here: afloat, or standing on a bed that is higher.
@@ -186,7 +228,7 @@ export function stepSwim(state: SwimState, shape: SwimShape, body: SwimBody, sen
   const rest = Math.max(afloatAt, sense.bed + shape.feet)
   state.immersion = clamp01((level - (body.y - shape.feet)) / height)
   state.phase = nextPhase(state, shape, body, sense, rest - body.y)
-  const afloat = state.phase === 'swim' || state.phase === 'glide'
+  const afloat = state.phase === 'swim' || state.phase === 'glide' || state.phase === 'under'
   state.submerged = afloat ? rest - body.y : 0
 
   // Where the water is taking it: there, or up onto what stands ahead of a body that swims or
@@ -196,14 +238,25 @@ export function stepSwim(state: SwimState, shape: SwimShape, body: SwimBody, sen
   state.climbing = ledge > rest && (state.climbing || wet)
   const line = state.climbing ? ledge : rest
   const below = line - body.y
+  // A wall out of the water is a climb to show, from when it starts until it is underfoot.
+  const wall = sense.ahead >= level && sense.ahead - sense.bed >= WALL * unit
+  state.climb = state.climbing && (state.climb !== null || wall) ? Math.max(below, 0) : null
   let carried = false
-  if ((afloat || state.climbing || state.immersion > WADE_FROM) && below > -BAND * unit) {
+  if (state.phase === 'under' && sense.diving) {
+    // Down at the swimming speed, easing to a stop at standing height over the bed.
+    const most = sense.sprinting ? shape.swimSprint : shape.swim
+    const room = body.y - (sense.bed + shape.feet)
+    const down = Math.min(most, SETTLE * room)
+    body.vy += (-down - body.vy) * (1 - Math.exp(-SINK * dt))
+    carried = true
+  } else if ((afloat || state.climbing || state.immersion > WADE_FROM) && below > -BAND * unit) {
     // How fast that height is itself moving (a swell, a bank coming up under a swimmer), fed
     // forward so the body keeps up with it.
     const rate = state.line === null || dt <= 0 ? 0 : (line - state.line) / dt
     const moving = Math.min(Math.max(rate, -2 * unit), 2 * unit)
     if (line > afloatAt) {
-      const rise = Math.min(RISE * below + Math.max(moving, 0), CLIMB * unit)
+      const most = state.climb === null ? CLIMB : HAUL
+      const rise = Math.min(RISE * below + Math.max(moving, 0), most * unit)
       // A climb is taken up at just that speed, so it arrives without overshooting. Over a bed
       // the water only lifts: holding a body down to it would keep it off a step.
       body.vy = state.climbing ? Math.max(rise, 0) : Math.max(body.vy, rise)

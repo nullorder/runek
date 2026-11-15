@@ -1,6 +1,6 @@
 ---
 title: "Player"
-summary: "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. The body it carries turns to face the way it walks, and its motion (speed, distance, heading, jumps, where the camera looks) is published every frame for that body and for net code. In open water (an Ocean, a Lake, a Pool) it wades, swims where the water is over half its height, dives when it leaves the ground over deep water, and climbs out onto a bank or a low ledge. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings."
+summary: "First/third-person character controller (ecctrl wrapper). WASD moves; mouse-drag or the arrow keys steer the camera in either view. The body it carries turns to face the way it walks, and its motion (speed, distance, heading, jumps, where the camera looks) is published every frame for that body and for net code. In open water (an Ocean, a Lake, a Pool) it wades, swims where the water is over half its height, dives when it leaves the ground over deep water, swims down under the surface while the `dive` control is held, and climbs out onto a bank or a low ledge. Its third-person camera rides higher over a swimmer, the view turns to the water's color and fog while the camera is under the surface, and it leaves splashes, ripples and a wake. Reads the world's `avatar` setting for its default view and the world's `controls` for key bindings."
 category: component
 component: player
 order: 100
@@ -19,13 +19,13 @@ Pulls `@react-three/drei@^10.7.7`, `@react-three/fiber@^9.6.1`, `@react-three/ra
 ```tsx
 import { Player } from './runek/Player'
 
-<Player position={[0, 0, 0]} />
+<Player position={[0, 0, 0]} seed={1} />
 ```
 
 Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 
 ```json
-{ "type": "Player", "props": { "position": [0, 0, 0] } }
+{ "type": "Player", "props": { "position": [0, 0, 0], "seed": 1 } }
 ```
 
 ## Props
@@ -33,7 +33,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `position` | `[x, y, z]` | `[0, 3, 0]` | Position [x, y, z] in units (1 unit = 1 m, Y-up). |
-| `seed` | `number` |  | Accepted for the component contract; this component has no seeded variation yet. |
+| `seed` | `number` | `1` | Sets how the avatar's splashes scatter. |
 | `view` | `"first" \| "third" \| "overhead"` |  | Camera view: `first` (through the avatar's eyes), `third` (behind it), or `overhead` (high above at a fixed tilt, following it; scroll zooms, WASD walks relative to the screen). Unset defers to the world default (`<World avatar>`); falls back to first-person. An explicit value here always wins. A world `view` control (e.g. `controls: { view: ['KeyV'] }`) cycles the three at runtime. |
 | `yaw` | `number` | `0` | Initial camera yaw in radians (0 faces +z). |
 | `height` | `number` | `1.3` | How tall the avatar is, feet to crown, in meters: the length of its capsule. |
@@ -41,9 +41,10 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `eyeHeight` | `number` |  | Eye height above the feet, in meters: where the first-person camera sits, what the third-person camera turns about, and what others look at when they look at the player. Unset, just under the top of the capsule as it floats (about 1.4 at the default size). |
 | `speed` | `number` | `2.5` | Top walking speed, in meters per second. |
 | `sprintSpeed` | `number` | `5` | Top speed while the `run` key is held, in meters per second. |
-| `swim` | `boolean` | `true` | Swim in open water (an `Ocean`, a `Lake`, a `Pool`). Water slows a walk from the knee up; where it is over half the avatar's height the avatar floats at the surface and swims, and leaving the ground over deep water is a dive. False leaves water as something to look at: the avatar walks the bed under it. |
+| `swim` | `boolean` | `true` | Swim in open water (an `Ocean`, a `Lake`, a `Pool`). Water slows a walk from the knee up; where it is over half the avatar's height the avatar floats at the surface and swims, leaving the ground over deep water is a dive, and holding the world's `dive` control (C) swims down under the surface. False leaves water as something to look at: the avatar walks the bed under it. |
 | `swimSpeed` | `number` | `1.5` | Top swimming speed, in meters per second. Never faster than `speed`. |
 | `swimSprintSpeed` | `number` | `2.6` | Top swimming speed while the `run` key is held, in meters per second: a front crawl on a `Person` body. Never faster than `sprintSpeed`. |
+| `underwater` | `boolean` | `true` | The view from under water: while the camera is below the surface of an `Ocean`, a `Lake` or a `Pool`, the world is fogged with the water's color, as far as the water is clear. False leaves the view as it is above. |
 | `cameraDistance` | `number` | `5` | How far behind the avatar the third-person camera starts, in meters; scrolling zooms from there. |
 | `fov` | `number` | `140` | How wide the first-person view is, in degrees across, on a 16:9 screen. The default, 140, takes in most of what both eyes see, so the world wraps around you instead of sitting behind a window. Like most games it follows the screen's shape, not its size: a wider screen (an ultrawide or curved monitor) keeps the same angle top to bottom and sees more across, up to 200°; a narrower one sees less across, down to 110°, then holds that and opens up top to bottom, until a tall phone screen just shows less across. It is drawn through a gently curved (Panini) lens: true to life straight ahead, the sides squeezed in rather than stretched as a flat camera would. Third-person and overhead keep the world camera's own lens. |
 | `peripheralBlur` | `number` | `4` | How blurred the very edge of the first-person view is, in CSS pixels, easing to sharp toward the centre the way peripheral vision does; turn to look at something and it comes into focus. 0 turns it off. |

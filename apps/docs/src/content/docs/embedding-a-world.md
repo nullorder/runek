@@ -170,13 +170,41 @@ Open water needs no wiring: an `Ocean`, a `Lake` and a `Pool` publish where thei
 - **Wading.** From the knee up the water slows a walk, easing down to the swimming speed at the waist.
 - **Swimming.** Where the still water is over half the avatar's height it floats, its eye just over the surface, riding the swell the water draws. `swimSpeed` (1.5 m/s) is the cruise and `swimSprintSpeed` (2.6 m/s) the pace with the `run` key. It stands again where the water is a little shallower than it started swimming in, so a sloping beach doesn't flip it back and forth.
 - **Diving.** Leaving the ground over water at least a body deep, moving, with the feet 0.3 m or more over the surface, is a dive: head first, a glide under the surface, then up. From a standstill the avatar drops in feet first.
-- **Getting out.** A beach walks out. Swimming into a bank, a step or a ledge up to 0.6 m over the surface (a pool's rim, a low dock) lifts the avatar onto it.
+- **Going under.** Hold the `dive` control (C by default) and a swimmer goes down at the swimming speed, as far as the bed, steering with the movement keys as it does at the surface. Let go and it floats back up. Held through a dive, it carries on down.
+- **Getting out.** A beach walks out. Swimming into a bank, a step or a ledge up to 0.6 m over the surface (a pool's rim, a low dock) lifts the avatar onto it. Over a wall (a ledge out of the water whose top stands 0.9 m or more over the bed) that is a climb, taking about a second.
 
-A `Person` body does the strokes: it treads water when still, swims breaststroke at a cruise and a front crawl at a sprint, and makes an arrow of itself for a dive. Every other `Person` follows the same half-height rule on its own: one placed in deep water treads at the surface, and a walker swims the stretch of its route that crosses water. `swim={false}` on a `Player` or a `Person` leaves water as something to look at.
+A `Person` body does the strokes: it treads water when still, swims breaststroke at a cruise and a front crawl at a sprint, makes an arrow of itself for a dive, pulls and kicks its way along under water, and climbs out hands first, pressing up and bringing a knee onto the top. Every other `Person` follows the same half-height rule on its own: one placed in deep water treads at the surface, and a walker swims the stretch of its route that crosses water. `swim={false}` on a `Player` or a `Person` leaves water as something to look at.
 
-`playerMotion.swim` is `'swim'`, `'dive'`, `'glide'` or `null`; `immersion` is how much of the body is under the still water (0 to 1); `submerged` is how far it is below where it floats. A pose source that wants to do the strokes itself adds a `swim(ctx, out)` method beside `update` and reads `ctx.swim`; without one it isn't asked while its figure is in the water, and the built-in strokes play.
+`playerMotion.swim` is `'swim'`, `'dive'`, `'glide'`, `'under'`, `'climb'` or `null`; `immersion` is how much of the body is under the still water (0 to 1); `submerged` is how far it is below where it floats, or during a `'climb'` how far its feet still are under the top. A pose source that wants to do the strokes itself adds a `swim(ctx, out)` method beside `update` and reads `ctx.swim`; without one it isn't asked while its figure is in the water, and the built-in strokes play.
 
-Not yet: swimming down under the surface on purpose, an underwater view, and splashes.
+### The camera in the water
+
+In third person the camera rides higher behind a swimmer, at least 20 degrees over an avatar afloat at the surface, so it looks down at the water instead of skimming it. The mouse and the look keys raise it further. Under water it goes back to following level, and comes down with a diver.
+
+While the camera is below the surface the view is the water's: the world's fog takes the water's color and closes in to how far that water is clear (30 m in an `Ocean`, 16 in a `Lake`, 40 in a `Pool`), and a backdrop of the same color stands in for the sky and whatever lies further off. Looking up, an `Ocean` or a `Lake` shows its underside: the sky's light through a window overhead, the sun where it comes down through the surface, and what floats or stands over the water seen through it. Back above the surface the world's fog is as it was. `underwater={false}` on the `Player` leaves the view alone, and a world with a camera of its own can mount the same helper beside it:
+
+```tsx
+import { Underwater } from './runek/player/Underwater'
+
+<World>
+  <MyCameraRig />
+  <Underwater />
+</World>
+```
+
+### Splashes and wakes
+
+A body in water marks it. Going in is a splash sized by the fall: a ripple from a walk, rings and thrown drops from a dive. Swimming leaves a ring every half meter, and the line of them opens into a wake; treading water or wading leaves a slow ring now and then. The `Player` draws its own (in first person too) and every other `Person` in water draws its own, as two instanced draws that are made the first time a body is in water and cost nothing before. `Player`'s `seed` sets how its splashes scatter. For a body of your own, `WaterTrail` takes a record you fill each frame:
+
+```tsx
+import { WaterTrail } from './runek/water/trail'
+
+// wet: in the water and breaking its surface. y: the water's surface there. fall: speed downward.
+const source = useRef({ wet: false, x: 0, y: 0, z: 0, fall: 0 })
+<WaterTrail source={source} seed={7} />
+```
+
+Not yet: a touch or gamepad button for going under, bubbles, and ledges higher than 0.6 m (a ship's side).
 
 ## Seats, ladders and wading
 

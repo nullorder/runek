@@ -1,6 +1,6 @@
 ---
 title: "Lake"
-summary: "Procedural animated-shader water surface (no textures); place its surface at or below ground level. A Player or a Person swims in it where the ground under it leaves the water over half their height."
+summary: "Procedural animated-shader water surface (no textures); place its surface at or below ground level. A Player or a Person swims in it where the ground under it leaves the water over half their height, and it is drawn from below for a swimmer who goes under."
 category: component
 component: lake
 order: 100

@@ -86,19 +86,22 @@ export interface PlayerMotion {
   sag?: number
   /** What the body is doing in water, or null out of it and while it wades. `dive`: in the air,
    *  head first, on its way into water deep enough to take it. `glide`: under the surface after a
-   *  dive, on its way back up. `swim`: afloat, in water over half its height. Unset on a `Player`
-   *  vendored before swimming. */
+   *  dive, on its way back up. `swim`: afloat, in water over half its height. `under`: swimming
+   *  down or along under the surface while the `dive` control is held, and on its way back up
+   *  after. `climb`: being lifted out onto a wall ahead (a pool's rim, a dock). Unset on a
+   *  `Player` vendored before swimming. */
   swim?: PlayerSwim | null
   /** How much of the body is under the still water, feet to crown: 0 dry, 1 covered. */
   immersion?: number
   /** How far a swimming body is under the height it rests at (afloat, or standing where the
-   *  water is too shallow to float), in world units: 0 at rest, more after a dive or a drop into
-   *  the water, less than 0 while it is over it (dropping in, climbing out). */
+   *  water is too shallow to float), in world units: 0 at rest, more after a dive, a drop into
+   *  the water or a swim down, less than 0 while it is over it (dropping in). During a `climb`:
+   *  how far its feet still are under the top of the wall. */
   submerged?: number
 }
 
 /** What a body is doing in water (`PlayerMotion.swim`). */
-export type PlayerSwim = 'dive' | 'glide' | 'swim'
+export type PlayerSwim = 'dive' | 'glide' | 'swim' | 'under' | 'climb'
 
 /** Where a held avatar is (`PlayerControl.pin`). Whoever holds it may change `feet` and `climb`
  *  from frame to frame. */

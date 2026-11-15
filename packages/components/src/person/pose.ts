@@ -37,11 +37,13 @@ export interface PoseContext {
    *  (`PlayerControl.pin`). The climbing cycle follows it. Null when not climbing. */
   climb: number | null
   /** What the figure is doing in water: `swim` afloat, `dive` in the air head first on its way
-   *  in, `glide` under the surface after a dive. Null on land and while it wades. The figure
-   *  lies down and keeps to the surface by itself; a source's `swim` fills the stroke. */
+   *  in, `glide` under the surface after a dive, `under` swimming down or along beneath it,
+   *  `climb` getting out over a wall. Null on land and while it wades. The figure lies down and
+   *  keeps to the surface by itself; a source's `swim` fills the stroke. */
   swim: PlayerSwim | null
   /** How far a swimming figure is under the height it rests at, in world units: more than 0
-   *  after a dive or a drop into the water, less while it is over it (climbing out). */
+   *  after a dive, a drop into the water or a swim down, less while it is over it. During a
+   *  `climb`: how far the top of the wall still is over its feet. */
   submerged: number
   /** Where the figure stands in the world this frame, for a source that places footfalls. */
   position: [number, number, number]

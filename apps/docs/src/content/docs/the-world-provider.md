@@ -52,7 +52,8 @@ import { Player } from './runek/Player'
 
 Input bindings are a world setting, not a hardcode. The defaults move with
 WASD and steer the camera with the arrow keys (Left/Right turn, Up/Down look
-— in first *and* third person, composing with mouse-drag). Override any
+— in first *and* third person, composing with mouse-drag). Space jumps, Shift
+runs, and C, held, swims down under water (the `dive` action). Override any
 subset; the rest keep their defaults:
 
 ```tsx
@@ -235,26 +236,36 @@ the avatar through the same call.
 `distance` covered, `vertical` speed, `grounded`, the body's `heading`, and where the camera
 looks relative to it (`lookYaw`, `lookPitch`). It is written in place after every physics step,
 so keep the ref and read it whenever you need it, a network send included. In water it also
-says what the body is doing (`swim`: `'swim'`, `'dive'`, `'glide'` or `null`), how much of it is
-under (`immersion`, 0 to 1) and how far it is below where it floats (`submerged`). The body
+says what the body is doing (`swim`: `'swim'`, `'dive'`, `'glide'`, `'under'`, `'climb'` or
+`null`), how much of it is under (`immersion`, 0 to 1) and how far it is below where it floats
+(`submerged`; during a `'climb'`, how far its feet still are under the top of the wall). The body
 `Player` carries reads the same record through `PlayerMotionContext` (see [embedding a
 world](/docs/embedding-a-world#several-players-one-world) for feeding a remote copy).
 
 `useWorld().waters` is every body of water a figure can get into: an `Ocean`, a `Lake` and a
 `Pool` each publish themselves with `useWater` while mounted. `waterAt(waters, x, top, z)`
-answers with the water over a point (its still `level` and the `swell` on it now) for something
-whose highest point is `top`, or `null` where there is none. `Player` and `Person` ask it every
-frame, which is all it takes for them to wade, swim and dive; your own floating crate or boat
-can ask the same way. A water component of your own joins in with one call:
+answers with the water over a point (its still `level`, the `swell` on it now, and the `body`
+of water it is) for something whose highest point is `top`, or `null` where there is none.
+`Player` and `Person` ask it every frame, which is all it takes for them to wade, swim and
+dive; your own floating crate or boat can ask the same way. A water component of your own
+joins in with one call:
 
 ```tsx
 import { planeWater, useWater } from '@runek/core'
 
 const mesh = useRef<Mesh>(null)
-// A flat sheet in the mesh's local X-Y plane, 8 by 5, with a floor 1.2 below it.
-const water = useMemo(() => planeWater(() => mesh.current, [8, 5], { depth: 1.2 }), [])
+// A flat sheet in the mesh's local X-Y plane, 8 by 5, with a floor 1.2 below it, murky green
+// from inside: a camera under it sees 6 units through it.
+const water = useMemo(
+  () => planeWater(() => mesh.current, [8, 5], { depth: 1.2, color: '#3f6b4f', clarity: 6 }),
+  [],
+)
 useWater(water)
 ```
+
+`color` and `clarity` are what the water looks like from inside: while a `Player`'s camera is
+under the surface, the world's fog takes that color and closes at that distance. Draw the
+sheet on both sides (`side: DoubleSide`) so there is a surface to look up at.
 
 `useWorld().materials` holds the world's slot answers (absent when it gives none); `useMaterial` reads it for you.
 
