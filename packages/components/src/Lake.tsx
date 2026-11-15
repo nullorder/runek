@@ -1,9 +1,10 @@
 import { useFrame } from '@react-three/fiber'
-import { lazyModule, useNodeRenderer, useWorld, type Vec3 } from '@runek/core'
-import { useEffect, useMemo } from 'react'
+import { lazyModule, planeWater, useNodeRenderer, useWater, useWorld, type Vec3 } from '@runek/core'
+import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { WaterShape } from './nodes/water'
 import { lakeSurface } from './surfaces/lake'
+import { swellAt } from './surfaces/water'
 
 // The WebGPU (TSL) twin of the shader below, loaded only under a node renderer.
 const waterNodes = lazyModule(() => import('./nodes/water'))
@@ -102,9 +103,10 @@ const FRAGMENT = /* glsl */ `
   }
 `
 
-/** Procedural animated water (no textures), decorative (no collider). The local
- *  origin is the water surface: place it at or below the surrounding ground so it
- *  fills a depression rather than floating (CONTRACT §10). */
+/** Procedural animated water (no textures, no collider). The local origin is the water
+ *  surface: place it at or below the surrounding ground so it fills a depression rather than
+ *  floating (CONTRACT §10). It is water a `Player` or a `Person` swims in wherever the ground
+ *  under it leaves the water over half their height. */
 export function Lake({
   position,
   rotation = [0, 0, 0],
@@ -142,12 +144,28 @@ export function Lake({
   )
   useEffect(() => () => nodeMaterial?.dispose(), [nodeMaterial])
 
+  const meshRef = useRef<THREE.Mesh>(null)
+  const water = useMemo(
+    () =>
+      planeWater(() => meshRef.current, [w, d], {
+        wave: (lx, ly) =>
+          swellAt(WATER, lx, ly, uniforms.uTime.value * uniforms.uWaveSpeed.value) *
+          uniforms.uWaveHeight.value,
+      }),
+    [w, d, uniforms],
+  )
+  useWater(water)
+
   useFrame((_, delta) => {
     uniforms.uTime.value += delta
   })
 
   return (
-    <mesh position={pos} rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}>
+    <mesh
+      ref={meshRef}
+      position={pos}
+      rotation={[-Math.PI / 2 + rotation[0], rotation[1], rotation[2]]}
+    >
       <planeGeometry args={[w, d, segments, segments]} />
       {nodeMaterial ? (
         <primitive object={nodeMaterial} attach="material" />
