@@ -8563,7 +8563,7 @@
         },
         "steps": {
           "type": "boolean",
-          "description": "Build exit steps into one corner of the basin.",
+          "description": "Build exit steps into one corner of the basin, walkable from the floor up onto the coping.",
           "default": true
         },
         "copingColor": {

@@ -6804,7 +6804,7 @@
       },
       "steps": {
         "type": "boolean",
-        "doc": "Build exit steps into one corner of the basin.",
+        "doc": "Build exit steps into one corner of the basin, walkable from the floor up onto the coping.",
         "optional": true,
         "default": true
       },

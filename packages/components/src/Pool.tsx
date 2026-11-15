@@ -1,4 +1,4 @@
-import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import { ConvexHullCollider, CuboidCollider, RigidBody } from '@react-three/rapier'
 import { planeWater, useMaterials, useWater, useWorld, type WorldComponentProps } from '@runek/core'
 import { useMemo, useRef } from 'react'
 import type { Mesh } from 'three'
@@ -10,7 +10,7 @@ export interface PoolProps extends WorldComponentProps {
   depth?: number
   /** Coping ledge width around the rim, in units. */
   coping?: number
-  /** Build exit steps into one corner of the basin. */
+  /** Build exit steps into one corner of the basin, walkable from the floor up onto the coping. */
   steps?: boolean
   /** Coping color; defaults to the world palette's `wall` slot. */
   copingColor?: string
@@ -67,12 +67,51 @@ export function Pool({
   )
   useWater(water)
 
+  // The exit flight climbs one wall from the floor to the coping. Its treads are a riser apart
+  // down from the coping, each standing on the floor so it doubles as its own riser. One wedge
+  // over their nosings carries the avatar: a capsule floating on a spring stalls at a riser
+  // taller than its float height, and walks straight up a slope.
+  const flight = useMemo(() => {
+    if (!steps) return null
+    const floorTop = -dep + wallT
+    const rise = lip - floorTop
+    const riser = 0.25 * unit
+    // A 0.4 tread to each riser pitches it at 32°, steeper only where the basin is too short.
+    const length = Math.min((rise / riser) * 0.4 * unit, w - wallT)
+    const run = (length * riser) / rise
+    const width = Math.min(0.8 * unit, d - wallT * 2)
+    const z = halfD - wallT - width / 2
+    // The lowest riser takes up what is left: half a riser to one and a half.
+    const count = Math.max(0, Math.round(rise / riser) - 1)
+    const treads = Array.from({ length: count }, (_, i) => {
+      const top = lip - riser * (i + 1)
+      const front = halfW - run * (i + 1)
+      const back = Math.min(front + run, halfW - wallT)
+      return { x: (front + back) / 2, y: (top + floorTop) / 2, w: back - front, h: top - floorTop }
+    }).filter((t) => t.w > 0)
+    const profile = [
+      [halfW - length, floorTop],
+      [halfW, floorTop],
+      [halfW, lip],
+    ]
+    const ramp = new Float32Array(
+      [z - width / 2, z + width / 2].flatMap((side) => profile.flatMap(([x, y]) => [x, y, side])),
+    )
+    return { treads, ramp, z, width }
+  }, [steps, w, d, dep, lip, wallT, halfW, halfD, unit])
+
   const copingRun = [
     // [x, z, length, depth-extent, rotY] — four ledge boxes framing the water
     { x: 0, z: -halfD - c / 2, w: w + c * 2, d: c },
     { x: 0, z: halfD + c / 2, w: w + c * 2, d: c },
     { x: -halfW - c / 2, z: 0, w: c, d },
     { x: halfW + c / 2, z: 0, w: c, d },
+  ]
+  const walls = [
+    { x: 0, z: -halfD + wallT / 2, w, d: wallT },
+    { x: 0, z: halfD - wallT / 2, w, d: wallT },
+    { x: -halfW + wallT / 2, z: 0, w: wallT, d },
+    { x: halfW - wallT / 2, z: 0, w: wallT, d },
   ]
 
   return (
@@ -88,13 +127,7 @@ export function Pool({
           <boxGeometry args={[s.w, lip * 2, s.d]} />
         </mesh>
       ))}
-      {/* basin walls */}
-      {[
-        { x: 0, z: -halfD + wallT / 2, w, d: wallT },
-        { x: 0, z: halfD - wallT / 2, w, d: wallT },
-        { x: -halfW + wallT / 2, z: 0, w: wallT, d },
-        { x: halfW - wallT / 2, z: 0, w: wallT, d },
-      ].map((s) => (
+      {walls.map((s) => (
         <mesh
           key={`b${s.x.toFixed(3)}:${s.z.toFixed(3)}`}
           material={m.basin}
@@ -117,26 +150,25 @@ export function Pool({
       >
         <planeGeometry args={[w - wallT * 2, d - wallT * 2]} />
       </mesh>
-      {steps &&
-        [0, 1, 2].map((i) => {
-          // Corner stack descending into the basin: tread i tops out at -stepH·(i+1)
-          // and drops to the floor, so each box doubles as its own riser.
-          const stepH = dep / 4
-          const run = 0.4 * unit
-          const top = -stepH * (i + 1)
-          const boxH = dep - stepH * (i + 1)
-          const x = halfW - wallT - run * (i + 0.5)
-          const z = halfD - wallT - run
-          return (
-            <group key={`s${i}`}>
-              <mesh material={m.basin} receiveShadow position={[x, top - boxH / 2, z]}>
-                <boxGeometry args={[run, boxH, run * 2]} />
-              </mesh>
-              <CuboidCollider args={[run / 2, boxH / 2, run]} position={[x, top - boxH / 2, z]} />
-            </group>
-          )
-        })}
+      {flight?.treads.map((t) => (
+        <mesh
+          key={`s${t.x.toFixed(3)}`}
+          material={m.basin}
+          receiveShadow
+          position={[t.x, t.y, flight.z]}
+        >
+          <boxGeometry args={[t.w, t.h, flight.width]} />
+        </mesh>
+      ))}
+      {flight && <ConvexHullCollider args={[flight.ramp]} />}
       <CuboidCollider args={[w / 2, wallT / 2, d / 2]} position={[0, -dep + wallT / 2, 0]} />
+      {walls.map((s) => (
+        <CuboidCollider
+          key={`w${s.x.toFixed(3)}:${s.z.toFixed(3)}`}
+          args={[s.w / 2, dep / 2, s.d / 2]}
+          position={[s.x, -dep / 2, s.z]}
+        />
+      ))}
       <CuboidCollider args={[w / 2 + c, lip, c / 2]} position={[0, 0, -halfD - c / 2]} />
       <CuboidCollider args={[w / 2 + c, lip, c / 2]} position={[0, 0, halfD + c / 2]} />
       <CuboidCollider args={[c / 2, lip, d / 2]} position={[-halfW - c / 2, 0, 0]} />
