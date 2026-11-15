@@ -205,6 +205,49 @@ function BodyFacing({
   return null
 }
 
+/** The unseen box ecctrl casts its slope ray down from, kept beside whatever the avatar carries. */
+function findSlopeRay(beside: Object3D | null): Object3D | null {
+  return (
+    beside?.parent?.children.find(
+      (o) =>
+        o.type === 'Mesh' &&
+        (o.userData as { camExcludeCollision?: boolean }).camExcludeCollision === true,
+    ) ?? null
+  )
+}
+
+/** Keep ecctrl's slope ray ahead of the way the avatar is going. ecctrl finds the slope under a
+ *  point in front of the camera and tilts its push to match. It swings that point round to the
+ *  direction of travel only as part of its auto-balance, which is off here, so an avatar backing
+ *  down a slope or walking across one was read as climbing it and held well under its pace. */
+function SlopeRay({
+  body,
+  beside,
+}: {
+  body: RefObject<CustomEcctrlRigidBody | null>
+  /** Anything drawn straight inside ecctrl, where its slope ray's box is. */
+  beside: RefObject<Object3D | null>
+}) {
+  const scene = useThree((s) => s.scene)
+  const pivot = useRef<Object3D | null>(null)
+  const origin = useRef<Object3D | null>(null)
+  useFrame(() => {
+    const rb = body.current?.group
+    origin.current ??= findSlopeRay(beside.current)
+    pivot.current ??= findPivot(scene)
+    const from = origin.current
+    if (!rb || !from || !pivot.current) return
+    const v = rb.linvel()
+    if (Math.hypot(v.x, v.z) < TURNS_AT) return
+    // ecctrl squares the box's group to the camera, so the box is turned from the camera's way.
+    const turn = Math.atan2(v.x, v.z) - pivot.current.rotation.y
+    const reach = Math.hypot(from.position.x, from.position.z)
+    from.position.x = reach * Math.sin(turn)
+    from.position.z = reach * Math.cos(turn)
+  })
+  return null
+}
+
 /** Lower the body the avatar carries onto the ground. ecctrl holds the capsule `FLOAT_HEIGHT`
  *  above it on a spring, applied as one impulse a frame against a frame's worth of gravity, so
  *  the capsule settles lower by m·g·dt / k. Dropping the body by the rest stands its feet (the
@@ -1079,6 +1122,7 @@ export function Player({
       <object3D ref={eyes} position={[0, eyeOffset, 0]} />
       <CameraKeyLook pitchable={!cam.locked} />
       <BodyFacing turn={turn} motion={motion} />
+      <SlopeRay body={body} beside={eyes} />
       {firstPerson && <PaniniLens fov={fov} blur={peripheralBlur} />}
       {!firstPerson && (
         <CameraBoom

@@ -6811,7 +6811,7 @@
       },
       "steps": {
         "type": "boolean",
-        "doc": "Build exit steps into one corner of the basin.",
+        "doc": "Build exit steps into one corner of the basin, walkable from the floor up onto the coping.",
         "optional": true,
         "default": true
       },
@@ -9438,6 +9438,12 @@
       "falloff": {
         "type": "number",
         "doc": "Radial island falloff (0 = off). When set, the ground domes up toward the center and\nsinks below the world ground at its rim, so the mesh reads as a landmass surrounded by\nwater. The value is the fraction of the half-extent that stays land before the coast\n(e.g. 0.8 = land out to 80% of the radius, then a shoreline into the sea).",
+        "optional": true,
+        "default": 0
+      },
+      "shore": {
+        "type": "number",
+        "doc": "Width of a beach around an island, in units (0 = off; needs `falloff`). Past the land's\nedge the ground falls 2 units across this band at one slope, from 0.4 above the world\nground to wading depth, then drops to the deep; land near the coast is lowered to meet\nit. So the beach is as gentle as it is wide: 6 slopes at about 18°, which an avatar\nwalks up out of the sea, where a small island's bare coast is close to a cliff. It\nwidens the island, so leave room for it inside `size`.",
         "optional": true,
         "default": 0
       },

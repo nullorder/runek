@@ -73,6 +73,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instanced draws that exist only once a body has been in water.
   `Player`'s `seed` sets how its splashes scatter. `water/trail.tsx`
   exports `WaterTrail` for a body of your own.
+- `Terrain` gains `shore`: the width, in units, of a beach around an
+  island (one with `falloff`). Past the land's edge the ground falls 2
+  units across it at one slope, from just above the world ground to
+  wading depth, before it drops to the deep, so an avatar can walk up
+  out of the sea: `shore: 6` slopes at about 18°, where the coast of a
+  small island without it runs past 60°. Land near the coast is lowered
+  to meet the beach. Worlds that don't set `shore` keep every height
+  they had. The workshop's "Island cove" template has one, and its dock
+  now starts on the beach.
 
 ### Changed
 
@@ -106,6 +115,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Person`: a `belt` accessory goes on the bottoms under a top that hangs
   over the waist (a hoodie, a jacket) instead of round it, and stays over
   a tunic, coat, dress or robe.
+- `Pool`'s exit steps can be walked: the stock `Player` climbs from the
+  basin floor onto the deck and back down. The steps were three 0.4 m
+  blocks with a 0.47 m rise to the coping, taller than the avatar floats
+  above the ground, so it stalled against them. The flight now has
+  0.25 m risers, as many as the depth needs, under one sloped collider
+  that ends level with the coping.
+- `Pool`'s basin walls are solid. They were drawn without colliders, so
+  an avatar walking into one from the basin floor was pressed under the
+  coping, went out through the wall and fell off the edge of the basin
+  floor.
+- `Player` keeps its pace on a slope whichever way it walks. Backing
+  down a 32° ramp went 0.6 m/s and walking across it 0.9 m/s, against
+  2.2 and 2.5 facing the way it went, and stairs taken backwards were
+  slow the same way. ecctrl's slope ray stayed in front of the camera;
+  it now leads the way the avatar is moving.
 
 ## [0.18.0](https://github.com/nullorder/runek/compare/v0.17.0...v0.18.0) - 2026-11-14
 

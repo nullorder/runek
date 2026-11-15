@@ -9,6 +9,7 @@ export const RANGES: Record<string, Record<string, [number, number, number]>> = 
     frequency: [0.005, 0.2, 0.005],
     flatRadius: [0, 60, 0.5],
     falloff: [0, 1, 0.01],
+    shore: [0, 20, 0.5],
   },
   Grass: { count: [0, 6000, 50], sway: [0, 3, 0.05] },
   Person: {
