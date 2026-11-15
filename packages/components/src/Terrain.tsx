@@ -30,6 +30,13 @@ export interface TerrainProps {
    *  water. The value is the fraction of the half-extent that stays land before the coast
    *  (e.g. 0.8 = land out to 80% of the radius, then a shoreline into the sea). */
   falloff?: number
+  /** Width of a beach around an island, in units (0 = off; needs `falloff`). Past the land's
+   *  edge the ground falls 2 units across this band at one slope, from 0.4 above the world
+   *  ground to wading depth, then drops to the deep; land near the coast is lowered to meet
+   *  it. So the beach is as gentle as it is wide: 6 slopes at about 18°, which an avatar
+   *  walks up out of the sea, where a small island's bare coast is close to a cliff. It
+   *  widens the island, so leave room for it inside `size`. */
+  shore?: number
   /** Register a collider (default true). Set false for distant/backdrop terrain the player
    *  never walks, to skip a large trimesh collider. */
   collider?: boolean
@@ -60,6 +67,7 @@ export function Terrain({
   frequency = TERRAIN_DEFAULTS.frequency,
   flatRadius = TERRAIN_DEFAULTS.flatRadius,
   falloff = TERRAIN_DEFAULTS.falloff,
+  shore = TERRAIN_DEFAULTS.shore,
   collider = true,
   seed = TERRAIN_DEFAULTS.seed,
 }: TerrainProps) {
@@ -78,11 +86,20 @@ export function Terrain({
     () =>
       relief > 0
         ? terrainGeometry(
-            { size: [sizeX, sizeZ], relief, resolution, frequency, flatRadius, falloff, seed },
+            {
+              size: [sizeX, sizeZ],
+              relief,
+              resolution,
+              frequency,
+              flatRadius,
+              falloff,
+              shore,
+              seed,
+            },
             unit,
           )
         : null,
-    [sizeX, sizeZ, resolution, relief, frequency, flatRadius, falloff, seed, unit],
+    [sizeX, sizeZ, resolution, relief, frequency, flatRadius, falloff, shore, seed, unit],
   )
   useEffect(() => () => displaced?.dispose(), [displaced])
 

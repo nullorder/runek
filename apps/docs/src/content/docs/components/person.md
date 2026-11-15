@@ -39,7 +39,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `age` | `"child" \| "adult" \| "elder"` | `"adult"` | Head-to-body ratio, stature, and (for `elder`) a stooped spine. |
 | `body` | `PersonBodySpec` |  | The body: `build`, skin `tone`, and `height`. The flat props below are shorthands for the same fields; when both are set, this object wins. |
 | `face` | `PersonFaceSpec` |  | The face, part by part: eye color and size, brow color and weight, nose shape, lip color and fullness, blush. |
-| `clothes` | `PersonGarment[]` |  | Clothing layers, inner to outer, each with its own type, color, and options. The order decides the fit: a shirt listed before the jeans is tucked in. Replaces `outfit`; `[]` is the bare base body (a smooth mannequin). |
+| `clothes` | `PersonGarment[]` |  | Clothing layers, inner to outer, each with its own type, color, and options. The order decides the fit: a shirt listed before the jeans is tucked in, and each layer drapes over the ones listed before it. Replaces `outfit`; `[]` is the bare base body (a smooth mannequin). |
 | `height` | `number` |  | Standing height, in units. Every other measurement derives from it. |
 | `build` | `"slim" \| "average" \| "stocky" \| "athletic" \| "heavy" \| "petite" \| "lanky"` |  | Limb thickness and torso depth. Seeded when unset. |
 | `skinTone` | `color` |  | Skin color; seeded from a curated set of tones when unset. |
@@ -53,7 +53,7 @@ Or as a node in a world file ([worlds as data](/docs/worlds-as-data)):
 | `shoeColor` | `color` |  | Footwear color; defaults to the palette's `metal`. |
 | `trimColor` | `color` |  | The lit seams and stripes of street clothes (`runner`, `shell`, `rig`, `street`, a hoodie's cords) and a visor's slit. Defaults to a lamp color picked by the seed. They shine on a `punk` figure and are plain color on the others. |
 | `hat` | `"none" \| "cap" \| "straw" \| "brim" \| "bandana" \| "hood" \| "chef" \| "beanie"` |  |  |
-| `accessories` | `"belt" \| "scarf" \| "cape" \| "bag" \| "glasses" \| "staff" \| "headphones" \| "mask" \| "backpack" \| "visor"[]` |  |  |
+| `accessories` | `"belt" \| "scarf" \| "cape" \| "bag" \| "glasses" \| "staff" \| "headphones" \| "mask" \| "backpack" \| "visor"[]` |  | Worn extras. A `belt`, `scarf` or `cape` becomes a clothing layer on the outside of an `outfit`, except a belt under a top that hangs over the waist (a hoodie, a jacket), which goes on the bottoms beneath it. |
 | `pose` | `"stand" \| "sit" \| "lean" \| "work" \| "wave" \| "type" \| "play" \| "drink" \| "lie"` | `"stand"` | What the figure is doing when it isn't walking. `sit` and `type` need a seat under them (`type` is seated at a desk, fingers tapping); `work` leans over a counter; `play` works controls at waist height; `drink` holds a mug and sips from it now and then; `lie` lies on its back centered on `position`, head toward local -Z, so it takes a `Bed`'s position and rotation at mattress height. |
 | `patrol` | `[x, y, z][]` |  | Walk these waypoints, relative to `position` and turning with `rotation`, in units. Height follows the ground; a waypoint's y lifts the figure above it. |
 | `wander` | `number` |  | Wander a seeded loop of five points within this radius of `position`, in units. `patrol` wins when both are set. |

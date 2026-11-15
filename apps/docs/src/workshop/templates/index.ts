@@ -162,6 +162,7 @@ export const TEMPLATES: Template[] = [
             size: [44, 44],
             relief: 3,
             falloff: 0.55,
+            shore: 6,
             flatRadius: 7,
             seed: 12,
             color: '#d8c79a',
@@ -174,8 +175,8 @@ export const TEMPLATES: Template[] = [
         })),
         { type: 'Campfire', anchor: 'ground', props: { position: [0, 0, 0], seed: 2 } },
         { type: 'Rocks', anchor: 'ground', props: { position: [-4, 0, 3], count: 5, seed: 7 } },
-        { type: 'Dock', props: { position: [0, 0, 19], length: 9, seed: 3 } },
-        { type: 'Sailboat', props: { position: [4, -0.2, 24], rotation: [0, 0.6, 0], seed: 5 } },
+        { type: 'Dock', props: { position: [0, 0, 9.4], length: 9, seed: 3 } },
+        { type: 'Sailboat', props: { position: [4, -0.2, 15.5], rotation: [0, 0.6, 0], seed: 5 } },
         {
           type: 'Person',
           anchor: 'ground',

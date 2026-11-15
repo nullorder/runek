@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nullorder/runek/compare/v0.18.0...HEAD)
 
+### Added
+
+- `Terrain` gains `shore`: the width, in units, of a beach around an
+  island (one with `falloff`). Past the land's edge the ground falls 2
+  units across it at one slope, from just above the world ground to
+  wading depth, before it drops to the deep, so an avatar can walk up
+  out of the sea: `shore: 6` slopes at about 18°, where the coast of a
+  small island without it runs past 60°. Land near the coast is lowered
+  to meet the beach. Worlds that don't set `shore` keep every height
+  they had. The workshop's "Island cove" template has one, and its dock
+  now starts on the beach.
+
 ### Fixed
 
 - `Person`: no clothing layer passes through another. Each garment sits a
